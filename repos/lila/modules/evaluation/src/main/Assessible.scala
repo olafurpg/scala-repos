@@ -45,7 +45,7 @@ case class Assessible(analysed: Analysed) {
       moderateBlurRate(color),
       consistentMoveTimes(Pov(game, color)),
       noFastMoves(Pov(game, color)),
-      suspiciousHoldAlert(color)
+      suspiciousHoldAlert(color),
   )
 
   private val T = true
@@ -114,6 +114,6 @@ case class Assessible(analysed: Analysed) {
         mtAvg = mtAvg(color),
         mtSd = mtSd(color),
         blurs = blurs(color),
-        hold = hold(color)
+        hold = hold(color),
     )
 }

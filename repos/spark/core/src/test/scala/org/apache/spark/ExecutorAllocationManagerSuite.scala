@@ -825,7 +825,7 @@ class ExecutorAllocationManagerSuite
             TaskLocation("host3"),
             TaskLocation("host4")),
         Seq.empty,
-        Seq.empty
+        Seq.empty,
     )
     val stageInfo1 = createStageInfo(1, 5, localityPreferences1)
     sc.listenerBus.postToAll(SparkListenerStageSubmitted(stageInfo1))
@@ -841,7 +841,7 @@ class ExecutorAllocationManagerSuite
         Seq(TaskLocation("host3"),
             TaskLocation("host4"),
             TaskLocation("host5")),
-        Seq.empty
+        Seq.empty,
     )
     val stageInfo2 = createStageInfo(2, 3, localityPreferences2)
     sc.listenerBus.postToAll(SparkListenerStageSubmitted(stageInfo2))
@@ -1004,7 +1004,7 @@ private object ExecutorAllocationManagerSuite extends PrivateMethodTester {
   private def createStageInfo(
       stageId: Int,
       numTasks: Int,
-      taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty
+      taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty,
   ): StageInfo = {
     new StageInfo(stageId,
                   0,

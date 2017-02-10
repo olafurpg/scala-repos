@@ -42,7 +42,7 @@ private[testadapter] object EventSerializers {
       val selector: Selector,
       val status: Status,
       val throwable: OptionalThrowable,
-      val duration: Long
+      val duration: Long,
   )
       extends Event
 }

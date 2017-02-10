@@ -91,7 +91,7 @@ private[v1] object AllStagesResource {
                 shuffleRead = summary.shuffleRead,
                 shuffleWrite = summary.shuffleWrite,
                 memoryBytesSpilled = summary.memoryBytesSpilled,
-                diskBytesSpilled = summary.diskBytesSpilled
+                diskBytesSpilled = summary.diskBytesSpilled,
             )
         })
       } else {
@@ -128,7 +128,7 @@ private[v1] object AllStagesResource {
         details = stageInfo.details,
         accumulatorUpdates = accumulableInfo,
         tasks = taskData,
-        executorSummary = executorSummary
+        executorSummary = executorSummary,
     )
   }
 
@@ -139,7 +139,7 @@ private[v1] object AllStagesResource {
           StageStatus.ACTIVE -> listener.activeStages.values.toSeq,
           StageStatus.COMPLETE -> listener.completedStages.reverse.toSeq,
           StageStatus.FAILED -> listener.failedStages.reverse.toSeq,
-          StageStatus.PENDING -> listener.pendingStages.values.toSeq
+          StageStatus.PENDING -> listener.pendingStages.values.toSeq,
       )
     }
   }
@@ -158,7 +158,7 @@ private[v1] object AllStagesResource {
           convertAccumulableInfo
         },
         errorMessage = uiData.errorMessage,
-        taskMetrics = uiData.taskMetrics.map { convertUiTaskMetrics }
+        taskMetrics = uiData.taskMetrics.map { convertUiTaskMetrics },
     )
   }
 
@@ -190,7 +190,7 @@ private[v1] object AllStagesResource {
 
         def build: InputMetricDistributions = new InputMetricDistributions(
             bytesRead = submetricQuantiles(_.bytesRead),
-            recordsRead = submetricQuantiles(_.recordsRead)
+            recordsRead = submetricQuantiles(_.recordsRead),
         )
       }.metricOption
 
@@ -203,7 +203,7 @@ private[v1] object AllStagesResource {
         }
         def build: OutputMetricDistributions = new OutputMetricDistributions(
             bytesWritten = submetricQuantiles(_.bytesWritten),
-            recordsWritten = submetricQuantiles(_.recordsWritten)
+            recordsWritten = submetricQuantiles(_.recordsWritten),
         )
       }.metricOption
 
@@ -222,7 +222,7 @@ private[v1] object AllStagesResource {
               remoteBlocksFetched = submetricQuantiles(_.remoteBlocksFetched),
               localBlocksFetched = submetricQuantiles(_.localBlocksFetched),
               totalBlocksFetched = submetricQuantiles(_.totalBlocksFetched),
-              fetchWaitTime = submetricQuantiles(_.fetchWaitTime)
+              fetchWaitTime = submetricQuantiles(_.fetchWaitTime),
           )
       }.metricOption
 
@@ -238,7 +238,7 @@ private[v1] object AllStagesResource {
           new ShuffleWriteMetricDistributions(
               writeBytes = submetricQuantiles(_.bytesWritten),
               writeRecords = submetricQuantiles(_.recordsWritten),
-              writeTime = submetricQuantiles(_.writeTime)
+              writeTime = submetricQuantiles(_.writeTime),
           )
       }.metricOption
 
@@ -254,7 +254,7 @@ private[v1] object AllStagesResource {
         inputMetrics = inputMetrics,
         outputMetrics = outputMetrics,
         shuffleReadMetrics = shuffleReadMetrics,
-        shuffleWriteMetrics = shuffleWriteMetrics
+        shuffleWriteMetrics = shuffleWriteMetrics,
     )
   }
 
@@ -283,21 +283,21 @@ private[v1] object AllStagesResource {
         },
         shuffleWriteMetrics = internal.shuffleWriteMetrics.map {
           convertShuffleWriteMetrics
-        }
+        },
     )
   }
 
   def convertInputMetrics(internal: InternalInputMetrics): InputMetrics = {
     new InputMetrics(
         bytesRead = internal.bytesRead,
-        recordsRead = internal.recordsRead
+        recordsRead = internal.recordsRead,
     )
   }
 
   def convertOutputMetrics(internal: InternalOutputMetrics): OutputMetrics = {
     new OutputMetrics(
         bytesWritten = internal.bytesWritten,
-        recordsWritten = internal.recordsWritten
+        recordsWritten = internal.recordsWritten,
     )
   }
 
@@ -309,7 +309,7 @@ private[v1] object AllStagesResource {
         fetchWaitTime = internal.fetchWaitTime,
         remoteBytesRead = internal.remoteBytesRead,
         totalBlocksFetched = internal.totalBlocksFetched,
-        recordsRead = internal.recordsRead
+        recordsRead = internal.recordsRead,
     )
   }
 
@@ -318,7 +318,7 @@ private[v1] object AllStagesResource {
     new ShuffleWriteMetrics(
         bytesWritten = internal.bytesWritten,
         writeTime = internal.writeTime,
-        recordsWritten = internal.recordsWritten
+        recordsWritten = internal.recordsWritten,
     )
   }
 }

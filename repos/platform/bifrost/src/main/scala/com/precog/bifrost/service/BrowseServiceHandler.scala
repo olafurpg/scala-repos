@@ -81,7 +81,7 @@ class BrowseSupport[M[+ _]: Bind](vfs: VFSMetadata[M]) {
                   case PathOnly => Map("type" -> JArray(JString("directory")))
                 }
                 JObject(fields + ("name" -> JString(p.path.path.substring(1))))
-              }).toSeq: _*
+              }).toSeq: _*,
       )
     }
   }

@@ -54,7 +54,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
             maxMessagesToBuffer = 10000,
             formatter = new Formatter(timezone = Some("UTC")),
             category = "test",
-            level = Some(Level.DEBUG)
+            level = Some(Level.DEBUG),
         ).apply()
 
         scribe.updateLastTransmission()
@@ -83,7 +83,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
             maxMessagesToBuffer = 10000,
             formatter = new Formatter(timezone = Some("UTC")),
             category = "test",
-            level = Some(Level.DEBUG)
+            level = Some(Level.DEBUG),
         ).apply()
 
         val bytes = Array[Byte](1, 2, 3, 4, 5)
@@ -104,7 +104,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
           maxMessagesToBuffer = 1,
           formatter = BareFormatter,
           category = "test",
-          statsReceiver = statsReceiver
+          statsReceiver = statsReceiver,
       ).apply()
 
       scribe.updateLastTransmission()
@@ -174,7 +174,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
           maxMessagesToBuffer = 1,
           formatter = BareFormatter,
           category = "test",
-          statsReceiver = statsReceiver
+          statsReceiver = statsReceiver,
       ).apply()
 
       // Set up a rejectedExecutionHandler to count number of rejected tasks.

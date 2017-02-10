@@ -147,7 +147,7 @@ class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
   def getDashThumb(ctrlGrpName: String) =
     Seq(
         createCategoryLabel(ctrlGrpName),
-        createTiles(thumbnails(ctrlGrpName))
+        createTiles(thumbnails(ctrlGrpName)),
     )
 
   private def createCategoryLabel(value: String) =

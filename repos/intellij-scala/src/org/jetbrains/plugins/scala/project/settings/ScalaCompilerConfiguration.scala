@@ -15,7 +15,7 @@ import scala.collection.JavaConverters._
   */
 @State(
     name = "ScalaCompilerConfiguration",
-    storages = Array(new Storage("scala_compiler.xml"))
+    storages = Array(new Storage("scala_compiler.xml")),
 )
 class ScalaCompilerConfiguration(project: Project)
     extends PersistentStateComponent[Element] {

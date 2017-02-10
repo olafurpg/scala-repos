@@ -152,7 +152,7 @@ object VideoCubeDemo extends JFXApp {
           at(4 s) { c1.rx.angle -> 360d; c1.ry.angle -> 520d; },
           //        at (4 s) { c1.rz.angle -> 0d ; c1.ry.angle -> 720d; }
           at(7 s) { c1.rx.angle -> 360d; c1.ry.angle -> 520d },
-          at(10 s) { c1.rz.angle -> 1080d }
+          at(10 s) { c1.rz.angle -> 1080d },
       )
     }
 
@@ -241,7 +241,7 @@ class VideoCube(val mediaPlayers: List[MediaPlayer], size: Double)
         translateY = -0.5 * size
         translateZ = -0.5 * size
         text = "5"
-      }
+      },
   )
 
   /**

@@ -517,7 +517,7 @@ object JsonAST {
                         JField(x,
                                if (xs == Nil) replacement else rep(xs, value))
                       case field => field
-                    }
+                    },
                 )
               case other => other
             }
@@ -925,7 +925,7 @@ object JsonAST {
   case class RenderSettings(
       indent: Int,
       escapeChars: Set[Char] = Set(),
-      spaceAfterFieldName: Boolean = false
+      spaceAfterFieldName: Boolean = false,
   ) {
     val lineBreaks_? = indent > 0
   }

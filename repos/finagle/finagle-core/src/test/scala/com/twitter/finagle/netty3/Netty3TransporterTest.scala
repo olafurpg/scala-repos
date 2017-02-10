@@ -87,7 +87,7 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
       val transporter = new Netty3Transporter[Int, Int](
           "name",
           pipelineFactory,
-          socksProxy = Some(InetSocketAddress.createUnresolved("anAddr", 0))
+          socksProxy = Some(InetSocketAddress.createUnresolved("anAddr", 0)),
       )
 
       val unresolved = InetSocketAddress.createUnresolved("supdog", 0)
@@ -109,13 +109,13 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
       def expectedIdleStateHandler(
           readerTimeout: Duration,
           writerTimeout: Duration,
-          isHanlderExist: Boolean
+          isHanlderExist: Boolean,
       ) {
         val transporter = new Netty3Transporter[Int, Int](
             "name",
             Channels.pipelineFactory(Channels.pipeline()),
             channelReaderTimeout = readerTimeout,
-            channelWriterTimeout = writerTimeout
+            channelWriterTimeout = writerTimeout,
         )
         val pl =
           transporter.newPipeline(new InetSocketAddress(0), NullStatsReceiver)
@@ -232,7 +232,7 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
             SSLEngineResult.Status.CLOSED,
             SSLEngineResult.HandshakeStatus.NEED_UNWRAP,
             0,
-            0
+            0,
         )
 
         val session = mock[SSLSession]
@@ -246,14 +246,14 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
 
         val mockTlsConfig = Netty3TransporterTLSConfig(
             Function.const(new Engine(engine)),
-            Some("localhost")
+            Some("localhost"),
         )
 
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
         val transporter = new Netty3Transporter[Int, Int](
             "tls-enabled",
             pipelineFactory,
-            tlsConfig = Some(mockTlsConfig)
+            tlsConfig = Some(mockTlsConfig),
         )
 
         // 21 - alert message, 3 - SSL3 major version,

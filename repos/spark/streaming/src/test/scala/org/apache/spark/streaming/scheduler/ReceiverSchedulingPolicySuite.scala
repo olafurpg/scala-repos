@@ -61,7 +61,7 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         ExecutorCacheTaskLocation("host2", "2"),
         ExecutorCacheTaskLocation("host3", "3"),
         ExecutorCacheTaskLocation("host4", "4"),
-        ExecutorCacheTaskLocation("host5", "5")
+        ExecutorCacheTaskLocation("host5", "5"),
     )
     // Weights: host1 = 1.5, host2 = 0.5, host3 = 1.0, host4 = 0.5, host5 = 0.5
     val receiverTrackingInfoMap =
@@ -94,7 +94,7 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
     val expectedScheduledLocations = Set(
         ExecutorCacheTaskLocation("host2", "2"),
         ExecutorCacheTaskLocation("host4", "4"),
-        ExecutorCacheTaskLocation("host5", "5")
+        ExecutorCacheTaskLocation("host5", "5"),
     )
     assert(scheduledLocations.toSet === expectedScheduledLocations)
   }

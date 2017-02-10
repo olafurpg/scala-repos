@@ -63,7 +63,7 @@ object PlayerRepo {
 
   def existsActive(tourId: String, userId: String) =
     coll.count(Some(
-            selectTourUser(tourId, userId) ++ selectActive
+            selectTourUser(tourId, userId) ++ selectActive,
         )) map (0 !=)
 
   def unWithdraw(tourId: String) =
@@ -111,7 +111,7 @@ object PlayerRepo {
   def withPoints(tourId: String): Fu[List[Player]] =
     coll
       .find(
-          selectTour(tourId) ++ BSONDocument("m" -> BSONDocument("$gt" -> 0))
+          selectTour(tourId) ++ BSONDocument("m" -> BSONDocument("$gt" -> 0)),
       )
       .cursor[Player]()
       .collect[List]()
@@ -155,7 +155,7 @@ object PlayerRepo {
       tourId: String, userIds: Iterable[String]): Fu[List[Player]] =
     coll
       .find(selectTour(tourId) ++ BSONDocument(
-              "uid" -> BSONDocument("$in" -> userIds)
+              "uid" -> BSONDocument("$in" -> userIds),
           ))
       .cursor[Player]()
       .collect[List]()

@@ -41,10 +41,10 @@ class PoolBench extends StdBenchAnnotations {
             new BufferingPool(underlying, poolSize),
             poolSize,
             Duration.Top,
-            DefaultTimer.twitter
+            DefaultTimer.twitter,
         ),
         lowWatermark = 1,
-        highWatermark = poolSize
+        highWatermark = poolSize,
     )
 
     for (i <- 0 until (poolSize * loadedRatio).toInt) {

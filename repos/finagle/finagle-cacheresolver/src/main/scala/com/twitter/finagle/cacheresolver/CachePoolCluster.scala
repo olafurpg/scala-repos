@@ -113,7 +113,7 @@ object CacheNodeGroup {
   def newZkCacheNodeGroup(
       path: String,
       zkClient: ZooKeeperClient,
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   ) =
     new ZookeeperCacheNodeGroup(
         zkPath = path, zkClient = zkClient, statsReceiver = statsReceiver)
@@ -185,11 +185,11 @@ object CachePoolCluster {
     */
   def newUnmanagedZkCluster(
       zkPath: String,
-      zkClient: ZooKeeperClient
+      zkClient: ZooKeeperClient,
   ) =
     new ZookeeperServerSetCluster(
         ServerSets.create(
-            zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+            zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath),
     ) map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
@@ -377,7 +377,7 @@ class ZookeeperCachePoolCluster private[cacheresolver](
   private[this] def waitForClusterComplete(
       currentSet: Set[CacheNode],
       expectedSize: Int,
-      spoolChanges: Future[Spool[Cluster.Change[CacheNode]]]
+      spoolChanges: Future[Spool[Cluster.Change[CacheNode]]],
   ): Future[Set[CacheNode]] = {
     if (expectedSize == currentSet.size) {
       Future.value(currentSet)
@@ -408,7 +408,7 @@ class ZookeeperCachePoolCluster private[cacheresolver](
 class ZookeeperCacheNodeGroup(
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
-    protected val statsReceiver: StatsReceiver = NullStatsReceiver
+    protected val statsReceiver: StatsReceiver = NullStatsReceiver,
 )
     extends Group[CacheNode] with ZookeeperStateMonitor {
 

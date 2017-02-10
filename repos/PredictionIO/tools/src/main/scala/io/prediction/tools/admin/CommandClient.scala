@@ -22,23 +22,23 @@ abstract class BaseResponse()
 
 case class GeneralResponse(
     status: Int = 0,
-    message: String = ""
+    message: String = "",
 )
     extends BaseResponse()
 
 case class AppRequest(
     id: Int = 0,
     name: String = "",
-    description: String = ""
+    description: String = "",
 )
 
 case class TrainRequest(
-    enginePath: String = ""
+    enginePath: String = "",
 )
 case class AppResponse(
     id: Int = 0,
     name: String = "",
-    keys: Seq[AccessKey]
+    keys: Seq[AccessKey],
 )
     extends BaseResponse()
 
@@ -47,21 +47,21 @@ case class AppNewResponse(
     message: String = "",
     id: Int = 0,
     name: String = "",
-    key: String
+    key: String,
 )
     extends BaseResponse()
 
 case class AppListResponse(
     status: Int = 0,
     message: String = "",
-    apps: Seq[AppResponse]
+    apps: Seq[AppResponse],
 )
     extends BaseResponse()
 
 class CommandClient(
     val appClient: Apps,
     val accessKeyClient: AccessKeys,
-    val eventClient: LEvents
+    val eventClient: LEvents,
 ) {
 
   def futureAppNew(req: AppRequest)(

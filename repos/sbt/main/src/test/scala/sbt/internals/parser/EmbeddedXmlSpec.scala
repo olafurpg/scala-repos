@@ -152,6 +152,6 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
       """.stripMargin,
        "xml with blank line",
        false,
-       true)
+       true),
   )
 }

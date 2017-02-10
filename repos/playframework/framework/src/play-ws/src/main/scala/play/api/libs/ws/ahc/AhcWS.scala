@@ -423,7 +423,7 @@ class AhcWSModule extends Module {
           .toProvider[AhcWSClientConfigParser]
           .in[Singleton],
         bind[WSClientConfig].toProvider[WSConfigParser].in[Singleton],
-        bind[WSClient].toProvider[WSClientProvider].in[Singleton]
+        bind[WSClient].toProvider[WSClientProvider].in[Singleton],
     )
   }
 }

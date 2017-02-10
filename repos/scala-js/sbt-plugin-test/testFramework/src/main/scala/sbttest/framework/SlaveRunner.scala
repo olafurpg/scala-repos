@@ -6,7 +6,7 @@ final class SlaveRunner(
     args: Array[String],
     remoteArgs: Array[String],
     testClassLoader: ClassLoader,
-    send: String => Unit
+    send: String => Unit,
 )
     extends BaseRunner(args, remoteArgs, testClassLoader) {
 

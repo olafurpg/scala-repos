@@ -23,7 +23,7 @@ object SphinxDoc {
       generatedPdf in Sphinx <<=
         generatedPdf in Sphinx in LocalProject(AkkaBuild.docs.id) map identity,
       generatedEpub in Sphinx <<=
-        generatedEpub in Sphinx in LocalProject(AkkaBuild.docs.id) map identity
+        generatedEpub in Sphinx in LocalProject(AkkaBuild.docs.id) map identity,
   )
 
   def docsSettings =
@@ -57,7 +57,7 @@ object SphinxDoc {
         enableOutput in generatePdf in Sphinx := true,
         enableOutput in generateEpub in Sphinx := true,
         unmanagedSourceDirectories in Test <<=
-          sourceDirectory in Sphinx apply { _ ** "code" get }
+          sourceDirectory in Sphinx apply { _ ** "code" get },
     )
 
   // pre-processing settings for sphinx
@@ -90,7 +90,7 @@ object SphinxDoc {
                   }),
               "sigarVersion" -> Dependencies.Compile.sigar.revision,
               "sigarLoaderVersion" -> Dependencies.Compile.Provided.sigarLoader.revision,
-              "github" -> GitHub.url(v)
+              "github" -> GitHub.url(v),
           )
         },
             preprocess <<=
@@ -110,8 +110,8 @@ object SphinxDoc {
             sphinxInputs <<= (sphinxInputs, preprocess) map {
           (inputs, preprocessed) =>
             inputs.copy(src = preprocessed)
-        }
+        },
         )) ++ Seq(
-        cleanFiles <+= target in preprocess in Sphinx
+        cleanFiles <+= target in preprocess in Sphinx,
     )
 }

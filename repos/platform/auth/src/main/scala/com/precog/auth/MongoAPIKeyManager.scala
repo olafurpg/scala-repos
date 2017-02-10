@@ -53,7 +53,7 @@ case class MongoAPIKeyManagerSettings(
     deletedAPIKeys: String = "tokens_deleted",
     deletedGrants: String = "grants_deleted",
     timeout: Timeout = new Timeout(30000),
-    rootKeyId: String = "invalid"
+    rootKeyId: String = "invalid",
 )
 
 object MongoAPIKeyManagerSettings {
@@ -82,7 +82,7 @@ object MongoAPIKeyManager extends Logging {
         deletedAPIKeys,
         deletedGrants,
         timeoutMillis,
-        rootKeyId
+        rootKeyId,
     )
 
     val mongo = RealMongo(config.detach("mongo"))
@@ -112,7 +112,7 @@ object MongoAPIKeyManager extends Logging {
     val rootPermissions = Set[Permission](
         WritePermission(Path.Root, WriteAsAny),
         ReadPermission(Path.Root, WrittenByAny),
-        DeletePermission(Path.Root, WrittenByAny)
+        DeletePermission(Path.Root, WrittenByAny),
     )
 
     val rootGrant = Grant(
@@ -123,7 +123,7 @@ object MongoAPIKeyManager extends Logging {
         Set(),
         rootPermissions,
         new Instant(0L),
-        None
+        None,
     )
 
     val rootAPIKeyRecord = APIKeyRecord(rootAPIKeyId,

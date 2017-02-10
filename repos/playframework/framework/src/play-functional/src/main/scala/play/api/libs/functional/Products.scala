@@ -49,7 +49,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2) => B, f2: B => (A1, A2))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2, B](
         canBuild(m1, m2), { case a1 ~ a2 => f1(a1, a2) },
-        (b: B) => { val (a1, a2) = f2(b); new ~(a1, a2) }
+        (b: B) => { val (a1, a2) = f2(b); new ~(a1, a2) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], fu: ContravariantFunctor[M]): M[A] =
@@ -82,7 +82,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3) => B, f2: B => (A1, A2, A3))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 => f1(a1, a2, a3) },
-        (b: B) => { val (a1, a2, a3) = f2(b); new ~(new ~(a1, a2), a3) }
+        (b: B) => { val (a1, a2, a3) = f2(b); new ~(new ~(a1, a2), a3) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], fu: ContravariantFunctor[M]): M[A] =
@@ -115,7 +115,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4) => B, f2: B => (A1, A2, A3, A4))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 => f1(a1, a2, a3, a4) },
-        (b: B) => { val (a1, a2, a3, a4) = f2(b); new ~(new ~(new ~(a1, a2), a3), a4) }
+        (b: B) => { val (a1, a2, a3, a4) = f2(b); new ~(new ~(new ~(a1, a2), a3), a4) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], fu: ContravariantFunctor[M]): M[A] =
@@ -148,7 +148,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5) => B, f2: B => (A1, A2, A3, A4, A5))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 => f1(a1, a2, a3, a4, a5) },
-        (b: B) => { val (a1, a2, a3, a4, a5) = f2(b); new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5) }
+        (b: B) => { val (a1, a2, a3, a4, a5) = f2(b); new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], fu: ContravariantFunctor[M]): M[A] =
@@ -181,7 +181,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6) => B, f2: B => (A1, A2, A3, A4, A5, A6))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 => f1(a1, a2, a3, a4, a5, a6) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6) = f2(b); new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6) = f2(b); new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], fu: ContravariantFunctor[M]): M[A] =
@@ -214,7 +214,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 => f1(a1, a2, a3, a4, a5, a6, a7) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], fu: ContravariantFunctor[M]): M[A] =
@@ -247,7 +247,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 => f1(a1, a2, a3, a4, a5, a6, a7, a8) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], fu: ContravariantFunctor[M]): M[A] =
@@ -280,7 +280,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], fu: ContravariantFunctor[M]): M[A] =
@@ -313,7 +313,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], fu: ContravariantFunctor[M]): M[A] =
@@ -346,7 +346,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], fu: ContravariantFunctor[M]): M[A] =
@@ -379,7 +379,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], fu: ContravariantFunctor[M]): M[A] =
@@ -412,7 +412,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], fu: ContravariantFunctor[M]): M[A] =
@@ -445,7 +445,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], fu: ContravariantFunctor[M]): M[A] =
@@ -478,7 +478,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], fu: ContravariantFunctor[M]): M[A] =
@@ -511,7 +511,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], fu: ContravariantFunctor[M]): M[A] =
@@ -544,7 +544,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 ~ a17 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], witness17: <:<[A, A17], fu: ContravariantFunctor[M]): M[A] =
@@ -577,7 +577,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17 ~ A18, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 ~ a17 ~ a18 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], witness17: <:<[A, A17], witness18: <:<[A, A18], fu: ContravariantFunctor[M]): M[A] =
@@ -610,7 +610,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17 ~ A18 ~ A19, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 ~ a17 ~ a18 ~ a19 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], witness17: <:<[A, A17], witness18: <:<[A, A18], witness19: <:<[A, A19], fu: ContravariantFunctor[M]): M[A] =
@@ -643,7 +643,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17 ~ A18 ~ A19 ~ A20, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 ~ a17 ~ a18 ~ a19 ~ a20 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], witness17: <:<[A, A17], witness18: <:<[A, A18], witness19: <:<[A, A19], witness20: <:<[A, A20], fu: ContravariantFunctor[M]): M[A] =
@@ -675,7 +675,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17 ~ A18 ~ A19 ~ A20 ~ A21, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 ~ a17 ~ a18 ~ a19 ~ a20 ~ a21 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20), a21) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20), a21) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], witness17: <:<[A, A17], witness18: <:<[A, A18], witness19: <:<[A, A19], witness20: <:<[A, A20], witness21: <:<[A, A21], fu: ContravariantFunctor[M]): M[A] =
@@ -704,7 +704,7 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
     def apply[B](f1: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22) => B, f2: B => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22))(implicit fu: InvariantFunctor[M]): M[B] =
       fu.inmap[A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17 ~ A18 ~ A19 ~ A20 ~ A21 ~ A22, B](
         canBuild(m1, m2), { case a1 ~ a2 ~ a3 ~ a4 ~ a5 ~ a6 ~ a7 ~ a8 ~ a9 ~ a10 ~ a11 ~ a12 ~ a13 ~ a14 ~ a15 ~ a16 ~ a17 ~ a18 ~ a19 ~ a20 ~ a21 ~ a22 => f1(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22) },
-        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20), a21), a22) }
+        (b: B) => { val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22) = f2(b); new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20), a21), a22) },
       )
 
     def join[A >: A1](implicit witness1: <:<[A, A1], witness2: <:<[A, A2], witness3: <:<[A, A3], witness4: <:<[A, A4], witness5: <:<[A, A5], witness6: <:<[A, A6], witness7: <:<[A, A7], witness8: <:<[A, A8], witness9: <:<[A, A9], witness10: <:<[A, A10], witness11: <:<[A, A11], witness12: <:<[A, A12], witness13: <:<[A, A13], witness14: <:<[A, A14], witness15: <:<[A, A15], witness16: <:<[A, A16], witness17: <:<[A, A17], witness18: <:<[A, A18], witness19: <:<[A, A19], witness20: <:<[A, A20], witness21: <:<[A, A21], witness22: <:<[A, A22], fu: ContravariantFunctor[M]): M[A] =

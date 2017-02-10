@@ -145,7 +145,7 @@ class CoreGuiceModule extends AbstractModule {
         ContinueOnErrorStep(notifyLaunchQueueStepImpl),
         ContinueOnErrorStep(taskStatusEmitterPublishImpl),
         ContinueOnErrorStep(postToEventStreamStepImpl),
-        ContinueOnErrorStep(scaleAppUpdateStepImpl)
+        ContinueOnErrorStep(scaleAppUpdateStepImpl),
     )
   }
 
@@ -189,7 +189,7 @@ class CoreGuiceModule extends AbstractModule {
         actorRefFactory,
         "serializeTaskStatusUpdates",
         maxParallel = config.internalMaxParallelStatusUpdates(),
-        maxQueued = config.internalMaxQueuedStatusUpdates()
+        maxQueued = config.internalMaxQueuedStatusUpdates(),
     )
   }
 }

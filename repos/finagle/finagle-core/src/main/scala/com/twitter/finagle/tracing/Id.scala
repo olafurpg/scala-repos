@@ -61,7 +61,7 @@ object TraceId {
       traceId: Option[SpanId],
       parentId: Option[SpanId],
       spanId: SpanId,
-      sampled: Option[Boolean]
+      sampled: Option[Boolean],
   ): TraceId =
     TraceId(traceId, parentId, spanId, sampled, Flags())
 

@@ -122,7 +122,7 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
 
   // Common required fields
   case class Common(
-      `type`: String
+      `type`: String,
   )
 
   // User Actions fields
@@ -132,7 +132,7 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
       context: Option[JObject],
       anotherProperty1: Int,
       anotherProperty2: Option[String],
-      timestamp: String
+      timestamp: String,
   )
 
   // UserActionItem fields
@@ -143,6 +143,6 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
       context: JObject,
       anotherPropertyA: Option[Double],
       anotherPropertyB: Option[Boolean],
-      timestamp: String
+      timestamp: String,
   )
 }

@@ -14,7 +14,7 @@ import java.net.SocketAddress
 object DefaultClient {
   private def defaultFailureAccrual(
       sr: StatsReceiver,
-      responseClassifier: ResponseClassifier
+      responseClassifier: ResponseClassifier,
   ): ServiceFactoryWrapper =
     FailureAccrualFactory.wrapper(sr,
                                   FailureAccrualFactory.defaultPolicy(),
@@ -79,7 +79,7 @@ case class DefaultClient[Req, Rep](
     reporter: ReporterFactory = LoadedReporterFactory,
     loadBalancer: LoadBalancerFactory = DefaultBalancerFactory,
     newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] = TraceInitializerFilter
-        .clientModule[Req, Rep]
+        .clientModule[Req, Rep],
 )
     extends Client[Req, Rep] { outer =>
 

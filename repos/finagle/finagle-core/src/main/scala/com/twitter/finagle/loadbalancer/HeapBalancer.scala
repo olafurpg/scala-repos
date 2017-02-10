@@ -20,7 +20,7 @@ class HeapBalancer[Req, Rep](
     factories: Activity[Set[ServiceFactory[Req, Rep]]],
     statsReceiver: StatsReceiver,
     emptyException: Throwable,
-    rng: Random
+    rng: Random,
 )
     extends ServiceFactory[Req, Rep] with OnReady {
 
@@ -41,7 +41,7 @@ class HeapBalancer[Req, Rep](
       factory: ServiceFactory[Req, Rep],
       var load: Int,
       var index: Int,
-      var downq: Node = null
+      var downq: Node = null,
   )
 
   // Linked list of downed nodes.
@@ -53,7 +53,7 @@ class HeapBalancer[Req, Rep](
         def apply(node: Node, i: Int) {
           node.index = i
         }
-      }
+      },
   )
   import HeapOps._
 

@@ -285,7 +285,7 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
       "udf_format_number",
       "udf_round",
       "udf_round_3",
-      "view_cast"
+      "view_cast",
   )
 
   /**
@@ -1018,6 +1018,6 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
       "varchar_union1",
       "view",
       "view_cast",
-      "view_inputs"
+      "view_inputs",
   )
 }

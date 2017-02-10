@@ -197,7 +197,7 @@ private[scalajs] final class ScalaJSClassEmitter(
       js.Block(
           js.DocComment("@constructor"),
           envFieldDef("h", className, js.Function(Nil, js.Skip())),
-          js.Assign(envField("h", className).prototype, ctorToMimic.prototype)
+          js.Assign(envField("h", className).prototype, ctorToMimic.prototype),
       )
     }
 
@@ -235,7 +235,7 @@ private[scalajs] final class ScalaJSClassEmitter(
           inheritedCtorDef,
           js.Assign(typeVar.prototype, js.New(inheritedCtorRef, Nil)),
           genAddToPrototype(
-              className, js.StringLiteral("constructor"), typeVar)
+              className, js.StringLiteral("constructor"), typeVar),
       )
     }
 
@@ -750,7 +750,7 @@ private[scalajs] final class ScalaJSClassEmitter(
         isRawJSTypeParam,
         parentData,
         isInstanceFun,
-        isArrayOfFun
+        isArrayOfFun,
     )
 
     val prunedParams =
@@ -806,14 +806,14 @@ private[scalajs] final class ScalaJSClassEmitter(
           js.If(moduleInstanceVar === js.Undefined(),
                 js.Block(
                     moduleInstanceVar := js.Null(),
-                    assignModule
+                    assignModule,
                 ),
                 js.Skip())
         case CheckedBehavior.Fatal =>
           js.If(moduleInstanceVar === js.Undefined(), {
             js.Block(
                 moduleInstanceVar := js.Null(),
-                assignModule
+                assignModule,
             )
           }, js.If(moduleInstanceVar === js.Null(), {
             // throw new UndefinedBehaviorError(
@@ -893,7 +893,7 @@ private[scalajs] final class ScalaJSClassEmitter(
         js.Block(
             genLet(thisIdent, mutable = false, js.New(baseCtor, Nil)),
             ctorBody,
-            js.Return(js.VarRef(thisIdent))
+            js.Return(js.VarRef(thisIdent)),
         ))
 
     val (createNamespace, expCtorVar) = genCreateNamespaceInExports(fullName)
@@ -901,7 +901,7 @@ private[scalajs] final class ScalaJSClassEmitter(
         createNamespace,
         js.DocComment("@constructor"),
         expCtorVar := exportedCtor,
-        expCtorVar DOT "prototype" := baseCtor DOT "prototype"
+        expCtorVar DOT "prototype" := baseCtor DOT "prototype",
     )
   }
 
@@ -932,7 +932,7 @@ private[scalajs] final class ScalaJSClassEmitter(
         exportFullName)
     js.Block(
         createNamespace,
-        expAccessorVar := exportedValue
+        expAccessorVar := exportedValue,
     )
   }
 

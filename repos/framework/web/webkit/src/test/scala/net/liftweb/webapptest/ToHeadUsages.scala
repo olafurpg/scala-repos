@@ -60,7 +60,7 @@ object ToHeadUsages extends Specification {
           "/htmlFragmentWithHead",
           html =>
             html.getElementByXPath("/html/head/script[@id='fromFrag']") must not(
-                beNull when jetty.running)
+                beNull when jetty.running),
       )
     }
 
@@ -69,7 +69,7 @@ object ToHeadUsages extends Specification {
           "/htmlFragmentWithHead",
           html =>
             html.getElementsByXPath("/html/body/script[@id='fromFrag']").size must
-            (be_==(0) when jetty.running)
+            (be_==(0) when jetty.running),
       )
     }
 
@@ -78,7 +78,7 @@ object ToHeadUsages extends Specification {
           "/htmlSnippetWithHead",
           html =>
             html.getElementByXPath("/html/head/script[@src='snippet.js']") must not(
-                beNull when jetty.running)
+                beNull when jetty.running),
       )
     }
 
@@ -89,7 +89,7 @@ object ToHeadUsages extends Specification {
             {
               html.getElementById("fruit") must not(beNull when jetty.running)
               html.getElementById("bat") must not(beNull when jetty.running)
-          }
+          },
       )
     }
 
@@ -99,7 +99,7 @@ object ToHeadUsages extends Specification {
           html =>
             {
               html.getElementById("h1") must not(beNull when jetty.running)
-          }
+          },
       )
     }
 
@@ -121,7 +121,7 @@ object ToHeadUsages extends Specification {
           html =>
             {
               html.getElementById("frog") must not(beNull when jetty.running)
-          }
+          },
       )
     }
   }
@@ -161,7 +161,7 @@ object ToHeadUsages extends Specification {
           html =>
             {
               html.getElementById("second") must not(beNull when jetty.running)
-          }
+          },
       )
     }
 
@@ -173,7 +173,7 @@ object ToHeadUsages extends Specification {
               html.getElementByXPath(
                   "/html/body/span[@id='whack1']/span[@id='actor_false']") must not(
                   beNull when jetty.running)
-          }
+          },
       )
     }
 
@@ -185,7 +185,7 @@ object ToHeadUsages extends Specification {
               html.getElementByXPath(
                   "/html/body/span[@id='whack2']/span[@id='actor_true']") must not(
                   beNull when jetty.running)
-          }
+          },
       )
     }
 

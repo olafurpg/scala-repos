@@ -64,8 +64,8 @@ object AsyncRenderComet {
               cometName = Full(s"lazy-${S.renderVersion}"),
               cometHtml = NodeSeq.Empty,
               cometAttributes = Map.empty,
-              receiveUpdatesOnPage = true
-          )
+              receiveUpdatesOnPage = true,
+          ),
       )
 
   /**

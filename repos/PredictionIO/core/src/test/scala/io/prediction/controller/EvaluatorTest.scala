@@ -18,7 +18,7 @@ object TestEvaluator {
         sc: SparkContext,
         engineParams: EngineParams,
         instanceId: String = "",
-        params: WorkflowParams = WorkflowParams()
+        params: WorkflowParams = WorkflowParams(),
     ): Seq[Any] = {
       Seq[Any]()
     }

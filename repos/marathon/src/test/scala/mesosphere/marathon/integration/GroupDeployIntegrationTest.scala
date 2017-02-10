@@ -328,8 +328,8 @@ class GroupDeployIntegrationTest
             GroupUpdate(PathId("service"), apps = Set(service))
               .copy(dependencies = Some(Set("/test/db".toTestPath))),
             GroupUpdate(PathId("frontend"), apps = Set(frontend))
-              .copy(dependencies = Some(Set("/test/service".toTestPath)))
-        )
+              .copy(dependencies = Some(Set("/test/service".toTestPath))),
+        ),
     )
 
     When("The group gets deployed")

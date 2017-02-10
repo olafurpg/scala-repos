@@ -22,7 +22,7 @@ class WindowedByteCounterTest
   // cleans up thread
   private[this] def withCounter(
       fakeBean: FakeGarbageCollectorMXBean, fakePool: FakeMemoryPool)(
-      fn: (ByteCounter, () => Unit) => Unit
+      fn: (ByteCounter, () => Unit) => Unit,
   ): Unit = {
     Time.withCurrentTimeFrozen { ctl =>
       val nfo = new JvmInfo(fakePool, fakeBean)

@@ -13,14 +13,14 @@ object Formatting {
     SbtScalariform.scalariformSettings ++ Seq(
         ScalariformKeys.preferences in Compile := formattingPreferences,
         ScalariformKeys.preferences in Test := formattingPreferences,
-        ScalariformKeys.preferences in MultiJvm := formattingPreferences
+        ScalariformKeys.preferences in MultiJvm := formattingPreferences,
     )
 
   lazy val docFormatSettings =
     SbtScalariform.scalariformSettings ++ Seq(
         ScalariformKeys.preferences in Compile := docFormattingPreferences,
         ScalariformKeys.preferences in Test := docFormattingPreferences,
-        ScalariformKeys.preferences in MultiJvm := docFormattingPreferences
+        ScalariformKeys.preferences in MultiJvm := docFormattingPreferences,
     )
 
   def formattingPreferences = {

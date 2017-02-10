@@ -103,7 +103,7 @@ object Roots {
 
 private[poly] class BigDecimalSimpleRoots(
     val poly: Polynomial[BigDecimal],
-    scale: Int
+    scale: Int,
 )
     extends Roots[BigDecimal] {
   private val zpoly: Polynomial[BigInt] = Roots.removeDecimal(poly)
@@ -121,7 +121,7 @@ private[poly] class BigDecimalSimpleRoots(
         case Bounded(lb, ub, _) =>
           new BigDecimal(
               BigDecimalRootRefinement(poly, lb, ub, scale).approximateValue,
-              MathContext.UNLIMITED
+              MathContext.UNLIMITED,
           )
         case _ =>
           throw new RuntimeException("invalid isolated root interval")
@@ -131,7 +131,7 @@ private[poly] class BigDecimalSimpleRoots(
 
 private[poly] class BigDecimalRelativeRoots(
     val poly: Polynomial[BigDecimal],
-    mc: MathContext
+    mc: MathContext,
 )
     extends Roots[BigDecimal] {
   private val zpoly: Polynomial[BigInt] = Roots.removeDecimal(poly)
@@ -158,7 +158,7 @@ private[poly] class BigDecimalRelativeRoots(
 // http://arxiv.org/pdf/1011.0344v2.pdf
 // http://arxiv.org/pdf/1104.1362v3.pdf
 private[poly] class FixedRealRoots(
-    val poly: Polynomial[Real]
+    val poly: Polynomial[Real],
 )
     extends Roots[Real] {
   private val zpoly: Polynomial[BigInt] =
@@ -187,7 +187,7 @@ private[poly] class FixedRealRoots(
 }
 
 private[poly] class NumberRoots(
-    val poly: Polynomial[Number]
+    val poly: Polynomial[Number],
 )
     extends Roots[Number] {
   private val roots = new BigDecimalRelativeRoots(

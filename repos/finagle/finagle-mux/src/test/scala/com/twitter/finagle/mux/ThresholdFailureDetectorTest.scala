@@ -40,7 +40,7 @@ class ThresholdFailureDetectorTest
         closeTimeout = closeTimeout,
         nanoTime = nanoTime,
         statsReceiver = sr,
-        timer = timer
+        timer = timer,
     )
   }
 
@@ -187,7 +187,7 @@ class ThresholdFailureDetectorTest
         closeTimeout = Duration.Top,
         nanoTime = nanoTime,
         timer = timer,
-        statsReceiver = sr
+        statsReceiver = sr,
     )
 
     for (i <- 1 until failAfter) {

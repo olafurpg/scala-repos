@@ -45,7 +45,7 @@ final class DataForm {
                                chess.variant.RacingKings.id,
                                chess.variant.Crazyhouse.id) contains _)
         }.verifying("At least one variant", _.nonEmpty),
-            "color" -> stringIn(colorChoices)
+            "color" -> stringIn(colorChoices),
         )(SimulSetup.apply)(SimulSetup.unapply)) fill SimulSetup(
         clockTime = clockTimeDefault,
         clockIncrement = clockIncrementDefault,

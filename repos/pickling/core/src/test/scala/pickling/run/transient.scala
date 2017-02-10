@@ -15,7 +15,7 @@ class SparkContext(config: SparkConf)
 
 class RDD[T : ClassTag](
     @transient private var sc: SparkContext,
-    @transient private var deps: Seq[Dependency[_]]
+    @transient private var deps: Seq[Dependency[_]],
 )
 
 class RangePartitioner[K : ClassTag, V](

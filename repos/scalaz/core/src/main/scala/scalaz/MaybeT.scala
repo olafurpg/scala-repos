@@ -11,12 +11,12 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) { self =>
 
   def flatMap[B](f: A => MaybeT[F, B])(implicit F: Monad[F]): MaybeT[F, B] =
     new MaybeT[F, B](
-        F.bind(self.run)(_.cata(f(_).run, F.point(empty)))
+        F.bind(self.run)(_.cata(f(_).run, F.point(empty))),
     )
 
   def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] =
     new MaybeT[F, B](
-        F.bind(self.run)(_.cata((a => F.map(f(a))(just)), F.point(empty)))
+        F.bind(self.run)(_.cata((a => F.map(f(a))(just)), F.point(empty))),
     )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
@@ -201,7 +201,7 @@ private trait MaybeTBindRec[F[_]]
         B.tailrecM[A, Maybe[B]](a =>
               F.map(f(a).run) {
             _.cata(_.map(Maybe.just), \/.right(Maybe.empty))
-        })(a)
+        })(a),
     )
 }
 

@@ -217,8 +217,8 @@ object ScalaRearranger {
       ArrangementSectionRule.create(
           new StdArrangementMatchRule(
               new StdArrangementEntryMatcher(new ArrangementAtomMatchCondition(
-                      conditions(0), conditions(0)))
-          )
+                      conditions(0), conditions(0))),
+          ),
       ) :: matchRules
     } else {
       val composite = new ArrangementCompositeMatchCondition

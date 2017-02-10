@@ -107,7 +107,7 @@ case class HandshakeResponse(
     salt: Array[Byte],
     serverCap: Capability,
     charset: Short,
-    maxPacketSize: Int
+    maxPacketSize: Int,
 )
     extends Request {
   import Capability._
@@ -163,7 +163,7 @@ class ExecuteRequest(
     val stmtId: Int,
     val params: IndexedSeq[Parameter],
     val hasNewParams: Boolean,
-    val flags: Byte
+    val flags: Byte,
 )
     extends CommandRequest(Command.COM_STMT_EXECUTE) {
   private[this] val log = Logger.getLogger("finagle-mysql")
@@ -253,7 +253,7 @@ object ExecuteRequest {
       stmtId: Int,
       params: IndexedSeq[Parameter] = IndexedSeq.empty,
       hasNewParams: Boolean = true,
-      flags: Byte = 0
+      flags: Byte = 0,
   ) = {
     val sanitizedParams = params.map {
       case null => Parameter.NullParameter

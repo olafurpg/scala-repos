@@ -558,7 +558,7 @@ class UISeleniumSuite
 
       val expJobInfo = Seq(
           ("9", "collect"),
-          ("8", "count")
+          ("8", "count"),
       )
 
       eventually(timeout(1 second), interval(50 milliseconds)) {
@@ -609,7 +609,7 @@ class UISeleniumSuite
       val expStageInfo = Seq(
           ("19", "collect"),
           ("18", "count"),
-          ("17", "groupBy")
+          ("17", "groupBy"),
       )
 
       eventually(timeout(1 second), interval(50 milliseconds)) {

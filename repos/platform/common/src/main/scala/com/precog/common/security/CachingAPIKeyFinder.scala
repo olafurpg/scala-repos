@@ -35,12 +35,12 @@ import scalaz.syntax.monad._
 import scalaz.syntax.effect.id._
 
 case class CachingAPIKeyFinderSettings(
-    apiKeyCacheSettings: Seq[Cache.CacheOption[APIKey, v1.APIKeyDetails]]
+    apiKeyCacheSettings: Seq[Cache.CacheOption[APIKey, v1.APIKeyDetails]],
 )
 
 object CachingAPIKeyFinderSettings {
   val Default = CachingAPIKeyFinderSettings(
-      Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000))
+      Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000)),
   )
 }
 

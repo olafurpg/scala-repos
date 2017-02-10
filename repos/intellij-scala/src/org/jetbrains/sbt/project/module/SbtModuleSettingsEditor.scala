@@ -74,7 +74,7 @@ private class ResolversModel(val resolvers: Seq[SbtResolver])
   private val columns = Seq(
       SbtBundle("sbt.settings.resolvers.name"),
       SbtBundle("sbt.settings.resolvers.url"),
-      SbtBundle("sbt.settings.resolvers.updated")
+      SbtBundle("sbt.settings.resolvers.updated"),
   )
 
   def getColumnCount = columns.size

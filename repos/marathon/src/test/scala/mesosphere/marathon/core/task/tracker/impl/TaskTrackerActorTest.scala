@@ -52,7 +52,7 @@ class TaskTrackerActorTest
     f.taskTrackerActor ! TaskTrackerActor.ForwardTaskOp(
         deadline,
         Task.Id("task1"),
-        TaskOpProcessor.Action.Noop
+        TaskOpProcessor.Action.Noop,
     )
 
     Then("it will eventuall die")
@@ -100,7 +100,7 @@ class TaskTrackerActorTest
     val runningTask2 = MarathonTestHelper.runningTaskProto("running2")
     val appDataMap = TaskTracker.TasksByApp.of(
         TaskTracker.AppTasks(appId,
-                             Iterable(stagedTask, runningTask1, runningTask2))
+                             Iterable(stagedTask, runningTask1, runningTask2)),
     )
     f.taskLoader.loadTasks() returns Future.successful(appDataMap)
 
@@ -123,7 +123,7 @@ class TaskTrackerActorTest
     val runningTask2 = MarathonTestHelper.runningTaskProto(appId)
     val appDataMap = TaskTracker.TasksByApp.of(
         TaskTracker.AppTasks(appId,
-                             Iterable(stagedTask, runningTask1, runningTask2))
+                             Iterable(stagedTask, runningTask1, runningTask2)),
     )
     f.taskLoader.loadTasks() returns Future.successful(appDataMap)
 
@@ -160,7 +160,7 @@ class TaskTrackerActorTest
     val runningTask2 = MarathonTestHelper.runningTaskProto(appId)
     val appDataMap = TaskTracker.TasksByApp.of(
         TaskTracker.AppTasks(appId,
-                             Iterable(stagedTask, runningTask1, runningTask2))
+                             Iterable(stagedTask, runningTask1, runningTask2)),
     )
     f.taskLoader.loadTasks() returns Future.successful(appDataMap)
 
@@ -188,7 +188,7 @@ class TaskTrackerActorTest
     val runningTask2 = MarathonTestHelper.runningTaskProto(appId)
     val appDataMap = TaskTracker.TasksByApp.of(
         TaskTracker.AppTasks(appId,
-                             Iterable(stagedTask, runningTask1, runningTask2))
+                             Iterable(stagedTask, runningTask1, runningTask2)),
     )
     f.taskLoader.loadTasks() returns Future.successful(appDataMap)
 

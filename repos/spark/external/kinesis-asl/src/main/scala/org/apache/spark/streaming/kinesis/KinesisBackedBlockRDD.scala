@@ -60,7 +60,7 @@ private[kinesis] class KinesisBackedBlockRDDPartition(
     idx: Int,
     blockId: BlockId,
     val isBlockIdValid: Boolean,
-    val seqNumberRanges: SequenceNumberRanges
+    val seqNumberRanges: SequenceNumberRanges,
 )
     extends BlockRDDPartition(blockId, idx)
 
@@ -77,7 +77,7 @@ private[kinesis] class KinesisBackedBlockRDD[T : ClassTag](
     @transient private val isBlockIdValid: Array[Boolean] = Array.empty,
     val retryTimeoutMs: Int = 10000,
     val messageHandler: Record => T = KinesisUtils.defaultMessageHandler _,
-    val awsCredentialsOption: Option[SerializableAWSCredentials] = None
+    val awsCredentialsOption: Option[SerializableAWSCredentials] = None,
 )
     extends BlockRDD[T](sc, _blockIds) {
 

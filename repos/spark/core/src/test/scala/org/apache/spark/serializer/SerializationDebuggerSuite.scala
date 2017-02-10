@@ -167,8 +167,8 @@ class SerializationDebuggerSuite
             new ExternalizableClass(new SerializableSubclass(
                     new SerializableArray(
                         Array(new SerializableClass1,
-                              new SerializableClass2(new NotSerializable))
-                    )
+                              new SerializableClass2(new NotSerializable)),
+                    ),
                 ))))
 
     findAndAssert(
@@ -177,8 +177,8 @@ class SerializationDebuggerSuite
             new ExternalizableClass(new SerializableSubclass(
                     new SerializableArray(
                         Array(new SerializableClass1,
-                              new SerializableClass2(new SerializableClass1))
-                    )
+                              new SerializableClass2(new SerializableClass1)),
+                    ),
                 ))))
   }
 

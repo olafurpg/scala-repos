@@ -16,7 +16,7 @@ case class ALSAlgorithmParams(
 class ALSModel(
     val similarUserFeatures: Map[Int, Array[Double]],
     val similarUserStringIntMap: BiMap[String, Int],
-    val similarUsers: Map[Int, User]
+    val similarUsers: Map[Int, User],
 )
     extends Serializable {
 
@@ -104,7 +104,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     new ALSModel(
         similarUserFeatures = m.productFeatures.collectAsMap().toMap,
         similarUserStringIntMap = similarUserStringIntMap,
-        similarUsers = similarUsers
+        similarUsers = similarUsers,
     )
   }
 
@@ -152,7 +152,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             similarUsers = model.similarUsers,
             queryList = queryList,
             whiteList = whiteList,
-            blackList = blackList
+            blackList = blackList,
         )
     }
 
@@ -162,7 +162,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       case (i, s) =>
         new similarUserScore(
             user = model.similarUserIntStringMap(i),
-            score = s
+            score = s,
         )
     }
 
@@ -208,7 +208,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       similarUsers: Map[Int, User],
       queryList: Set[Int],
       whiteList: Option[Set[Int]],
-      blackList: Option[Set[Int]]
+      blackList: Option[Set[Int]],
   ): Boolean = {
     whiteList.map(_.contains(i)).getOrElse(true) &&
     blackList.map(!_.contains(i)).getOrElse(true) &&

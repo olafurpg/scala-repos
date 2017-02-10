@@ -147,7 +147,7 @@ class EvaluationInstanceSerializer
                       "evaluatorResultsHTML",
                       JString(i.evaluatorResultsHTML)) :: JField(
                       "evaluatorResultsJSON",
-                      JString(i.evaluatorResultsJSON)) :: Nil
+                      JString(i.evaluatorResultsJSON)) :: Nil,
               )
-          })
+          }),
     )

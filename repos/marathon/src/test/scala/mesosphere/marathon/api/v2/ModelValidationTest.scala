@@ -32,7 +32,7 @@ class ModelValidationTest
                       Set(
                           createServicePortApp("/a".toPath, 0),
                           createServicePortApp("/b".toPath, 0),
-                          createServicePortApp("/c".toPath, 0)
+                          createServicePortApp("/c".toPath, 0),
                       ))
 
     val failedResult = Group.validGroupWithConfig(Some(2)).apply(group)
@@ -134,9 +134,9 @@ class ModelValidationTest
                             image = "demothing",
                             network = Some(Network.BRIDGE),
                             portMappings = Some(Seq(PortMapping(
-                                          2000, servicePort = servicePort)))
-                        ))
-              ))
+                                          2000, servicePort = servicePort))),
+                        )),
+              )),
     )
 
   case class ImportantTitle(name: String)

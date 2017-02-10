@@ -161,7 +161,10 @@ class EnsembleGridPane extends EnsembleExample {
     // grid3 places the child by influencing the rows and columns
     // via GridRowInfo and GridColumnInfo. This grid uses the percentages
     val grid3Caption = new Label {
-      text = "The example below shows GridPane content placement by " + "influencing row and column percentages.  " + "Also, grid lines are made visible in this example.  " + "The lines can be helpful in debugging."
+      text = "The example below shows GridPane content placement by " +
+ "influencing row and column percentages.  " +
+ "Also, grid lines are made visible in this example.  " +
+ "The lines can be helpful in debugging."
       wrapText = true
     }
 
@@ -214,7 +217,7 @@ class EnsembleGridPane extends EnsembleExample {
           new Separator(),
           new VBox { children = List(grid2Caption, grid2) },
           new Separator(),
-          new VBox { children = List(grid3Caption, grid3) }
+          new VBox { children = List(grid3Caption, grid3) },
       )
     }
   }

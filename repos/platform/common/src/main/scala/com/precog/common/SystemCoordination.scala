@@ -112,7 +112,7 @@ case class EventRelayState(
         idSequenceBlock.producerId,
         nextSequenceId,
         idSequenceBlock.firstSequenceId,
-        idSequenceBlock.lastSequenceId
+        idSequenceBlock.lastSequenceId,
     )
 }
 

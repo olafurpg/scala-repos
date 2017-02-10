@@ -11,7 +11,7 @@ import java.io.File
   */
 case class RpcResponseEnvelope(
     callId: Option[Int],
-    payload: EnsimeServerMessage
+    payload: EnsimeServerMessage,
 )
 
 sealed trait EnsimeServerMessage
@@ -33,13 +33,13 @@ sealed trait DebugVmStatus extends RpcResponse
 
 // must have redundant status: String to match legacy API
 case class DebugVmSuccess(
-    status: String = "success"
+    status: String = "success",
 )
     extends DebugVmStatus
 case class DebugVmError(
     errorCode: Int,
     details: String,
-    status: String = "error"
+    status: String = "error",
 )
     extends DebugVmStatus
 
@@ -53,7 +53,7 @@ sealed trait DebugEvent extends EnsimeEvent
   */
 case class SendBackgroundMessageEvent(
     detail: String,
-    code: Int = 105
+    code: Int = 105,
 )
     extends GeneralSwankEvent
 
@@ -82,21 +82,21 @@ case class Note(
     beg: Int,
     end: Int,
     line: Int,
-    col: Int
+    col: Int,
 )
     extends RpcResponse
 
 /** The presentation compiler is providing notes: e.g. errors, warnings. */
 case class NewScalaNotesEvent(
     isFull: Boolean,
-    notes: List[Note]
+    notes: List[Note],
 )
     extends GeneralSwankEvent
 
 /** The presentation compiler is providing notes: e.g. errors, warnings. */
 case class NewJavaNotesEvent(
     isFull: Boolean,
-    notes: List[Note]
+    notes: List[Note],
 )
     extends GeneralSwankEvent
 
@@ -105,7 +105,7 @@ case class DebugStepEvent(
     threadId: DebugThreadId,
     threadName: String,
     file: File,
-    line: Int
+    line: Int,
 )
     extends DebugEvent
 
@@ -114,7 +114,7 @@ case class DebugBreakEvent(
     threadId: DebugThreadId,
     threadName: String,
     file: File,
-    line: Int
+    line: Int,
 )
     extends DebugEvent
 
@@ -130,7 +130,7 @@ case class DebugExceptionEvent(
     threadId: DebugThreadId,
     threadName: String,
     file: Option[File],
-    line: Option[Int]
+    line: Option[Int],
 )
     extends DebugEvent
 
@@ -179,7 +179,7 @@ case class RefactorResult(
 case class RefactorDiffEffect(
     procedureId: Int,
     refactorType: RefactorType,
-    diff: File
+    diff: File,
 )
     extends RpcResponse with RefactorProcedure
 
@@ -212,20 +212,20 @@ sealed trait PatchOp {
 
 case class PatchInsert(
     start: Int,
-    text: String
+    text: String,
 )
     extends PatchOp
 
 case class PatchDelete(
     start: Int,
-    end: Int
+    end: Int,
 )
     extends PatchOp
 
 case class PatchReplace(
     start: Int,
     end: Int,
-    text: String
+    text: String,
 )
     extends PatchOp
 
@@ -252,7 +252,7 @@ object SourceSymbol {
       FunctionCallSymbol,
       ImplicitConversionSymbol,
       ImplicitParamsSymbol,
-      DeprecatedSymbol
+      DeprecatedSymbol,
   )
 }
 
@@ -290,7 +290,7 @@ case class PackageInfo(
     name: String,
     fullName: String,
     // n.b. members should be sorted by name for consistency
-    members: Seq[EntityInfo]
+    members: Seq[EntityInfo],
 )
     extends EntityInfo {
   require(
@@ -308,7 +308,7 @@ case class TypeSearchResult(
     name: String,
     localName: String,
     declAs: DeclaredAs,
-    pos: Option[SourcePosition]
+    pos: Option[SourcePosition],
 )
     extends SymbolSearchResult
 
@@ -317,7 +317,7 @@ case class MethodSearchResult(
     localName: String,
     declAs: DeclaredAs,
     pos: Option[SourcePosition],
-    ownerName: String
+    ownerName: String,
 )
     extends SymbolSearchResult
 
@@ -329,14 +329,14 @@ case class SymbolSearchResults(syms: List[SymbolSearchResult])
 
 case class SymbolDesignations(
     file: File,
-    syms: List[SymbolDesignation]
+    syms: List[SymbolDesignation],
 )
     extends RpcResponse
 
 case class SymbolDesignation(
     start: Int,
     end: Int,
-    symType: SourceSymbol
+    symType: SourceSymbol,
 )
 
 case class SymbolInfo(
@@ -344,7 +344,7 @@ case class SymbolInfo(
     localName: String,
     declPos: Option[SourcePosition],
     `type`: TypeInfo,
-    isCallable: Boolean
+    isCallable: Boolean,
 )
     extends RpcResponse {
   def tpe = `type`
@@ -352,7 +352,7 @@ case class SymbolInfo(
 
 case class Op(
     op: String,
-    description: String
+    description: String,
 )
 
 case class MethodBytecode(
@@ -361,13 +361,13 @@ case class MethodBytecode(
     methodSignature: Option[String],
     byteCode: List[Op],
     startLine: Int,
-    endLine: Int
+    endLine: Int,
 )
 
 case class CompletionSignature(
     sections: List[List[(String, String)]],
     result: String,
-    hasImplicit: Boolean
+    hasImplicit: Boolean,
 )
 
 case class CompletionInfo(
@@ -375,13 +375,13 @@ case class CompletionInfo(
     typeSig: CompletionSignature,
     isCallable: Boolean,
     relevance: Int,
-    toInsert: Option[String]
+    toInsert: Option[String],
 )
     extends RpcResponse
 
 case class CompletionInfoList(
     prefix: String,
-    completions: List[CompletionInfo]
+    completions: List[CompletionInfo],
 )
     extends RpcResponse
 
@@ -449,13 +449,13 @@ sealed trait DebugValue extends RpcResponse {
 }
 
 case class DebugNullValue(
-    typeName: String
+    typeName: String,
 )
     extends DebugValue
 
 case class DebugPrimitiveValue(
     summary: String,
-    typeName: String
+    typeName: String,
 )
     extends DebugValue
 
@@ -463,7 +463,7 @@ case class DebugObjectInstance(
     summary: String,
     fields: List[DebugClassField],
     typeName: String,
-    objectId: DebugObjectId
+    objectId: DebugObjectId,
 )
     extends DebugValue
 
@@ -471,7 +471,7 @@ case class DebugStringInstance(
     summary: String,
     fields: List[DebugClassField],
     typeName: String,
-    objectId: DebugObjectId
+    objectId: DebugObjectId,
 )
     extends DebugValue
 
@@ -479,7 +479,7 @@ case class DebugArrayInstance(
     length: Int,
     typeName: String,
     elementTypeName: String,
-    objectId: DebugObjectId
+    objectId: DebugObjectId,
 )
     extends DebugValue
 
@@ -487,7 +487,7 @@ case class DebugClassField(
     index: Int,
     name: String,
     typeName: String,
-    summary: String
+    summary: String,
 )
     extends RpcResponse
 
@@ -495,7 +495,7 @@ case class DebugStackLocal(
     index: Int,
     name: String,
     summary: String,
-    typeName: String
+    typeName: String,
 )
     extends RpcResponse
 
@@ -506,14 +506,14 @@ case class DebugStackFrame(
     className: String,
     methodName: String,
     pcLocation: LineSourcePosition,
-    thisObjectId: DebugObjectId
+    thisObjectId: DebugObjectId,
 )
     extends RpcResponse
 
 case class DebugBacktrace(
     frames: List[DebugStackFrame],
     threadId: DebugThreadId,
-    threadName: String
+    threadName: String,
 )
     extends RpcResponse
 
@@ -522,7 +522,7 @@ case class NamedTypeMemberInfo(
     `type`: TypeInfo,
     pos: Option[SourcePosition],
     signatureString: Option[String],
-    declAs: DeclaredAs
+    declAs: DeclaredAs,
 )
     extends EntityInfo {
   override def members = List.empty
@@ -547,14 +547,14 @@ case class BasicTypeInfo(
     fullName: String,
     typeArgs: Iterable[TypeInfo],
     members: Iterable[EntityInfo],
-    pos: Option[SourcePosition]
+    pos: Option[SourcePosition],
 )
     extends TypeInfo
 
 case class ArrowTypeInfo(
     name: String,
     resultType: TypeInfo,
-    paramSections: Iterable[ParamSectionInfo]
+    paramSections: Iterable[ParamSectionInfo],
 )
     extends TypeInfo {
   def declAs = DeclaredAs.Nil
@@ -566,12 +566,12 @@ case class ArrowTypeInfo(
 
 case class ParamSectionInfo(
     params: Iterable[(String, TypeInfo)],
-    isImplicit: Boolean
+    isImplicit: Boolean,
 )
 
 case class InterfaceInfo(
     `type`: TypeInfo,
-    viaView: Option[String]
+    viaView: Option[String],
 )
     extends RpcResponse {
   def tpe = `type`
@@ -593,12 +593,12 @@ case class ERangePositions(positions: List[ERangePosition]) extends RpcResponse
 case class FileRange(file: String, start: Int, end: Int) extends RpcResponse
 
 case class EnsimeImplementation(
-    name: String
+    name: String,
 )
 case class ConnectionInfo(
     pid: Option[Int] = None,
     implementation: EnsimeImplementation = EnsimeImplementation("ENSIME"),
-    version: String = "0.8.20"
+    version: String = "0.8.20",
 )
     extends RpcResponse
 
@@ -607,7 +607,7 @@ sealed trait ImplicitInfo
 case class ImplicitConversionInfo(
     start: Int,
     end: Int,
-    fun: SymbolInfo
+    fun: SymbolInfo,
 )
     extends ImplicitInfo
 
@@ -616,7 +616,7 @@ case class ImplicitParamInfo(
     end: Int,
     fun: SymbolInfo,
     params: List[SymbolInfo],
-    funIsImplicit: Boolean
+    funIsImplicit: Boolean,
 )
     extends ImplicitInfo
 
@@ -633,5 +633,5 @@ case class StructureViewMember(
     keyword: String,
     name: String,
     position: SourcePosition,
-    members: List[StructureViewMember]
+    members: List[StructureViewMember],
 )

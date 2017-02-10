@@ -57,7 +57,7 @@ import org.apache.spark.util.{CallSite, Utils}
   *  - A function that is used to generate an RDD after each time interval
   */
 abstract class DStream[T : ClassTag](
-    @transient private[streaming] var ssc: StreamingContext
+    @transient private[streaming] var ssc: StreamingContext,
 )
     extends Serializable with Logging {
 
@@ -241,20 +241,20 @@ abstract class DStream[T : ClassTag](
     require(
         !mustCheckpoint || checkpointDuration != null,
         s"The checkpoint interval for ${this.getClass.getSimpleName} has not been set." +
-        " Please use DStream.checkpoint() to set the interval."
+        " Please use DStream.checkpoint() to set the interval.",
     )
 
     require(
         checkpointDuration == null ||
         context.sparkContext.checkpointDir.isDefined,
-        "The checkpoint directory has not been set. Please set it by StreamingContext.checkpoint()."
+        "The checkpoint directory has not been set. Please set it by StreamingContext.checkpoint().",
     )
 
     require(
         checkpointDuration == null || checkpointDuration >= slideDuration,
         s"The checkpoint interval for ${this.getClass.getSimpleName} has been set to " +
         s"$checkpointDuration which is lower than its slide time ($slideDuration). " +
-        s"Please set it to at least $slideDuration."
+        s"Please set it to at least $slideDuration.",
     )
 
     require(
@@ -262,21 +262,21 @@ abstract class DStream[T : ClassTag](
         checkpointDuration.isMultipleOf(slideDuration),
         s"The checkpoint interval for ${this.getClass.getSimpleName} has been set to " +
         s" $checkpointDuration which not a multiple of its slide time ($slideDuration). " +
-        s"Please set it to a multiple of $slideDuration."
+        s"Please set it to a multiple of $slideDuration.",
     )
 
     require(
         checkpointDuration == null || storageLevel != StorageLevel.NONE,
         s"${this.getClass.getSimpleName} has been marked for checkpointing but the storage " +
         "level has not been set to enable persisting. Please use DStream.persist() to set the " +
-        "storage level to use memory for better checkpointing performance."
+        "storage level to use memory for better checkpointing performance.",
     )
 
     require(
         checkpointDuration == null || rememberDuration > checkpointDuration,
         s"The remember duration for ${this.getClass.getSimpleName} has been set to " +
         s" $rememberDuration which is not more than the checkpoint interval" +
-        s" ($checkpointDuration). Please set it to higher than $checkpointDuration."
+        s" ($checkpointDuration). Please set it to higher than $checkpointDuration.",
     )
 
     dependencies.foreach(_.validateAtStart())
@@ -396,7 +396,7 @@ abstract class DStream[T : ClassTag](
     // restore them later after setting our own.
     val prevCallSite = CallSite(
         ssc.sparkContext.getLocalProperty(CallSite.SHORT_FORM),
-        ssc.sparkContext.getLocalProperty(CallSite.LONG_FORM)
+        ssc.sparkContext.getLocalProperty(CallSite.LONG_FORM),
     )
     val prevScope = ssc.sparkContext.getLocalProperty(scopeKey)
     val prevScopeNoOverride =
@@ -610,7 +610,7 @@ abstract class DStream[T : ClassTag](
     */
   def mapPartitions[U : ClassTag](
       mapPartFunc: Iterator[T] => Iterator[U],
-      preservePartitioning: Boolean = false
+      preservePartitioning: Boolean = false,
   ): DStream[U] = ssc.withScope {
     new MapPartitionedDStream(
         this, context.sparkContext.clean(mapPartFunc), preservePartitioning)
@@ -722,7 +722,7 @@ abstract class DStream[T : ClassTag](
     */
   def transformWith[U : ClassTag, V : ClassTag](
       other: DStream[U],
-      transformFunc: (RDD[T], RDD[U]) => RDD[V]
+      transformFunc: (RDD[T], RDD[U]) => RDD[V],
   ): DStream[V] = ssc.withScope {
     // because the DStream is reachable from the outer object here, and because
     // DStreams can't be serialized with closures, we can't proactively check
@@ -739,7 +739,7 @@ abstract class DStream[T : ClassTag](
     */
   def transformWith[U : ClassTag, V : ClassTag](
       other: DStream[U],
-      transformFunc: (RDD[T], RDD[U], Time) => RDD[V]
+      transformFunc: (RDD[T], RDD[U], Time) => RDD[V],
   ): DStream[V] = ssc.withScope {
     // because the DStream is reachable from the outer object here, and because
     // DStreams can't be serialized with closures, we can't proactively check
@@ -821,7 +821,7 @@ abstract class DStream[T : ClassTag](
   def reduceByWindow(
       reduceFunc: (T, T) => T,
       windowDuration: Duration,
-      slideDuration: Duration
+      slideDuration: Duration,
   ): DStream[T] = ssc.withScope {
     this
       .reduce(reduceFunc)
@@ -849,7 +849,7 @@ abstract class DStream[T : ClassTag](
       reduceFunc: (T, T) => T,
       invReduceFunc: (T, T) => T,
       windowDuration: Duration,
-      slideDuration: Duration
+      slideDuration: Duration,
   ): DStream[T] = ssc.withScope {
     this
       .map(x => (1, x))
@@ -900,7 +900,7 @@ abstract class DStream[T : ClassTag](
           windowDuration,
           slideDuration,
           numPartitions,
-          (x: (T, Long)) => x._2 != 0L
+          (x: (T, Long)) => x._2 != 0L,
       )
   }
 

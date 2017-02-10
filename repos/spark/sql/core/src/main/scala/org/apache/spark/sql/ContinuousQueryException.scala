@@ -36,7 +36,7 @@ class ContinuousQueryException private[sql](
     val message: String,
     val cause: Throwable,
     val startOffset: Option[Offset] = None,
-    val endOffset: Option[Offset] = None
+    val endOffset: Option[Offset] = None,
 )
     extends Exception(message, cause) {
 

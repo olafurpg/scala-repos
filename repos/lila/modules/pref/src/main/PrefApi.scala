@@ -123,7 +123,7 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
     coll.distinct("_id",
                   BSONDocument(
                       "_id" -> BSONDocument("$in" -> userIds),
-                      "follow" -> false
+                      "follow" -> false,
                   ).some) map lila.db.BSON.asStringSet
 
   def followableIds(userIds: List[String]): Fu[Set[String]] =

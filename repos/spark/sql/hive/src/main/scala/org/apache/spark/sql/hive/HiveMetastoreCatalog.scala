@@ -324,7 +324,7 @@ private[hive] class HiveMetastoreCatalog(
                          inputFormat = None,
                          outputFormat = None,
                          serde = None,
-                         serdeProperties = options
+                         serdeProperties = options,
                      ),
                    properties = tableProperties.toMap)
     }
@@ -343,7 +343,7 @@ private[hive] class HiveMetastoreCatalog(
                 inputFormat = serde.inputFormat,
                 outputFormat = serde.outputFormat,
                 serde = serde.serde,
-                serdeProperties = options
+                serdeProperties = options,
             ),
           schema = relation.schema.map { f =>
             CatalogColumn(f.name,
@@ -483,8 +483,8 @@ private[hive] class HiveMetastoreCatalog(
         ParquetRelation.MERGE_SCHEMA -> mergeSchema.toString,
         ParquetRelation.METASTORE_TABLE_NAME -> TableIdentifier(
             metastoreRelation.tableName,
-            Some(metastoreRelation.databaseName)
-        ).unquotedString
+            Some(metastoreRelation.databaseName),
+        ).unquotedString,
     )
     val tableIdentifier = QualifiedTableName(
         metastoreRelation.databaseName, metastoreRelation.tableName)
@@ -712,7 +712,7 @@ private[hive] class HiveMetastoreCatalog(
               bucketSpec = None,
               mode,
               options = Map.empty[String, String],
-              child
+              child,
           )
         } else {
           val desc =
@@ -947,7 +947,7 @@ private[hive] case class MetastoreRelation(
                     .map(_.toLong)
                     .filter(_ > 0)
                     .getOrElse(sqlContext.conf.defaultSizeInBytes)))
-      }
+      },
   )
 
   // When metastore partition pruning is turned off, we cache the list of all partitions to
@@ -1010,7 +1010,7 @@ private[hive] case class MetastoreRelation(
       // substitute some output formats, e.g. substituting SequenceFileOutputFormat to
       // HiveSequenceFileOutputFormat.
       hiveQlTable.getOutputFormatClass,
-      hiveQlTable.getMetadata
+      hiveQlTable.getMetadata,
   )
 
   implicit class SchemaAttribute(f: CatalogColumn) {
@@ -1019,7 +1019,7 @@ private[hive] case class MetastoreRelation(
           f.name,
           HiveMetastoreTypes.toDataType(f.dataType),
           // Since data can be dumped in randomly with no validation, everything is nullable.
-          nullable = true
+          nullable = true,
       )(qualifiers = Seq(alias.getOrElse(tableName)))
   }
 

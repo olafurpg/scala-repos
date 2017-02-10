@@ -212,7 +212,7 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     def handleNamespaceBinding(pre: String, z: String): Tree = {
       def mkAssign(t: Tree): Tree = Assign(
           Ident(_tmpscope),
-          New(_scala_xml_NamespaceBinding, LL(const(pre), t, Ident(_tmpscope)))
+          New(_scala_xml_NamespaceBinding, LL(const(pre), t, Ident(_tmpscope))),
       )
 
       val uri1 = attrMap(z) match {
@@ -298,7 +298,7 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
         makeSymbolicAttrs,
         Ident(_scope),
         empty,
-        args
+        args,
     )
 
     atPos(pos.makeTransparent)(Block(nsResult, Block(attrResult, body)))

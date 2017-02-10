@@ -187,7 +187,7 @@ class TaskSerializerTest
           .addIpAddresses(MesosProtos.NetworkInfo.IPAddress
                 .newBuilder()
                 .setIpAddress("1.2.3.4"))
-          .build()
+          .build(),
       )
     val fullSampleTaskStateWithoutNetworking: Task.LaunchedOnReservation =
       Task.LaunchedOnReservation(
@@ -199,12 +199,12 @@ class TaskSerializerTest
           status = Task.Status(
                 stagedAt = Timestamp(stagedAtLong),
                 startedAt = Some(Timestamp(startedAtLong)),
-                mesosStatus = Some(sampleTaskStatus)
+                mesosStatus = Some(sampleTaskStatus),
             ),
           networking = Task.NoNetworking,
           reservation = Task.Reservation(
                 Seq(LocalVolumeId(appId, "my-volume", "uuid-123")),
-                Task.Reservation.State.Launched)
+                Task.Reservation.State.Launched),
       )
 
     val completeTask = MarathonTask
@@ -292,7 +292,7 @@ class TaskSerializerTest
                           Task.Reservation.Timeout(
                               initiated = now,
                               deadline = now + 1.minute,
-                              reason = Task.Reservation.Timeout.Reason.ReservationTimeout))))
+                              reason = Task.Reservation.Timeout.Reason.ReservationTimeout)))),
         )
 
       def launchedEphemeralProto =
@@ -325,7 +325,7 @@ class TaskSerializerTest
           appVersion,
           status,
           hostPorts,
-          Task.Reservation(localVolumeIds, Task.Reservation.State.Launched)
+          Task.Reservation(localVolumeIds, Task.Reservation.State.Launched),
       )
 
       def reservedProtoWithoutReservation =

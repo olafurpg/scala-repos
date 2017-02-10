@@ -78,7 +78,7 @@ object ScalaJSPlugin extends AutoPlugin {
     def NodeJSEnv(
         executable: String = "node",
         args: Seq[String] = Seq.empty,
-        env: Map[String, String] = Map.empty
+        env: Map[String, String] = Map.empty,
     ): Def.Initialize[Task[NodeJSEnv]] = Def.task {
       new NodeJSEnv(executable, args, env)
     }
@@ -103,7 +103,7 @@ object ScalaJSPlugin extends AutoPlugin {
         executable: String = "phantomjs",
         args: Seq[String] = Seq.empty,
         env: Map[String, String] = Map.empty,
-        autoExit: Boolean = true
+        autoExit: Boolean = true,
     ): Def.Initialize[Task[PhantomJSEnv]] = Def.task {
       val loader = scalaJSPhantomJSClassLoader.value
       new PhantomJSEnv(executable, args, env, autoExit, loader)
@@ -297,7 +297,7 @@ object ScalaJSPlugin extends AutoPlugin {
     super.globalSettings ++ Seq(
         scalaJSStage := Stage.FastOpt,
         scalaJSUseRhino := true,
-        scalaJSClearCacheStats := globalIRCache.clearStats()
+        scalaJSClearCacheStats := globalIRCache.clearStats(),
     )
   }
 

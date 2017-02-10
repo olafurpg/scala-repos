@@ -190,7 +190,7 @@ object Status {
       506 -> VariantAlsoNegotiates,
       507 -> InsufficientStorage,
       510 -> NotExtended,
-      511 -> NetworkAuthenticationRequired
+      511 -> NetworkAuthenticationRequired,
   )
 
   // See note in Status.
@@ -250,6 +250,6 @@ object Status {
       VariantAlsoNegotiates -> "Variant Also Negotiates",
       InsufficientStorage -> "Insufficient Storage",
       NotExtended -> "Not Extended",
-      NetworkAuthenticationRequired -> "Network Authentication Required"
+      NetworkAuthenticationRequired -> "Network Authentication Required",
   )
 }

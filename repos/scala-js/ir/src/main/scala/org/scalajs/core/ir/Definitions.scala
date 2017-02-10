@@ -116,7 +116,7 @@ object Definitions {
         "scala_Int" -> "I",
         "scala_Long" -> "J",
         "scala_Float" -> "F",
-        "scala_Double" -> "D"
+        "scala_Double" -> "D",
     ) ++ (for (index <- 2 to 22) yield s"scala_Tuple$index" -> ("T" + index)) ++
     (for (index <- 0 to 22) yield s"scala_Function$index" -> ("F" + index))
 
@@ -133,7 +133,7 @@ object Definitions {
       "scala_runtime_" -> "sr_",
       "scala_" -> "s_",
       "java_lang_" -> "jl_",
-      "java_util_" -> "ju_"
+      "java_util_" -> "ju_",
   )
 
   private val decompressedPrefixes: Seq[(String, String)] =

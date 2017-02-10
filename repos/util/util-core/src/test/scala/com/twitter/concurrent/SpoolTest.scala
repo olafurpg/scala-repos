@@ -542,11 +542,11 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
             "2" *:: Future.value("3" *:: Future.value(Spool.empty[String]))),
         Spool.empty,
         "foo" *:: Future.value("bar" *:: Future.value(
-                "baz" *:: Future.value(Spool.empty[String])))
+                "baz" *:: Future.value(Spool.empty[String]))),
     ).map(Future.value)
     assert(
         Await.result(Spool.merge(spools).flatMap(_.toSeq), 5.seconds) == Seq(
-            "a", "1", "foo", "b", "2", "bar", "c", "3", "baz")
+            "a", "1", "foo", "b", "2", "bar", "c", "3", "baz"),
     )
   }
 

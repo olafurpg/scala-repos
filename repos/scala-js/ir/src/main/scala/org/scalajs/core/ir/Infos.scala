@@ -22,7 +22,7 @@ object Infos {
       val kind: ClassKind,
       val superClass: Option[String], // always None for interfaces
       val interfaces: List[String], // direct parent interfaces only
-      val methods: List[MethodInfo]
+      val methods: List[MethodInfo],
   )
 
   object ClassInfo {
@@ -51,7 +51,7 @@ object Infos {
       val instantiatedClasses: List[String],
       val accessedModules: List[String],
       val usedInstanceTests: List[String],
-      val accessedClassData: List[String]
+      val accessedClassData: List[String],
   )
 
   object MethodInfo {
@@ -255,7 +255,7 @@ object Infos {
           instantiatedClasses = instantiatedClasses.toList,
           accessedModules = accessedModules.toList,
           usedInstanceTests = usedInstanceTests.toList,
-          accessedClassData = accessedClassData.toList
+          accessedClassData = accessedClassData.toList,
       )
     }
   }

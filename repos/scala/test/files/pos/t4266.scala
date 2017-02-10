@@ -3,7 +3,7 @@ object Test {
   trait Tensor2Like[
       @specialized(Int) A1,
       +D1 <: DomainLike[A1],
-      +D <: Product2DomainLike[D1]
+      +D <: Product2DomainLike[D1],
   ] {
     def domain: D;
 

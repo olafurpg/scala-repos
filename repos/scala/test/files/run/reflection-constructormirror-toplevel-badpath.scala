@@ -3,7 +3,7 @@ import scala.reflect.ClassTag
 
 case class R(
     sales: Int,
-    name: String
+    name: String,
 )
 
 class Foo {

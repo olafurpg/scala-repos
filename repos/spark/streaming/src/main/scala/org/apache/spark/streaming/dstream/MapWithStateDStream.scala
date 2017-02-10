@@ -160,7 +160,7 @@ private[streaming] class InternalMapWithStateDStream[
               .getInitialStateRDD()
               .getOrElse(new EmptyRDD[(K, S)](ssc.sparkContext)),
             partitioner,
-            validTime
+            validTime,
         )
     }
 

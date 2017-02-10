@@ -317,7 +317,7 @@ private trait LazyTuple2Semigroup[A1, A2]
   implicit def _2: Semigroup[A2]
   def append(f1: LazyTuple2[A1, A2], f2: => LazyTuple2[A1, A2]) = LazyTuple2(
       _1.append(f1._1, f2._1),
-      _2.append(f1._2, f2._2)
+      _2.append(f1._2, f2._2),
   )
 }
 private trait LazyTuple3Semigroup[A1, A2, A3]
@@ -329,7 +329,7 @@ private trait LazyTuple3Semigroup[A1, A2, A3]
     LazyTuple3(
         _1.append(f1._1, f2._1),
         _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3)
+        _3.append(f1._3, f2._3),
     )
 }
 private trait LazyTuple4Semigroup[A1, A2, A3, A4]
@@ -344,7 +344,7 @@ private trait LazyTuple4Semigroup[A1, A2, A3, A4]
         _1.append(f1._1, f2._1),
         _2.append(f1._2, f2._2),
         _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4)
+        _4.append(f1._4, f2._4),
     )
 }
 

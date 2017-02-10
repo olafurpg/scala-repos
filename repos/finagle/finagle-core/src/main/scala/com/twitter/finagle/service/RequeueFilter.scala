@@ -56,7 +56,7 @@ private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
 
   private[this] def responseFuture(
       attempt: Int,
-      t: Try[Rep]
+      t: Try[Rep],
   ): Future[Rep] = {
     requeueStat.add(attempt)
     Future.const(t)
@@ -67,7 +67,7 @@ private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
       service: Service[Req, Rep],
       attempt: Int,
       retriesRemaining: Int,
-      backoffs: Stream[Duration]
+      backoffs: Stream[Duration],
   ): Future[Rep] = {
     service(req).transform {
       case t @ Throw(RetryPolicy.RetryableWriteException(_)) =>

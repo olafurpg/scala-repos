@@ -84,7 +84,7 @@ class FastTrack[MacrosAndAnalyzer <: Macros with Analyzer](
           },
           makeWhitebox(QuasiquoteClass_api_unapply) {
             case _ => _.expandQuasiquote
-          }
+          },
       )
     }
 }

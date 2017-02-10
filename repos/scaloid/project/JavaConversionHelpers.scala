@@ -35,13 +35,13 @@ trait JavaConversionHelpers {
     List(
         m.getName,
         m.getReturnType.getName,
-        "[" + m.getParameterTypes.map(_.getName).toList.mkString(",") + "]"
+        "[" + m.getParameterTypes.map(_.getName).toList.mkString(",") + "]",
     ).mkString(":")
 
   def propDescSignature(pdesc: PropertyDescriptor): String =
     List(
         pdesc.getName,
-        pdesc.getPropertyType
+        pdesc.getPropertyType,
     ).mkString(":")
 
   def simpleClassName(s: String): String = s.split(Array('.', '#')).last
@@ -63,7 +63,7 @@ trait JavaConversionHelpers {
           case p: ParameterizedType =>
             ScalaType(
                 step(p.getRawType, nextLevel).name,
-                p.getActualTypeArguments.map(step(_, nextLevel)).toList
+                p.getActualTypeArguments.map(step(_, nextLevel)).toList,
             )
           case t: TypeVariable[_] =>
             ScalaType(t.getName,
@@ -90,7 +90,7 @@ trait JavaConversionHelpers {
               } else {
                 ScalaType(
                     name = c.getName.replace("$", innerClassDelim(c)),
-                    params = c.getTypeParameters.map(step(_, nextLevel)).toList
+                    params = c.getTypeParameters.map(step(_, nextLevel)).toList,
                 )
               }
             }

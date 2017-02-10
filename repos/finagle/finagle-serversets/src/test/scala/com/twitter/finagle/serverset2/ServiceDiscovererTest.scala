@@ -29,7 +29,7 @@ class ServiceDiscovererTest
   class ServiceDiscovererWithExposedCache(
       varZkSession: Var[ZkSession],
       statsReceiver: StatsReceiver,
-      timer: Timer = DefaultTimer.twitter
+      timer: Timer = DefaultTimer.twitter,
   )
       extends ServiceDiscoverer(
           varZkSession, statsReceiver, ForeverEpoch, timer) {

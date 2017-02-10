@@ -123,7 +123,7 @@ trait JavaScanners extends ast.parser.ScannersCommon {
         javanme.TRYkw -> TRY,
         javanme.VOIDkw -> VOID,
         javanme.VOLATILEkw -> VOLATILE,
-        javanme.WHILEkw -> WHILE
+        javanme.WHILEkw -> WHILE,
     )
 
     private var kwOffset = -1

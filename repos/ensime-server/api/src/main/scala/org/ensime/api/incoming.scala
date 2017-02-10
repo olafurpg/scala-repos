@@ -37,7 +37,7 @@ sealed trait RpcAnalyserRequest extends RpcRequest
   */
 case class ImplicitInfoReq(
     file: Either[File, SourceFileInfo],
-    range: OffsetRange
+    range: OffsetRange,
 )
     extends RpcAnalyserRequest
 
@@ -86,7 +86,7 @@ sealed trait RpcSearchRequest extends RpcRequest
   */
 case class PublicSymbolSearchReq(
     keywords: List[String],
-    maxResults: Int
+    maxResults: Int,
 )
     extends RpcSearchRequest
 
@@ -97,7 +97,7 @@ case class ImportSuggestionsReq(
     file: Either[File, SourceFileInfo],
     point: Int,
     names: List[String],
-    maxResults: Int
+    maxResults: Int,
 )
     extends RpcSearchRequest
 
@@ -106,7 +106,7 @@ case class ImportSuggestionsReq(
   */
 case class UsesOfSymbolAtPointReq(
     file: Either[File, SourceFileInfo],
-    point: Int
+    point: Int,
 )
     extends RpcAnalyserRequest // will probably become a search request
 
@@ -116,7 +116,7 @@ case class UsesOfSymbolAtPointReq(
   */
 case class DocUriAtPointReq(
     file: Either[File, SourceFileInfo],
-    point: OffsetRange
+    point: OffsetRange,
 )
     extends RpcAnalyserRequest
 
@@ -127,7 +127,7 @@ case class DocUriAtPointReq(
 case class DocUriForSymbolReq(
     typeFullName: String,
     memberName: Option[String],
-    signatureString: Option[String]
+    signatureString: Option[String],
 )
     extends RpcAnalyserRequest
 
@@ -139,7 +139,7 @@ case class CompletionsReq(
     point: Int,
     maxResults: Int,
     caseSens: Boolean,
-    reload: Boolean
+    reload: Boolean,
 )
     extends RpcAnalyserRequest
 
@@ -148,7 +148,7 @@ case class CompletionsReq(
   */
 case class PackageMemberCompletionReq(
     path: String,
-    prefix: String
+    prefix: String,
 )
     extends RpcAnalyserRequest
 
@@ -163,7 +163,7 @@ case class TypeByNameReq(name: String) extends RpcAnalyserRequest
 case class TypeByNameAtPointReq(
     name: String,
     file: Either[File, SourceFileInfo],
-    range: OffsetRange
+    range: OffsetRange,
 )
     extends RpcAnalyserRequest
 
@@ -172,7 +172,7 @@ case class TypeByNameAtPointReq(
   */
 case class TypeAtPointReq(
     file: Either[File, SourceFileInfo],
-    range: OffsetRange
+    range: OffsetRange,
 )
     extends RpcAnalyserRequest
 
@@ -218,7 +218,7 @@ case class SymbolAtPointReq(file: Either[File, SourceFileInfo], point: Int)
 case class SymbolByNameReq(
     typeFullName: String,
     memberName: Option[String],
-    signatureString: Option[String]
+    signatureString: Option[String],
 )
     extends RpcAnalyserRequest
 
@@ -234,7 +234,7 @@ case class PrepareRefactorReq(
     procId: Int,
     tpe: Symbol, // tpe is ignored but part of the legacy wire format
     params: RefactorDesc,
-    interactive: Boolean
+    interactive: Boolean,
 )
     extends RpcAnalyserRequest
 
@@ -244,7 +244,7 @@ case class PrepareRefactorReq(
 case class RefactorReq(
     procId: Int,
     params: RefactorDesc,
-    interactive: Boolean
+    interactive: Boolean,
 )
     extends RpcAnalyserRequest
 
@@ -274,7 +274,7 @@ case class SymbolDesignationsReq(
     file: Either[File, SourceFileInfo],
     start: Int,
     end: Int,
-    requestedTypes: List[SourceSymbol]
+    requestedTypes: List[SourceSymbol],
 )
     extends RpcAnalyserRequest
 

@@ -45,7 +45,7 @@ object Team extends LilaController {
     NotForKids {
       text.trim.isEmpty.fold(
           paginator popularTeams page map { html.team.all(_) },
-          Env.teamSearch(text, page) map { html.team.search(text, _) }
+          Env.teamSearch(text, page) map { html.team.search(text, _) },
       )
     }
   }
@@ -73,7 +73,7 @@ object Team extends LilaController {
               err => BadRequest(html.team.edit(team, err)).fuccess,
               data =>
                 api.update(team, data, me) inject Redirect(
-                    routes.Team.show(team.id))
+                    routes.Team.show(team.id)),
           )
       }
     }
@@ -130,7 +130,7 @@ object Team extends LilaController {
               _ map { team =>
                 Redirect(routes.Team.show(team.id)): Result
               }
-          }
+          },
       )
     }
   }
@@ -144,7 +144,7 @@ object Team extends LilaController {
       OptionResult(api.requestable(id, me)) { team =>
         team.open.fold(
             Ok(html.team.join(team)),
-            Redirect(routes.Team.requestForm(team.id))
+            Redirect(routes.Team.requestForm(team.id)),
         )
       }
     }
@@ -179,7 +179,7 @@ object Team extends LilaController {
           },
           setup =>
             api.createRequest(team, setup, me) inject Redirect(
-                routes.Team.show(team.id))
+                routes.Team.show(team.id)),
       )
     }
   }

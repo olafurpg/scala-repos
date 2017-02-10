@@ -28,7 +28,7 @@ trait LabelsService {
         userName = owner,
         repositoryName = repository,
         labelName = labelName,
-        color = color
+        color = color,
     )
 
   def updateLabel(owner: String,

@@ -26,7 +26,7 @@ private[streaming] case class ReceivedBlockInfo(
     streamId: Int,
     numRecords: Option[Long],
     metadataOption: Option[Any],
-    blockStoreResult: ReceivedBlockStoreResult
+    blockStoreResult: ReceivedBlockStoreResult,
 ) {
 
   require(numRecords.isEmpty || numRecords.get >= 0,

@@ -61,14 +61,14 @@ some text
 
 [fOo]: http://www.example.com "A Title"
 more text
-[BAR]: <http://www.example.com/bla> (Also a title)"""
+[BAR]: <http://www.example.com/bla> (Also a title)""",
     ) should equal(
         new MarkdownLineReader(
             List(
                 new OtherLine("some text"),
                 new BlockQuoteLine("> ", "bla"),
                 new EmptyLine(""),
-                new OtherLine("more text")
+                new OtherLine("more text"),
             ),
             Map(
                 "bar" -> new LinkDefinition(
@@ -76,7 +76,7 @@ more text
                 "baz" -> new LinkDefinition(
                     "baz", "http://foo.bar", Some("Title next line")),
                 "foo" -> new LinkDefinition(
-                    "foo", "http://www.example.com", Some("A Title"))
+                    "foo", "http://www.example.com", Some("A Title")),
             )))
   }
 

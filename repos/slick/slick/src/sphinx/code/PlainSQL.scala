@@ -62,7 +62,7 @@ object PlainSQL extends App {
           },
           coffeeByName("Colombian").map { s =>
             println(s"Coffee Colombian: $s")
-          }
+          },
       )
       db.run(a)
     }
@@ -94,7 +94,7 @@ object PlainSQL extends App {
       // Insert some suppliers
       sqlu"insert into suppliers values(101, 'Acme, Inc.', '99 Market Street', 'Groundsville', 'CA', '95199')",
       sqlu"insert into suppliers values(49, 'Superior Coffee', '1 Party Place', 'Mendocino', 'CA', '95460')",
-      sqlu"insert into suppliers values(150, 'The High Ground', '100 Coffee Lane', 'Meadows', 'CA', '93966')"
+      sqlu"insert into suppliers values(150, 'The High Ground', '100 Coffee Lane', 'Meadows', 'CA', '93966')",
   )
   //#sqlu
 
@@ -112,7 +112,7 @@ object PlainSQL extends App {
         Coffee("French_Roast", 49, 8.99, 0, 0),
         Coffee("Espresso", 150, 9.99, 0, 0),
         Coffee("Colombian_Decaf", 101, 8.99, 0, 0),
-        Coffee("French_Roast_Decaf", 49, 9.99, 0, 0)
+        Coffee("French_Roast_Decaf", 49, 9.99, 0, 0),
     ).map(insert)
 
     val combined: DBIO[Seq[Int]] = DBIO.sequence(inserts)

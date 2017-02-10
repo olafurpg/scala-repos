@@ -236,13 +236,13 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
         (r * rhs.real) - (i * rhs.imag),
         (r * rhs.imag) + (i * rhs.real),
         (j * rhs.real) + (k * rhs.imag),
-        (j * rhs.imag) + (k * rhs.real)
+        (j * rhs.imag) + (k * rhs.real),
     )
   def *(rhs: Quaternion[A])(implicit s: Rng[A]): Quaternion[A] = Quaternion(
       (lhs.r * rhs.r) - (lhs.i * rhs.i) - (lhs.j * rhs.j) - (lhs.k * rhs.k),
       (lhs.r * rhs.i) + (lhs.i * rhs.r) + (lhs.j * rhs.k) - (lhs.k * rhs.j),
       (lhs.r * rhs.j) - (lhs.i * rhs.k) + (lhs.j * rhs.r) + (lhs.k * rhs.i),
-      (lhs.r * rhs.k) + (lhs.i * rhs.j) - (lhs.j * rhs.i) + (lhs.k * rhs.r)
+      (lhs.r * rhs.k) + (lhs.i * rhs.j) - (lhs.j * rhs.i) + (lhs.k * rhs.r),
   )
 
   def /(rhs: A)(implicit f: Field[A]): Quaternion[A] =

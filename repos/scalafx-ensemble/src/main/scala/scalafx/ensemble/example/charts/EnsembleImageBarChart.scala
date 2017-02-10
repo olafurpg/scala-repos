@@ -59,7 +59,7 @@ class EnsembleImageBarChart extends EnsembleExample {
           XYChart.Data[String, Number]("SUV", 120),
           XYChart.Data[String, Number]("Sedan", 50),
           XYChart.Data[String, Number]("Truck", 180),
-          XYChart.Data[String, Number]("Van", 20)
+          XYChart.Data[String, Number]("Van", 20),
       )
     }
   }

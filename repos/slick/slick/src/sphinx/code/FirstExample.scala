@@ -79,7 +79,7 @@ object FirstExample extends App {
             ("French_Roast", 49, 8.99, 0, 0),
             ("Espresso", 150, 9.99, 0, 0),
             ("Colombian_Decaf", 101, 8.99, 0, 0),
-            ("French_Roast_Decaf", 49, 9.99, 0, 0)
+            ("French_Roast_Decaf", 49, 9.99, 0, 0),
         )
         // Equivalent SQL code:
         // insert into COFFEES(COF_NAME, SUP_ID, PRICE, SALES, TOTAL) values (?,?,?,?,?)

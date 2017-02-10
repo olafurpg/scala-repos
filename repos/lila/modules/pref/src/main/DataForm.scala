@@ -36,7 +36,7 @@ private[pref] final class DataForm {
           "insightShare" -> number.verifying(Set(0, 1, 2) contains _),
           "confirmResign" -> number.verifying(
               Pref.ConfirmResign.choices.toMap contains _),
-          "captured" -> number.verifying(Set(0, 1) contains _)
+          "captured" -> number.verifying(Set(0, 1) contains _),
       )(PrefData.apply)(PrefData.unapply))
 
   case class PrefData(autoQueen: Int,
@@ -118,7 +118,7 @@ private[pref] final class DataForm {
           "clockTenths" -> number.verifying(
               Pref.ClockTenths.choices.toMap contains _),
           "submitMove" -> number.verifying(
-              Pref.SubmitMove.choices.toMap contains _)
+              Pref.SubmitMove.choices.toMap contains _),
       )(MiniPrefData.apply)(MiniPrefData.unapply))
 
   case class MiniPrefData(autoQueen: Int,
@@ -144,41 +144,41 @@ private[pref] final class DataForm {
 
   val theme = Form(
       single(
-          "theme" -> nonEmptyText.verifying(Theme contains _)
+          "theme" -> nonEmptyText.verifying(Theme contains _),
       ))
 
   val pieceSet = Form(
       single(
-          "set" -> nonEmptyText.verifying(PieceSet contains _)
+          "set" -> nonEmptyText.verifying(PieceSet contains _),
       ))
 
   val theme3d = Form(
       single(
-          "theme" -> nonEmptyText.verifying(Theme3d contains _)
+          "theme" -> nonEmptyText.verifying(Theme3d contains _),
       ))
 
   val pieceSet3d = Form(
       single(
-          "set" -> nonEmptyText.verifying(PieceSet3d contains _)
+          "set" -> nonEmptyText.verifying(PieceSet3d contains _),
       ))
 
   val soundSet = Form(
       single(
-          "set" -> nonEmptyText.verifying(SoundSet contains _)
+          "set" -> nonEmptyText.verifying(SoundSet contains _),
       ))
 
   val bg = Form(
       single(
-          "bg" -> text.verifying(List("light", "dark", "transp") contains _)
+          "bg" -> text.verifying(List("light", "dark", "transp") contains _),
       ))
 
   val bgImg = Form(
       single(
-          "bgImg" -> nonEmptyText
+          "bgImg" -> nonEmptyText,
       ))
 
   val is3d = Form(
       single(
-          "is3d" -> text.verifying(List("true", "false") contains _)
+          "is3d" -> text.verifying(List("true", "false") contains _),
       ))
 }

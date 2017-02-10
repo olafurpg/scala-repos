@@ -34,7 +34,7 @@ class CorsTest extends FlatSpec with MustMatchers {
       },
       exposedHeaders = "Icey" :: Nil,
       supportsCredentials = true,
-      maxAge = Some(Duration.Top)
+      maxAge = Some(Duration.Top),
   )
 
   val corsFilter = new Cors.HttpFilter(policy)

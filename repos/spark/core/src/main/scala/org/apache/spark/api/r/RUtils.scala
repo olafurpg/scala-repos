@@ -34,7 +34,7 @@ private[spark] object RUtils {
     val sparkHome =
       sys.env.get("SPARK_HOME").orElse(sys.props.get("spark.test.home"))
     sparkHome.map(
-        Seq(_, "R", "lib").mkString(File.separator)
+        Seq(_, "R", "lib").mkString(File.separator),
     )
   }
 

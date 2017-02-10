@@ -327,7 +327,7 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
         (List(LARRAY_LENGTH, LARRAY_GET, LARRAY_SET) map (_ -> LONG)) ++
         (List(FARRAY_LENGTH, FARRAY_GET, FARRAY_SET) map (_ -> FLOAT)) ++
         (List(DARRAY_LENGTH, DARRAY_GET, DARRAY_SET) map (_ -> DOUBLE)) ++
-        (List(OARRAY_LENGTH, OARRAY_GET, OARRAY_SET) map (_ -> ObjectRef)): _*
+        (List(OARRAY_LENGTH, OARRAY_GET, OARRAY_SET) map (_ -> ObjectRef)): _*,
     )
   }
 
@@ -360,7 +360,7 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
                coreBTypes.StringRef,
                coreBTypes.jliMethodTypeRef,
                ArrayBType(ObjectRef)),
-          coreBTypes.jliCallSiteRef
+          coreBTypes.jliCallSiteRef,
       ).descriptor)
 
   lazy val lambdaDeserializeBootstrapHandle = new scala.tools.asm.Handle(
@@ -371,9 +371,9 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
           List(
               coreBTypes.jliMethodHandlesLookupRef,
               coreBTypes.StringRef,
-              coreBTypes.jliMethodTypeRef
+              coreBTypes.jliMethodTypeRef,
           ),
-          coreBTypes.jliCallSiteRef
+          coreBTypes.jliCallSiteRef,
       ).descriptor)
 }
 

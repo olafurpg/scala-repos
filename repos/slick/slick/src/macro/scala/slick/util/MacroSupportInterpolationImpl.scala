@@ -46,7 +46,7 @@ object MacroSupportInterpolationImpl {
                       Select(skipParens,
                              TermName(NameTransformer.encode("unary_!"))),
                       append(Literal(Constant(c2))),
-                      ctx.universe.EmptyTree
+                      ctx.universe.EmptyTree,
                   )
                 case '{' => // optional open parentheses with indent
                   flushSB
@@ -55,10 +55,10 @@ object MacroSupportInterpolationImpl {
                              TermName(NameTransformer.encode("unary_!"))),
                       Block(List(
                                 append(Literal(Constant('('))),
-                                Select(sqlBuilder, TermName("newLineIndent"))
+                                Select(sqlBuilder, TermName("newLineIndent")),
                             ),
                             Literal(Constant(()))),
-                      ctx.universe.EmptyTree
+                      ctx.universe.EmptyTree,
                   )
                 case '}' => // optional close parentheses with dedent
                   flushSB
@@ -67,10 +67,10 @@ object MacroSupportInterpolationImpl {
                              TermName(NameTransformer.encode("unary_!"))),
                       Block(List(
                                 Select(sqlBuilder, TermName("newLineDedent")),
-                                append(Literal(Constant(')')))
+                                append(Literal(Constant(')'))),
                             ),
                             Literal(Constant(()))),
-                      ctx.universe.EmptyTree
+                      ctx.universe.EmptyTree,
                   )
                 case '[' => // open parenthesis with indent
                   sb append '('

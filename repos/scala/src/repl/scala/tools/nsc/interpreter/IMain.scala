@@ -508,7 +508,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
                 (t0 =>
                       "  " + safePos(t0, -1) + ": " + t0.shortClass +
                     "\n") mkString ""
-            }) mkString "\n"
+            }) mkString "\n",
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -1040,7 +1040,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
           evalResult,
           lineRep.printName,
           executionWrapper,
-          fullAccessPath
+          fullAccessPath,
       )
 
       val postamble = """
@@ -1247,9 +1247,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     exitingTyper(
         dealiasNonPublic(
             dropNullaryMethod(
-                sym.tpe_*
-            )
-        )
+                sym.tpe_*,
+            ),
+        ),
     )
   }
   def cleanMemberDecl(owner: Symbol, member: Name): Type =
@@ -1336,7 +1336,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     TypeStrings.quieter(
         exitingTyper(sym.defString),
         sym.owner.name + ".this.",
-        sym.owner.fullName + "."
+        sym.owner.fullName + ".",
     )
   }
 

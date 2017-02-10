@@ -60,7 +60,7 @@ class DataTypeParserSuite extends SparkFunSuite {
   checkDataType(
       "array<struct<tinYint:tinyint>>",
       ArrayType(
-          StructType(StructField("tinYint", ByteType, true) :: Nil), true)
+          StructType(StructField("tinYint", ByteType, true) :: Nil), true),
   )
   checkDataType("MAP<int, STRING>", MapType(IntegerType, StringType, true))
   checkDataType("MAp<int, ARRAY<double>>",
@@ -69,19 +69,19 @@ class DataTypeParserSuite extends SparkFunSuite {
       "MAP<int, struct<varchar:string>>",
       MapType(IntegerType,
               StructType(StructField("varchar", StringType, true) :: Nil),
-              true)
+              true),
   )
 
   checkDataType(
       "struct<intType: int, ts:timestamp>",
       StructType(StructField("intType", IntegerType, true) :: StructField(
-              "ts", TimestampType, true) :: Nil)
+              "ts", TimestampType, true) :: Nil),
   )
   // It is fine to use the data type string as the column name.
   checkDataType(
       "Struct<int: int, timestamp:timestamp>",
       StructType(StructField("int", IntegerType, true) :: StructField(
-              "timestamp", TimestampType, true) :: Nil)
+              "timestamp", TimestampType, true) :: Nil),
   )
   checkDataType(
       """
@@ -102,20 +102,20 @@ class DataTypeParserSuite extends SparkFunSuite {
                       true) :: StructField(
               "MAP", MapType(TimestampType, StringType), true) :: StructField(
               "arrAy", ArrayType(DoubleType, true), true) :: StructField(
-              "anotherArray", ArrayType(StringType, true), true) :: Nil)
+              "anotherArray", ArrayType(StringType, true), true) :: Nil),
   )
   // A column name can be a reserved word in our DDL parser and SqlParser.
   checkDataType(
       "Struct<TABLE: string, CASE:boolean>",
       StructType(StructField("TABLE", StringType, true) :: StructField(
-              "CASE", BooleanType, true) :: Nil)
+              "CASE", BooleanType, true) :: Nil),
   )
   // Use backticks to quote column names having special characters.
   checkDataType(
       "struct<`x+y`:int, `!@#$%^&*()`:string, `1_2.345<>:\"`:varchar(20)>",
       StructType(StructField("x+y", IntegerType, true) :: StructField(
               "!@#$%^&*()", StringType, true) :: StructField(
-              "1_2.345<>:\"", StringType, true) :: Nil)
+              "1_2.345<>:\"", StringType, true) :: Nil),
   )
   // Empty struct.
   checkDataType("strUCt<>", StructType(Nil))

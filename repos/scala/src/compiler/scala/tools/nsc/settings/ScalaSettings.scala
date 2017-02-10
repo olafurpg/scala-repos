@@ -106,7 +106,7 @@ trait ScalaSettings
         name = "-language",
         helpArg = "feature",
         descr = description,
-        domain = languageFeatures
+        domain = languageFeatures,
     )
   }
 
@@ -251,7 +251,7 @@ trait ScalaSettings
       name = "-Xxml",
       helpArg = "property",
       descr = "Configure XML parsing",
-      domain = XxmlSettings
+      domain = XxmlSettings,
   )
 
   /** Compatibility stubs for options whose value name did
@@ -580,7 +580,7 @@ trait ScalaSettings
         helpArg = "phase",
         descr = description,
         domain = YstatisticsPhases,
-        default = Some(List("_"))
+        default = Some(List("_")),
     ) withPostSetHook { _ =>
       scala.reflect.internal.util.Statistics.enabled = true
     }

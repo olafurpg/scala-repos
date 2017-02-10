@@ -74,7 +74,7 @@ private[scalding] class VersionedState(
       Interval
         .leftClosedRightOpen(
             batcher.earliestTimeOf(beginning),
-            batcher.earliestTimeOf(end)
+            batcher.earliestTimeOf(end),
         )
         .right
         .get

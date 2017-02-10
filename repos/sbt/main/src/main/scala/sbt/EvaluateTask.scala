@@ -307,7 +307,7 @@ object EvaluateTask {
   def injectSettings: Seq[Setting[_]] = Seq(
       (state in GlobalScope) ::= dummyState,
       (streamsManager in GlobalScope) ::= dummyStreamsManager,
-      (executionRoots in GlobalScope) ::= dummyRoots
+      (executionRoots in GlobalScope) ::= dummyRoots,
   )
 
   def evalPluginDef(log: Logger)(
@@ -530,7 +530,7 @@ object EvaluateTask {
           case results.TPair(Task(info, _), Value(v)) =>
             info.post(v) get transformState
           case _ => Nil
-        }
+        },
     )
 
   def transformInc[T](result: Result[T]): Result[T] =

@@ -40,7 +40,7 @@ object SbtLauncherPlugin extends AutoPlugin {
         rebundle(rawSbtLaunchJar.value,
                  propFileLocations.toMap,
                  target.value / "sbt-launch.jar")
-      }
+      },
   )
 
   def rebundle(jar: File, overrides: Map[String, File], target: File): File = {

@@ -37,7 +37,7 @@ case class TreePrinter(name: String = "",
           prefix1 + cCyan + (if (name.nonEmpty) name + ": " else "") +
           (if (marked) cNormal + bYellow + cBlack else cYellow) +
           (if (multiLine) multi1 else "") + markedDiName + cNormal +
-          (if (di.name.nonEmpty && di.mainInfo.nonEmpty) " " else "")
+          (if (di.name.nonEmpty && di.mainInfo.nonEmpty) " " else ""),
       )
       if (multiLine) {
         val lines = di.mainInfo.replace("\r", "").split('\n')

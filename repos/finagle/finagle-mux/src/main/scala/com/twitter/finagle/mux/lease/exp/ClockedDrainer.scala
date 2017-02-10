@@ -38,7 +38,7 @@ private[finagle] class ClockedDrainer(
     log: Logger,
     lr: LogsReceiver = NullLogsReceiver,
     statsReceiver: StatsReceiver = NullStatsReceiver,
-    verbose: Boolean = false
+    verbose: Boolean = false,
 )
     extends Thread("GcDrainer") with Lessor {
 
@@ -295,7 +295,7 @@ private[finagle] object ClockedDrainer {
           val rSnooper = new RequestSnooper(
               coord.counter,
               drainerPercentile().toDouble / 100.0,
-              lr
+              lr,
           )
 
           val (min, max) = drainerDiscountRange()
@@ -306,7 +306,7 @@ private[finagle] object ClockedDrainer {
               min,
               max,
               rSnooper,
-              lr
+              lr,
           )
 
           new ClockedDrainer(
@@ -316,7 +316,7 @@ private[finagle] object ClockedDrainer {
               rSnooper,
               log,
               lr,
-              DefaultStatsReceiver.scope("gcdrainer")
+              DefaultStatsReceiver.scope("gcdrainer"),
           )
       }
     } else {

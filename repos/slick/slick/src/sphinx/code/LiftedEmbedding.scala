@@ -175,7 +175,7 @@ object LiftedEmbedding extends App {
                      DBIO.seq(
                          schema.create,
                          //...
-                         schema.drop
+                         schema.drop,
                      ))
                  //#ddl
                  ,
@@ -330,11 +330,11 @@ object LiftedEmbedding extends App {
           coffees += ("Colombian", 101, 7.99, 0, 0),
           coffees ++= Seq(
               ("French_Roast", 49, 8.99, 0, 0),
-              ("Espresso", 150, 9.99, 0, 0)
+              ("Espresso", 150, 9.99, 0, 0),
           ),
           // "sales" and "total" will use the default value 0:
           coffees.map(c => (c.name, c.supID, c.price)) +=
-          ("Colombian_Decaf", 101, 8.99)
+          ("Colombian_Decaf", 101, 8.99),
       )
 
       // Get the statement without having to specify a value to insert:
@@ -350,9 +350,9 @@ object LiftedEmbedding extends App {
                            (suppliers ++= Seq(
                                    (101, "", "", "", "", ""),
                                    (49, "", "", "", "", ""),
-                                   (150, "", "", "", "", "")
+                                   (150, "", "", "", "", ""),
                                )),
-                           insertActions
+                           insertActions,
                        )),
                    Duration.Inf)
 
@@ -386,7 +386,7 @@ object LiftedEmbedding extends App {
           (users.map { u =>
                 (u.id, u.first ++ " " ++ u.last)
               }),
-          users2 forceInsertExpr (users.length + 1, "admin")
+          users2 forceInsertExpr (users.length + 1, "admin"),
       )
       //#insert4
       Await.result(db.run(actions), Duration.Inf)
@@ -419,8 +419,8 @@ object LiftedEmbedding extends App {
       Await.result(db.run(
                        usersForInsert ++= Seq(
                            User(None, "", ""),
-                           User(None, "", "")
-                       )
+                           User(None, "", ""),
+                       ),
                    ),
                    Duration.Inf)
 
@@ -504,7 +504,7 @@ object LiftedEmbedding extends App {
                           SimpleLiteral[java.sql.Date]("CURRENT_DATE")
                         salesPerDay.map(_ => current_date)
                         //#simpleliteral
-                      }.result.head
+                      }.result.head,
                   ),
                   Duration.Inf)
           .isInstanceOf[java.sql.Date]
@@ -561,7 +561,7 @@ object LiftedEmbedding extends App {
 
       implicit def pairShape[Level <: ShapeLevel, M1, M2, U1, U2, P1, P2](
           implicit s1: Shape[_ <: Level, M1, U1, P1],
-          s2: Shape[_ <: Level, M2, U2, P2]
+          s2: Shape[_ <: Level, M2, U2, P2],
       ) =
         new PairShape[Level, Pair[M1, M2], Pair[U1, U2], Pair[P1, P2]](
             Seq(s1, s2))
@@ -580,7 +580,7 @@ object LiftedEmbedding extends App {
       val insertAction = DBIO.seq(
           as += Pair(1, "a"),
           as += Pair(2, "c"),
-          as += Pair(3, "b")
+          as += Pair(3, "b"),
       )
 
       // Use it for returning data from a query
@@ -615,7 +615,7 @@ object LiftedEmbedding extends App {
       val insertActions = DBIO.seq(
           bs += B(1, "a"),
           bs.map(b => (b.id, b.s)) += ((2, "c")),
-          bs += B(3, "b")
+          bs += B(3, "b"),
       )
 
       val q3 = bs.map { case b => LiftedB(b.id, (b.s ++ b.s)) }.filter {
@@ -640,7 +640,7 @@ object LiftedEmbedding extends App {
         def s = column[String]("s")
         def projection = LiftedC(
             Pair(column("p1"), column("p2")), // (cols defined inline, type inferred)
-            LiftedB(id, s)
+            LiftedB(id, s),
         )
         def * = projection
       }
@@ -649,7 +649,7 @@ object LiftedEmbedding extends App {
       val insertActions2 = DBIO.seq(
           cs += C(Pair(7, "x"), B(1, "a")),
           cs += C(Pair(8, "y"), B(2, "c")),
-          cs += C(Pair(9, "z"), B(3, "b"))
+          cs += C(Pair(9, "z"), B(3, "b")),
       )
 
       val q4 = cs.map {

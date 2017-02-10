@@ -371,6 +371,6 @@ private trait FreeTTraverse[S[_], M[_]]
             G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
           case -\/(a) =>
             G.map(f(a))(FreeT.point[S, M, B])
-        }
+        },
     )(FreeT.liftM(_)(M).flatMap(identity))
 }

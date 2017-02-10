@@ -446,13 +446,13 @@ private[niflheim] class NIHDBActor private (
       state.blockState = state.blockState.copy(
           cooked = CookedReader.load(cookedDir, file) :: state.blockState.cooked
               .filterNot(_.id == id),
-          pending = state.blockState.pending - id
+          pending = state.blockState.pending - id,
       )
 
       state.currentBlocks = computeBlockMap(state.blockState)
 
       currentState = currentState.copy(
-          cookedMap = currentState.cookedMap + (id -> file.getPath)
+          cookedMap = currentState.cookedMap + (id -> file.getPath),
       )
 
       logger.debug("Cook complete on %d".format(id))

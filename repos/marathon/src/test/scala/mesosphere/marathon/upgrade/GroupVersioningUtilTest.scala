@@ -15,12 +15,12 @@ class GroupVersioningUtilTest
                 id = PathId("/nested"),
                 apps = Set(
                       AppDefinition(PathId("/nested/app"),
-                                    cmd = Some("sleep 123"))
+                                    cmd = Some("sleep 123")),
                   ),
-                version = Timestamp(2)
-            )
+                version = Timestamp(2),
+            ),
         ),
-      version = Timestamp(2)
+      version = Timestamp(2),
   )
 
   val nestedAppScaled = Group.empty.copy(
@@ -30,12 +30,12 @@ class GroupVersioningUtilTest
                 apps = Set(
                       AppDefinition(PathId("/nested/app"),
                                     cmd = Some("sleep 123"),
-                                    instances = 2)
+                                    instances = 2),
                   ),
-                version = Timestamp(2)
-            )
+                version = Timestamp(2),
+            ),
         ),
-      version = Timestamp(2)
+      version = Timestamp(2),
   )
 
   val nestedAppUpdated = Group.empty.copy(
@@ -44,12 +44,12 @@ class GroupVersioningUtilTest
                 id = PathId("/nested"),
                 apps = Set(
                       AppDefinition(PathId("/nested/app"),
-                                    cmd = Some("sleep 234"))
+                                    cmd = Some("sleep 234")),
                   ),
-                version = Timestamp(2)
-            )
+                version = Timestamp(2),
+            ),
         ),
-      version = Timestamp(2)
+      version = Timestamp(2),
   )
 
   test("No changes for empty group") {
@@ -81,7 +81,7 @@ class GroupVersioningUtilTest
         nestedApp.updateApp(
             PathId("/nested/app"),
             update,
-            Timestamp(10)
+            Timestamp(10),
         ))
   }
 
@@ -101,7 +101,7 @@ class GroupVersioningUtilTest
           .updateApp(
               PathId("/nested/app"),
               update,
-              Timestamp(10)
+              Timestamp(10),
           )
           .toString)
   }
@@ -120,7 +120,7 @@ class GroupVersioningUtilTest
           .updateApp(
               PathId("/nested/app"),
               update,
-              Timestamp(10)
+              Timestamp(10),
           )
           .toString)
   }

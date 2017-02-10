@@ -165,7 +165,7 @@ case class Game(
                          player.blurs +
                          (blur &&
                              moveOrDrop.fold(_.color, _.color) == player.color)
-                           .fold(1, 0))
+                           .fold(1, 0)),
     )
 
     val updated = copy(
@@ -189,7 +189,7 @@ case class Game(
               moveTimes :+ {
                 (nowTenths - lmt - (lag.??(_.toMillis) / 100)).toInt max 0
               }
-            }
+            },
           ),
         status = situation.status | status,
         clock = game.clock)
@@ -210,13 +210,13 @@ case class Game(
     val events =
       moveOrDrop.fold(
           Event.Move(_, situation, state, clockEvent, updated.crazyData),
-          Event.Drop(_, situation, state, clockEvent, updated.crazyData)
+          Event.Drop(_, situation, state, clockEvent, updated.crazyData),
       ) :: {
         // abstraction leak, I know.
         (updated.variant.threeCheck && situation.check) ?? List(
             Event.CheckCount(
                 white = updated.checkCount.white,
-                black = updated.checkCount.black
+                black = updated.checkCount.black,
             ))
       }.toList
 
@@ -237,7 +237,7 @@ case class Game(
                  copy(
                      status = Status.Started,
                      mode = Mode(mode.rated && userIds.distinct.size == 2),
-                     updatedAt = DateTime.now.some
+                     updatedAt = DateTime.now.some,
                  ))
 
   def correspondenceClock: Option[CorrespondenceClock] = daysPerTurn map {
@@ -286,7 +286,7 @@ case class Game(
 
   def mapPlayers(f: Player => Player) = copy(
       whitePlayer = f(whitePlayer),
-      blackPlayer = f(blackPlayer)
+      blackPlayer = f(blackPlayer),
   )
 
   def playerCanOfferDraw(color: Color) =
@@ -334,9 +334,9 @@ case class Game(
           status = status,
           whitePlayer = whitePlayer finish (winner == Some(White)),
           blackPlayer = blackPlayer finish (winner == Some(Black)),
-          clock = clock map (_.stop)
+          clock = clock map (_.stop),
       ),
-      List(Event.End(winner)) ::: clock.??(c => List(Event.Clock(c)))
+      List(Event.End(winner)) ::: clock.??(c => List(Event.Clock(c))),
   )
 
   def rated = mode.rated
@@ -431,7 +431,7 @@ case class Game(
 
   def playerBlurPercent(color: Color): Int = (playedTurns > 5).fold(
       (player(color).blurs * 100) / playerMoves(color),
-      0
+      0,
   )
 
   def isBeingPlayed = !isPgnImport && !finishedOrAborted

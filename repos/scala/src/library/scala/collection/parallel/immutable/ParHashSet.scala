@@ -96,7 +96,7 @@ class ParHashSet[T] private[immutable](private[this] val trie: HashSet[T])
             val sndlength = previousRemaining - fstlength
             Seq(
                 new ParHashSetIterator(fst, fstlength),
-                new ParHashSetIterator(snd, sndlength)
+                new ParHashSetIterator(snd, sndlength),
             )
           case _ =>
             // iterator of the collision map case

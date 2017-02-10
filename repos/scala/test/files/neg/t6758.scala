@@ -40,6 +40,6 @@ class AnnotNotFound {
   class D[@typeparam T]
 
   class E(
-      @valueparam x: Any
+      @valueparam x: Any,
   )
 }

@@ -88,7 +88,7 @@ object ErrorMapping {
         .asInstanceOf[Class[Throwable]] -> NotEnoughReplicasAfterAppendCode,
       classOf[TopicAuthorizationException].asInstanceOf[Class[Throwable]] -> TopicAuthorizationCode,
       classOf[GroupAuthorizationException].asInstanceOf[Class[Throwable]] -> GroupAuthorizationCode,
-      classOf[ClusterAuthorizationException].asInstanceOf[Class[Throwable]] -> ClusterAuthorizationCode
+      classOf[ClusterAuthorizationException].asInstanceOf[Class[Throwable]] -> ClusterAuthorizationCode,
   ).withDefaultValue(UnknownCode)
 
   /* invert the mapping */

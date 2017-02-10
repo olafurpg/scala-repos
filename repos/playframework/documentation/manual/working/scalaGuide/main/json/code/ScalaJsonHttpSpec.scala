@@ -79,7 +79,7 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
                   Ok(Json.obj("status" -> "OK",
                               "message" ->
                               ("Place '" + place.name + "' saved.")))
-              }
+              },
           )
         }.getOrElse {
           BadRequest(
@@ -134,7 +134,7 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
                 Ok(Json.obj(
                         "status" -> "OK",
                         "message" -> ("Place '" + place.name + "' saved.")))
-            }
+            },
         )
       }
       //#handle-json-bodyparser
@@ -171,12 +171,12 @@ object Place {
     List(
         Place(
             "Sandleford",
-            Location(51.377797, -1.318965)
+            Location(51.377797, -1.318965),
         ),
         Place(
             "Watership Down",
-            Location(51.235685, -1.309197)
-        )
+            Location(51.235685, -1.309197),
+        ),
     )
   }
 

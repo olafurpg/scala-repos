@@ -25,7 +25,7 @@ class ImplicitAnalyzer(val global: RichPresentationCompiler) {
                   ImplicitConversionInfo(
                       treeP.startOrCursor,
                       treeP.endOrCursor,
-                      SymbolInfo(t.fun.symbol)
+                      SymbolInfo(t.fun.symbol),
                   ))
             case t: ApplyToImplicitArgs =>
               val funIsImplicit = t.fun match {
@@ -40,7 +40,7 @@ class ImplicitAnalyzer(val global: RichPresentationCompiler) {
                       t.args.map { a =>
                     SymbolInfo(a.symbol)
                   },
-                      funIsImplicit
+                      funIsImplicit,
                   ))
             case _ =>
           }

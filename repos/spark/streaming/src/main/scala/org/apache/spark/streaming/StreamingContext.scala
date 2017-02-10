@@ -61,7 +61,7 @@ import org.apache.spark.util.{CallSite, ShutdownHookManager, ThreadUtils, Utils}
 class StreamingContext private[streaming](
     _sc: SparkContext,
     _cp: Checkpoint,
-    _batchDur: Duration
+    _batchDur: Duration,
 )
     extends Logging {
 
@@ -306,7 +306,7 @@ class StreamingContext private[streaming](
   def socketTextStream(
       hostname: String,
       port: Int,
-      storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2
+      storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2,
   ): ReceiverInputDStream[String] = withNamedScope("socket text stream") {
     socketStream[String](
         hostname, port, SocketReceiver.bytesToLines, storageLevel)
@@ -326,7 +326,7 @@ class StreamingContext private[streaming](
       hostname: String,
       port: Int,
       converter: (InputStream) => Iterator[T],
-      storageLevel: StorageLevel
+      storageLevel: StorageLevel,
   ): ReceiverInputDStream[T] = {
     new SocketInputDStream[T](this, hostname, port, converter, storageLevel)
   }
@@ -345,7 +345,7 @@ class StreamingContext private[streaming](
   def rawSocketStream[T : ClassTag](
       hostname: String,
       port: Int,
-      storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2
+      storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2,
   ): ReceiverInputDStream[T] = withNamedScope("raw socket stream") {
     new RawInputDStream[T](this, hostname, port, storageLevel)
   }
@@ -363,7 +363,7 @@ class StreamingContext private[streaming](
   def fileStream[
       K : ClassTag,
       V : ClassTag,
-      F <: NewInputFormat[K, V]: ClassTag
+      F <: NewInputFormat[K, V]: ClassTag,
   ](directory: String): InputDStream[(K, V)] = {
     new FileInputDStream[K, V, F](this, directory)
   }
@@ -383,7 +383,7 @@ class StreamingContext private[streaming](
   def fileStream[
       K : ClassTag,
       V : ClassTag,
-      F <: NewInputFormat[K, V]: ClassTag
+      F <: NewInputFormat[K, V]: ClassTag,
   ](directory: String,
     filter: Path => Boolean,
     newFilesOnly: Boolean): InputDStream[(K, V)] = {
@@ -406,7 +406,7 @@ class StreamingContext private[streaming](
   def fileStream[
       K : ClassTag,
       V : ClassTag,
-      F <: NewInputFormat[K, V]: ClassTag
+      F <: NewInputFormat[K, V]: ClassTag,
   ](directory: String,
     filter: Path => Boolean,
     newFilesOnly: Boolean,
@@ -478,7 +478,7 @@ class StreamingContext private[streaming](
     */
   def queueStream[T : ClassTag](
       queue: Queue[RDD[T]],
-      oneAtATime: Boolean = true
+      oneAtATime: Boolean = true,
   ): InputDStream[T] = {
     queueStream(queue, oneAtATime, sc.makeRDD(Seq[T](), 1))
   }
@@ -499,7 +499,7 @@ class StreamingContext private[streaming](
   def queueStream[T : ClassTag](
       queue: Queue[RDD[T]],
       oneAtATime: Boolean,
-      defaultRDD: RDD[T]
+      defaultRDD: RDD[T],
   ): InputDStream[T] = {
     new QueueInputDStream(this, queue, oneAtATime, defaultRDD)
   }
@@ -517,7 +517,7 @@ class StreamingContext private[streaming](
     */
   def transform[T : ClassTag](
       dstreams: Seq[DStream[_]],
-      transformFunc: (Seq[RDD[_]], Time) => RDD[T]
+      transformFunc: (Seq[RDD[_]], Time) => RDD[T],
   ): DStream[T] = withScope {
     new TransformedDStream[T](dstreams, sparkContext.clean(transformFunc))
   }
@@ -536,7 +536,7 @@ class StreamingContext private[streaming](
     require(
         !isCheckpointingEnabled || checkpointDuration != null,
         "Checkpoint directory has been set, but the graph checkpointing interval has " +
-        "not been set. Please use StreamingContext.checkpoint() to set the interval."
+        "not been set. Please use StreamingContext.checkpoint() to set the interval.",
     )
 
     // Verify whether the DStream checkpoint is serializable
@@ -550,7 +550,7 @@ class StreamingContext private[streaming](
               "DStream checkpointing has been enabled but the DStreams with their functions " +
               "are not serializable\n" + SerializationDebugger
                 .improveException(checkpoint, e)
-                .getMessage()
+                .getMessage(),
             )
       }
     }
@@ -661,7 +661,7 @@ class StreamingContext private[streaming](
     */
   def stop(
       stopSparkContext: Boolean = conf.getBoolean(
-            "spark.streaming.stopSparkContextByDefault", true)
+            "spark.streaming.stopSparkContextByDefault", true),
   ): Unit = synchronized {
     stop(stopSparkContext, false)
   }
@@ -820,7 +820,7 @@ object StreamingContext extends Logging {
       checkpointPath: String,
       creatingFunc: () => StreamingContext,
       hadoopConf: Configuration = SparkHadoopUtil.get.conf,
-      createOnError: Boolean = false
+      createOnError: Boolean = false,
   ): StreamingContext = {
     ACTIVATION_LOCK.synchronized {
       getActive().getOrElse {
@@ -847,7 +847,7 @@ object StreamingContext extends Logging {
       checkpointPath: String,
       creatingFunc: () => StreamingContext,
       hadoopConf: Configuration = SparkHadoopUtil.get.conf,
-      createOnError: Boolean = false
+      createOnError: Boolean = false,
   ): StreamingContext = {
     val checkpointOption = CheckpointReader.read(
         checkpointPath, new SparkConf(), hadoopConf, createOnError)
@@ -871,7 +871,7 @@ object StreamingContext extends Logging {
       appName: String,
       sparkHome: String,
       jars: Seq[String],
-      environment: Map[String, String]
+      environment: Map[String, String],
   ): SparkContext = {
     val conf = SparkContext.updatedConf(
         new SparkConf(), master, appName, sparkHome, jars, environment)

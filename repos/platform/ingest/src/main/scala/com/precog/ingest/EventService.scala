@@ -70,7 +70,7 @@ object EventService {
       fileCreateHandler: FileStoreHandler,
       archiveHandler: ArchiveServiceHandler[ByteChunk],
       shardClient: HttpClient[ByteChunk],
-      stop: Stoppable
+      stop: Stoppable,
   )
 
   case class ServiceConfig(
@@ -80,7 +80,7 @@ object EventService {
       ingestBatchSize: Int,
       ingestMaxFields: Int,
       ingestTmpDir: File,
-      deleteTimeout: Timeout
+      deleteTimeout: Timeout,
   )
 
   object ServiceConfig {
@@ -102,7 +102,7 @@ object EventService {
                           .getParentFile))
                 .get, //fail fast 
             deleteTimeout = akka.util.Timeout(
-                  config[Long]("delete.timeout", 10000l))
+                  config[Long]("delete.timeout", 10000l)),
         )
       }
     }

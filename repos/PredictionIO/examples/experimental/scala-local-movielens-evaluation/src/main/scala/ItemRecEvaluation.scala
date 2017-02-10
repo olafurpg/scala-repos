@@ -32,7 +32,7 @@ object ItemRecEvaluation1 {
                   evalDuration = Duration.standardDays(7),
                   evalCount = 12)),
         //evalCount = 3)),
-        evalParams = Some(new EvalParams(queryN = 10))
+        evalParams = Some(new EvalParams(queryN = 10)),
     )
 
     val pp = new PreparatorParams(actions = Map("rate" -> None),
@@ -58,7 +58,7 @@ object ItemRecEvaluation1 {
         ratingParams = new BinaryRatingParams(
               actionsMap = Map("rate" -> None), goodThreshold = 3),
         measureType = MeasureType.PrecisionAtK,
-        measureK = 10
+        measureK = 10,
     )
 
     Workflow.runEngine(
@@ -67,7 +67,7 @@ object ItemRecEvaluation1 {
         engine = engine,
         engineParams = engineParams,
         evaluatorClassOpt = Some(classOf[ItemRecEvaluator]),
-        evaluatorParams = evaluatorParams
+        evaluatorParams = evaluatorParams,
     )
   }
 }

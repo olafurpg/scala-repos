@@ -12,7 +12,7 @@ object NeedTestJVM extends SpecLite {
             new runtime.AbstractFunction0[String] {
               override def finalize = { flag = true }
               override def apply = ""
-            }
+            },
         )
         .asInstanceOf[Need[String]]
 

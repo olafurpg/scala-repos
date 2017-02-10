@@ -371,7 +371,7 @@ abstract class Stream[+A]
     if (isStreamBuilder(bf))
       asThat(
           if (isEmpty) that.toStream
-          else cons(head, asStream[A](tail ++ that))
+          else cons(head, asStream[A](tail ++ that)),
       )
     else super.++(that)(bf)
 
@@ -399,7 +399,7 @@ abstract class Stream[+A]
     if (isStreamBuilder(bf))
       asThat(
           if (isEmpty) Stream(z)
-          else cons(z, asStream[B](tail.scanLeft(op(z, head))(op)))
+          else cons(z, asStream[B](tail.scanLeft(op(z, head))(op))),
       )
     else super.scanLeft(z)(op)(bf)
 
@@ -422,7 +422,7 @@ abstract class Stream[+A]
     if (isStreamBuilder(bf))
       asThat(
           if (isEmpty) Stream.Empty
-          else cons(f(head), asStream[B](tail map f))
+          else cons(f(head), asStream[B](tail map f)),
       )
     else super.map(f)(bf)
   }
@@ -505,7 +505,7 @@ abstract class Stream[+A]
 
             if (nonEmptyPrefix.isEmpty) Stream.empty
             else prefix append asStream[B](nonEmptyPrefix.tail flatMap f)
-          }
+          },
       )
     else super.flatMap(f)(bf)
 
@@ -643,7 +643,7 @@ abstract class Stream[+A]
           if (this.isEmpty || that.isEmpty) Stream.Empty
           else
             cons((this.head, that.head),
-                 asStream[(A1, B)](this.tail zip that.tail))
+                 asStream[(A1, B)](this.tail zip that.tail)),
       )
     else super.zip(that)(bf)
 

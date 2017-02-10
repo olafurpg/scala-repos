@@ -568,7 +568,7 @@ trait Infer extends Checkable { self: Analyzer =>
                 // this infers Foo.type instead of "object Foo" (see also widenIfNecessary)
                 else if (targ.typeSymbol.isModuleClass ||
                          tvar.constr.avoidWiden) targ
-                else targ.widen
+                else targ.widen,
             )))
       }
       buf.result()
@@ -1325,7 +1325,7 @@ trait Infer extends Checkable { self: Analyzer =>
 
       TypeBounds(
           lub(lo :: loBounds map toOrigin),
-          glb(hi :: hiBounds map toOrigin)
+          glb(hi :: hiBounds map toOrigin),
       )
     }
 

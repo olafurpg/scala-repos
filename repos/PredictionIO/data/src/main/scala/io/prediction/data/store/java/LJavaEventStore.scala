@@ -78,7 +78,7 @@ object LJavaEventStore {
               untilTime,
               limitInt,
               latest,
-              timeout
+              timeout,
           )
           .toSeq)
   }
@@ -136,7 +136,7 @@ object LJavaEventStore {
               startTime,
               untilTime,
               limitInt,
-              timeout
+              timeout,
           )
           .toSeq)
   }

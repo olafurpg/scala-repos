@@ -69,14 +69,14 @@ class ScalaJsonSpec extends Specification {
                       JsObject(Seq(
                               "name" -> JsString("Fiver"),
                               "age" -> JsNumber(4),
-                              "role" -> JsNull
+                              "role" -> JsNull,
                           )),
                       JsObject(Seq(
                               "name" -> JsString("Bigwig"),
                               "age" -> JsNumber(6),
-                              "role" -> JsString("Owsla")
-                          ))
-                  ))
+                              "role" -> JsString("Owsla"),
+                          )),
+                  )),
           ))
       //#convert-from-classes
       (json \ "name").get must_== JsString("Watership Down")
@@ -93,14 +93,14 @@ class ScalaJsonSpec extends Specification {
               Json.obj(
                   "name" -> "Fiver",
                   "age" -> 4,
-                  "role" -> JsNull
+                  "role" -> JsNull,
               ),
               Json.obj(
                   "name" -> "Bigwig",
                   "age" -> 6,
-                  "role" -> "Owsla"
-              )
-          )
+                  "role" -> "Owsla",
+              ),
+          ),
       )
       //#convert-from-factory
       (json \ "name").get must_== JsString("Watership Down")
@@ -138,7 +138,7 @@ class ScalaJsonSpec extends Specification {
       implicit val locationWrites = new Writes[Location] {
         def writes(location: Location) = Json.obj(
             "lat" -> location.lat,
-            "long" -> location.long
+            "long" -> location.long,
         )
       }
 
@@ -146,7 +146,7 @@ class ScalaJsonSpec extends Specification {
         def writes(resident: Resident) = Json.obj(
             "name" -> resident.name,
             "age" -> resident.age,
-            "role" -> resident.role
+            "role" -> resident.role,
         )
       }
 
@@ -162,8 +162,8 @@ class ScalaJsonSpec extends Specification {
           Location(51.235685, -1.309197),
           Seq(
               Resident("Fiver", 4, None),
-              Resident("Bigwig", 6, Some("Owsla"))
-          )
+              Resident("Bigwig", 6, Some("Owsla")),
+          ),
       )
 
       val json = Json.toJson(place)
@@ -198,8 +198,8 @@ class ScalaJsonSpec extends Specification {
           Location(51.235685, -1.309197),
           Seq(
               Resident("Fiver", 4, None),
-              Resident("Bigwig", 6, Some("Owsla"))
-          )
+              Resident("Bigwig", 6, Some("Owsla")),
+          ),
       )
 
       val json = Json.toJson(place)
@@ -321,7 +321,7 @@ class ScalaJsonSpec extends Specification {
           },
           valid = { name =>
             Some(name)
-          }
+          },
       )
       //#convert-to-type-validate
       nameResult must beLike {

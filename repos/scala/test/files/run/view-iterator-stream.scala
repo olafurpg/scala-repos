@@ -41,7 +41,7 @@ object Test {
   def slice(from: Int, until: Int): Perturber =
     Perturber(
         "slice(%d, %d)".format(from, until),
-        _.toTraversable.slice(from, until)
+        _.toTraversable.slice(from, until),
     )
 
   val fns = List[Perturber](toV, toI, toS, toIS)

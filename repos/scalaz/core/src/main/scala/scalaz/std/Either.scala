@@ -347,8 +347,8 @@ trait EitherInstances extends EitherInstances0 {
             a => Left(Left(a)),
             _.fold(
                 b => Left(Right(b)),
-                Right(_)
-            )
+                Right(_),
+            ),
         )
 
       override def reassociateRight[A, B, C](
@@ -356,9 +356,9 @@ trait EitherInstances extends EitherInstances0 {
         f.fold(
             _.fold(
                 Left(_),
-                b => Right(Left(b))
+                b => Right(Left(b)),
             ),
-            c => Right(Right(c))
+            c => Right(Right(c)),
         )
     }
 

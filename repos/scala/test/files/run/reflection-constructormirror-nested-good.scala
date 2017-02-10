@@ -19,7 +19,7 @@ class Foo {
 object Test extends App {
   case class R(
       sales: Int,
-      name: String
+      name: String,
   )
   val foo = new Foo
   println(foo.foo)

@@ -46,7 +46,7 @@ case class UserInfo(user: User,
         isStreamer option Trophy(_id = "",
                                  user = user.id,
                                  kind = Trophy.Kind.Streamer,
-                                 date = org.joda.time.DateTime.now)
+                                 date = org.joda.time.DateTime.now),
     ).flatten ::: trophies
 }
 

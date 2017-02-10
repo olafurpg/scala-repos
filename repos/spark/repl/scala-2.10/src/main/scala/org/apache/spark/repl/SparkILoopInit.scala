@@ -97,7 +97,7 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
   protected def postInitThunks =
     List[Option[() => Unit]](
         Some(intp.setContextClassLoader _),
-        if (isReplPower) Some(() => enablePowerMode(true)) else None
+        if (isReplPower) Some(() => enablePowerMode(true)) else None,
     ).flatten
   // ++ (
   //   warningsThunks

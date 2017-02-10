@@ -328,7 +328,7 @@ object JE {
                   JsCmds.JsCrVar(
                       "df",
                       JsRaw("document.createDocumentFragment()")) & addToDocFrag(
-                      "df", visible.toList) & JE.JsRaw("return df").cmd
+                      "df", visible.toList) & JE.JsRaw("return df").cmd,
               ).toJsCmd + "(), " + AnonFunc(JsCmds.JsCrVar("df",
                                                            JsRaw("document.createDocumentFragment()")) & addToDocFrag(
                       "df",
@@ -652,8 +652,8 @@ trait HtmlFixer {
         session.normalizeHtmlAndAppendEventHandlers(
             session.processSurroundAndInclude(
                 s"JS SetHTML id: $uid",
-                content
-            )
+                content,
+            ),
         )
       } openOr {
         content

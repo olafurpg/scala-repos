@@ -197,7 +197,7 @@ trait Printers extends api.Printers { self: SymbolTable =>
         "" +
         (if (tree.symbol == NoSymbol) mods.privateWithin
          else if (tree.symbol.hasAccessBoundary) tree.symbol.privateWithin.name
-         else "")
+         else ""),
     )
 
     def printFlags(flags: Long, privateWithin: String) = {

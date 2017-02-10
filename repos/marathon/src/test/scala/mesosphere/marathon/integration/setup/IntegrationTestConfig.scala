@@ -80,7 +80,7 @@ object IntegrationTestConfig {
     val libCandidates = dirs.flatMap { (libDir: String) =>
       Stream(
           new File(libDir, "libmesos.dylib"),
-          new File(libDir, "libmesos.so")
+          new File(libDir, "libmesos.so"),
       )
     }
 

@@ -1496,7 +1496,7 @@ object Conformance {
                         wild.upperBound,
                         ScalaPsiElementFactory.createTypeParameterFromText(
                             wild.name,
-                            PsiManager.getInstance(ta.getProject)
+                            PsiManager.getInstance(ta.getProject),
                         )))
                 (true, tpt)
               case _ => (false, tp)

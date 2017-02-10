@@ -22,7 +22,7 @@ trait LabelsControllerBase extends ControllerBase {
       "labelName" -> trim(
           label("Label name",
                 text(required, labelName, uniqueLabelName, maxlength(100)))),
-      "labelColor" -> trim(label("Color", text(required, color)))
+      "labelColor" -> trim(label("Color", text(required, color))),
   )(LabelForm.apply)
 
   get("/:owner/:repository/issues/labels")(

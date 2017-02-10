@@ -22,7 +22,7 @@ object ScriptSpec extends Specification {
     "not delimit statements on double-semicolons, rather escaping them to a single semicolon" in {
       val statements = IndexedSeq(
           "SELECT * FROM punctuation WHERE characters = ';' OR characters = ';;'",
-          "DROP the_beat"
+          "DROP the_beat",
       )
 
       // double the semicolons

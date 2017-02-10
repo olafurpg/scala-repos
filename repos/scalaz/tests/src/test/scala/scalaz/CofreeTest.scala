@@ -68,7 +68,7 @@ object CofreeTest extends SpecLite {
               .map(s =>
                     Foldable[CofreeLazyOption].foldRight(s, Stream.empty[A])(
                         _ #:: _))
-              .getOrElse(Stream.empty)
+              .getOrElse(Stream.empty),
           )
     }
 

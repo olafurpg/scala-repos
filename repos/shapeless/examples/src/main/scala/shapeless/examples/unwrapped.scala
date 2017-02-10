@@ -53,7 +53,7 @@ object UnwrappedExamples {
     implicit def encodeHCons[
         K <: Symbol,
         V,
-        Rest <: HList
+        Rest <: HList,
     ](implicit key: Witness.Aux[K],
       encodeV: Lazy[EncodeValue[V]],
       encodeRest: Strict[Encode[Rest]]) = new Encode[FieldType[K, V] :: Rest] {
@@ -110,7 +110,7 @@ object UnwrappedExamples {
         K <: Symbol,
         V,
         U,
-        Rest <: HList
+        Rest <: HList,
     ](implicit key: Witness.Aux[K],
       uw: Strict[Unwrapped.Aux[V, U]],
       encodeV: Lazy[EncodeValue[U]],

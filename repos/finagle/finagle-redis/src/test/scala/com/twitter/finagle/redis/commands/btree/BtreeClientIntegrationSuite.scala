@@ -207,7 +207,7 @@ final class BtreeClientIntegrationSuite
 
   def testBrangeInclusiveStart(
       client: Client,
-      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]],
   ) {
     val rand = new scala.util.Random()
     for ((outerKey, inner) <- dict) {
@@ -226,7 +226,7 @@ final class BtreeClientIntegrationSuite
 
   def testBrangeInclusiveEnd(
       client: Client,
-      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]],
   ) {
     val rand = new scala.util.Random()
     for ((outerKey, inner) <- dict) {
@@ -245,7 +245,7 @@ final class BtreeClientIntegrationSuite
 
   def testBrangeInclusiveStartEnd(
       client: Client,
-      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]],
   ) {
     val rand = new scala.util.Random()
     for ((outerKey, inner) <- dict) {
@@ -271,7 +271,7 @@ final class BtreeClientIntegrationSuite
 
   def testBrangeExclusiveStart(
       client: Client,
-      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]],
   ) {
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
@@ -289,7 +289,7 @@ final class BtreeClientIntegrationSuite
 
   def testBrangeExclusiveEnd(
       client: Client,
-      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]],
   ) {
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
@@ -307,7 +307,7 @@ final class BtreeClientIntegrationSuite
 
   def testBrangeExclusiveStartEnd(
       client: Client,
-      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]],
   ) {
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
@@ -332,7 +332,7 @@ final class BtreeClientIntegrationSuite
   def validate(
       outerKey: String,
       exp: List[(String, String)],
-      got: Seq[(ChannelBuffer, ChannelBuffer)]
+      got: Seq[(ChannelBuffer, ChannelBuffer)],
   ) {
     assert(got.size == exp.size,
            "BRANGE failed for " + outerKey + " expected size " + exp.size +

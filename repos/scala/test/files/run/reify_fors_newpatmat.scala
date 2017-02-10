@@ -12,7 +12,7 @@ object Test extends App {
       val persons = List(
           new Person("Bob", 17),
           new Person("John", 40),
-          new Person("Richard", 68)
+          new Person("Richard", 68),
       )
 
       /** A Person class. 'val' constructor parameters become

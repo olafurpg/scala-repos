@@ -126,7 +126,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
         W = DenseMatrix.zeros[Double](DIM, 2 * m),
         M = DenseMatrix.zeros[Double](2 * m, 2 * m),
         yHistory = DenseMatrix.zeros[Double](0, 0),
-        sHistory = DenseMatrix.zeros[Double](0, 0)
+        sHistory = DenseMatrix.zeros[Double](0, 0),
     )
   }
 
@@ -295,7 +295,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
       } else if (yHistory.cols < m) {
         history.copy(
             yHistory = DenseMatrix.horzcat(yHistory, newY.toDenseMatrix.t),
-            sHistory = DenseMatrix.horzcat(sHistory, newS.toDenseMatrix.t)
+            sHistory = DenseMatrix.horzcat(sHistory, newS.toDenseMatrix.t),
         )
       } else {
         //m <= k discard the oldest yk and sk
@@ -303,7 +303,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
             yHistory = DenseMatrix.horzcat(
                   yHistory(::, 1 until m), newY.toDenseMatrix.t),
             sHistory = DenseMatrix.horzcat(
-                  sHistory(::, 1 until m), newS.toDenseMatrix.t)
+                  sHistory(::, 1 until m), newS.toDenseMatrix.t),
         )
       }
     }

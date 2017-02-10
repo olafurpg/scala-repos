@@ -19,19 +19,19 @@ object VersionUtil {
   lazy val globalVersionSettings = Seq[Setting[_]](
       // Set the version properties globally (they are the same for all projects)
       versionProperties in Global := versionPropertiesImpl.value,
-      version in Global := versionProperties.value.mavenVersion
+      version in Global := versionProperties.value.mavenVersion,
   )
 
   lazy val generatePropertiesFileSettings = Seq[Setting[_]](
       copyrightString := "Copyright 2002-2016, LAMP/EPFL",
       resourceGenerators in Compile +=
         generateVersionPropertiesFile.map(file => Seq(file)).taskValue,
-      generateVersionPropertiesFile := generateVersionPropertiesFileImpl.value
+      generateVersionPropertiesFile := generateVersionPropertiesFileImpl.value,
   )
 
   lazy val generateBuildCharacterFileSettings = Seq[Setting[_]](
       generateBuildCharacterPropertiesFile :=
-        generateBuildCharacterPropertiesFileImpl.value
+        generateBuildCharacterPropertiesFileImpl.value,
   )
 
   case class Versions(canonicalVersion: String,
@@ -51,7 +51,7 @@ object VersionUtil {
     def toMap: Map[String, String] = Map(
         "version.number" -> canonicalVersion,
         "maven.version.number" -> mavenVersion,
-        "osgi.version.number" -> osgiVersion
+        "osgi.version.number" -> osgiVersion,
     )
   }
 

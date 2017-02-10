@@ -6,7 +6,7 @@ object Test extends CompilerTest {
       """|import scala.language.postfixOps
        |class A {
        |  val one = 1 toString
-       |}""".stripMargin
+       |}""".stripMargin,
   )
   def check(source: String, unit: CompilationUnit) {
     for (ClassDef(_, _, _, Template(_, _, stats)) <- unit.body; stat <- stats;

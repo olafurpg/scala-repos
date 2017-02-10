@@ -30,7 +30,7 @@ class TaskUpdateActorTest
         f.oneSecondInFuture,
         f.opInitiator.ref,
         taskId,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
 
     And("a processor that fails immediately")
@@ -62,7 +62,7 @@ class TaskUpdateActorTest
         f.clock.now,
         f.opInitiator.ref,
         taskId,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
 
     And("a processor that succeeds immediately")
@@ -102,7 +102,7 @@ class TaskUpdateActorTest
         f.oneSecondInFuture,
         f.opInitiator.ref,
         taskId,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
 
     And("a processor that processes it immediately")
@@ -132,7 +132,7 @@ class TaskUpdateActorTest
         f.oneSecondInFuture,
         f.opInitiator.ref,
         taskId,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
 
     And("a processor that does not return")
@@ -162,14 +162,14 @@ class TaskUpdateActorTest
         f.oneSecondInFuture,
         f.opInitiator.ref,
         task1Id,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
     val task2Id = Task.Id.forApp(appId)
     val op2 = TaskOpProcessor.Operation(
         f.oneSecondInFuture,
         f.opInitiator.ref,
         task2Id,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
 
     And("a processor that does not return")
@@ -217,13 +217,13 @@ class TaskUpdateActorTest
         f.oneSecondInFuture,
         f.opInitiator.ref,
         task1Id,
-        TaskOpProcessor.Action.Expunge
+        TaskOpProcessor.Action.Expunge,
     )
     val op2 = TaskOpProcessor.Operation(
         f.oneSecondInFuture,
         f.opInitiator.ref,
         task1Id,
-        TaskOpProcessor.Action.Noop
+        TaskOpProcessor.Action.Noop,
     )
 
     And("a processor that does not return")

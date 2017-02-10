@@ -218,7 +218,7 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
             .getElementFactory
             .createFieldFromText(
                 "public final static " + getQualifiedName + " MODULE$",
-                this
+                this,
             ),
           this)
       field.setNavigationElement(this)

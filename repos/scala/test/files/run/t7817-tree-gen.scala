@@ -15,7 +15,7 @@ object Test extends CompilerTest {
     package test { class C { object O } }
     class D { object P }
     package test2 { object `package` { object PO; def bar = 0 } }
-    """
+    """,
   )
   def check(source: String, unit: CompilationUnit) = enteringTyper {
     def checkTree(msg: String, t: => Tree) = {

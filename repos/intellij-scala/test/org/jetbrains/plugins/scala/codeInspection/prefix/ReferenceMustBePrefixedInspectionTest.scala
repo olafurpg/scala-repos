@@ -40,7 +40,7 @@ class ReferenceMustBePrefixedInspectionTest
        |
        |object AAA {
        |  val list: util.List[Int] = null
-       |}"""
+       |}""",
   )
 
   def testExtends() = doTest(
@@ -53,7 +53,7 @@ class ReferenceMustBePrefixedInspectionTest
       """import scala.collection.mutable
        |import scala.collection.mutable.Seq
        |
-       |object AAA extends mutable.Seq[Int]"""
+       |object AAA extends mutable.Seq[Int]""",
   )
 
   def testApply() = doTest(
@@ -72,7 +72,7 @@ class ReferenceMustBePrefixedInspectionTest
       |
       |object AAA {
       |  val s = mutable.Seq(0, 1)
-      |}"""
+      |}""",
   )
 
   def testUnapply() = doTest(
@@ -97,7 +97,7 @@ class ReferenceMustBePrefixedInspectionTest
       |  Map(1 -> "a") match {
       |    case hm: mutable.HashMap =>
       |  }
-      |}"""
+      |}""",
   )
 
   def testHaveImport() = doTest(
@@ -118,6 +118,6 @@ class ReferenceMustBePrefixedInspectionTest
       |
       |object AAA {
       |  val hm: mutable.HashMap = null
-      |}"""
+      |}""",
   )
 }

@@ -27,7 +27,7 @@ private[loadbalancer] object Heap {
   */
 private[loadbalancer] class Heap[T](
     ord: Ordering[T],
-    indexer: Heap.Indexer[T]
+    indexer: Heap.Indexer[T],
 ) {
   import ord._
 

@@ -29,7 +29,7 @@ object JavaLangString {
         List(
             Ident("Ljava_io_Serializable", Some("java.io.Serializable")),
             Ident("jl_CharSequence", Some("java.lang.CharSequence")),
-            Ident("jl_Comparable", Some("java.lang.Comparable"))
+            Ident("jl_Comparable", Some("java.lang.Comparable")),
         ),
         None,
         List(
@@ -130,7 +130,7 @@ object JavaLangString {
                     ParamDef(Ident("end", Some("end")),
                              IntType,
                              mutable = false,
-                             rest = false)
+                             rest = false),
                 ),
                 ClassType("jl_CharSequence"), {
                   Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
@@ -140,7 +140,7 @@ object JavaLangString {
                              VarRef(Ident("begin", Some("begin")))(IntType),
                              VarRef(Ident("end", Some("end")))(IntType)))(
                       ClassType("jl_CharSequence"))
-                })(OptimizerHints.empty.withInline(true), None)
+                })(OptimizerHints.empty.withInline(true), None),
         ))(OptimizerHints.empty)
 
     val hashedClassDef = Hashers.hashClassDef(classDef)

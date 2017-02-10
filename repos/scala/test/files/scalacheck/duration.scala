@@ -15,7 +15,7 @@ object Test extends Properties("Division of Duration by Long") {
       1 -> (arbitrary[Byte] map (_.toLong << 32)),
       1 -> (arbitrary[Byte] map (_.toLong << 40)),
       1 -> (arbitrary[Byte] map (_.toLong << 48)),
-      1 -> (choose(-127L, 127L) map (_ << 56))
+      1 -> (choose(-127L, 127L) map (_ << 56)),
   )
 
   val genTwoSmall = for {
@@ -42,7 +42,7 @@ object Test extends Properties("Division of Duration by Long") {
       1 -> (0L, Long.MinValue),
       1 -> (1L, Long.MinValue),
       1 -> (-1L, Long.MinValue),
-      90 -> genClose
+      90 -> genClose,
   )
 
   def mul(a: Long, b: Long): Long = {

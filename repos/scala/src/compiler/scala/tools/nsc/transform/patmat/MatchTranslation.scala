@@ -320,7 +320,7 @@ trait MatchTranslation { self: PatternMatching =>
                                           casesNoSubstOnly,
                                           pt,
                                           matchOwner,
-                                          Some(scrut => Throw(REF(exSym))))
+                                          Some(scrut => Throw(REF(exSym)))),
               )
             })
           }
@@ -655,7 +655,7 @@ trait MatchTranslation { self: PatternMatching =>
             aligner.isBool,
             checkedLength,
             patBinderOrCasted,
-            ignoredSubPatBinders
+            ignoredSubPatBinders,
         )
       }
 

@@ -417,7 +417,7 @@ object Test extends Properties("HtmlFactory") {
        true),
       (None,
        """abstract def test1(): Int [use case] This takes the implicit value in scope.""",
-       true)
+       true),
   )
 
   property("SI-5287: Display correct \"Definition classes\"") = checkText(
@@ -427,7 +427,7 @@ object Test extends Properties("HtmlFactory") {
            [use case] The usecase explanation
            [use case] The usecase explanation
            Definition Classes SI_5287 SI_5287_B SI_5287_A""",
-       true)
+       true),
   ) // the explanation appears twice, as small comment and full comment
 
   property("Comment inheritance: Correct comment inheritance for overriding") = checkText(
@@ -475,7 +475,7 @@ object Test extends Properties("HtmlFactory") {
           arg2 The string comment
           returns The return comment
           """,
-       true)
+       true),
   )
 
   for (useCaseFile <- List("UseCaseInheritance", "UseCaseOverrideInheritance")) {
@@ -549,7 +549,7 @@ object Test extends Properties("HtmlFactory") {
             arg2 The string comment
             returns The return comment
             """,
-         true)
+         true),
     )
   }
 
@@ -753,7 +753,7 @@ object Test extends Properties("HtmlFactory") {
          """class B extends AnyRef
             Annotations @DeveloperApi()
          """,
-         true)
+         true),
     )
   }
 

@@ -29,11 +29,11 @@ object Macros {
                         TypeDef(Modifiers(),
                                 TypeName(lit),
                                 Nil,
-                                TypeTree(typeOf[Int]))
-                    )
-                )
+                                TypeTree(typeOf[Int])),
+                    ),
+                ),
             ),
-            Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil)
+            Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil),
         ))
   }
 
@@ -67,12 +67,12 @@ object Macros {
                             Nil,
                             Nil,
                             TypeTree(),
-                            c.literal(42).tree
-                        )
-                    )
-                )
+                            c.literal(42).tree,
+                        ),
+                    ),
+                ),
             ),
-            Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil)
+            Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil),
         ))
   }
 
@@ -107,10 +107,10 @@ object Macros {
                             Nil,
                             Nil,
                             TypeTree(),
-                            c.literal(42).tree
-                        )
-                    )
-                )
+                            c.literal(42).tree,
+                        ),
+                    ),
+                ),
             ),
             ClassDef(
                 Modifiers(Flag.FINAL),
@@ -124,9 +124,9 @@ object Macros {
                                 List(List()),
                                 TypeTree(),
                                 Block(List(pendingSuperCall),
-                                      Literal(Constant(())))) :: Nil)
+                                      Literal(Constant(())))) :: Nil),
             ),
-            Apply(Select(New(Ident(wrapper)), termNames.CONSTRUCTOR), Nil)
+            Apply(Select(New(Ident(wrapper)), termNames.CONSTRUCTOR), Nil),
         ))
   }
 }

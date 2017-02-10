@@ -26,8 +26,8 @@ class LoadingFutureCacheTest extends FunSuite {
                   cacheLoaderCount += 1
                   Future.value(k.hashCode)
                 }
-              }
-          )
+              },
+          ),
       )
   }
 

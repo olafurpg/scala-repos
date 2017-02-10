@@ -62,7 +62,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
       source: SourceFile,
       offset: Int,
       prefix: String,
-      constructing: Boolean
+      constructing: Boolean,
   )
       extends CompletionContext
 
@@ -70,7 +70,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
       source: SourceFile,
       offset: Int,
       prefix: String,
-      constructing: Boolean
+      constructing: Boolean,
   )
       extends CompletionContext
 
@@ -92,7 +92,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
 
       val preceding = inputP.source.content.slice(
           Math.max(0, inputP.point - 100),
-          inputP.point
+          inputP.point,
       )
 
       val defaultPrefix = IdentRegexp.findFirstMatchIn(preceding) match {
@@ -202,7 +202,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
                   (c1.relevance == c2.relevance &&
                       c1.name.length < c2.name.length)
                 })
-                .take(maxResults)
+                .take(maxResults),
             )
         case _ => CompletionInfoList("", Nil)
       }
@@ -218,7 +218,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
         sym: Symbol,
         tpe: Type,
         inherited: Boolean,
-        viaView: Symbol
+        viaView: Symbol,
     ): List[CompletionInfo] = {
 
       var score = 0
@@ -363,7 +363,7 @@ object Keywords {
       "var",
       "while",
       "with",
-      "yield"
+      "yield",
   )
 
   val keywordCompletions =
@@ -438,7 +438,7 @@ object CompletionUtil {
               CompletionSignature(List.empty, s.name, false),
               isCallable = false,
               40,
-              None
+              None,
           )
         }
       case unknown =>

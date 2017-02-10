@@ -263,7 +263,7 @@ object RecordSpec extends Specification {
           ("optionalBinaryField", JsNull),
           ("legacyOptionalBinaryField", JsNull),
           ("legacyOptionalJodaTimeField", JsNull),
-          ("optionalJodaTimeField", JsNull)
+          ("optionalJodaTimeField", JsNull),
       )
 
       "convert to JsExp (via asJSON)" in {
@@ -328,7 +328,7 @@ object RecordSpec extends Specification {
                 JField("optionalBinaryField", JNothing),
                 JField("mandatoryJodaTimeField", JInt(dt.getMillis)),
                 JField("legacyOptionalJodaTimeField", JNothing),
-                JField("optionalJodaTimeField", JNothing)
+                JField("optionalJodaTimeField", JNothing),
             ))
       }
 

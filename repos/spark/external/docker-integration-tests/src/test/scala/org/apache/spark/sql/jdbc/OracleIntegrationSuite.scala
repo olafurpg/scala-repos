@@ -51,7 +51,7 @@ class OracleIntegrationSuite
   override val db = new DatabaseOnDocker {
     override val imageName = "wnameless/oracle-xe-11g:latest"
     override val env = Map(
-        "ORACLE_ROOT_PASSWORD" -> "oracle"
+        "ORACLE_ROOT_PASSWORD" -> "oracle",
     )
     override val jdbcPort: Int = 1521
     override def getJdbcUrl(ip: String, port: Int): String =

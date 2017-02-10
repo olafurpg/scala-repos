@@ -174,7 +174,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     javaOpts += "-Djava.io.tmpdir=" + new Path(
         YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
-        YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR
+        YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR,
     )
 
     // Certain configs need to be passed here because they are needed before the Executor
@@ -349,7 +349,7 @@ private[yarn] class ExecutorRunnable(container: Container,
     // lookup appropriate http scheme for container log urls
     val yarnHttpPolicy = yarnConf.get(
         YarnConfiguration.YARN_HTTP_POLICY_KEY,
-        YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
+        YarnConfiguration.YARN_HTTP_POLICY_DEFAULT,
     )
     val httpScheme =
       if (yarnHttpPolicy == "HTTPS_ONLY") "https://" else "http://"

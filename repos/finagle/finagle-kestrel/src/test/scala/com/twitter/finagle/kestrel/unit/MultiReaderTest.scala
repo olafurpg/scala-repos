@@ -63,7 +63,7 @@ class MultiReaderTest
 
     def newKestrelService(
         executor: Option[ExecutorService],
-        queues: LoadingCache[Buf, BlockingDeque[Buf]]
+        queues: LoadingCache[Buf, BlockingDeque[Buf]],
     ): Service[Command, Response] = {
       val interpreter = new Interpreter(queues)
       new Service[Command, Response] {
@@ -174,7 +174,7 @@ class MultiReaderTest
 
     def newKestrelService(
         executor: Option[ExecutorService],
-        queues: LoadingCache[Buf, BlockingDeque[Buf]]
+        queues: LoadingCache[Buf, BlockingDeque[Buf]],
     ): Service[Command, Response] = {
       val interpreter = new Interpreter(queues)
       new Service[Command, Response] {
@@ -288,7 +288,7 @@ class MultiReaderTest
         assert(
             ISet((handle.messages ??),
                  (handle.messages ??),
-                 (handle.messages ??)) == ISet(ms(0), ms(1), ms(2))
+                 (handle.messages ??)) == ISet(ms(0), ms(1), ms(2)),
         )
       }
     }

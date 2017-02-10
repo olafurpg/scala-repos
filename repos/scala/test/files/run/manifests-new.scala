@@ -77,14 +77,14 @@ object Test {
     List(
         typeOf[T] <:< typeOf[Any],
         typeOf[T] <:< typeOf[AnyRef],
-        !(typeOf[T] <:< typeOf[AnyVal])
+        !(typeOf[T] <:< typeOf[AnyVal]),
     ) foreach (assert(_, "assertAnyRef"))
 
   def assertAnyVal[T : TypeTag] =
     List(
         typeOf[T] <:< typeOf[Any],
         !(typeOf[T] <:< typeOf[AnyRef]),
-        typeOf[T] <:< typeOf[AnyVal]
+        typeOf[T] <:< typeOf[AnyVal],
     ) foreach (assert(_, "assertAnyVal"))
 
   def assertSameType[T : TypeTag, U : TypeTag] =
@@ -99,7 +99,7 @@ object Test {
   def testVariancesVia[T : TypeTag, U : TypeTag] = assert(
       typeCompare[T, U] == SUB &&
       showsCovariance[T, U, List] && showsInvariance[T, U, Set],
-      "testVariancesVia"
+      "testVariancesVia",
   )
 
   def runAllTests = {

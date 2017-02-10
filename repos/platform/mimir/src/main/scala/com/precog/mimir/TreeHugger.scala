@@ -68,7 +68,7 @@ class Code extends UsefulStuff {
         LAZYVAL("mathlib1") := REF("_mathlib1"),
         LAZYVAL("mathlib2") := REF("_mathlib2"),
         DEF("_mathlib1", sym.BIF1) := REF("Set()"),
-        DEF("_mathlib2", sym.BIF2) := REF("Set()")
+        DEF("_mathlib2", sym.BIF2) := REF("Set()"),
     )
   }
 
@@ -77,7 +77,7 @@ class Code extends UsefulStuff {
         (DEF("_mathlib1") withFlags (Flags.OVERRIDE) :=
               REF("super._mathlib1") SEQ_++ (sym.Set UNAPPLY (ID(m1)))) ::
         (DEF("_mathlib2") withFlags (Flags.OVERRIDE) := REF("super._mathlib2") SEQ_++
-            (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
+            (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*,
     )
   }
 

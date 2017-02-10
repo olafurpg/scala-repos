@@ -47,7 +47,7 @@ object fsc extends Command {
               "Specify compile server host at port number.  Usually this option " & "is not needed.  Note that the hostname must be for a host that shares " & "the same filesystem."),
           Definition(
               CmdOptionBound("J", Argument("flag")),
-              "Pass " & Mono(Argument("flag")) & " directly to the Java VM for the compilation daemon.")
+              "Pass " & Mono(Argument("flag")) & " directly to the Java VM for the compilation daemon."),
       ))
 
   val example = Section(
@@ -98,7 +98,7 @@ object fsc extends Command {
                              "java") & " command defined by " & MBold(
                              "JAVACMD") & ".",
                          "With Java 1.5 (or newer) one may for example configure the " & "memory usage of the JVM as follows: " & Mono(
-                             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\"")
+                             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\""),
                      ))))
 
   val exitStatus = Section(

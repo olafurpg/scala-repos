@@ -395,13 +395,13 @@ object FormSpec extends Specification {
       "render the right number of fields if there's multiple sub fields at a given index when filled from a value" in {
         render(
             form.fill(
-                new JavaForm(List(new JavaSubForm("somea", "someb")).asJava))
+                new JavaForm(List(new JavaSubForm("somea", "someb")).asJava)),
         ) must exactly("foo[0].a=somea,foo[0].b=someb")
       }
 
       "render the right number of fields if there's multiple sub fields at a given index when filled from a form" in {
         render(
-            fillNoBind("somea" -> "someb")
+            fillNoBind("somea" -> "someb"),
         ) must exactly("foo[0].a=somea,foo[0].b=someb")
       }
 
@@ -410,7 +410,7 @@ object FormSpec extends Specification {
             form.fill(new JavaForm(List(new JavaSubForm("a", "b"),
                                         new JavaSubForm("c", "d"),
                                         new JavaSubForm("e", "f"),
-                                        new JavaSubForm("g", "h")).asJava))
+                                        new JavaSubForm("g", "h")).asJava)),
         ) must exactly("foo[0].a=a,foo[0].b=b",
                        "foo[1].a=c,foo[1].b=d",
                        "foo[2].a=e,foo[2].b=f",
@@ -419,7 +419,7 @@ object FormSpec extends Specification {
 
       "get the order of the fields correct when filled from a form" in {
         render(
-            fillNoBind("a" -> "b", "c" -> "d", "e" -> "f", "g" -> "h")
+            fillNoBind("a" -> "b", "c" -> "d", "e" -> "f", "g" -> "h"),
         ) must exactly("foo[0].a=a,foo[0].b=b",
                        "foo[1].a=c,foo[1].b=d",
                        "foo[2].a=e,foo[2].b=f",

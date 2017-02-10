@@ -47,5 +47,5 @@ case class Account(
     lastLoginDate: Option[java.util.Date],
     image: Option[String],
     isGroupAccount: Boolean,
-    isRemoved: Boolean
+    isRemoved: Boolean,
 )

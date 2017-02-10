@@ -174,7 +174,7 @@ case class CssUrlPrefixer(prefix: String) extends Parsers {
         val remainingString = remaining.source
           .subSequence(
               remaining.offset,
-              remaining.source.length
+              remaining.source.length,
           )
           .toString
 

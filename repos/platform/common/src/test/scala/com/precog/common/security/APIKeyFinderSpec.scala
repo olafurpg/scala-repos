@@ -71,7 +71,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         val permissions: Set[Permission] = Set(
             ReadPermission(path, WrittenByAccount(accountId)),
             DeletePermission(path, WrittenByAccount(accountId)),
-            WritePermission(path, WriteAs(accountId))
+            WritePermission(path, WriteAs(accountId)),
         )
 
         keyFinder.hasCapability(key.apiKey, permissions, None).copoint must beTrue
@@ -83,7 +83,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
       val permissions: Set[Permission] = Set(
           ReadPermission(path, WrittenByAccount("user1")),
           WritePermission(path, WriteAsAny),
-          DeletePermission(path, WrittenByAny)
+          DeletePermission(path, WrittenByAny),
       )
 
       val (key0, key1, grantId, mgr) = (for {
@@ -133,7 +133,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
       val permissions: Set[Permission] = Set(
           ReadPermission(path, WrittenByAccount("user1")),
           WritePermission(path, WriteAsAny),
-          DeletePermission(path, WrittenByAny)
+          DeletePermission(path, WrittenByAny),
       )
 
       val expiration = new DateTime(100)

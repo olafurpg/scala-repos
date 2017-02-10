@@ -278,7 +278,7 @@ private[tournament] final class TournamentApi(
                     fire = sheet.onFire,
                     ratingDiff = perf.fold(player.ratingDiff)(
                           _.intRating - player.rating),
-                    provisional = perf.fold(player.provisional)(_.provisional)
+                    provisional = perf.fold(player.provisional)(_.provisional),
                 )
                 .recomputeMagicScore
           }
@@ -390,7 +390,7 @@ private[tournament] final class TournamentApi(
         site ! SendToFlag("tournament",
                           Json.obj(
                               "t" -> "reload",
-                              "d" -> scheduleJsonView(vis)
+                              "d" -> scheduleJsonView(vis),
                           ))
       }
       TournamentRepo.promotable foreach { tours =>

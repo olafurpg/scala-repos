@@ -42,7 +42,7 @@ object Test extends Properties("reflect.internal.util.Collections") {
 
   val tests = List(
       ("map2Conserve(identity)", prop1_map2Conserve),
-      ("map2Conserve == old impl", prop2_map2Conserve)
+      ("map2Conserve == old impl", prop2_map2Conserve),
   )
 
   checkStackOverflow()

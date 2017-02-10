@@ -286,7 +286,7 @@ object IsotonicRegressionModel extends MLReadable[IsotonicRegressionModel] {
 
   /** [[MLWriter]] instance for [[IsotonicRegressionModel]] */
   private[IsotonicRegressionModel] class IsotonicRegressionModelWriter(
-      instance: IsotonicRegressionModel
+      instance: IsotonicRegressionModel,
   )
       extends MLWriter with Logging {
 

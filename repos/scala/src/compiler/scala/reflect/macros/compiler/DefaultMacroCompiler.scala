@@ -68,7 +68,7 @@ abstract class DefaultMacroCompiler
                                        List(List(Literal(Constant(null))))),
                                    methName),
                             targs)),
-        isImplBundle = true
+        isImplBundle = true,
     )
     val vanillaResult = tryCompile(vanillaImplRef)
     val bundleResult = tryCompile(bundleImplRef)

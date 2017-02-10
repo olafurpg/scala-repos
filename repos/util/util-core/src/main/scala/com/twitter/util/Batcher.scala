@@ -2,9 +2,9 @@ package com.twitter.util
 
 /** Provides an interface for working with a batched [[com.twitter.util.Future]] */
 class Batcher[In, Out] private[util](
-    executor: BatchExecutor[In, Out]
+    executor: BatchExecutor[In, Out],
 )(
-    implicit timer: Timer
+    implicit timer: Timer,
 )
     extends (In => Future[Out]) { batcher =>
 

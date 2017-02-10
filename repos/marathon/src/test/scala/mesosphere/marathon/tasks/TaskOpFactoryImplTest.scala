@@ -26,7 +26,7 @@ class TaskOpFactoryImplTest
       .build()
     val app: AppDefinition = AppDefinition(portDefinitions = List())
     val runningTasks: Set[Task] = Set(
-        MarathonTestHelper.mininimalTask("some task ID")
+        MarathonTestHelper.mininimalTask("some task ID"),
     )
 
     val request =
@@ -38,13 +38,13 @@ class TaskOpFactoryImplTest
         agentInfo = Task.AgentInfo(
               host = "some_host",
               agentId = Some(offer.getSlaveId.getValue),
-              attributes = List.empty
+              attributes = List.empty,
           ),
         appVersion = app.version,
         status = Task.Status(
-              stagedAt = f.clock.now()
+              stagedAt = f.clock.now(),
           ),
-        networking = Task.HostPorts(List.empty)
+        networking = Task.HostPorts(List.empty),
     )
     assert(inferredTaskOp.isDefined, "task op is not empty")
     assert(inferredTaskOp.get.maybeNewTask.get == expectedTask)
@@ -147,7 +147,7 @@ class TaskOpFactoryImplTest
         reservedTask.taskId.idString,
         localVolumeIdLaunched,
         localVolumeIdUnwanted,
-        localVolumeIdMatch
+        localVolumeIdMatch,
     )
     val runningTasks =
       Seq(f.residentLaunchedTask(app.id, localVolumeIdLaunched), reservedTask)

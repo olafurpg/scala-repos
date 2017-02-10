@@ -39,7 +39,7 @@ object ApiRepository {
         forks = forkedCount,
         `private` = repository.isPrivate,
         default_branch = repository.defaultBranch,
-        owner = owner
+        owner = owner,
     )(urlIsHtmlUrl)
 
   def apply(repositoryInfo: RepositoryInfo, owner: ApiUser): ApiRepository =

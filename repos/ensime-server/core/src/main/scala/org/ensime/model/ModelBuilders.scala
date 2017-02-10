@@ -201,7 +201,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
             typeFullName(tpe),
             tpe.typeArgs.map(TypeInfo(_)),
             members,
-            symPos
+            symPos,
         )
       }
       tpe match {
@@ -225,7 +225,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           params.map { s =>
             (s.nameString, TypeInfo(s.tpe))
           },
-          params.exists(_.isImplicit)
+          params.exists(_.isImplicit),
       )
     }
   }
@@ -254,7 +254,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           localName,
           locateSymbolPos(sym, PosNeededYes),
           TypeInfo(tpe, PosNeededAvail),
-          isArrowType(tpe)
+          isArrowType(tpe),
       )
     }
   }
@@ -266,13 +266,13 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         tpeSig: CompletionSignature,
         isCallable: Boolean,
         relevance: Int,
-        toInsert: Option[String]
+        toInsert: Option[String],
     ) = new CompletionInfo(
         name,
         tpeSig,
         isCallable,
         relevance,
-        toInsert
+        toInsert,
     )
 
     def fromSymbol(sym: Symbol, relevance: Int): CompletionInfo =
@@ -285,7 +285,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           completionSignatureForType(tpe),
           isArrowType(tpe.underlying),
           relevance,
-          None
+          None,
       )
     }
   }
@@ -324,7 +324,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
       new ArrowTypeInfo(
           tpe.toString(),
           TypeInfo(tpe.finalResultType),
-          paramSections
+          paramSections,
       )
     }
 

@@ -49,7 +49,7 @@ trait CommentFactoryBase {
       groupNames0: Map[String, Body] = Map.empty,
       groupPrio0: Map[String, Body] = Map.empty,
       hideImplicitConversions0: List[Body] = List.empty,
-      shortDescription0: List[Body] = List.empty
+      shortDescription0: List[Body] = List.empty,
   ): Comment = new Comment {
     val body = body0 getOrElse Body(Seq.empty)
     val authors = authors0
@@ -252,7 +252,7 @@ trait CommentFactoryBase {
         tags: Map[TagKey, List[String]],
         lastTagKey: Option[TagKey],
         remaining: List[String],
-        inCodeBlock: Boolean
+        inCodeBlock: Boolean,
     ): Comment = remaining match {
 
       case CodeBlockStartRegex(before, marker, after) :: ls
@@ -482,7 +482,7 @@ trait CommentFactoryBase {
               groupPrio0 = allSymsOneTag(SimpleTagKey("groupprio")),
               hideImplicitConversions0 = allTags(
                     SimpleTagKey("hideImplicitConversion")),
-              shortDescription0 = allTags(SimpleTagKey("shortDescription"))
+              shortDescription0 = allTags(SimpleTagKey("shortDescription")),
           )
 
           for ((key, _) <- bodyTags) reporter.warning(
@@ -788,7 +788,7 @@ trait CommentFactoryBase {
       val i = inline(checkSentenceEnded())
       Summary(
           if (jump(".")) Chain(List(i, Text(".")))
-          else i
+          else i,
       )
     }
 

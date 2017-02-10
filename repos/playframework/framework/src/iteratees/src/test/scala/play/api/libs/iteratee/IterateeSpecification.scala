@@ -37,7 +37,7 @@ trait IterateeSpecification { self: org.specs2.mutable.SpecificationLike =>
     Try(
         Await.result(
             e(Cont { case _ => throw new RuntimeException() }),
-            Duration.Inf
+            Duration.Inf,
         )) must beAFailedTry
   }
 

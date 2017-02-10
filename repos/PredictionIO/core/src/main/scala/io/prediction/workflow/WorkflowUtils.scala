@@ -66,14 +66,14 @@ object WorkflowUtils extends Logging {
     try {
       (
           EngineLanguage.Scala,
-          engineObject.instance.asInstanceOf[EngineFactory]
+          engineObject.instance.asInstanceOf[EngineFactory],
       )
     } catch {
       case e @ (_: NoSuchFieldException | _: ClassNotFoundException) =>
         try {
           (
               EngineLanguage.Java,
-              Class.forName(engine).newInstance.asInstanceOf[EngineFactory]
+              Class.forName(engine).newInstance.asInstanceOf[EngineFactory],
           )
         }
     }
@@ -88,7 +88,7 @@ object WorkflowUtils extends Logging {
     try {
       (
           EngineLanguage.Scala,
-          epgObject.instance.asInstanceOf[EngineParamsGenerator]
+          epgObject.instance.asInstanceOf[EngineParamsGenerator],
       )
     } catch {
       case e @ (_: NoSuchFieldException | _: ClassNotFoundException) =>
@@ -98,7 +98,7 @@ object WorkflowUtils extends Logging {
               Class
                 .forName(epg)
                 .newInstance
-                .asInstanceOf[EngineParamsGenerator]
+                .asInstanceOf[EngineParamsGenerator],
             )
         }
     }
@@ -112,14 +112,14 @@ object WorkflowUtils extends Logging {
     try {
       (
           EngineLanguage.Scala,
-          evaluationObject.instance.asInstanceOf[Evaluation]
+          evaluationObject.instance.asInstanceOf[Evaluation],
       )
     } catch {
       case e @ (_: NoSuchFieldException | _: ClassNotFoundException) =>
         try {
           (
               EngineLanguage.Java,
-              Class.forName(evaluation).newInstance.asInstanceOf[Evaluation]
+              Class.forName(evaluation).newInstance.asInstanceOf[Evaluation],
           )
         }
     }
@@ -316,7 +316,7 @@ object WorkflowUtils extends Logging {
 
     NameParams(
         name = nameOpt.getOrElse(""),
-        params = paramsOpt
+        params = paramsOpt,
     )
   }
 

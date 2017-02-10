@@ -42,7 +42,7 @@ class ScalaMacroEvaluator(project: Project)
   lazy val typingRules = Seq(
       MatchRule("product", "shapeless.Generic", ShapelessForProduct),
       MatchRule("apply", "shapeless.LowPriorityGeneric", ShapelessForProduct),
-      DefaultRule
+      DefaultRule,
   )
 
   def isMacro(n: PsiNamedElement): Option[ScFunction] = {

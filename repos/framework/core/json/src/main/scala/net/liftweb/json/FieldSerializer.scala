@@ -32,7 +32,7 @@ package json
   */
 case class FieldSerializer[A : Manifest](
     serializer: PartialFunction[(String, Any), Option[(String, Any)]] = Map(),
-    deserializer: PartialFunction[JField, JField] = Map()
+    deserializer: PartialFunction[JField, JField] = Map(),
 )
 
 object FieldSerializer {

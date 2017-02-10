@@ -153,7 +153,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     Future.sequence(
         blockManagerInfo.values.map { bm =>
           bm.slaveEndpoint.ask[Int](removeMsg)
-        }.toSeq
+        }.toSeq,
     )
   }
 
@@ -163,7 +163,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     Future.sequence(
         blockManagerInfo.values.map { bm =>
           bm.slaveEndpoint.ask[Boolean](removeMsg)
-        }.toSeq
+        }.toSeq,
     )
   }
 
@@ -181,7 +181,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     Future.sequence(
         requiredBlockManagers.map { bm =>
           bm.slaveEndpoint.ask[Int](removeMsg)
-        }.toSeq
+        }.toSeq,
     )
   }
 
@@ -307,7 +307,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
                 Future { info.blocks.asScala.keys.filter(filter).toSeq }
               }
             future
-          }
+          },
       )
       .map(_.flatten.toSeq)
   }

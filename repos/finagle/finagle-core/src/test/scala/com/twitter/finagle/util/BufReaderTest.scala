@@ -36,7 +36,7 @@ class BufReaderTest extends FunSuite with GeneratorDrivenPropertyChecks {
             ((int >> 24) & 0xff).toByte,
             ((int >> 16) & 0xff).toByte,
             ((int >> 8) & 0xff).toByte,
-            (int & 0xff).toByte
+            (int & 0xff).toByte,
         ))
     val br = BufReader(buf)
     assert(br.readIntBE() == int)
@@ -53,7 +53,7 @@ class BufReaderTest extends FunSuite with GeneratorDrivenPropertyChecks {
             ((long >> 24) & 0xff).toByte,
             ((long >> 16) & 0xff).toByte,
             ((long >> 8) & 0xff).toByte,
-            (long & 0xff).toByte
+            (long & 0xff).toByte,
         ))
     val br = BufReader(buf)
     assert(br.readLongBE() == long)

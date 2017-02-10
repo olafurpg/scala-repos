@@ -178,6 +178,6 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
   protected def failingNode(cause: Throwable) = Node(
       new FailingFactory(cause),
       new Metric(NullStatsReceiver, "failing"),
-      0
+      0,
   )
 }

@@ -97,7 +97,7 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
         CandleStick(28, 23, 44, 46, 15, 22.2),
         CandleStick(29, 28, 18, 30, 12, 23),
         CandleStick(30, 28, 18, 30, 12, 23.2),
-        CandleStick(31, 28, 18, 30, 12, 22)
+        CandleStick(31, 28, 18, 30, 12, 22),
     )
 
     createChart(data)

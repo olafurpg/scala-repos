@@ -66,7 +66,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = kryo,
                 keyOrdering = None,
                 aggregator = None,
-                mapSideCombine = false
+                mapSideCombine = false,
             )))
 
     val rangePartitioner = mock(classOf[RangePartitioner[Any, Any]])
@@ -77,7 +77,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = kryo,
                 keyOrdering = None,
                 aggregator = None,
-                mapSideCombine = false
+                mapSideCombine = false,
             )))
 
     // Shuffles with key orderings are supported as long as no aggregator is specified
@@ -87,7 +87,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = kryo,
                 keyOrdering = Some(mock(classOf[Ordering[Any]])),
                 aggregator = None,
-                mapSideCombine = false
+                mapSideCombine = false,
             )))
   }
 
@@ -102,7 +102,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = java,
                 keyOrdering = None,
                 aggregator = None,
-                mapSideCombine = false
+                mapSideCombine = false,
             )))
 
     // The serialized shuffle path do not support shuffles with more than 16 million output
@@ -115,7 +115,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = kryo,
                 keyOrdering = None,
                 aggregator = None,
-                mapSideCombine = false
+                mapSideCombine = false,
             )))
 
     // We do not support shuffles that perform aggregation
@@ -125,7 +125,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = kryo,
                 keyOrdering = None,
                 aggregator = Some(mock(classOf[Aggregator[Any, Any, Any]])),
-                mapSideCombine = false
+                mapSideCombine = false,
             )))
     assert(
         !canUseSerializedShuffle(shuffleDep(
@@ -133,7 +133,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 serializer = kryo,
                 keyOrdering = Some(mock(classOf[Ordering[Any]])),
                 aggregator = Some(mock(classOf[Aggregator[Any, Any, Any]])),
-                mapSideCombine = true
+                mapSideCombine = true,
             )))
   }
 }

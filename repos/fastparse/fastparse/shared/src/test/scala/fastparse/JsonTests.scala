@@ -51,7 +51,7 @@ object JsonTests extends TestSuite {
   val integral = P("0" | CharIn('1' to '9') ~ digits.?)
 
   val number = P(CharIn("+-").? ~ integral ~ fractional.? ~ exponent.?).!.map(
-      x => Js.Num(x.toDouble)
+      x => Js.Num(x.toDouble),
   )
 
   val `null` = P("null").map(_ => Js.Null)
@@ -73,7 +73,7 @@ object JsonTests extends TestSuite {
   val obj = P("{" ~/ pair.rep(sep = ",".~/) ~ space ~ "}").map(Js.Obj(_: _*))
 
   val jsonExpr: P[Js.Val] = P(
-      space ~ (obj | array | string | `true` | `false` | `null` | number) ~ space
+      space ~ (obj | array | string | `true` | `false` | `null` | number) ~ space,
   )
 
   val tests = TestSuite {
@@ -94,7 +94,7 @@ object JsonTests extends TestSuite {
       }
       'jsonExpr - {
         val Parsed.Success(value, _) = jsonExpr.parse(
-            """{"omg": "123", "wtf": 12.4123}"""
+            """{"omg": "123", "wtf": 12.4123}""",
         )
         assert(
             value == Js.Obj("omg" -> Js.Str("123"), "wtf" -> Js.Num(12.4123)))
@@ -161,7 +161,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / (obj | array | string | true | false | null | number):2:9 ..."}\n        "
-        """
+        """,
       )
       * - check(
           """
@@ -189,7 +189,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / ("}" | "\""):3:13 ..."firstName\""
-        """
+        """,
       )
       * - check(
           """
@@ -217,7 +217,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / pair:2:9 / ":":3:24 ..." \"John\",\n "
-        """
+        """,
       )
       * - check(
           """
@@ -245,7 +245,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / ("}" | ","):4:14 ..."lastName\":"
-        """
+        """,
       )
       * - check(
           """
@@ -273,7 +273,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / ("}" | ","):7:32 ...": \"21 2nd "
-        """
+        """,
       )
       * - check(
           """
@@ -301,7 +301,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / pair:16:18 / string:16:18 / "\"":17:17 ..."{\n        "
-        """
+        """,
       )
       * - check(
           """
@@ -329,7 +329,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / pair:11:14 / jsonExpr:12:27 / obj:13:17 / pair:13:17 / ":":14:27 ..." \"home\",\n "
-        """
+        """,
       )
       * - check(
           """
@@ -357,7 +357,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / pair:11:14 / jsonExpr:12:28 / array:12:29 / jsonExpr:12:29 / obj:13:17 / ("}" | ","):15:35 ..."555-1234\n "
-        """
+        """,
       )
       * - check(
           """
@@ -385,7 +385,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / pair:11:14 / jsonExpr:12:28 / array:12:29 / jsonExpr:16:18 / obj:17:17 / ("}" | ","):19:35 ..."555-4567\n "
-        """
+        """,
       )
       * - check(
           """
@@ -413,7 +413,7 @@ object JsonTests extends TestSuite {
         """,
           """
           jsonExpr:1:0 / obj:2:9 / pair:11:14 / jsonExpr:12:28 / array:12:29 / ("]" | ","):22:9 ..."}\n        "
-        """
+        """,
       )
     }
   }

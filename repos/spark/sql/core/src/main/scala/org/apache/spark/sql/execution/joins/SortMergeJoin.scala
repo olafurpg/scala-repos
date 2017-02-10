@@ -131,7 +131,7 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
                 rightKeyGenerator,
                 keyOrdering,
                 RowIterator.fromScala(leftIter),
-                RowIterator.fromScala(rightIter)
+                RowIterator.fromScala(rightIter),
             )
             private[this] val joinRow = new JoinedRow
             private[this] val resultProjection: (InternalRow) => InternalRow =
@@ -176,7 +176,7 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
               bufferedKeyGenerator = createRightKeyGenerator(),
               keyOrdering,
               streamedIter = RowIterator.fromScala(leftIter),
-              bufferedIter = RowIterator.fromScala(rightIter)
+              bufferedIter = RowIterator.fromScala(rightIter),
           )
           val rightNullRow = new GenericInternalRow(right.output.length)
           new LeftOuterIterator(smjScanner,
@@ -191,7 +191,7 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
               bufferedKeyGenerator = createLeftKeyGenerator(),
               keyOrdering,
               streamedIter = RowIterator.fromScala(rightIter),
-              bufferedIter = RowIterator.fromScala(leftIter)
+              bufferedIter = RowIterator.fromScala(leftIter),
           )
           val leftNullRow = new GenericInternalRow(left.output.length)
           new RightOuterIterator(smjScanner,

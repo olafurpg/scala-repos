@@ -189,11 +189,11 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
           List(
               JObject(List(
                       JField("name", JString("Jack")),
-                      JField("birthdate", JString("2010-11-02T23:58:00.000Z"))
+                      JField("birthdate", JString("2010-11-02T23:58:00.000Z")),
                   )),
               JObject(List(JField("name", JString("Jill")),
                            JField("birthdate",
-                                  JString("2010-11-03T00:08:00.000Z"))))
+                                  JString("2010-11-03T00:08:00.000Z")))),
           ))
       mother.children.toForm must beEmpty
       /*
@@ -202,7 +202,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
        */
       mother.firstBorn.asJValue mustEqual JObject(List(
               JField("name", JString("Jack")),
-              JField("birthdate", JString("2010-11-02T23:58:00.000Z"))
+              JField("birthdate", JString("2010-11-02T23:58:00.000Z")),
           ))
       mother.firstBorn.toForm must beEmpty
     }
@@ -249,7 +249,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
                                  List(JField(
                                          "$dt",
                                          JString(
-                                             "2010-11-02T23:58:00.000Z")))))
+                                             "2010-11-02T23:58:00.000Z"))))),
                   )),
               JObject(List(
                       JField("name", JString("Jill")),
@@ -257,8 +257,8 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
                           "birthdate",
                           JObject(List(JField(
                                       "$dt",
-                                      JString("2010-11-03T00:08:00.000Z")))))
-                  ))
+                                      JString("2010-11-03T00:08:00.000Z"))))),
+                  )),
           ))
       mother.children.toForm must beEmpty
 
@@ -272,7 +272,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
               JField("name", JString("Jack")),
               JField("birthdate",
                      JObject(List(JField(
-                                 "$dt", JString("2010-11-02T23:58:00.000Z")))))
+                                 "$dt", JString("2010-11-02T23:58:00.000Z"))))),
           ))
       mother.firstBorn.toForm must beEmpty
     }

@@ -18,7 +18,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
 
     val data = Json.obj(
         "tournament" -> Json.obj("id" -> tour.id),
-        "version" -> version
+        "version" -> version,
     )
     Json stringify {
       user.fold(data) { u =>
@@ -47,7 +47,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       List(
           "Lichess " -> "",
           "Marathon" -> icon('\\'),
-          "SuperBlitz" -> icon(lila.rating.PerfType.Blitz.iconChar)
+          "SuperBlitz" -> icon(lila.rating.PerfType.Blitz.iconChar),
       ) ::: lila.rating.PerfType.leaderboardable.map { pt =>
         pt.name -> icon(pt.iconChar)
       }

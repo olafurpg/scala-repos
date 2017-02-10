@@ -17,14 +17,14 @@ class SamplingTracerTest extends FunSuite with MockitoSugar {
       None,
       new SpanId(1L),
       None,
-      Flags()
+      Flags(),
   )
 
   private val record = Record(
       traceId,
       Time.now,
       Annotation.Message("sup"),
-      None
+      None,
   )
 
   test("sends sampled events to Sink") {

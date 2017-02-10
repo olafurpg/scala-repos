@@ -65,13 +65,13 @@ object HB_0_8_0 {
       "properties" -> "p",
       "prId" -> "pk", // columna name is 'pk' in 0.8.0/0.8.1
       "eventTimeZone" -> "etz",
-      "creationTimeZone" -> "ctz"
+      "creationTimeZone" -> "ctz",
   ).mapValues(Bytes.toBytes(_))
 
   class RowKey(
       val appId: Int,
       val millis: Long,
-      val uuidLow: Long
+      val uuidLow: Long,
   ) {
     lazy val toBytes: Array[Byte] = {
       // add UUID least significant bits for multiple actions at the same time
@@ -106,7 +106,7 @@ object HB_0_8_0 {
       new RowKey(
           appId = Bytes.toInt(b.slice(0, 4)),
           millis = Bytes.toLong(b.slice(4, 12)),
-          uuidLow = Bytes.toLong(b.slice(12, 20))
+          uuidLow = Bytes.toLong(b.slice(12, 20)),
       )
     }
   }
@@ -170,7 +170,7 @@ object HB_0_8_0 {
 
     val creationTime: DateTime = new DateTime(
         getTimestamp("event"),
-        creationTimeZone
+        creationTimeZone,
     )
 
     Event(
@@ -184,7 +184,7 @@ object HB_0_8_0 {
         eventTime = new DateTime(rowKey.millis, eventTimeZone),
         tags = Seq(),
         prId = prId,
-        creationTime = creationTime
+        creationTime = creationTime,
     )
   }
 }

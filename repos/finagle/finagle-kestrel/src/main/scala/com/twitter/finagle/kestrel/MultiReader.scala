@@ -30,7 +30,7 @@ private[finagle] object MultiReaderHelper {
   private[finagle] def merge(
       readHandles: Var[Try[Set[ReadHandle]]],
       trackOutstandingRequests: Boolean = false,
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   ): ReadHandle = {
     val error = new Broker[Throwable]
     val messages = new Broker[ReadMessage]
@@ -70,7 +70,7 @@ private[finagle] object MultiReaderHelper {
               abortCounter.incr()
               outstandingReads.decrementAndGet()
               v
-            }
+            },
         )
       } else {
         msg
@@ -131,7 +131,7 @@ private[finagle] object MultiReaderHelper {
               }
               exposeNumReadHandles(newHandles)
               loop(newHandles)
-            }
+            },
         )
         .sync()
     }
@@ -175,7 +175,7 @@ private[finagle] object MultiReaderHelper {
         _error: Offer[Throwable],
         _closeHandleOf: Offer[Unit],
         _numReadHandlesGauge: Gauge,
-        _outstandingReadsGauge: Gauge
+        _outstandingReadsGauge: Gauge,
     ): ReadHandle = new ReadHandle {
       val messages = _messages
       val error = _error
@@ -223,7 +223,7 @@ object MultiReaderMemcache {
       case Name.Bound(va) => apply(va, queueName)
       case Name.Path(_) =>
         throw new UnsupportedOperationException(
-            "Failed to bind Name.Path in `MultiReaderMemcache.apply`"
+            "Failed to bind Name.Path in `MultiReaderMemcache.apply`",
         )
     }
   }
@@ -294,7 +294,7 @@ object MultiReaderThrift {
       case Name.Bound(va) => apply(va, queueName, clientId)
       case Name.Path(_) =>
         throw new UnsupportedOperationException(
-            "Failed to bind Name.Path in `MultiReaderThrift.apply`"
+            "Failed to bind Name.Path in `MultiReaderThrift.apply`",
         )
     }
   }
@@ -313,7 +313,7 @@ object MultiReaderThrift {
   def apply(
       va: Var[Addr],
       queueName: String,
-      clientId: Option[ClientId]
+      clientId: Option[ClientId],
   ): MultiReaderBuilderThrift = {
     val config = MultiReaderConfig[ThriftClientRequest, Array[Byte]](
         va, queueName, clientId)

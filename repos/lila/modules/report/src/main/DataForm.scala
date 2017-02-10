@@ -17,7 +17,7 @@ private[report] final class DataForm(val captcher: akka.actor.ActorSelection)
           "reason" -> nonEmptyText.verifying(Reason.names contains _),
           "text" -> text(minLength = 5, maxLength = 2000),
           "gameId" -> text,
-          "move" -> text
+          "move" -> text,
       )({
     case (username, reason, text, gameId, move) =>
       ReportSetup(user = fetchUser(username) err "Unknown username " +

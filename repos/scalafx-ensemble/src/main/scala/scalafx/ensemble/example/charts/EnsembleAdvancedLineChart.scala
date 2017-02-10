@@ -50,7 +50,7 @@ class EnsembleAdvancedLineChart extends EnsembleExample {
         40d -> 80d,
         50d -> 90d,
         70d -> 30d,
-        170d -> 122d
+        170d -> 122d,
     )
 
     // Prepare series

@@ -27,7 +27,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
   def save(userId: User.ID, perfType: PerfType, perf: Perf): Funit =
     (perf.nb >= 2) ?? coll
       .update(BSONDocument(
-                  "_id" -> s"$userId:${perfType.id}"
+                  "_id" -> s"$userId:${perfType.id}",
               ),
               BSONDocument("user" -> userId,
                            "perf" -> perfType.id,
@@ -48,7 +48,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
               user.perfs(pt).nonEmpty
             }.map { pt =>
               s"${user.id}:${pt.id}"
-            })
+            }),
             ))
         .void
     }
@@ -89,7 +89,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
       val enumerator = coll
         .find(
             BSONDocument("perf" -> perfId, "stable" -> true),
-            BSONDocument("user" -> true, "_id" -> false)
+            BSONDocument("user" -> true, "_id" -> false),
         )
         .sort(BSONDocument("rating" -> -1))
         .cursor[BSONDocument]()
@@ -131,9 +131,9 @@ final class RankingApi(coll: lila.db.Types.Coll,
                                       "$subtract" -> BSONArray(
                                           "$rating",
                                           BSONDocument("$mod" -> BSONArray(
-                                                  "$rating", Stat.group))
-                                      )
-                                  )
+                                                  "$rating", Stat.group)),
+                                      ),
+                                  ),
                               )),
                           GroupField("r")("nb" -> SumValue(1))))
           .map { res =>

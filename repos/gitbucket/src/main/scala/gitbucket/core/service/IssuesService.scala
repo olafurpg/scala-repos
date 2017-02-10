@@ -238,7 +238,7 @@ trait IssuesService { self: AccountService =>
                           issue.repositoryName,
                           _,
                           t._4.get,
-                          t._5.get)
+                          t._5.get),
                 )
               } toList,
               milestone,
@@ -626,7 +626,7 @@ object IssuesService {
               Some(s"is:${state}"),
               author.map(author => s"author:${author}"),
               assigned.map(assignee => s"assignee:${assignee}"),
-              mentioned.map(mentioned => s"mentions:${mentioned}")
+              mentioned.map(mentioned => s"mentions:${mentioned}"),
           ).flatten ++ labels.map(label => s"label:${label}") ++ List(
               milestone.map {
                 _ match {
@@ -642,7 +642,7 @@ object IssuesService {
                 case ("updated", "desc") => Some("sort:updated-desc")
                 case ("updated", "asc") => Some("sort:updated-asc")
               },
-              visibility.map(visibility => s"visibility:${visibility}")
+              visibility.map(visibility => s"visibility:${visibility}"),
           ).flatten ++ groups.map(group => s"group:${group}")).mkString(" ")
 
     def toURL: String =
@@ -663,7 +663,7 @@ object IssuesService {
           Some("direction=" + urlEncode(direction)),
           visibility.map(x => "visibility=" + urlEncode(x)),
           if (groups.isEmpty) None
-          else Some("groups=" + urlEncode(groups.mkString(",")))
+          else Some("groups=" + urlEncode(groups.mkString(","))),
       ).flatten.mkString("&")
   }
 
@@ -726,7 +726,7 @@ object IssuesService {
           sort,
           direction,
           conditions.get("visibility").flatMap(_.headOption),
-          conditions.get("group").map(_.toSet).getOrElse(Set.empty)
+          conditions.get("group").map(_.toSet).getOrElse(Set.empty),
       )
     }
 
@@ -750,7 +750,7 @@ object IssuesService {
             .getOrElse("created"),
           param(request, "direction", Seq("asc", "desc")).getOrElse("desc"),
           param(request, "visibility"),
-          param(request, "groups").map(_.split(",").toSet).getOrElse(Set.empty)
+          param(request, "groups").map(_.split(",").toSet).getOrElse(Set.empty),
       )
 
     def page(request: HttpServletRequest) =

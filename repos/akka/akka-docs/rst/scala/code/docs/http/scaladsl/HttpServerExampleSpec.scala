@@ -447,8 +447,8 @@ class HttpServerExampleSpec
                 HttpEntity(
                   ContentTypes.`text/plain(UTF-8)`,
                   // transform each number to a chunk of bytes
-                  numbers.map(n => ByteString(s"$n\n"))
-                )
+                  numbers.map(n => ByteString(s"$n\n")),
+                ),
               )
             }
           }

@@ -20,7 +20,7 @@ case class BacktestingParams(
     val enterThreshold: Double,
     val exitThreshold: Double,
     val maxPositions: Int = 1,
-    val optOutputPath: Option[String] = None
+    val optOutputPath: Option[String] = None,
 )
     extends Params {}
 
@@ -37,7 +37,7 @@ case class DailyStat(
     val nav: Double,
     val ret: Double,
     val market: Double,
-    val positionCount: Int
+    val positionCount: Int,
 )
     extends Serializable
 
@@ -45,13 +45,13 @@ case class OverallStat(
     val ret: Double,
     val vol: Double,
     val sharpe: Double,
-    val days: Int
+    val days: Int,
 )
     extends Serializable
 
 case class BacktestingResult(
     val daily: Seq[DailyStat],
-    val overall: OverallStat
+    val overall: OverallStat,
 )
     extends Serializable with NiceRendering {
   override def toString(): String = overall.toString
@@ -173,7 +173,7 @@ class BacktestingEvaluator(val params: BacktestingParams)
               nav = nav,
               ret = ret,
               market = todayPrice.first(mktTicker).get,
-              positionCount = positions.size
+              positionCount = positions.size,
           ))
     }
     // FIXME. Force Close the last day.
@@ -196,7 +196,7 @@ class BacktestingEvaluator(val params: BacktestingParams)
 
     val result = BacktestingResult(
         daily = dailyStats,
-        overall = overall
+        overall = overall,
     )
 
     params.optOutputPath.map { path =>

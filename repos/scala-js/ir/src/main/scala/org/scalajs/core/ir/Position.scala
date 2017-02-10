@@ -14,7 +14,7 @@ final case class Position(
     /** Zero-based line number. */
     line: Int,
     /** Zero-based column number. */
-    column: Int
+    column: Int,
 ) {
   def show: String = s"$line:$column"
 

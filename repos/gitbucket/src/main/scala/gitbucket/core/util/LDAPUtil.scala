@@ -53,7 +53,7 @@ object LDAPUtil {
         tls = ldapSettings.tls.getOrElse(false),
         ssl = ldapSettings.ssl.getOrElse(false),
         keystore = ldapSettings.keystore.getOrElse(""),
-        error = "System LDAP authentication failed."
+        error = "System LDAP authentication failed.",
     ) { conn =>
       findUser(conn,
                userName,
@@ -81,7 +81,7 @@ object LDAPUtil {
         tls = ldapSettings.tls.getOrElse(false),
         ssl = ldapSettings.ssl.getOrElse(false),
         keystore = ldapSettings.keystore.getOrElse(""),
-        error = "User LDAP Authentication Failed."
+        error = "User LDAP Authentication Failed.",
     ) { conn =>
       if (ldapSettings.mailAttribute.getOrElse("").isEmpty) {
         Right(

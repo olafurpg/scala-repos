@@ -145,11 +145,11 @@ package shapeless {
           pt = tpe,
           isView = false,
           context0 = sCtx,
-          pos0 = c.enclosingPosition.asInstanceOf[global.Position]
+          pos0 = c.enclosingPosition.asInstanceOf[global.Position],
       ) {
         override def searchImplicit(
             implicitInfoss: List[List[analyzer.ImplicitInfo]],
-            isLocalToCallsite: Boolean
+            isLocalToCallsite: Boolean,
         ): analyzer.SearchResult = {
           val filteredInput = implicitInfoss.map { infos =>
             infos.filter { info =>

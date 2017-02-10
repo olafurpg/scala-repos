@@ -42,8 +42,8 @@ private[opening] final class Selector(openingColl: Coll,
                   "$gt" -> BSONInteger(
                       user.perfs.opening.intRating - tolerance),
                   "$lt" -> BSONInteger(
-                      user.perfs.opening.intRating + tolerance)
-              )
+                      user.perfs.opening.intRating + tolerance),
+              ),
           ))
       .one[Opening] flatMap {
       case Some(opening) => fuccess(opening)

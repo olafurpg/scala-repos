@@ -271,7 +271,7 @@ object CreateWorkflow extends Logging {
           engineParamsGeneratorClass = wfc.engineParamsGeneratorClass.get,
           batch = wfc.batch,
           env = pioEnvVars,
-          sparkConf = workflowParams.sparkEnv
+          sparkConf = workflowParams.sparkEnv,
       )
       Workflow.runEvaluation(evaluation = evaluation.get,
                              engineParamsGenerator = engineParamsGenerator.get,

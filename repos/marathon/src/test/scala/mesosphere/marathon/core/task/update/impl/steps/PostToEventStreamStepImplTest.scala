@@ -30,7 +30,7 @@ class PostToEventStreamStepImplTest
         .processUpdate(
             timestamp = updateTimestamp,
             task = existingTask,
-            status = status
+            status = status,
         )
         .futureValue
     }
@@ -49,13 +49,13 @@ class PostToEventStreamStepImplTest
                 ipAddresses = Nil,
                 ports = portsList,
                 version = version.toString,
-                timestamp = updateTimestamp.toString
-            )
+                timestamp = updateTimestamp.toString,
+            ),
         ))
     And("only sending event info gets logged")
     logs should have size 1
     logs.map(_.toString) should be(Seq(
-            s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}"
+            s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}",
         ))
   }
 
@@ -72,7 +72,7 @@ class PostToEventStreamStepImplTest
         .processUpdate(
             timestamp = updateTimestamp,
             task = existingTask,
-            status = status
+            status = status,
         )
         .futureValue
     }
@@ -113,7 +113,7 @@ class PostToEventStreamStepImplTest
         .processUpdate(
             timestamp = updateTimestamp,
             task = existingTask,
-            status = status
+            status = status,
         )
         .futureValue
     }
@@ -132,13 +132,13 @@ class PostToEventStreamStepImplTest
                 ipAddresses = Nil,
                 ports = portsList,
                 version = version.toString,
-                timestamp = updateTimestamp.toString
-            )
+                timestamp = updateTimestamp.toString,
+            ),
         ))
     And("only sending event info gets logged")
     logs should have size 1
     logs.map(_.toString) should be(Seq(
-            s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}"
+            s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}",
         ))
   }
 

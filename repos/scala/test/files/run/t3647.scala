@@ -7,7 +7,7 @@ object Test {
             "line1",
             "line2",
             "line3",
-            "line4"
+            "line4",
         ).iterator)
     assert(ps.filter(_ == '\n').size == 3)
 

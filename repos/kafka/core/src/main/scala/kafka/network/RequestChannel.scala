@@ -227,7 +227,7 @@ class RequestChannel(val numProcessors: Int, val queueSize: Int)
       "RequestQueueSize",
       new Gauge[Int] {
         def value = requestQueue.size
-      }
+      },
   )
 
   newGauge("ResponseQueueSize", new Gauge[Int] {

@@ -85,11 +85,11 @@ object ThriftMuxResponseClassifier {
     * which will automatically apply these transformations to a [[ResponseClassifier]].
     */
   private[finagle] def usingDeserializeCtx(
-      classifier: ResponseClassifier
+      classifier: ResponseClassifier,
   ): ResponseClassifier = new ResponseClassifier {
     private[this] def deserialized(
         deserCtx: DeserializeCtx[_],
-        buf: Buf
+        buf: Buf,
     ): ReqRep = {
       val bytes = Buf.ByteArray.Owned.extract(buf)
       ReqRep(deserCtx.request, deserCtx.deserialize(bytes))

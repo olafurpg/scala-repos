@@ -59,7 +59,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
 
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i, s"str$i"))
+        (1 to 10).map(i => Row(i, s"str$i")),
     )
   }
 
@@ -70,7 +70,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
 
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i * 2, s"${i * 4}"))
+        (1 to 10).map(i => Row(i * 2, s"${i * 4}")),
     )
 
     sql(s"""
@@ -79,7 +79,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
 
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i * 4, s"${i * 6}"))
+        (1 to 10).map(i => Row(i * 4, s"${i * 6}")),
     )
   }
 
@@ -92,7 +92,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     }.getMessage
     assert(
         message.contains("generates the same number of columns as its schema"),
-        "SELECT clause generating a different number of columns should not be not allowed."
+        "SELECT clause generating a different number of columns should not be not allowed.",
     )
   }
 
@@ -102,7 +102,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     """.stripMargin)
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i, s"str$i"))
+        (1 to 10).map(i => Row(i, s"str$i")),
     )
 
     // Writing the table to less part files.
@@ -114,7 +114,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     """.stripMargin)
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i, s"str$i"))
+        (1 to 10).map(i => Row(i, s"str$i")),
     )
 
     // Writing the table to more part files.
@@ -126,7 +126,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     """.stripMargin)
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i, s"str$i"))
+        (1 to 10).map(i => Row(i, s"str$i")),
     )
 
     sql(s"""
@@ -134,7 +134,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     """.stripMargin)
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        (1 to 10).map(i => Row(i * 10, s"str$i"))
+        (1 to 10).map(i => Row(i * 10, s"str$i")),
     )
 
     caseInsensitiveContext.dropTempTable("jt1")
@@ -147,7 +147,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     """.stripMargin)
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        sql("SELECT a, b FROM jt").collect()
+        sql("SELECT a, b FROM jt").collect(),
     )
 
     sql(s"""
@@ -155,7 +155,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     """.stripMargin)
     checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
-        sql("SELECT a, b FROM jt UNION ALL SELECT a, b FROM jt").collect()
+        sql("SELECT a, b FROM jt UNION ALL SELECT a, b FROM jt").collect(),
     )
   }
 
@@ -230,7 +230,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
 
     checkAnswer(
         sql("SELECT * FROM oneToTen"),
-        (1 to 10).map(Row(_)).toSeq
+        (1 to 10).map(Row(_)).toSeq,
     )
 
     val message = intercept[AnalysisException] {
@@ -240,7 +240,7 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     }.getMessage
     assert(
         message.contains("does not allow insertion."),
-        "It is not allowed to insert into a table that is not an InsertableRelation."
+        "It is not allowed to insert into a table that is not an InsertableRelation.",
     )
 
     caseInsensitiveContext.dropTempTable("oneToTen")

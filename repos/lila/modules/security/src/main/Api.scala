@@ -21,7 +21,7 @@ final class Api(firewall: Firewall,
     Form(
         mapping(
             "username" -> nonEmptyText,
-            "password" -> nonEmptyText
+            "password" -> nonEmptyText,
         )(authenticateUser)(_.map(u => (u.username, "")))
           .verifying("Invalid username or password", _.isDefined))
 
@@ -88,7 +88,7 @@ final class Api(firewall: Firewall,
       .distinct(
           field,
           BSONDocument("user" -> userId,
-                       field -> BSONDocument("$exists" -> true)).some
+                       field -> BSONDocument("$exists" -> true)).some,
       )
       .flatMap {
         case Nil => fuccess(Nil)
@@ -97,8 +97,8 @@ final class Api(firewall: Firewall,
               "user",
               BSONDocument(
                   field -> BSONDocument("$in" -> values),
-                  "user" -> BSONDocument("$ne" -> userId)
-              ).some
+                  "user" -> BSONDocument("$ne" -> userId),
+              ).some,
           ) map lila.db.BSON.asStrings
       }
 
@@ -112,8 +112,8 @@ final class Api(firewall: Firewall,
         "user",
         BSONDocument(
             field -> value,
-            "date" -> BSONDocument("$gt" -> DateTime.now.minusYears(1))
-        ).some
+            "date" -> BSONDocument("$gt" -> DateTime.now.minusYears(1)),
+        ).some,
     ) map lila.db.BSON.asStrings
 }
 

@@ -44,7 +44,7 @@ object Formats extends Formats {
     def asSeconds: OFormat[FiniteDuration] =
       format.inmap(
           _.seconds,
-          _.toSeconds
+          _.toSeconds,
       )
   }
 }
@@ -66,7 +66,7 @@ trait Formats
           "version" -> failure.version,
           "slaveId" ->
           (if (failure.slaveId.isDefined) failure.slaveId.get.getValue
-           else JsNull)
+           else JsNull),
       )
   }
 
@@ -118,7 +118,7 @@ trait Formats
     id =>
       Json.obj(
           "containerPath" -> id.containerPath,
-          "persistenceId" -> id.idString
+          "persistenceId" -> id.idString,
       )
   }
 
@@ -126,7 +126,7 @@ trait Formats
     val base = Json.obj(
         "id" -> task.taskId,
         "slaveId" -> task.agentInfo.agentId,
-        "host" -> task.agentInfo.host
+        "host" -> task.agentInfo.host,
     )
 
     val launched = task.launched.map { launched =>
@@ -135,13 +135,13 @@ trait Formats
           "stagedAt" -> launched.status.stagedAt,
           "ports" -> launched.ports,
           "ipAddresses" -> launched.ipAddresses,
-          "version" -> launched.appVersion
+          "version" -> launched.appVersion,
       )
     }.getOrElse(base)
 
     val reservation = task.reservationWithVolumes.map { reservation =>
       launched ++ Json.obj(
-          "localVolumes" -> reservation.volumeIds
+          "localVolumes" -> reservation.volumeIds,
       )
     }.getOrElse(launched)
 
@@ -153,7 +153,7 @@ trait Formats
 
     val enrichedJson =
       taskJson ++ Json.obj(
-          "appId" -> task.appId
+          "appId" -> task.appId,
       )
 
     val withServicePorts =
@@ -171,21 +171,21 @@ trait Formats
       Reads.of[String](Reads.minLength[String](1)).map(PathId(_)),
       Writes[PathId] { id =>
         JsString(id.toString)
-      }
+      },
   )
 
   implicit lazy val TaskIdFormat: Format[Task.Id] = Format(
       Reads.of[String](Reads.minLength[String](3)).map(Task.Id(_)),
       Writes[Task.Id] { id =>
         JsString(id.idString)
-      }
+      },
   )
 
   implicit lazy val TimestampFormat: Format[Timestamp] = Format(
       Reads.of[String].map(Timestamp(_)),
       Writes[Timestamp] { t =>
         JsString(t.toString)
-      }
+      },
   )
 
   implicit lazy val CommandFormat: Format[Command] = Json.format[Command]
@@ -290,7 +290,7 @@ trait IpAddressFormats {
   private[this] lazy val ValidPortProtocol: Reads[String] = {
     implicitly[Reads[String]].filter(
         ValidationError("Invalid protocol. Only 'udp' or 'tcp' are allowed."))(
-        DiscoveryInfo.Port.AllowedProtocols
+        DiscoveryInfo.Port.AllowedProtocols,
     )
   }
 
@@ -308,7 +308,7 @@ trait IpAddressFormats {
           hasUniquePortNames)
       .filter(ValidationError(
               "There may be only one port with a particular port number/protocol combination."))(
-          hasUniquePortNumberProtocol
+          hasUniquePortNumberProtocol,
       )
   }
 
@@ -323,7 +323,7 @@ trait IpAddressFormats {
         .map(DiscoveryInfo(_)),
       Writes[DiscoveryInfo] { discoveryInfo =>
         Json.obj("ports" -> discoveryInfo.ports.map(PortFormat.writes))
-      }
+      },
   )
 
   implicit lazy val IpAddressFormat: Format[IpAddress] =
@@ -343,7 +343,7 @@ trait DeploymentFormats {
       Reads.of[Seq[Int]].map(_.map(_.toByte).toArray),
       Writes { xs =>
         JsArray(xs.to[Seq].map(b => JsNumber(b.toInt)))
-      }
+      },
   )
 
   implicit lazy val GroupUpdateFormat: Format[GroupUpdate] =
@@ -360,18 +360,18 @@ trait DeploymentFormats {
         Reads
           .of[Map[String, String]]
           .map(
-              _.map { case (k, v) => new java.net.URL(k) -> v }
+              _.map { case (k, v) => new java.net.URL(k) -> v },
           ),
         Writes[Map[java.net.URL, String]] { m =>
           Json.toJson(m)
-        }
+        },
     )
 
   implicit lazy val DeploymentActionWrites: Writes[DeploymentAction] = Writes {
     action =>
       Json.obj(
           "type" -> action.getClass.getSimpleName,
-          "app" -> action.app.id
+          "app" -> action.app.id,
       )
   }
 
@@ -392,7 +392,7 @@ trait EventFormats {
           "uri" -> event.uri,
           "appDefinition" -> event.appDefinition,
           "eventType" -> event.eventType,
-          "timestamp" -> event.timestamp
+          "timestamp" -> event.timestamp,
       )
   }
 
@@ -403,7 +403,7 @@ trait EventFormats {
           "original" -> plan.original,
           "target" -> plan.target,
           "steps" -> plan.steps,
-          "version" -> plan.version
+          "version" -> plan.version,
       )
   }
 
@@ -480,7 +480,7 @@ trait EventSubscribersFormats {
   implicit lazy val EventSubscribersWrites: Writes[EventSubscribers] = Writes {
     eventSubscribers =>
       Json.obj(
-          "callbackUrls" -> eventSubscribers.urls
+          "callbackUrls" -> eventSubscribers.urls,
       )
   }
 }
@@ -499,7 +499,7 @@ trait HealthCheckFormats {
         "firstSuccess" -> health.firstSuccess,
         "lastFailure" -> health.lastFailure,
         "lastSuccess" -> health.lastSuccess,
-        "taskId" -> health.taskId
+        "taskId" -> health.taskId,
     )
   }
 
@@ -594,7 +594,7 @@ trait AppAndGroupFormats {
         builder += JsString(constraint.getOperator.name)
         if (constraint.hasValue) builder += JsString(constraint.getValue)
         JsArray(builder.result())
-      }
+      },
   )
 
   implicit lazy val AppDefinitionReads: Reads[AppDefinition] = {
@@ -745,7 +745,7 @@ trait AppAndGroupFormats {
             acceptedResourceRoles = extra.acceptedResourceRoles,
             ipAddress = extra.ipAddress,
             versionInfo = AppDefinition.VersionInfo.OnlyVersion(extra.version),
-            residency = extra.residencyOrDefault
+            residency = extra.residencyOrDefault,
         )
       }
     }
@@ -860,7 +860,7 @@ trait AppAndGroupFormats {
           "acceptedResourceRoles" -> app.acceptedResourceRoles,
           "ipAddress" -> app.ipAddress,
           "version" -> app.version,
-          "residency" -> app.residency
+          "residency" -> app.residency,
       )
       Json.toJson(app.versionInfo) match {
         case JsNull => appJson
@@ -875,7 +875,7 @@ trait AppAndGroupFormats {
             .FullVersionInfo(_, lastScalingAt, lastConfigChangeAt) =>
         Json.obj(
             "lastScalingAt" -> lastScalingAt,
-            "lastConfigChangeAt" -> lastConfigChangeAt
+            "lastConfigChangeAt" -> lastConfigChangeAt,
         )
 
       case AppDefinition.VersionInfo.OnlyVersion(version) => JsNull
@@ -887,7 +887,7 @@ trait AppAndGroupFormats {
         "tasksStaged" -> counts.tasksStaged,
         "tasksRunning" -> counts.tasksRunning,
         "tasksHealthy" -> counts.tasksHealthy,
-        "tasksUnhealthy" -> counts.tasksUnhealthy
+        "tasksUnhealthy" -> counts.tasksUnhealthy,
     )
   }
 
@@ -897,7 +897,7 @@ trait AppAndGroupFormats {
           "staged" -> counts.tasksStaged,
           "running" -> counts.tasksRunning,
           "healthy" -> counts.tasksHealthy,
-          "unhealthy" -> counts.tasksUnhealthy
+          "unhealthy" -> counts.tasksUnhealthy,
       )
   }
 
@@ -905,7 +905,7 @@ trait AppAndGroupFormats {
     lifeTime =>
       Json.obj(
           "averageSeconds" -> lifeTime.averageSeconds,
-          "medianSeconds" -> lifeTime.medianSeconds
+          "medianSeconds" -> lifeTime.medianSeconds,
       )
   }
 
@@ -914,7 +914,7 @@ trait AppAndGroupFormats {
       Json.obj("counts" -> TaskCountsWritesWithoutPrefix.writes(stats.counts))
     Json.obj(
         "stats" -> stats.maybeLifeTime.fold(ifEmpty = statsJson)(
-            lifeTime => statsJson ++ Json.obj("lifeTime" -> lifeTime))
+            lifeTime => statsJson ++ Json.obj("lifeTime" -> lifeTime)),
     )
   }
 
@@ -924,12 +924,12 @@ trait AppAndGroupFormats {
           "startedAfterLastScaling" -> byVersion.maybeStartedAfterLastScaling,
           "withLatestConfig" -> byVersion.maybeWithLatestConfig,
           "withOutdatedConfig" -> byVersion.maybeWithOutdatedConfig,
-          "totalSummary" -> byVersion.maybeTotalSummary
+          "totalSummary" -> byVersion.maybeTotalSummary,
       )
       Json.toJson(
           maybeJsons.iterator.flatMap {
             case (k, v) => v.map(k -> TaskStatsWrites.writes(_))
-          }.toMap
+          }.toMap,
       )
     }
 
@@ -944,7 +944,7 @@ trait AppAndGroupFormats {
         info.maybeLastTaskFailure.map(
             lastFailure => Json.obj("lastTaskFailure" -> lastFailure)),
         info.maybeTaskStats.map(
-            taskStats => Json.obj("taskStats" -> taskStats))
+            taskStats => Json.obj("taskStats" -> taskStats)),
     ).flatten
 
     maybeJson.foldLeft(appJson)((result, obj) => result ++ obj)
@@ -953,13 +953,13 @@ trait AppAndGroupFormats {
   implicit lazy val GroupInfoWrites: Writes[GroupInfo] = Writes { info =>
     val maybeJson = Seq[Option[JsObject]](
         info.maybeApps.map(apps => Json.obj("apps" -> apps)),
-        info.maybeGroups.map(groups => Json.obj("groups" -> groups))
+        info.maybeGroups.map(groups => Json.obj("groups" -> groups)),
     ).flatten
 
     val groupJson = Json.obj(
         "id" -> info.group.id,
         "dependencies" -> info.group.dependencies,
-        "version" -> info.group.version
+        "version" -> info.group.version,
     )
 
     maybeJson.foldLeft(groupJson)((result, obj) => result ++ obj)
@@ -1005,7 +1005,7 @@ trait AppAndGroupFormats {
               maxLaunchDelay = maxLaunchDelaySeconds,
               container = container,
               healthChecks = healthChecks,
-              dependencies = dependencies
+              dependencies = dependencies,
         )).flatMap { update =>
       // necessary because of case class limitations (good for another 21 fields)
       case class ExtraFields(uris: Option[Seq[String]],
@@ -1060,7 +1060,7 @@ trait AppAndGroupFormats {
                 extra.ports.map { ports =>
                   PortDefinitions.apply(ports: _*)
                 }
-              }
+              },
           )
         }
     }.map(addHealthCheckPortIndexIfNecessary)

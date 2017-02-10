@@ -61,7 +61,7 @@ object SwaggerAuthSerializers {
     SwaggerSerializers.formats ++ Seq(
         new AuthOperationSerializer[T](userOption),
         new AuthEndpointSerializer[T],
-        new AuthApiSerializer[T]
+        new AuthApiSerializer[T],
     )
 
   class AuthOperationSerializer[T <: AnyRef : Manifest](userOption: Option[T])
@@ -81,7 +81,7 @@ object SwaggerAuthSerializers {
                 (value \ "consumes").extract[List[String]],
                 (value \ "produces").extract[List[String]],
                 (value \ "protocols").extract[List[String]],
-                (value \ "authorizations").extract[List[String]]
+                (value \ "authorizations").extract[List[String]],
             )
         }, {
           case obj: AuthOperation[T] if obj.allows(userOption) =>
@@ -142,7 +142,7 @@ object SwaggerAuthSerializers {
                   .extractOpt[Map[String, Model]]
                   .getOrElse(Map.empty),
                 (json \ "authorizations").extractOrElse(List.empty[String]),
-                (json \ "position").extractOrElse(0)
+                (json \ "position").extractOrElse(0),
             )
         }, {
           case x: AuthApi[T] =>
@@ -287,7 +287,7 @@ object AuthApi {
         produces,
         protocols,
         authorizations,
-        allows
+        allows,
     )
   }
 }

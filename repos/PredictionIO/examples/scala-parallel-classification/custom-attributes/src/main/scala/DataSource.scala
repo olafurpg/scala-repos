@@ -44,7 +44,7 @@ class DataSource(val dsp: DataSourceParams)
                 Vectors.dense(Array(
                         gendersMap(properties.get[String]("gender")),
                         properties.get[Double]("age"),
-                        educationMap(properties.get[String]("education"))
+                        educationMap(properties.get[String]("education")),
                     )))
           } catch {
             case e: Exception => {
@@ -63,6 +63,6 @@ class DataSource(val dsp: DataSourceParams)
 class TrainingData(
     val labeledPoints: RDD[LabeledPoint],
     val gendersMap: Map[String, Double],
-    val educationMap: Map[String, Double]
+    val educationMap: Map[String, Double],
 )
     extends Serializable

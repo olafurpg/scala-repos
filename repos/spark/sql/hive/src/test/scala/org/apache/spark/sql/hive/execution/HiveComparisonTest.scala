@@ -198,7 +198,7 @@ abstract class HiveComparisonTest
       "totalSize",
       "totalNumberFiles",
       "maxFileSize",
-      "minFileSize"
+      "minFileSize",
   )
   protected def nonDeterministicLine(line: String) =
     nonDeterministicLineIndicators.exists(line contains _)
@@ -207,7 +207,7 @@ abstract class HiveComparisonTest
   // want to ignore.
   lazy val ignoredLineIndicators = Seq(
       "# Partition Information",
-      "# col_name"
+      "# col_name",
   )
 
   protected def ignoredLine(line: String) =
@@ -555,7 +555,7 @@ abstract class HiveComparisonTest
         val excludedSubstrings = Seq(
             "into table",
             "create table",
-            "drop index"
+            "drop index",
         )
         !queryList.map(_.toLowerCase).exists { query =>
           excludedSubstrings.exists(s => query.contains(s))

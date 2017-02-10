@@ -8,7 +8,7 @@ case class CreateARepository(
     name: String,
     description: Option[String],
     `private`: Boolean = false,
-    auto_init: Boolean = false
+    auto_init: Boolean = false,
 ) {
   def isValid: Boolean = {
     name.length <= 40 && name.matches("[a-zA-Z0-9\\-\\+_.]+") &&

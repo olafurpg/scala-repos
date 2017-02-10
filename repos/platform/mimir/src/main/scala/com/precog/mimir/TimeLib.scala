@@ -83,7 +83,7 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         HourMin,
         HourMinSec,
         ParseDateTimeFuzzy,
-        ParsePeriod
+        ParsePeriod,
     )
 
     override def _lib2 = super._lib2 ++ Set(
@@ -107,7 +107,7 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         ChangeTimeZone,
         ParseDateTime,
         MinTimeOf,
-        MaxTimeOf
+        MaxTimeOf,
     )
 
     //val textAndDate = JUnionT(JTextT, JDateT)

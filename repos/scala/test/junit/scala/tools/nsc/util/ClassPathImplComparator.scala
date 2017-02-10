@@ -59,7 +59,7 @@ object ClassPathImplComparator {
       "scala.Option",
       "scala.Int",
       "scala.collection.immutable.Vector",
-      "scala.util.hashing.MurmurHash3"
+      "scala.util.hashing.MurmurHash3",
   )
 
   private val oldCpCreationStats = new DurationStats("Old classpath - create")

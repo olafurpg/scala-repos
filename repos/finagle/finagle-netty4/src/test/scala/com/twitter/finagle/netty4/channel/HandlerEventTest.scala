@@ -24,7 +24,7 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
       new SimpleChannelSnooper("test"),
       new ByteBufSnooper("test"),
       new WriteCompletionTimeoutHandler(
-          DefaultTimer.twitter, Duration.fromSeconds(10))
+          DefaultTimer.twitter, Duration.fromSeconds(10)),
   )
   val loop = new NioEventLoopGroup()
 

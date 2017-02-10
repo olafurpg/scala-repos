@@ -33,7 +33,7 @@ class DebugTest
           withDebugSession(
               "stepping.ForComprehensionListString",
               "stepping/ForComprehensionListString.scala",
-              9
+              9,
           ) { breakpointsFile =>
             import testkit._
 
@@ -61,7 +61,7 @@ class DebugTest
           withDebugSession(
               "breakpoints.Breakpoints",
               "breakpoints/Breakpoints.scala",
-              32
+              32,
           ) { breakpointsFile =>
             import testkit._
             val breakpointsPath = breakpointsFile.getAbsolutePath
@@ -82,7 +82,7 @@ class DebugTest
                                   DebugStackLocal(0,
                                                   "args",
                                                   "Array[]",
-                                                  "java.lang.String[]")
+                                                  "java.lang.String[]"),
                                   ),
                                   1,
                                   "breakpoints.Breakpoints$",
@@ -95,7 +95,7 @@ class DebugTest
                                   "breakpoints.Breakpoints",
                                   "main",
                                   LineSourcePosition(`breakpointsFile`, _),
-                                  _)
+                                  _),
                   ),
                   DebugThreadId(1),
                   "main") =>
@@ -188,7 +188,7 @@ class DebugTest
         withDebugSession(
             "breakpoints.Breakpoints",
             "breakpoints/Breakpoints.scala",
-            32
+            32,
         ) { breakpointsFile =>
           import testkit._
           val breakpointsPath = breakpointsFile.getAbsolutePath
@@ -212,7 +212,7 @@ class DebugTest
             case BreakpointList(activeBreakpoints, pendingBreakpoints) =>
               activeBreakpoints should contain theSameElementsAs Set(
                   Breakpoint(breakpointsFile, 11),
-                  Breakpoint(breakpointsFile, 13)
+                  Breakpoint(breakpointsFile, 13),
               )
               pendingBreakpoints shouldBe empty
           }
@@ -239,7 +239,7 @@ class DebugTest
           withDebugSession(
               "debug.Variables",
               "debug/Variables.scala",
-              21
+              21,
           ) { variablesFile =>
             // boolean local
             getVariableValue(DebugThreadId(1), "a") should matchPattern {
@@ -335,14 +335,14 @@ trait DebugTestUtils {
   def withDebugSession(
       className: String,
       fileName: String,
-      breakLine: Int
+      breakLine: Int,
   )(
-      f: File => Any
+      f: File => Any,
   )(
       implicit config: EnsimeConfig,
       testkit: TestKitFix,
       // don't take an implicit TestActorRef or it steals the implicit sender
-      p: (TestActorRef[Project], TestProbe)
+      p: (TestActorRef[Project], TestProbe),
   ): Any = {
     import testkit._
     val resolvedFile = scalaMain(config) / fileName

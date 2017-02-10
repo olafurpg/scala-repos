@@ -111,7 +111,7 @@ trait TestEventService
   val accessTest = Set[Permission](
       ReadPermission(Path.Root, WrittenByAccount("test")),
       WritePermission(testAccount.rootPath, WriteAsAny),
-      DeletePermission(testAccount.rootPath, WrittenByAny)
+      DeletePermission(testAccount.rootPath, WrittenByAny),
   )
 
   val expiredAccount = TestAccounts
@@ -197,7 +197,7 @@ trait TestEventService
     } yield {
       (
           response.copy(content = content),
-          stored.toList collect { case in: Ingest => in }
+          stored.toList collect { case in: Ingest => in },
       )
     }
   }

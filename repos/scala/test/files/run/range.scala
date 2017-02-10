@@ -60,7 +60,7 @@ object Test {
         GR(BigInt(5)),
         GR(5L),
         GR(5.0d),
-        GR(2.toByte)
+        GR(2.toByte),
     )
     val grs = _grs ::: (_grs map (_.negated))
     grs foreach (_.check)

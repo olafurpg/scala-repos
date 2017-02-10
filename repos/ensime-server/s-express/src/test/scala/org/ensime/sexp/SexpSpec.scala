@@ -48,20 +48,20 @@ class SexpSpec extends EnsimeSpec {
   "SexpData" should "create from varargs" in {
     SexpData(
         fookey -> barsym,
-        barkey -> foosym
+        barkey -> foosym,
     ) should ===(
         SexpList(
             fookey,
             barsym,
             barkey,
-            foosym
+            foosym,
         ))
   }
 
   it should "unroll as basic" in {
     SexpData(
         fookey -> barsym,
-        barkey -> foosym
+        barkey -> foosym,
     ) should ===(
         SexpCons(
             fookey,
@@ -71,10 +71,10 @@ class SexpSpec extends EnsimeSpec {
                     barkey,
                     SexpCons(
                         foosym,
-                        SexpNil
-                    )
-                )
-            )
+                        SexpNil,
+                    ),
+                ),
+            ),
         ))
   }
 
@@ -87,10 +87,10 @@ class SexpSpec extends EnsimeSpec {
                 barkey,
                 SexpCons(
                     foosym,
-                    SexpNil
-                )
-            )
-        )
+                    SexpNil,
+                ),
+            ),
+        ),
     ) match {
       case SexpData(kvs) if kvs.size == 2 =>
       case _ => fail()
@@ -108,7 +108,7 @@ class SexpSpec extends EnsimeSpec {
     SexpCons(a, b) should ===(
         SexpCons(
             SexpCons(foosym, SexpNil),
-            SexpCons(barsym, SexpNil)
+            SexpCons(barsym, SexpNil),
         ))
   }
 }

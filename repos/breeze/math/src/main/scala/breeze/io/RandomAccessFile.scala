@@ -756,7 +756,7 @@ class RandomAccessFile(file: File, arg0: String = "r")(
                                  ba(c8 + 4),
                                  ba(c8 + 5),
                                  ba(c8 + 6),
-                                 ba(c8 + 7))
+                                 ba(c8 + 7)),
       )
       c += 1
     }
@@ -777,7 +777,7 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     while (c < n) {
       val c4 = c * 4
       tr(c) = java.lang.Float.intBitsToFloat(
-          converter.bytesToInt32(ba(c4), ba(c4 + 1), ba(c4 + 2), ba(c4 + 3))
+          converter.bytesToInt32(ba(c4), ba(c4 + 1), ba(c4 + 2), ba(c4 + 3)),
       )
       c += 1
     }

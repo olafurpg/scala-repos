@@ -53,7 +53,7 @@ object Handler {
                     "step",
                     Json.obj(
                         "step" -> step.toJson,
-                        "path" -> anaMove.path
+                        "path" -> anaMove.path,
                     ))
               case scalaz.Failure(err) =>
                 member push lila.socket.Socket.makeMessage("stepFailure",
@@ -70,7 +70,7 @@ object Handler {
                     "step",
                     Json.obj(
                         "step" -> step.toJson,
-                        "path" -> anaDrop.path
+                        "path" -> anaDrop.path,
                     ))
               case scalaz.Failure(err) =>
                 member push lila.socket.Socket.makeMessage("stepFailure",
@@ -86,7 +86,7 @@ object Handler {
                   "dests",
                   Json.obj(
                       "dests" -> req.dests,
-                      "path" -> req.path
+                      "path" -> req.path,
                   ) ++ req.opening.?? { o =>
                     Json.obj("opening" -> o)
                   })

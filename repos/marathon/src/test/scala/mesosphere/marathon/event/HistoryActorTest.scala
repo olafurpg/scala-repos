@@ -25,7 +25,7 @@ class HistoryActorTest
     failureRepo = mock[TaskFailureRepository]
     historyActor = TestActorRef(
         Props(
-            new HistoryActor(system.eventStream, failureRepo)
+            new HistoryActor(system.eventStream, failureRepo),
         ))
   }
 
@@ -97,7 +97,7 @@ class HistoryActorTest
         host = "host",
         ipAddresses = Seq(ipAddress),
         ports = Nil,
-        version = Timestamp.now().toString
+        version = Timestamp.now().toString,
     )
   }
 }

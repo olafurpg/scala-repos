@@ -595,8 +595,8 @@ private[http] trait CoreRequestVarHandler {
 
                   ret
                 }
-              }
-          )
+              },
+          ),
       )
   }
 
@@ -675,8 +675,8 @@ private[http] trait CoreRequestVarHandler {
 
                   ret
                 }
-              }
-          )
+              },
+          ),
       )
     }
   }

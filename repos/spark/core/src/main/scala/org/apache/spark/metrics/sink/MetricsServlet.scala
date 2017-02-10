@@ -55,7 +55,7 @@ private[spark] class MetricsServlet(val property: Properties,
             new ServletParams(request => getMetricsSnapshot(request),
                               "text/json"),
             securityMgr,
-            conf)
+            conf),
     )
   }
 

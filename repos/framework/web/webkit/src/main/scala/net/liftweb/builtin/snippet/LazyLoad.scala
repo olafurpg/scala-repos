@@ -76,9 +76,9 @@ object LazyLoad extends DispatchSnippet {
                   }
                 } openOr {
                   <div><img src="/images/ajax-loader.gif" alt="Loading"/></div>
-                }
+                },
             )
-          }
+          },
       )
   }
 

@@ -17,7 +17,7 @@ object ScalaTestingWithDatabases extends Specification {
 
       val database = Databases(
           driver = "com.mysql.jdbc.Driver",
-          url = "jdbc:mysql://localhost/test"
+          url = "jdbc:mysql://localhost/test",
       )
       //#database
     }
@@ -32,8 +32,8 @@ object ScalaTestingWithDatabases extends Specification {
           name = "mydatabase",
           config = Map(
                 "user" -> "test",
-                "password" -> "secret"
-            )
+                "password" -> "secret",
+            ),
       )
       //#full-config
 
@@ -48,7 +48,7 @@ object ScalaTestingWithDatabases extends Specification {
 
       Databases.withDatabase(
           driver = "com.mysql.jdbc.Driver",
-          url = "jdbc:mysql://localhost/test"
+          url = "jdbc:mysql://localhost/test",
       ) { database =>
         val connection = database.getConnection()
       // ...
@@ -67,8 +67,8 @@ object ScalaTestingWithDatabases extends Specification {
             name = "mydatabase",
             config = Map(
                   "user" -> "test",
-                  "password" -> "secret"
-              )
+                  "password" -> "secret",
+              ),
         )(block)
       }
       //#custom-with-database
@@ -104,11 +104,11 @@ object ScalaTestingWithDatabases extends Specification {
       val database = Databases.inMemory(
           name = "mydatabase",
           urlOptions = Map(
-                "MODE" -> "MYSQL"
+                "MODE" -> "MYSQL",
             ),
           config = Map(
-                "logStatements" -> true
-            )
+                "logStatements" -> true,
+            ),
       )
       //#in-memory-full-config
 
@@ -142,11 +142,11 @@ object ScalaTestingWithDatabases extends Specification {
         Databases.withInMemory(
             name = "mydatabase",
             urlOptions = Map(
-                  "MODE" -> "MYSQL"
+                  "MODE" -> "MYSQL",
               ),
             config = Map(
-                  "logStatements" -> true
-              )
+                  "logStatements" -> true,
+              ),
         )(block)
       }
       //#with-in-memory-custom
@@ -180,8 +180,8 @@ object ScalaTestingWithDatabases extends Specification {
                 Evolution(
                     1,
                     "create table test (id bigint not null, name varchar(255));",
-                    "drop table test;"
-                )
+                    "drop table test;",
+                ),
             ))
         //#apply-evolutions-simple
 
@@ -232,11 +232,11 @@ object ScalaTestingWithDatabases extends Specification {
 
         Databases.withInMemory(
             urlOptions = Map(
-                  "MODE" -> "MYSQL"
+                  "MODE" -> "MYSQL",
               ),
             config = Map(
-                  "logStatements" -> true
-              )
+                  "logStatements" -> true,
+              ),
         ) { database =>
           Evolutions.withEvolutions(
               database,
@@ -244,8 +244,8 @@ object ScalaTestingWithDatabases extends Specification {
                   Evolution(
                       1,
                       "create table test (id bigint not null, name varchar(255));",
-                      "drop table test;"
-                  )
+                      "drop table test;",
+                  ),
               )) {
 
             block(database)

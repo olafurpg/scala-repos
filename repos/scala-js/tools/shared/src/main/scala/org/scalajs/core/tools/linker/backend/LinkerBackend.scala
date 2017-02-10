@@ -64,7 +64,7 @@ object LinkerBackend {
       /** Custom js code that wraps the output */
       val customOutputWrapper: (String, String) = ("", ""),
       /** Pretty-print the output. */
-      val prettyPrint: Boolean = false
+      val prettyPrint: Boolean = false,
   ) {
     def withRelativizeSourceMapBase(
         relativizeSourceMapBase: Option[URI]): Config =

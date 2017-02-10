@@ -759,7 +759,7 @@ trait Implicits { self: Analyzer =>
                               List(Ident(nme.argument) setType approximate(
                                       arg1)))),
                     EXPRmode,
-                    approximate(arg2)
+                    approximate(arg2),
                 ) match {
                   // try to infer implicit parameters immediately in order to:
                   //   1) guide type inference for implicit views

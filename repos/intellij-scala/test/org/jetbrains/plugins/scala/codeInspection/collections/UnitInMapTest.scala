@@ -39,7 +39,7 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
         |    val y = x + 2
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 

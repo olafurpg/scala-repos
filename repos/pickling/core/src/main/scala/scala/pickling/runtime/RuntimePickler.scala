@@ -229,7 +229,7 @@ class RuntimePickler(
                 new EffectivelyFinalLogic(fir)
               else if (fir.tpe.typeSymbol.asType.isAbstractType)
                 new AbstractLogic(fir)
-              else new DefaultLogic(fir)
+              else new DefaultLogic(fir),
           )
         else
           try {
@@ -237,7 +237,7 @@ class RuntimePickler(
             List(
                 if (fir.tpe.typeSymbol.isEffectivelyFinal)
                   new PrivateEffectivelyFinalJavaFieldLogic(fir, javaField)
-                else new PrivateJavaFieldLogic(fir, javaField)
+                else new PrivateJavaFieldLogic(fir, javaField),
             )
           } catch {
             case e: java.lang.NoSuchFieldException => List()

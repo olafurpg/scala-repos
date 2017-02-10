@@ -35,8 +35,8 @@ class DeploymentPlanTest
         apps = Set(c, d),
         groups = Set(
               Group("/test/database".toPath, Set(a)),
-              Group("/test/service".toPath, Set(b))
-          )
+              Group("/test/service".toPath, Set(b)),
+          ),
     )
 
     When("the group's apps are grouped by the longest outbound path")
@@ -69,7 +69,7 @@ class DeploymentPlanTest
 
     val group = Group(
         id = "/".toPath,
-        apps = Set(a, b, c, d, e)
+        apps = Set(a, b, c, d, e),
     )
 
     When("the group's apps are grouped by the longest outbound path")
@@ -134,7 +134,7 @@ class DeploymentPlanTest
         app.copy(cmd = Some("sleep 30")),
         app2.copy(instances = 10),
         AppDefinition("/app4".toPath, Some("cmd4")),
-        unchanged
+        unchanged,
     )
 
     val from = Group("/group".toPath, apps)
@@ -179,21 +179,21 @@ class DeploymentPlanTest
           dependencies = Set(mongoId),
           instances = 10,
           upgradeStrategy = strategy,
-          versionInfo = versionInfo
+          versionInfo = versionInfo,
       )
 
     val from = Group(
         id = "/test".toPath,
         groups = Set(
               Group("/test/database".toPath, Set(mongo._1)),
-              Group("/test/service".toPath, Set(service._1))
-          )
+              Group("/test/service".toPath, Set(service._1)),
+          ),
     )
 
     val to = Group("/test".toPath,
                    groups = Set(
                          Group("/test/database".toPath, Set(mongo._2)),
-                         Group("/test/service".toPath, Set(service._2))
+                         Group("/test/service".toPath, Set(service._2)),
                      ))
 
     When("the deployment plan is computed")
@@ -221,7 +221,7 @@ class DeploymentPlanTest
     val targetGroup = Group(
         id = "/test".toPath,
         apps = apps,
-        groups = Set()
+        groups = Set(),
     )
 
     When("the deployment plan is computed")
@@ -273,13 +273,13 @@ class DeploymentPlanTest
       Group("/test".toPath,
             groups = Set(
                   Group("/test/database".toPath, Set(mongo._1)),
-                  Group("/test/service".toPath, Set(service._1))
+                  Group("/test/service".toPath, Set(service._1)),
               ))
 
     val to: Group = Group("/test".toPath,
                           groups = Set(
                                 Group("/test/database".toPath, Set(mongo._2)),
-                                Group("/test/service".toPath, Set(service._2))
+                                Group("/test/service".toPath, Set(service._2)),
                             ))
 
     When("the deployment plan is computed")
@@ -345,7 +345,7 @@ class DeploymentPlanTest
             groups = Set(
                   Group("/test/database".toPath, Set(mongo._1)),
                   Group("/test/service".toPath, Set(service._1, toStop)),
-                  Group("/test/independent".toPath, Set(independent._1))
+                  Group("/test/independent".toPath, Set(independent._1)),
               ))
 
     val to: Group =
@@ -353,7 +353,7 @@ class DeploymentPlanTest
             groups = Set(
                   Group("/test/database".toPath, Set(mongo._2)),
                   Group("/test/service".toPath, Set(service._2, toStart)),
-                  Group("/test/independent".toPath, Set(independent._2))
+                  Group("/test/independent".toPath, Set(independent._2)),
               ))
 
     When("the deployment plan is computed")
@@ -384,7 +384,7 @@ class DeploymentPlanTest
     val from: Group =
       Group("/test".toPath,
             groups = Set(
-                  Group("/test/independent".toPath, Set(app._1))
+                  Group("/test/independent".toPath, Set(app._1)),
               ))
     val to: Group = Group("/test".toPath)
 
@@ -418,7 +418,7 @@ class DeploymentPlanTest
         id = "/test".toPath,
         cmd = Some("sleep 5"),
         instances = 1,
-        versionInfo = VersionInfo.forNewConfig(Timestamp(10))
+        versionInfo = VersionInfo.forNewConfig(Timestamp(10)),
     )
     val appNew = app.copy(instances = 1) // no change
 
@@ -432,7 +432,7 @@ class DeploymentPlanTest
     val app = AppDefinition(
         id = "/test".toPath,
         cmd = Some("sleep 5"),
-        versionInfo = VersionInfo.forNewConfig(Timestamp(10))
+        versionInfo = VersionInfo.forNewConfig(Timestamp(10)),
     )
     val appNew = app.markedForRestarting
 
@@ -456,8 +456,8 @@ class DeploymentPlanTest
         id = "/test".toPath,
         apps = Set(oldApp),
         groups = Set(
-              Group("/test/some".toPath, Set(oldApp))
-          )
+              Group("/test/some".toPath, Set(oldApp)),
+          ),
     )
 
     val newApp = oldApp.copy(instances = 5)
@@ -465,8 +465,8 @@ class DeploymentPlanTest
         id = "/test".toPath,
         apps = Set(newApp),
         groups = Set(
-              Group("/test/some".toPath, Set(newApp))
-          )
+              Group("/test/some".toPath, Set(newApp)),
+          ),
     )
 
     val taskToKill = MarathonTestHelper.stagedTaskForApp(aId)
@@ -529,7 +529,7 @@ class DeploymentPlanTest
           residency = Some(
                 Residency(
                     123,
-                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
+                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT)),
       )
     }
     val vol1 = persistentVolume("foo")

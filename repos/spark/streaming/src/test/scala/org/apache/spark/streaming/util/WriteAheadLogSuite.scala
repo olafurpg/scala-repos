@@ -485,7 +485,7 @@ class BatchedWriteAheadLogSuite
     val events = Seq(
         BlockAdditionEvent(ReceivedBlockInfo(0, None, None, null)),
         BatchAllocationEvent(null, null),
-        BatchCleanupEvent(Nil)
+        BatchCleanupEvent(Nil),
     )
 
     val buffers =

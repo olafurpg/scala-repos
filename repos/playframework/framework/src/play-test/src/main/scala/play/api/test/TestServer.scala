@@ -39,7 +39,7 @@ case class TestServer(
           port = Option(port),
           sslPort = sslPort,
           mode = Mode.Test,
-          properties = System.getProperties
+          properties = System.getProperties,
       )
       testServerProcess = TestServer.start(serverProvider, config, application)
     } catch {

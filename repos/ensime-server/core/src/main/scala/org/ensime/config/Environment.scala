@@ -13,7 +13,7 @@ object Environment {
       s"  Built with Scala version: ${BuildInfo.scalaVersion}",
       s"  Built with sbt version: ${BuildInfo.sbtVersion}",
       s"  Built from git sha: ${BuildInfo.gitSha}",
-      s"  Built on: ${BuildInfo.builtAtString}"
+      s"  Built on: ${BuildInfo.builtAtString}",
   )
 
   private def osVersion: String =

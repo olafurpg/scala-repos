@@ -231,7 +231,7 @@ class AsyncProducerTest {
             0 -> Map(TopicAndPartition("topic1", 0) -> topic1Broker1Data,
                      TopicAndPartition("topic2", 0) -> topic2Broker1Data),
             1 -> Map(TopicAndPartition("topic1", 1) -> topic1Broker2Data,
-                     TopicAndPartition("topic2", 1) -> topic2Broker2Data)
+                     TopicAndPartition("topic2", 1) -> topic2Broker2Data),
         ))
 
     val actualResult = handler.partitionAndCollate(producerDataList)

@@ -171,7 +171,7 @@ private trait LazyOptionTBindRec[F[_]]
               F.map(f(a).run) {
             _.fold(_.map(b => LazyOption.lazySome(b)),
                    \/.right(LazyOption.lazyNone))
-        })(a)
+        })(a),
     )
 }
 

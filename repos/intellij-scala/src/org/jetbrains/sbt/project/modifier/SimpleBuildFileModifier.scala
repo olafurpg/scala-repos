@@ -73,7 +73,7 @@ class SimpleBuildFileModifier(
                                 buildFileEntry.file,
                                 SimpleBuildFileModifier.newLine(
                                     module.getProject),
-                                _)
+                                _),
                       ))
                   .find(_.isDefined)
                   .flatten))

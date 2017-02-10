@@ -44,7 +44,7 @@ class MigrationClient(
     newClient: Client,
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
-    protected val statsReceiver: StatsReceiver = NullStatsReceiver
+    protected val statsReceiver: StatsReceiver = NullStatsReceiver,
 )
     extends ProxyClient with ZookeeperStateMonitor {
 

@@ -104,7 +104,7 @@ trait Mimes {
     detectMime(fallback) {
       MimeUtil2
         .getMostSpecificMimeType(
-            mimeUtil.getMimeTypes(new URL(url), new MimeType(fallback))
+            mimeUtil.getMimeTypes(new URL(url), new MimeType(fallback)),
         )
         .toString
     }
@@ -125,7 +125,7 @@ trait Mimes {
   private def quiet(fn: => Unit): Unit = {
     allCatch.withApply(
         internalLogger.warn(
-            "An error occurred while registering a mime type detector.", _)
+            "An error occurred while registering a mime type detector.", _),
     )(fn)
   }
 

@@ -76,7 +76,7 @@ private[twitter] object ServerAdmissionControl {
         "Proactively reject requests when the server operates beyond its capacity"
       def make(
           _enabled: Param,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ): ServiceFactory[Req, Rep] = {
         val Param(enabled) = _enabled
 

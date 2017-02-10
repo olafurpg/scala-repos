@@ -50,7 +50,7 @@ abstract class AbstractFetcherManager(
                 .max(curMaxAll)
           })
       },
-      Map("clientId" -> clientId)
+      Map("clientId" -> clientId),
   )
 
   newGauge(
@@ -71,7 +71,7 @@ abstract class AbstractFetcherManager(
           }
         }
       },
-      Map("clientId" -> clientId)
+      Map("clientId" -> clientId),
   )
 
   private def getFetcherId(topic: String, partitionId: Int): Int = {

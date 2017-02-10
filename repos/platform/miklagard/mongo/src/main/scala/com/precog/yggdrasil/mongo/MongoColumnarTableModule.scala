@@ -221,7 +221,7 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
               case InitialLoad(Nil) =>
                 M.point(None)
             },
-            UnknownSize
+            UnknownSize,
         )
       }
     }

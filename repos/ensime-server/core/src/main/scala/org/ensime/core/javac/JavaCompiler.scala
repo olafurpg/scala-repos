@@ -27,7 +27,7 @@ class JavaCompiler(
     val reportHandler: ReportHandler,
     val indexer: ActorRef,
     val search: SearchService,
-    val vfs: EnsimeVFS
+    val vfs: EnsimeVFS,
 )
     extends JavaDocFinding with JavaCompletion with JavaSourceFinding
     with Helpers with SLF4JLogging {
@@ -48,7 +48,7 @@ class JavaCompiler(
   def getTask(
       lint: String,
       listener: DiagnosticListener[JavaFileObject],
-      files: java.lang.Iterable[JavaFileObject]
+      files: java.lang.Iterable[JavaFileObject],
   ): JavacTask = {
     val compiler = ToolProvider.getSystemJavaCompiler()
 
@@ -74,7 +74,7 @@ class JavaCompiler(
                    "-cp",
                    cp,
                    "-Xlint:" + lint,
-                   "-proc:none"
+                   "-proc:none",
                ).asJava,
                null,
                files)
@@ -124,7 +124,7 @@ class JavaCompiler(
                   tpeMirror.map(typeMirrorToTypeInfo).getOrElse(nullTpe),
                   tpeMirror
                     .map(_.getKind == TypeKind.EXECUTABLE)
-                    .getOrElse(false)
+                    .getOrElse(false),
                 ))
         }
         path.getLeaf match {
@@ -147,7 +147,7 @@ class JavaCompiler(
       file: SourceFileInfo,
       offset: Int,
       maxResults: Int,
-      caseSens: Boolean
+      caseSens: Boolean,
   ): CompletionInfoList = {
     completionsAt(file, offset, maxResults, caseSens)
   }
@@ -281,8 +281,8 @@ class JavaCompiler(
               },
                   diag.getEndPosition().toInt,
                   diag.getLineNumber().toInt,
-                  diag.getColumnNumber().toInt
-              )
+                  diag.getColumnNumber().toInt,
+              ),
           ))
     }
   }

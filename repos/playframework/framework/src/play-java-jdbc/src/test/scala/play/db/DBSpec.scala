@@ -49,7 +49,7 @@ object DBSpec extends org.specs2.mutable.Specification {
     GuiceApplicationBuilder()
       .configure(
           "db.default.driver" -> "acolyte.jdbc.Driver",
-          "db.default.url" -> "jdbc:acolyte:test?handler=test"
+          "db.default.url" -> "jdbc:acolyte:test?handler=test",
       )
       .build()
   }

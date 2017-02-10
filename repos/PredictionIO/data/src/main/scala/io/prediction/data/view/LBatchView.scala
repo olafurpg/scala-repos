@@ -148,7 +148,7 @@ class LBatchView(val appId: Int,
   def aggregateProperties(
       entityType: String,
       startTimeOpt: Option[DateTime] = None,
-      untilTimeOpt: Option[DateTime] = None
+      untilTimeOpt: Option[DateTime] = None,
   ): Map[String, DataMap] = {
 
     events

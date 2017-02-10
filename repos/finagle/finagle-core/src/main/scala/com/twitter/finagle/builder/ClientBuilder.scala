@@ -79,7 +79,7 @@ object ClientBuilder {
     * }}}
     */
   def stackClientOfCodec[Req, Rep](
-      codecFactory: CodecFactory[Req, Rep]#Client
+      codecFactory: CodecFactory[Req, Rep]#Client,
   ): StackClient[Req, Rep] =
     ClientBuilderClient(CodecClient[Req, Rep](codecFactory))
 }
@@ -91,7 +91,7 @@ object ClientConfig {
 
   private case class NilClient[Req, Rep](
       stack: Stack[ServiceFactory[Req, Rep]] = StackClient.newStack[Req, Rep],
-      params: Stack.Params = DefaultParams
+      params: Stack.Params = DefaultParams,
   )
       extends StackBasedClient[Req, Rep] {
 
@@ -263,7 +263,7 @@ private[builder] final class ClientConfig[
   */
 class ClientBuilder[
     Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] private[finagle](
-    client: StackBasedClient[Req, Rep]
+    client: StackBasedClient[Req, Rep],
 ) {
   import ClientConfig._
   import com.twitter.finagle.param._
@@ -281,7 +281,7 @@ class ClientBuilder[
 
   private def copy[
       Req1, Rep1, HasCluster1, HasCodec1, HasHostConnectionLimit1](
-      client: StackBasedClient[Req1, Rep1]
+      client: StackBasedClient[Req1, Rep1],
   )
     : ClientBuilder[
         Req1, Rep1, HasCluster1, HasCodec1, HasHostConnectionLimit1] =
@@ -289,7 +289,7 @@ class ClientBuilder[
 
   private def configured[
       P : Stack.Param, HasCluster1, HasCodec1, HasHostConnectionLimit1](
-      param: P
+      param: P,
   ): ClientBuilder[Req, Rep, HasCluster1, HasCodec1, HasHostConnectionLimit1] =
     copy(client.configured(param))
 
@@ -311,7 +311,7 @@ class ClientBuilder[
     * string.
     */
   def hosts(
-      hostnamePortCombinations: String
+      hostnamePortCombinations: String,
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] = {
     val addresses = InetSocketAddressUtil.parseHosts(hostnamePortCombinations)
     hosts(addresses)
@@ -322,7 +322,7 @@ class ClientBuilder[
     * [[java.net.InetSocketAddress]] instead.
     */
   def hosts(
-      sockaddrs: Seq[InetSocketAddress]
+      sockaddrs: Seq[InetSocketAddress],
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] =
     addrs(sockaddrs.map(Address(_)): _*)
 
@@ -331,7 +331,7 @@ class ClientBuilder[
     * [[java.net.SocketAddress]] client.
     */
   def hosts(
-      address: InetSocketAddress
+      address: InetSocketAddress,
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] =
     hosts(Seq(address))
 
@@ -341,7 +341,7 @@ class ClientBuilder[
     */
   @varargs
   def addrs(
-      addrs: Address*
+      addrs: Address*,
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] =
     dest(Name.bound(addrs: _*))
 
@@ -351,7 +351,7 @@ class ClientBuilder[
     * label, this replaces the builder's current name.
     */
   def dest(
-      addr: String
+      addr: String,
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] = {
     Resolver.evalLabeled(addr) match {
       case (n, "") => dest(n)
@@ -370,7 +370,7 @@ class ClientBuilder[
     * client.
     */
   def dest(
-      name: Name
+      name: Name,
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] =
     configured(DestName(name))
 
@@ -389,12 +389,12 @@ class ClientBuilder[
     * remains connected.
     */
   def cluster(
-      cluster: Cluster[SocketAddress]
+      cluster: Cluster[SocketAddress],
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] =
     group(Group.fromCluster(cluster))
 
   def group(
-      group: Group[SocketAddress]
+      group: Group[SocketAddress],
   ): ClientBuilder[Req, Rep, Yes, HasCodec, HasHostConnectionLimit] =
     dest(Name.fromGroup(group))
 
@@ -411,7 +411,7 @@ class ClientBuilder[
     * type variables. One of the codec variations is required.
     */
   def codec[Req1, Rep1](
-      codec: Codec[Req1, Rep1]
+      codec: Codec[Req1, Rep1],
   ): ClientBuilder[Req1, Rep1, HasCluster, Yes, HasHostConnectionLimit] =
     this
       .codec(Function.const(codec)(_))
@@ -423,7 +423,7 @@ class ClientBuilder[
     * transparent to the user.
     */
   def codec[Req1, Rep1](
-      codecFactory: CodecFactory[Req1, Rep1]
+      codecFactory: CodecFactory[Req1, Rep1],
   ): ClientBuilder[Req1, Rep1, HasCluster, Yes, HasHostConnectionLimit] =
     this
       .codec(codecFactory.client)
@@ -433,7 +433,7 @@ class ClientBuilder[
     * A variation of codec for codecs that support only client-codecs.
     */
   def codec[Req1, Rep1](
-      codecFactory: CodecFactory[Req1, Rep1]#Client
+      codecFactory: CodecFactory[Req1, Rep1]#Client,
   ): ClientBuilder[Req1, Rep1, HasCluster, Yes, HasHostConnectionLimit] =
     copy(CodecClient[Req1, Rep1](codecFactory).withParams(params))
 
@@ -452,7 +452,7 @@ class ClientBuilder[
     * such connection pool parameters will not be applied.
     */
   def stack[Req1, Rep1](
-      client: StackBasedClient[Req1, Rep1]
+      client: StackBasedClient[Req1, Rep1],
   ): ClientBuilder[Req1, Rep1, HasCluster, Yes, Yes] = {
     copy(client.withParams(client.params ++ params))
   }
@@ -964,7 +964,7 @@ class ClientBuilder[
     */
   def buildFactory()(
       implicit THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ClientConfigEvidence[
-          HasCluster, HasCodec, HasHostConnectionLimit]
+          HasCluster, HasCodec, HasHostConnectionLimit],
   ): ServiceFactory[Req, Rep] = {
     val Label(label) = params[Label]
     val DestName(dest) = params[DestName]
@@ -973,7 +973,7 @@ class ClientBuilder[
 
   @deprecated("Used for ABI compat", "5.0.1")
   def buildFactory(
-      THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
+      THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig,
   ): ServiceFactory[Req, Rep] =
     buildFactory()(new ClientConfigEvidence[
             HasCluster, HasCodec, HasHostConnectionLimit] {})
@@ -983,7 +983,7 @@ class ClientBuilder[
     */
   def build()(
       implicit THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ClientConfigEvidence[
-          HasCluster, HasCodec, HasHostConnectionLimit]
+          HasCluster, HasCodec, HasHostConnectionLimit],
   ): Service[Req, Rep] = {
     val Label(label) = params[Label]
     val DestName(dest) = params[DestName]
@@ -992,7 +992,7 @@ class ClientBuilder[
 
   @deprecated("Used for ABI compat", "5.0.1")
   def build(
-      THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
+      THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig,
   ): Service[Req, Rep] =
     build()(new ClientConfigEvidence[
             HasCluster, HasCodec, HasHostConnectionLimit] {})
@@ -1024,7 +1024,7 @@ class ClientBuilder[
   * filters historically included in `ClientBuilder` clients.
   */
 private case class ClientBuilderClient[Req, Rep](
-    client: StackClient[Req, Rep]
+    client: StackClient[Req, Rep],
 )
     extends StackClient[Req, Rep] {
 
@@ -1055,7 +1055,7 @@ private object ClientBuilderClient {
     override def make(
         statsP: Stats,
         exceptionStatsHandlerP: ExceptionStatsHandler,
-        next: ServiceFactory[Req, Rep]
+        next: ServiceFactory[Req, Rep],
     ) = {
       val Stats(statsReceiver) = statsP
       val ExceptionStatsHandler(categorizer) = exceptionStatsHandlerP
@@ -1074,7 +1074,7 @@ private object ClientBuilderClient {
     override def make(
         globalTimeoutP: GlobalTimeout,
         timerP: Timer,
-        next: ServiceFactory[Req, Rep]
+        next: ServiceFactory[Req, Rep],
     ) = {
       val GlobalTimeout(timeout) = globalTimeoutP
       val Timer(timer) = timerP
@@ -1096,7 +1096,7 @@ private object ClientBuilderClient {
 
     override def make(
         labelP: Label,
-        next: ServiceFactory[Req, Rep]
+        next: ServiceFactory[Req, Rep],
     ) = {
       val Label(label) = labelP
 
@@ -1108,7 +1108,7 @@ private object ClientBuilderClient {
   def newClient[Req, Rep](
       client: StackBasedClient[Req, Rep],
       dest: Name,
-      label: String
+      label: String,
   ): ServiceFactory[Req, Rep] = {
     val params = client.params
     val Daemonize(daemon) = params[Daemonize]
@@ -1141,7 +1141,7 @@ private object ClientBuilderClient {
   def newService[Req, Rep](
       client0: StackBasedClient[Req, Rep],
       dest: Name,
-      label: String
+      label: String,
   ): Service[Req, Rep] = {
     val client = client0
       .transformed(new Stack.Transformer {
@@ -1183,7 +1183,7 @@ private object ClientBuilderClient {
 private case class CodecClient[Req, Rep](
     codecFactory: CodecFactory[Req, Rep]#Client,
     stack: Stack[ServiceFactory[Req, Rep]] = StackClient.newStack[Req, Rep],
-    params: Stack.Params = ClientConfig.DefaultParams
+    params: Stack.Params = ClientConfig.DefaultParams,
 )
     extends StackClient[Req, Rep] {
   import com.twitter.finagle.param._
@@ -1231,7 +1231,7 @@ private case class CodecClient[Req, Rep](
 
     case class Client(
         stack: Stack[ServiceFactory[Req, Rep]] = clientStack,
-        params: Stack.Params = params
+        params: Stack.Params = params,
     )
         extends StdStackClient[Req, Rep, Client] {
       protected def copy1(stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
@@ -1262,7 +1262,7 @@ private case class CodecClient[Req, Rep](
 
     Client(
         stack = clientStack,
-        params = clientParams
+        params = clientParams,
     ).newClient(dest, label)
   }
 

@@ -475,7 +475,7 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
             .map(_.callsitePosition)
             .getOrElse(NoPosition),
         annotatedInline = false,
-        annotatedNoInline = false
+        annotatedNoInline = false,
     )
     // (*) The documentation in class LambdaMetafactory says:
     //     "if implMethod corresponds to an instance method, the first capture argument

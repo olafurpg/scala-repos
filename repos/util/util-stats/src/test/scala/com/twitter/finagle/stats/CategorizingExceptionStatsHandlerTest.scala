@@ -52,7 +52,7 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
             "clienterrors/java.lang.RuntimeException/java.lang.Exception",
             "sourcedfailures/service",
             "sourcedfailures/service/java.lang.RuntimeException",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 
@@ -73,7 +73,7 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
         keys == Seq(
             "failures",
             "failures/java.lang.RuntimeException",
-            "failures/java.lang.RuntimeException/java.lang.Exception"
+            "failures/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 
@@ -111,7 +111,7 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
             "clienterrors",
             "clienterrors/java.lang.RuntimeException/java.lang.Exception",
             "sourcedfailures/service",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 }

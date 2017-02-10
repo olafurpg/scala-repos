@@ -373,7 +373,7 @@ abstract class MixinNodes {
                   case t: ScTemplateDefinition =>
                     zSubst = zSubst.followed(
                         new ScSubstitutor(
-                            Map.empty, Map.empty, Some(ScThisType(t)))
+                            Map.empty, Map.empty, Some(ScThisType(t))),
                     )
                   case _ =>
                 }
@@ -397,7 +397,7 @@ abstract class MixinNodes {
                   case t: ScTemplateDefinition =>
                     zSubst = zSubst.followed(
                         new ScSubstitutor(
-                            Map.empty, Map.empty, Some(ScThisType(t)))
+                            Map.empty, Map.empty, Some(ScThisType(t))),
                     )
                   case _ =>
                 }

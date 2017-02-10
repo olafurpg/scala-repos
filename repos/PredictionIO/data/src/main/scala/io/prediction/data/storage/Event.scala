@@ -46,7 +46,7 @@ case class Event(
     val eventTime: DateTime = DateTime.now,
     val tags: Seq[String] = Nil,
     val prId: Option[String] = None,
-    val creationTime: DateTime = DateTime.now
+    val creationTime: DateTime = DateTime.now,
 ) {
   override def toString(): String = {
     s"Event(id=$eventId,event=$event,eType=$entityType,eId=$entityId," +

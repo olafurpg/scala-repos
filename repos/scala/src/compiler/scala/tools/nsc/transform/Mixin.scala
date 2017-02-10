@@ -833,7 +833,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
                   (mkCheckedAccessor(
                       clazz, _: Tree, fieldOffset(sym), stat.pos, sym))(
                       if (sym.tpe.resultType.typeSymbol == UnitClass) UNIT
-                      else rhs
+                      else rhs,
                 ))
           } else if (sym.isConstructor) {
             deriveDefDef(stat)(addInitBits(clazz, _))
@@ -883,7 +883,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
                   Nil
                 case stat => List(stat)
               },
-              exprOwner
+              exprOwner,
           )
         }
       }

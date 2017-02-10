@@ -109,7 +109,7 @@ class FlagTest extends FunSuite {
           naive.toSet == Set(
               Entry(Seq("flags", "foo"), "973"),
               Entry(Seq("flags", "bar"), "hello there"),
-              Entry(Seq("flags", "help"), "false")
+              Entry(Seq("flags", "help"), "false"),
           ))
     }
   }
@@ -128,7 +128,7 @@ class FlagTest extends FunSuite {
       }
       assert(naive.toSet == Set(
               Entry(Seq("flags", "baz"), Flag.EmptyRequired),
-              Entry(Seq("flags", "help"), "false")
+              Entry(Seq("flags", "help"), "false"),
           ))
     }
   }
@@ -143,7 +143,7 @@ class FlagTest extends FunSuite {
       assert(fooFlag() == 123)
       assert(naive.toSet == Set(
               Entry(Seq("flags", "foo"), "123"),
-              Entry(Seq("flags", "help"), "false")
+              Entry(Seq("flags", "help"), "false"),
           ))
     }
   }
@@ -398,7 +398,7 @@ class FlagTest extends FunSuite {
           """-com.twitter.app.MyGlobalFlag='a test flag'""",
           """-flag.with.single.quote='i'"'"'m so cool'""",
           """-help='false'""",
-          """-unset.local.flag='a flag!' \"""
+          """-unset.local.flag='a flag!' \""",
       )
 
       // make sure every line in localAndGlobal exists in the flagString

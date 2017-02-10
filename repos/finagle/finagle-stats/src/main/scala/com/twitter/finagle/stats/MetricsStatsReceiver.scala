@@ -66,7 +66,7 @@ object debugLoggedStatNames
     extends GlobalFlag[Set[String]](
         Set.empty,
         "Comma separated stat names for logging observed values" +
-        " (set via a -D system property to avoid load ordering issues)"
+        " (set via a -D system property to avoid load ordering issues)",
     )
 
 // It's possible to override the scope separator (the default value for `MetricsStatsReceiver` is
@@ -76,7 +76,7 @@ object debugLoggedStatNames
 object scopeSeparator
     extends GlobalFlag[String](
         "/",
-        "Override the scope separator."
+        "Override the scope separator.",
     )
 
 object MetricsStatsReceiver {
@@ -193,7 +193,7 @@ object MetricsStatsReceiver {
 class MetricsStatsReceiver(
     val registry: Metrics,
     sink: Sink,
-    histogramFactory: String => HistogramInterface
+    histogramFactory: String => HistogramInterface,
 )
     extends StatsReceiverWithCumulativeGauges {
   import MetricsStatsReceiver._
@@ -234,14 +234,14 @@ class MetricsStatsReceiver(
           "For best performance, metrics should be created and stored in member variables " +
           "and not requested via `StatsReceiver.{counter,stat,addGauge}` at runtime. " +
           "Large numbers are an indication that these metrics are being requested " +
-          "frequently at runtime."
+          "frequently at runtime.",
       ) {
         Seq(
             checkRequestsLimit("counter", counterRequests),
             checkRequestsLimit("stat", statRequests),
-            checkRequestsLimit("addGauge", gaugeRequests)
+            checkRequestsLimit("addGauge", gaugeRequests),
         ).flatten
-      }
+      },
   )
 
   // Scope separator, a string value used to separate scopes defined by `StatsReceiver`.

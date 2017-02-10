@@ -94,7 +94,7 @@ class ConnectionManagerTest extends FunSuite with MockitoSugar {
     perform(
         makeRequest(Version.Http11),
         makeResponse(Version.Http11),
-        true
+        true,
     )
   }
 
@@ -102,7 +102,7 @@ class ConnectionManagerTest extends FunSuite with MockitoSugar {
     perform(
         makeRequest(Version.Http11, "Connection" -> "close"),
         makeResponse(Version.Http11),
-        true
+        true,
     )
   }
 }

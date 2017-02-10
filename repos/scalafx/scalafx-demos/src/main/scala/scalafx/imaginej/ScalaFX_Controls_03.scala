@@ -89,7 +89,7 @@ object ScalaFX_Controls_03 extends JFXApp {
     children = List(
         homeRadioButton,
         calendarRadioButton,
-        contactsRadioButton
+        contactsRadioButton,
     )
   }
 
@@ -100,7 +100,7 @@ object ScalaFX_Controls_03 extends JFXApp {
     padding = Insets(20, 10, 10, 20)
     children = List(
         vBox,
-        iconImageView
+        iconImageView,
     )
   }
 

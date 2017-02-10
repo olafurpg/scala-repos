@@ -50,7 +50,7 @@ class AppUpdateTest extends MarathonSpec {
     shouldViolate(
         update.copy(portDefinitions = Some(PortDefinitions(9000, 8080, 9000))),
         "/portDefinitions",
-        "Ports must be unique."
+        "Ports must be unique.",
     )
 
     shouldViolate(
@@ -58,7 +58,7 @@ class AppUpdateTest extends MarathonSpec {
                   Seq(PortDefinition(port = 9000, name = Some("foo")),
                       PortDefinition(port = 9001, name = Some("foo"))))),
         "/portDefinitions",
-        "Port names must be unique."
+        "Port names must be unique.",
     )
 
     shouldNotViolate(
@@ -66,7 +66,7 @@ class AppUpdateTest extends MarathonSpec {
                   Seq(PortDefinition(port = 9000, name = Some("foo")),
                       PortDefinition(port = 9001, name = Some("bar"))))),
         "/portDefinitions",
-        "Port names must be unique."
+        "Port names must be unique.",
     )
 
     shouldViolate(update.copy(mem = Some(-3.0)),
@@ -113,8 +113,8 @@ class AppUpdateTest extends MarathonSpec {
               Container(
                   `type` = mesos.ContainerInfo.Type.DOCKER,
                   volumes = Nil,
-                  docker = Some(Docker(image = "docker:///group/image"))
-              )
+                  docker = Some(Docker(image = "docker:///group/image")),
+              ),
           ),
         healthChecks = Some(Set[HealthCheck]()),
         dependencies = Some(Set[PathId]()),
@@ -123,22 +123,22 @@ class AppUpdateTest extends MarathonSpec {
               Map(
                   "one" -> "aaa",
                   "two" -> "bbb",
-                  "three" -> "ccc"
-              )
+                  "three" -> "ccc",
+              ),
           ),
         ipAddress = Some(
               IpAddress(
                   groups = Seq("a", "b", "c"),
                   labels = Map(
                         "foo" -> "bar",
-                        "baz" -> "buzz"
+                        "baz" -> "buzz",
                     ),
                   discoveryInfo = DiscoveryInfo(
                         ports = Seq(Port(name = "http",
                                          number = 80,
-                                         protocol = "tcp"))
-                    )
-              ))
+                                         protocol = "tcp")),
+                    ),
+              )),
     )
     JsonTestHelper.assertSerializationRoundtripWorks(update1)
   }
@@ -240,7 +240,7 @@ class AppUpdateTest extends MarathonSpec {
     val app = AppDefinition(
         id = PathId("test"),
         cmd = Some("sleep 1"),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(1))
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(1)),
     )
 
     val updateCmd = AppUpdate(cmd = Some("sleep 2"))

@@ -90,7 +90,7 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
         Label(1),
         VarOp(ILOAD, 1),
         Op(IRETURN),
-        Label(2)
+        Label(2),
     )
     m.maxLocals = 2
     m.maxStack = 1
@@ -185,7 +185,7 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
         Op(IADD),
         Op(SWAP),
         VarOp(ISTORE, 1),
-        Op(IRETURN)
+        Op(IRETURN),
     )
     m.maxLocals = 2
     m.maxStack = 4
@@ -221,7 +221,7 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     val m = genMethod(descriptor = "(I)I")(
         Incr(IINC, 1, 1), // producer and consumer of local variable 1
         VarOp(ILOAD, 1),
-        Op(IRETURN)
+        Op(IRETURN),
     )
     m.maxLocals = 2
     m.maxStack = 1
@@ -277,7 +277,7 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
         Jump(GOTO, Label(1)),
         Label(2),
         IntOp(BIPUSH, 9),
-        Op(IRETURN)
+        Op(IRETURN),
     )
     m.maxLocals = 2
     m.maxStack = 2

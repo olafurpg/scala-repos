@@ -20,7 +20,7 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
       .find(BSONDocument())
       .sort(BSONDocument(
               "year" -> -1,
-              "month" -> -1
+              "month" -> -1,
           ))
       .cursor[HistoryMonth]()
       .collect[List]()
@@ -45,7 +45,7 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
         mixedLeaderboard(
             after = new DateTime(year, month, 1, 0, 0).pp(
                   "compute mod history"),
-            before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some
+            before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some,
         ).map {
           _.headOption.map { champ =>
             HistoryMonth(HistoryMonth.makeId(year, month), year, month, champ)
@@ -100,7 +100,7 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
       .aggregate(
           Match(BSONDocument(
                   "date" -> dateRange(after, before),
-                  "mod" -> notLichess
+                  "mod" -> notLichess,
               )),
           List(GroupField("mod")("nb" -> SumValue(1)), Sort(Descending("nb"))))
       .map {
@@ -114,7 +114,7 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
     reportColl
       .aggregate(Match(BSONDocument(
                          "createdAt" -> dateRange(after, before),
-                         "processedBy" -> notLichess
+                         "processedBy" -> notLichess,
                      )),
                  List(GroupField("processedBy")("nb" -> SumValue(1)),
                       Sort(Descending("nb"))))

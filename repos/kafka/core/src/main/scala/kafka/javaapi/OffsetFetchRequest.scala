@@ -45,7 +45,7 @@ class OffsetFetchRequest(groupId: String,
         requestInfo = scalaSeq,
         versionId = versionId,
         correlationId = correlationId,
-        clientId = clientId
+        clientId = clientId,
     )
   }
 

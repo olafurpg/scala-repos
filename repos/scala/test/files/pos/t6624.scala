@@ -1,7 +1,7 @@
 sealed trait KList[+M[_]]
 
 case class KCons[M[_], +T <: KList[M]](
-    tail: T
+    tail: T,
 )
     extends KList[M]
 

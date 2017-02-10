@@ -27,7 +27,7 @@ class UniqueKeyJoinJob(args: Args) extends Job(args) {
             case (key, value) => (key, value)
         },
         inputReducers = Some(1),
-        requireFullySatisfiable = false
+        requireFullySatisfiable = false,
     )
 
   val output = uniqueKeyJoiner
@@ -43,19 +43,19 @@ class UniqueKeyedServiceSpec extends WordSpec {
   val input = List(
       (Timestamp(1001), (1001, 300L)),
       (Timestamp(1003), (1002, 200L)),
-      (Timestamp(1003), (1003, 400L))
+      (Timestamp(1003), (1003, 400L)),
   )
 
   val service = List(
       (1002, "b-1002"),
-      (1001, "a-1001")
+      (1001, "a-1001"),
   )
   val typedSource = service.toMap
 
   val expectedResult = Set(
       (Timestamp(1001), (1001, (300L, Some("a-1001")))),
       (Timestamp(1003), (1002, (200L, Some("b-1002")))),
-      (Timestamp(1003), (1003, (400L, None)))
+      (Timestamp(1003), (1003, (400L, None))),
   )
 
   "A unique key join service" should {

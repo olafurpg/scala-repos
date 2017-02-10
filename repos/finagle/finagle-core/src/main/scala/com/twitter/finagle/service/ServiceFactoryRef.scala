@@ -9,7 +9,7 @@ import com.twitter.util.Updatable
   * @param init The starting factory to proxy to
   */
 private[finagle] class ServiceFactoryRef[Req, Rep](
-    init: ServiceFactory[Req, Rep]
+    init: ServiceFactory[Req, Rep],
 )
     extends ServiceFactoryProxy[Req, Rep](init)
     with Updatable[ServiceFactory[Req, Rep]] {

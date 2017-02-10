@@ -29,7 +29,7 @@ object EvolutionsReaderSpec extends Specification {
               3,
               "insert into test (id, name) values (3, 'charlie');\ninsert into test (id, name) values (4, 'dave');",
               ""),
-          Evolution(4, "", "")
+          Evolution(4, "", ""),
       )
     }
   }

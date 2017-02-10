@@ -52,9 +52,9 @@ object PlatformBuild extends Build {
           "Maven Repo 1" at "http://repo1.maven.org/maven2/",
           "Guiceyfruit" at "http://guiceyfruit.googlecode.com/svn/repo/releases/",
           "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases/",
-          "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+          "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
       ),
-      credentials += Credentials(Path.userHome / ".ivy2" / ".rgcredentials")
+      credentials += Credentials(Path.userHome / ".ivy2" / ".rgcredentials"),
   )
 
   val blueeyesVersion = "1.0.0-M9.5"
@@ -106,20 +106,20 @@ object PlatformBuild extends Build {
           "com.chuusai" %% "shapeless" % "1.2.3",
           "org.spire-math" % "spire_2.9.1" % "0.3.0-RC2",
           "com.rubiconproject.oss" % "jchronic" % "0.2.6",
-          "javax.servlet" % "servlet-api" % "2.4" % "provided"
-      )
+          "javax.servlet" % "servlet-api" % "2.4" % "provided",
+      ),
   )
 
   val jettySettings = Seq(
       libraryDependencies ++= Seq(
           "org.eclipse.jetty" % "jetty-server" % "8.1.3.v20120416",
-          "javax.servlet" % "javax.servlet-api" % "3.0.1"
+          "javax.servlet" % "javax.servlet-api" % "3.0.1",
       ),
       ivyXML := <dependencies>
       <dependency org="org.eclipse.jetty" name="jetty-server" rev="8.1.3.v20120416">
         <exclude org="org.eclipse.jetty.orbit" />
       </dependency>
-    </dependencies>
+    </dependencies>,
   )
 
   val jprofilerSettings = Seq(
@@ -139,7 +139,7 @@ object PlatformBuild extends Build {
         opts ++ Seq(
             "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
             (d, d, conf, id))
-      }
+      },
   )
 
   val commonPluginsSettings =

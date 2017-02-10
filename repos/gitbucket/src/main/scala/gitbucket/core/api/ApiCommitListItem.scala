@@ -23,7 +23,7 @@ object ApiCommitListItem {
                       commit = Commit(
                             message = commit.fullMessage,
                             author = ApiPersonIdent.author(commit),
-                            committer = ApiPersonIdent.committer(commit)
+                            committer = ApiPersonIdent.committer(commit),
                         )(commit.id, repositoryName),
                       author = None,
                       committer = None,

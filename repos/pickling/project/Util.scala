@@ -20,7 +20,7 @@ object Util {
                 "Sonatype Nexus Repository Manager",
                 "oss.sonatype.org",
                 readServerConfig("username"),
-                readServerConfig("password")
+                readServerConfig("password"),
             ))
       } catch {
         case ex: Exception =>

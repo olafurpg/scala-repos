@@ -17,7 +17,7 @@ private[api] final class AnalysisApi {
               "mate" -> info.mate,
               "variation" -> info.variation.isEmpty
                 .fold(JsNull, info.variation mkString " "),
-              "comment" -> adviceOption.map(_.makeComment(false, true))
+              "comment" -> adviceOption.map(_.makeComment(false, true)),
           )
           .noNull
     })

@@ -97,7 +97,7 @@ class Codec[A : Manifest](
     firstStage: Stage,
     encoder: Encoder[A],
     bytesReadCounter: Int => Unit,
-    bytesWrittenCounter: Int => Unit
+    bytesWrittenCounter: Int => Unit,
 )
     extends FrameDecoder with ChannelDownstreamHandler {
   def this(firstStage: Stage, encoder: Encoder[A]) =

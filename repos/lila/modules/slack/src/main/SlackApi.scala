@@ -18,7 +18,7 @@ final class SlackApi(
             icon = "heart_eyes",
             text = s"$username donated ${amount(event.gross)} (${amount(
             event.net)})! Weekly progress: ${event.progress}%",
-            channel = "general"
+            channel = "general",
         )) >> event.message.?? { msg =>
       client(
           SlackMessage(username = username,

@@ -14,7 +14,7 @@ object LargeJsonTest extends TestSuite {
       val Parsed.Success(value, _) = jsonExpr.parse(
           io.Source
             .fromInputStream(getClass.getResourceAsStream("/test.json"))
-            .mkString
+            .mkString,
         )
       assert(value(200)("friends")(1)("name").value == "Susan White")
     }

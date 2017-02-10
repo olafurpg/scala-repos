@@ -23,7 +23,7 @@ import org.apache.spark.rdd.RDD
   */
 class BiMap[K, V] private[prediction](
     private val m: Map[K, V],
-    private val i: Option[BiMap[V, K]] = None
+    private val i: Option[BiMap[V, K]] = None,
 )
     extends Serializable {
 

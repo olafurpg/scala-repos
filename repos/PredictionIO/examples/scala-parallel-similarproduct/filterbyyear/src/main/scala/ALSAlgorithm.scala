@@ -20,7 +20,7 @@ case class ALSAlgorithmParams(
 class ALSModel(
     val productFeatures: Map[Int, Array[Double]],
     val itemStringIntMap: BiMap[String, Int],
-    val items: Map[Int, Item]
+    val items: Map[Int, Item],
 )
     extends Serializable {
 
@@ -110,7 +110,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     new ALSModel(
         productFeatures = m.productFeatures.collectAsMap.toMap,
         itemStringIntMap = itemStringIntMap,
-        items = items
+        items = items,
     )
   }
 
@@ -160,7 +160,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             queryList = queryList,
             whiteList = whiteList,
             blackList = blackList,
-            recommendFromYear = query.recommendFromYear
+            recommendFromYear = query.recommendFromYear,
         )
     }
 
@@ -171,7 +171,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         new ItemScore(
             item = model.itemIntStringMap(i),
             score = s,
-            year = model.items(i).year
+            year = model.items(i).year,
         )
     }
 
@@ -220,7 +220,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       queryList: Set[Int],
       whiteList: Option[Set[Int]],
       blackList: Option[Set[Int]],
-      recommendFromYear: Option[Int]
+      recommendFromYear: Option[Int],
   ): Boolean = {
     whiteList.map(_.contains(i)).getOrElse(true) &&
     blackList.map(!_.contains(i)).getOrElse(true) &&

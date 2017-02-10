@@ -194,7 +194,7 @@ class CountVectorizerSuite
                split("a a a b b c"),
                Vectors.sparse(4, Seq((0, 1.0), (1, 1.0), (2, 1.0)))),
               (1, split("c c c"), Vectors.sparse(4, Seq((2, 1.0)))),
-              (2, split("a"), Vectors.sparse(4, Seq((0, 1.0))))
+              (2, split("a"), Vectors.sparse(4, Seq((0, 1.0)))),
           ))
       .toDF("id", "words", "expected")
 

@@ -98,7 +98,7 @@ class ContinuousQueryListenerSuite
                       CompositeOffset.fill(LongOffset(0))))
             }
             listener.checkAsyncErrors()
-          }
+          },
       )
     }
   }
@@ -108,7 +108,7 @@ class ContinuousQueryListenerSuite
       listener.reset()
       testStream(MemoryStream[Int].toDS)(
           StartStream,
-          StopStream
+          StopStream,
       )
       listener.startStatus != null
     }
@@ -142,7 +142,7 @@ class ContinuousQueryListenerSuite
             Assert(listener.startStatus !== null,
                    "onQueryStarted not called before query returned"),
             StopStream,
-            Assert { listener.checkAsyncErrors() }
+            Assert { listener.checkAsyncErrors() },
         )
       }
     }

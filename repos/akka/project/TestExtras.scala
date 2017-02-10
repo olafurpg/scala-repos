@@ -28,7 +28,7 @@ object TestExtras {
         testOptions +=
           Tests.Argument(TestFrameworks.ScalaTest,
                          "-u",
-                         (target.value / "test-reports").getAbsolutePath)
+                         (target.value / "test-reports").getAbsolutePath),
     )
   }
 
@@ -73,7 +73,7 @@ object TestExtras {
           testOptions in Test <++= onlyTestTags map { tags =>
             if (tags.isEmpty) Seq.empty
             else Seq(Tests.Argument("-n", tags.mkString(" ")))
-          }
+          },
       )
     }
 

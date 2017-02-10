@@ -85,7 +85,7 @@ class BucketGenerationalQueue[A](timeout: Duration)
           origin.inMilliseconds,
           span.inMilliseconds,
           age().toString,
-          super.size
+          super.size,
       )
   }
 

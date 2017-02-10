@@ -35,7 +35,7 @@ class ConditionalExpressionSuite
         (true, null, 2, null),
         (false, 1, null, null),
         (null, null, 2, 2),
-        (null, 1, null, null)
+        (null, 1, null, null),
     )
 
     // dataType must match T.

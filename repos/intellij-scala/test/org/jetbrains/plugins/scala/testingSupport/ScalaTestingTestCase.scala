@@ -175,7 +175,7 @@ abstract class ScalaTestingTestCase(
           case Some(myPackage) => myPackage.getDirectories().head
           case _ =>
             throw new RuntimeException(failedConfigMessage(packageName))
-        }
+        },
     )
 
   override protected def createTestFromModule(

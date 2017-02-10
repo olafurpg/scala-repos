@@ -70,7 +70,7 @@ private[reconcile] class OfferMatcherReconciler(
             val unreserveAndDestroy = TaskOp.UnreserveAndDestroyVolumes(
                 taskId = taskId,
                 oldTask = tasksByApp.task(taskId),
-                resources = spuriousResources.to[Seq]
+                resources = spuriousResources.to[Seq],
             )
             TaskOpWithSource(source(offer.getId), unreserveAndDestroy)
         }.to[Seq]

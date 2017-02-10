@@ -187,7 +187,7 @@ class PipelineSuite
           Seq((1, Vectors.dense(0.0, 1.0, 4.0), 1.0),
               (2, Vectors.dense(1.0, 0.0, 4.0), 2.0),
               (3, Vectors.dense(1.0, 0.0, 5.0), 3.0),
-              (4, Vectors.dense(0.0, 0.0, 5.0), 4.0))
+              (4, Vectors.dense(0.0, 0.0, 5.0), 4.0)),
       )
       .toDF("id", "features", "label")
 

@@ -275,7 +275,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
         { statement =>
           val queries = Seq(
               s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}=291",
-              "SET hive.cli.print.header=true"
+              "SET hive.cli.print.header=true",
           )
 
           queries.map(statement.execute)
@@ -390,7 +390,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
           val sf = Future {
             statement.executeQuery(
                 "SELECT COUNT(*) FROM test_map " +
-                List.fill(4)("join test_map").mkString(" ")
+                List.fill(4)("join test_map").mkString(" "),
             )
           }
           // Similarly, this is also slightly race-prone on fast machines where the query above
@@ -494,7 +494,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
           s"ADD JAR $jarURL",
           s"""CREATE TEMPORARY FUNCTION udtf_count2
            |AS 'org.apache.spark.sql.hive.execution.GenericUDTFCount2'
-         """.stripMargin
+         """.stripMargin,
       ).foreach(statement.execute)
 
       val rs1 = statement.executeQuery("DESCRIBE FUNCTION udtf_count2")
@@ -515,7 +515,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
 
       Seq(
           s"CREATE TABLE test_udtf(key INT, value STRING)",
-          s"LOAD DATA LOCAL INPATH '$dataPath' OVERWRITE INTO TABLE test_udtf"
+          s"LOAD DATA LOCAL INPATH '$dataPath' OVERWRITE INTO TABLE test_udtf",
       ).foreach(statement.execute)
 
       val rs2 = statement.executeQuery(
@@ -558,7 +558,7 @@ class SingleSessionSuite extends HiveThriftJdbcTest {
           s"ADD JAR $jarURL",
           s"""CREATE TEMPORARY FUNCTION udtf_count2
               |AS 'org.apache.spark.sql.hive.execution.GenericUDTFCount2'
-           """.stripMargin
+           """.stripMargin,
       ).foreach(statement.execute)
     }, { statement =>
       val rs1 = statement.executeQuery("SET foo")

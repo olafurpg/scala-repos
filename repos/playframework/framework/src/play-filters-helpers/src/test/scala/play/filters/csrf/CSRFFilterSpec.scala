@@ -81,7 +81,7 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
     // other
     "feed the body once a check has been done and passes" in {
       withServer(Seq(
-              "play.http.filters" -> classOf[CsrfFilters].getName
+              "play.http.filters" -> classOf[CsrfFilters].getName,
           )) {
         case _ =>
           Action(_.body.asFormUrlEncoded
@@ -103,7 +103,7 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       .configure(
           "play.crypto.secret" -> "foobar",
           "play.filters.csrf.body.bufferSize" -> "200",
-          "play.http.filters" -> classOf[CsrfFilters].getName
+          "play.http.filters" -> classOf[CsrfFilters].getName,
       )
       .routes {
         case _ =>
@@ -135,8 +135,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
                     "buffered" -> "buffer",
                     // This value must go over the edge of csrf.body.bufferSize
                     "longvalue" -> Random.alphanumeric.take(1024).mkString(""),
-                    "foo" -> "bar"
-                ).map(f => f._1 + "=" + f._2).mkString("&")
+                    "foo" -> "bar",
+                ).map(f => f._1 + "=" + f._2).mkString("&"),
             ))
       response.status must_== OK
       response.body must_== "bar buffer"
@@ -170,7 +170,7 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
         environment,
         None,
         new DefaultWebCommands,
-        Configuration.load(environment)
+        Configuration.load(environment),
     )
     def loader = new GuiceApplicationLoader
     "allow injecting CSRF filters" in {
@@ -208,7 +208,7 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
           Seq(
               "play.http.filters" -> classOf[CsrfFilters].getName,
               "play.filters.csrf.cookie.name" -> "csrf",
-              "play.filters.csrf.errorHandler" -> "play.filters.csrf.JavaErrorHandler"
+              "play.filters.csrf.errorHandler" -> "play.filters.csrf.JavaErrorHandler",
           )) {
         case _ => Action(Results.Ok)
       } {
@@ -224,7 +224,7 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
         handleResponse: (WSResponse) => T) =
       withServer(
           configuration ++ Seq(
-              "play.http.filters" -> classOf[CsrfFilters].getName)
+              "play.http.filters" -> classOf[CsrfFilters].getName),
       ) {
         case _ =>
           Action { implicit req =>
@@ -244,7 +244,7 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       def apply[T](makeRequest: (WSRequest) => Future[WSResponse])(
           handleResponse: (WSResponse) => T) =
         withServer(
-            Seq("play.http.filters" -> classOf[CsrfFilters].getName)
+            Seq("play.http.filters" -> classOf[CsrfFilters].getName),
         ) {
           case _ => Action(Results.Ok.withHeaders(responseHeaders: _*))
         } {

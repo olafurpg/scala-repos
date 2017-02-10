@@ -42,10 +42,10 @@ class BlockStatusListenerSuite extends SparkFunSuite {
         "localhost:10000",
         StorageLevel.MEMORY_AND_DISK,
         memSize = 100,
-        diskSize = 100
+        diskSize = 100,
     )
     val expectedExecutorStreamBlockStatus = Seq(
-        ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock))
+        ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock)),
     )
     assert(
         listener.allExecutorStreamBlockStatus === expectedExecutorStreamBlockStatus)
@@ -67,12 +67,12 @@ class BlockStatusListenerSuite extends SparkFunSuite {
         "localhost:10001",
         StorageLevel.MEMORY_AND_DISK,
         memSize = 100,
-        diskSize = 100
+        diskSize = 100,
     )
     // Each block manager should contain one block
     val expectedExecutorStreamBlockStatus2 = Set(
         ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock)),
-        ExecutorStreamBlockStatus("1", "localhost:10001", Seq(expectedBlock2))
+        ExecutorStreamBlockStatus("1", "localhost:10001", Seq(expectedBlock2)),
     )
     assert(
         listener.allExecutorStreamBlockStatus.toSet === expectedExecutorStreamBlockStatus2)
@@ -88,7 +88,7 @@ class BlockStatusListenerSuite extends SparkFunSuite {
     // Only the first block manager contains a block
     val expectedExecutorStreamBlockStatus3 = Set(
         ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock)),
-        ExecutorStreamBlockStatus("1", "localhost:10001", Seq.empty)
+        ExecutorStreamBlockStatus("1", "localhost:10001", Seq.empty),
     )
     assert(
         listener.allExecutorStreamBlockStatus.toSet === expectedExecutorStreamBlockStatus3)
@@ -106,7 +106,7 @@ class BlockStatusListenerSuite extends SparkFunSuite {
                              diskSize = 100)))
     // The second block manager is removed so we should not see the new block
     val expectedExecutorStreamBlockStatus4 = Seq(
-        ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock))
+        ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock)),
     )
     assert(
         listener.allExecutorStreamBlockStatus === expectedExecutorStreamBlockStatus4)

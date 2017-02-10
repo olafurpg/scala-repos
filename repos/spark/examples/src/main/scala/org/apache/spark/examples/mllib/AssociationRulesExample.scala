@@ -35,7 +35,7 @@ object AssociationRulesExample {
         Seq(
             new FreqItemset(Array("a"), 15L),
             new FreqItemset(Array("b"), 35L),
-            new FreqItemset(Array("a", "b"), 12L)
+            new FreqItemset(Array("a", "b"), 12L),
         ))
 
     val ar = new AssociationRules().setMinConfidence(0.8)

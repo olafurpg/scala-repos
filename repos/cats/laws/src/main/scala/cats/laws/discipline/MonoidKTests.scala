@@ -16,7 +16,7 @@ trait MonoidKTests[F[_]] extends SemigroupKTests[F] {
       val parents = Seq(semigroupK[A])
       val props = Seq(
           "monoidK left identity" -> forAll(laws.monoidKLeftIdentity[A] _),
-          "monoidK right identity" -> forAll(laws.monoidKRightIdentity[A] _)
+          "monoidK right identity" -> forAll(laws.monoidKRightIdentity[A] _),
       )
     }
   }

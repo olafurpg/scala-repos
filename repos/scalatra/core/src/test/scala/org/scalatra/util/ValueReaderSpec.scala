@@ -21,7 +21,7 @@ class ValueReaderSpec extends Specification with DefaultImplicitConversions {
       "stringlist" -> Seq("hello", "world"),
       "intlist" -> Seq("1", "2"),
       "longlist" -> Seq("1239485775745309200", "1239485775745309299"),
-      "booleanlist" -> Seq("false", "true")
+      "booleanlist" -> Seq("false", "true"),
   )
   "A StringMapValueReader" should {
     "read a string value" in {

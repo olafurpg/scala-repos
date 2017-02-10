@@ -47,21 +47,21 @@ private[process] trait ProcessImpl { self: Process.type =>
   private[process] class AndProcess(
       a: ProcessBuilder,
       b: ProcessBuilder,
-      io: ProcessIO
+      io: ProcessIO,
   )
       extends SequentialProcess(a, b, io, _ == 0)
 
   private[process] class OrProcess(
       a: ProcessBuilder,
       b: ProcessBuilder,
-      io: ProcessIO
+      io: ProcessIO,
   )
       extends SequentialProcess(a, b, io, _ != 0)
 
   private[process] class ProcessSequence(
       a: ProcessBuilder,
       b: ProcessBuilder,
-      io: ProcessIO
+      io: ProcessIO,
   )
       extends SequentialProcess(a, b, io, _ => true)
 
@@ -69,7 +69,7 @@ private[process] trait ProcessImpl { self: Process.type =>
       a: ProcessBuilder,
       b: ProcessBuilder,
       io: ProcessIO,
-      evaluateSecondProcess: Int => Boolean
+      evaluateSecondProcess: Int => Boolean,
   )
       extends CompoundProcess {
 
@@ -104,7 +104,7 @@ private[process] trait ProcessImpl { self: Process.type =>
       (
           thread,
           Future { thread.join(); code.get },
-          () => thread.interrupt()
+          () => thread.interrupt(),
       )
     }
 

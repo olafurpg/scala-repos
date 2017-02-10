@@ -20,7 +20,7 @@ class CryptoConfigParserSpec extends Specification {
             Environment.simple(mode = mode),
             Configuration.reference ++ Configuration.from(
                 secret.map("play.crypto.secret" -> _).toMap +
-                ("play.crypto.aes.transformation" -> "AES")
+                ("play.crypto.aes.transformation" -> "AES"),
             )).get.secret
       }
 

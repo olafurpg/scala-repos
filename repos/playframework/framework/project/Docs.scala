@@ -74,7 +74,7 @@ object Docs {
           }
 
           docMappings ++ apiDocMappings ++ webjarMappings ++ referenceConfMappings
-      }
+      },
   )
 
   def playdocSettings: Seq[Setting[_]] = Playdoc.projectSettings ++ Seq(
@@ -101,7 +101,7 @@ object Docs {
         }
 
         docMappings ++ webjarMappings ++ referenceConfs
-      }
+      },
   )
 
   def apiDocsTask = Def.task {
@@ -173,7 +173,7 @@ object Docs {
           "1000",
           "-Xdoclint:none", // We would like to relax this, but for now too much stuff breaks.
           "-exclude",
-          "play.api:play.core"
+          "play.api:play.core",
       )
 
       val javadoc = {

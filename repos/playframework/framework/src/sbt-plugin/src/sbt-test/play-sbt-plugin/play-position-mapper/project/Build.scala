@@ -63,6 +63,6 @@ object ApplicationBuild extends Build {
         },
         scalaVersion := sys.props.get("scala.version").getOrElse("2.11.7"),
         checkLogContainsTask,
-        compileIgnoreErrorsTask
+        compileIgnoreErrorsTask,
     )
 }

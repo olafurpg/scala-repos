@@ -130,16 +130,16 @@ object HttpConfiguration {
                   .toInt,
               maxDiskBuffer = config
                   .get[ConfigMemorySize]("play.http.parser.maxDiskBuffer")
-                  .toBytes
+                  .toBytes,
             ),
         actionComposition = ActionCompositionConfiguration(
               controllerAnnotationsFirst = config.get[Boolean](
                     "play.http.actionComposition.controllerAnnotationsFirst"),
               executeActionCreatorActionFirst = config.get[Boolean](
-                    "play.http.actionComposition.executeActionCreatorActionFirst")
+                    "play.http.actionComposition.executeActionCreatorActionFirst"),
           ),
         cookies = CookiesConfiguration(
-              strict = config.get[Boolean]("play.http.cookies.strict")
+              strict = config.get[Boolean]("play.http.cookies.strict"),
           ),
         session = SessionConfiguration(
               cookieName = config.getDeprecated[String](
@@ -151,14 +151,14 @@ object HttpConfiguration {
               httpOnly = config.getDeprecated[Boolean](
                     "play.http.session.httpOnly", "session.httpOnly"),
               domain = config.getDeprecated[Option[String]](
-                    "play.http.session.domain", "session.domain")
+                    "play.http.session.domain", "session.domain"),
           ),
         flash = FlashConfiguration(
               cookieName = config.getDeprecated[String](
                     "play.http.flash.cookieName", "flash.cookieName"),
               secure = config.get[Boolean]("play.http.flash.secure"),
-              httpOnly = config.get[Boolean]("play.http.flash.httpOnly")
-          )
+              httpOnly = config.get[Boolean]("play.http.flash.httpOnly"),
+          ),
     )
   }
 

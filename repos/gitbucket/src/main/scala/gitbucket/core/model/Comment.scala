@@ -45,7 +45,7 @@ case class IssueComment(
     commentedUserName: String,
     content: String,
     registeredDate: java.util.Date,
-    updatedDate: java.util.Date
+    updatedDate: java.util.Date,
 )
     extends Comment
 
@@ -98,6 +98,6 @@ case class CommitComment(
     newLine: Option[Int],
     registeredDate: java.util.Date,
     updatedDate: java.util.Date,
-    issueId: Option[Int]
+    issueId: Option[Int],
 )
     extends Comment

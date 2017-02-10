@@ -53,7 +53,7 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
           "username" -> light.map(_.name),
           "title" -> light.map(_.title),
           "rating" -> player.rating,
-          "provisional" -> player.provisional.filter(identity)
+          "provisional" -> player.provisional.filter(identity),
       )
       .noNull
   }
@@ -74,7 +74,7 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
         "hostColor" -> p.hostColor,
         "winnerColor" -> p.winnerColor,
         "wins" -> p.wins, // can't be normalized because BC
-        "game" -> games.find(_.id == p.gameId).map(gameJson(hostId))
+        "game" -> games.find(_.id == p.gameId).map(gameJson(hostId)),
     )
 
   private implicit val colorWriter: Writes[chess.Color] = Writes { c =>

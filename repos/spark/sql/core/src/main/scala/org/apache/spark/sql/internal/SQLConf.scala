@@ -518,7 +518,7 @@ object SQLConf {
       "spark.sql.pivotMaxValues",
       defaultValue = Some(10000),
       doc = "When doing a pivot without specifying values for the pivot column this is the maximum " +
-        "number of (distinct) values that will be collected without error."
+        "number of (distinct) values that will be collected without error.",
   )
 
   val RUN_SQL_ON_FILES = booleanConf(

@@ -110,7 +110,7 @@ class ArgumentCaptureTest
     assert(
         captured == Seq(
             ("foo", "bar", "baz"),
-            ("spam", "ham", "eggs")
+            ("spam", "ham", "eggs"),
         ))
   }
 
@@ -127,7 +127,7 @@ class ArgumentCaptureTest
     assert(
         captured == Seq(
             ("foo", "bar", "baz", "spam"),
-            ("north", "east", "south", "west")
+            ("north", "east", "south", "west"),
         ))
   }
 
@@ -144,7 +144,7 @@ class ArgumentCaptureTest
     assert(
         captured == Seq(
             ("foo", "bar", "baz", "spam", "ham"),
-            ("doh", "ray", "mi", "fa", "so")
+            ("doh", "ray", "mi", "fa", "so"),
         ))
   }
 }

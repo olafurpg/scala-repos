@@ -516,7 +516,7 @@ private[spark] class Client(val args: ClientArguments,
       */
     List(
         (APP_JAR_NAME, args.userJar, APP_JAR),
-        ("log4j.properties", oldLog4jConf.orNull, null)
+        ("log4j.properties", oldLog4jConf.orNull, null),
     ).foreach {
       case (destName, path, confKey) =>
         if (path != null && !path.trim().isEmpty()) {
@@ -542,7 +542,7 @@ private[spark] class Client(val args: ClientArguments,
     List(
         (args.addJars, LocalResourceType.FILE, true),
         (args.files, LocalResourceType.FILE, false),
-        (args.archives, LocalResourceType.ARCHIVE, false)
+        (args.archives, LocalResourceType.ARCHIVE, false),
     ).foreach {
       case (flist, resType, addToClasspath) =>
         if (flist != null && !flist.isEmpty()) {
@@ -840,7 +840,7 @@ private[spark] class Client(val args: ClientArguments,
 
     val tmpDir = new Path(
         YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
-        YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR
+        YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR,
     )
     javaOpts += "-Djava.io.tmpdir=" + tmpDir
 
@@ -971,7 +971,7 @@ private[spark] class Client(val args: ClientArguments,
       prefixEnv ++ Seq(
           YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
           "/bin/java",
-          "-server"
+          "-server",
       ) ++ javaOpts ++ amArgs ++ Seq(
           "1>",
           ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout",
@@ -1114,7 +1114,7 @@ private[spark] class Client(val args: ClientArguments,
         ("start time", report.getStartTime.toString),
         ("final status", report.getFinalApplicationStatus.toString),
         ("tracking URL", report.getTrackingUrl),
-        ("user", report.getUser)
+        ("user", report.getUser),
     )
 
     // Use more loggable format if value is null or empty

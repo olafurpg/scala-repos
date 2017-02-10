@@ -67,7 +67,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
       () =>
         { in: String =>
           in.startsWith("exclude-me")
-      }
+      },
   )
 
   "LiftMerge when doing the final page merge" should {
@@ -92,7 +92,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               </div>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \ "head" \ "_") must_==
@@ -100,7 +100,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <script src="testscript"></script>,
               <script src="testscript2"></script>,
               <link href="testlink" />,
-              <link href="testlink2" />
+              <link href="testlink2" />,
           ): NodeSeq)
     }
 
@@ -128,14 +128,14 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \ "body" \ "_").takeRight(3) must_==
       (Seq(
               <script src="testscript2"></script>,
               <link href="testlink" />,
-              <link href="testlink2" />
+              <link href="testlink2" />,
           ): NodeSeq)
     }
 
@@ -164,14 +164,14 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \ "body" \ "_").takeRight(3) must_==
       (Seq(
               <script src="testscript2"></script>,
               <link href="testlink" />,
-              <link href="testlink2" />
+              <link href="testlink2" />,
           ): NodeSeq)
     }
 
@@ -200,7 +200,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \\ "link").map(_ \@ "href") must_==
@@ -232,7 +232,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \\ "script").map(_ \@ "src") must_==
@@ -264,7 +264,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \\ "a").map(_ \@ "href") must_==
@@ -296,7 +296,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
               <p>More thingies</p>
             </body>
           </html>,
-          mockReq
+          mockReq,
       )
 
       (result \\ "form").map(_ \@ "action") must_==
@@ -327,7 +327,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
                 <p>More thingies</p>
               </body>
             </html>,
-            mockReq
+            mockReq,
         )
       }
 
@@ -359,7 +359,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
                 <p>More thingies</p>
               </body>
             </html>,
-            mockReq
+            mockReq,
         )
       }
 
@@ -390,7 +390,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
                 <p>More thingies</p>
               </body>
             </html>,
-            mockReq
+            mockReq,
         )
       }
 
@@ -422,7 +422,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
                 <p>More thingies</p>
               </body>
             </html>,
-            mockReq
+            mockReq,
         )
       }
 

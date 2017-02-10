@@ -104,7 +104,7 @@ object Pos extends SFXEnumDelegateCompanion[jfxg.Pos, Pos] {
       BottomRight,
       BaselineLeft,
       BaselineCenter,
-      BaselineRight
+      BaselineRight,
   )
 }
 

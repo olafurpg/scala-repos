@@ -38,7 +38,7 @@ private[annotator] object ModifierChecker {
           ("final", "sealed"),
           if (withPrivate) ("final", "private") else ("", ""),
           ("private", "protected"),
-          if (withPrivate) ("private", "override") else ("", "")
+          if (withPrivate) ("private", "override") else ("", ""),
       )
       for ((bad1, bad2) <- illegalCombinations if
                           (bad1 == text &&

@@ -51,7 +51,7 @@ object LEventAggregator {
         PropertyMap(
             fields = v.dm.get.fields,
             firstUpdated = v.firstUpdated.get,
-            lastUpdated = v.lastUpdated.get
+            lastUpdated = v.lastUpdated.get,
         )
       }
   }
@@ -78,7 +78,7 @@ object LEventAggregator {
       PropertyMap(
           fields = d.fields,
           firstUpdated = prop.firstUpdated.get,
-          lastUpdated = prop.lastUpdated.get
+          lastUpdated = prop.lastUpdated.get,
       )
     }
   }
@@ -121,7 +121,7 @@ object LEventAggregator {
                 }.orElse(Some(e.eventTime)),
                 lastUpdated = p.lastUpdated.map { t =>
                   last(t, e.eventTime)
-                }.orElse(Some(e.eventTime))
+                }.orElse(Some(e.eventTime)),
             )
           }
         case _ => p // do nothing for others
@@ -138,6 +138,6 @@ object LEventAggregator {
   private case class Prop(
       dm: Option[DataMap] = None,
       firstUpdated: Option[DateTime] = None,
-      lastUpdated: Option[DateTime] = None
+      lastUpdated: Option[DateTime] = None,
   )
 }

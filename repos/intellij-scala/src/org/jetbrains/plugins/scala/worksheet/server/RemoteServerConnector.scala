@@ -73,7 +73,7 @@ class RemoteServerConnector(
                     "scala",
                     "Cannot run worksheet",
                     s"<html><body>${message.replace("\n", "<br>")}</body></html>",
-                    NotificationType.ERROR
+                    NotificationType.ERROR,
                 )
               }
           }
@@ -180,7 +180,7 @@ object RemoteServerConnector {
                                   worksheet,
                                   line1 getOrElse -1,
                                   column1 getOrElse -1,
-                                  null)
+                                  null),
       )
     }
 

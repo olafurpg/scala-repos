@@ -35,7 +35,7 @@ class EmptyLabelsAndLineNumbersTest {
         Op(RETURN),
         Label(9),
         LineNumber(8, Label(9)).dead,
-        Label(10)
+        Label(10),
     )
 
     val method = genMethod()(ops.map(_._1): _*)
@@ -92,7 +92,7 @@ class EmptyLabelsAndLineNumbersTest {
         Label(10),
         LineNumber(10, Label(10)),
         Label(11).dead,
-        LineNumber(12, Label(target6))
+        LineNumber(12, Label(target6)),
     )
 
     val method =

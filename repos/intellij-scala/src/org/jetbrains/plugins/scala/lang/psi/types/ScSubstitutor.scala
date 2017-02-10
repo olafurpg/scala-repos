@@ -104,7 +104,7 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
           placer match {
             case t: ScTemplateDefinition =>
               zSubst = zSubst.followed(
-                  new ScSubstitutor(Map.empty, Map.empty, Some(ScThisType(t)))
+                  new ScSubstitutor(Map.empty, Map.empty, Some(ScThisType(t))),
               )
             case _ =>
           }

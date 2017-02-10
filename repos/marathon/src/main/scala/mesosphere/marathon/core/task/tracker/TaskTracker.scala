@@ -113,7 +113,7 @@ object TaskTracker {
           .map {
             case (appId, appTasks) =>
               appId -> AppTasks.forTasks(appId, appTasks)
-          }
+          },
       )
 
     def empty: TasksByApp =

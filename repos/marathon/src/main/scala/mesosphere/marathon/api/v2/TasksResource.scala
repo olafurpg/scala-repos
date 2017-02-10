@@ -77,12 +77,12 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
             appId,
             task,
             health.getOrElse(task.taskId, Nil),
-            appToPorts.getOrElse(appId, Nil)
+            appToPorts.getOrElse(appId, Nil),
         )
       }
 
       ok(jsonObjString(
-              "tasks" -> enrichedTasks
+              "tasks" -> enrichedTasks,
           ))
     }
 
@@ -96,7 +96,7 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
               taskTracker,
               result(groupManager.rootGroup()).transitiveApps.toSeq
                 .filter(app => isAuthorized(ViewApp, app)),
-              "\t"
+              "\t",
           ))
     }
 

@@ -635,7 +635,7 @@ private[spark] object SparkConf extends Logging {
             "Please use spark.kryoserializer.buffer instead. The default value for " +
             "spark.kryoserializer.buffer.mb was previously specified as '0.064'. Fractional values " +
             "are no longer accepted. To specify the equivalent now, one may use '64k'."),
-        DeprecatedConfig("spark.rpc", "2.0", "Not used any more.")
+        DeprecatedConfig("spark.rpc", "2.0", "Not used any more."),
     )
 
     Map(
@@ -699,7 +699,7 @@ private[spark] object SparkConf extends Logging {
           AlternateConfig("spark.unsafe.offHeap", "1.6")),
       "spark.rpc.message.maxSize" -> Seq(
           AlternateConfig("spark.akka.frameSize", "1.6")),
-      "spark.yarn.jars" -> Seq(AlternateConfig("spark.yarn.jar", "2.0"))
+      "spark.yarn.jars" -> Seq(AlternateConfig("spark.yarn.jar", "2.0")),
   )
 
   /**

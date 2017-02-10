@@ -91,7 +91,7 @@ class EnsembleImageProperties extends EnsembleExample {
             spacing = 5
             children = List(sample1, sample3, sample4, sample5)
           },
-          sample2
+          sample2,
       )
     }
   }

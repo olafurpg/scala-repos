@@ -39,7 +39,7 @@ private[kinesis] class KinesisInputDStream[T : ClassTag](
     checkpointInterval: Duration,
     storageLevel: StorageLevel,
     messageHandler: Record => T,
-    awsCredentialsOption: Option[SerializableAWSCredentials]
+    awsCredentialsOption: Option[SerializableAWSCredentials],
 )
     extends ReceiverInputDStream[T](_ssc) {
 

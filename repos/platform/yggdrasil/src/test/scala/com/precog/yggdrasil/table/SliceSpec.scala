@@ -141,7 +141,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
       ColumnRef(CPath("4"), CNum),
       ColumnRef(CPath("5"), CEmptyObject),
       ColumnRef(CPath("6"), CEmptyArray),
-      ColumnRef(CPath("7"), CNum)
+      ColumnRef(CPath("7"), CNum),
   )
 
   "concat" should {

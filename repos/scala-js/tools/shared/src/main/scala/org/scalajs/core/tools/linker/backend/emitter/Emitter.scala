@@ -188,7 +188,7 @@ final class Emitter private (semantics: Semantics,
       addTree(
           classTreeCache.instanceTests.getOrElseUpdate(js.Block(
                   classEmitter.genInstanceTests(linkedClass),
-                  classEmitter.genArrayInstanceTests(linkedClass)
+                  classEmitter.genArrayInstanceTests(linkedClass),
               )(linkedClass.pos)))
     }
 
@@ -359,7 +359,7 @@ private[scalajs] object Emitter {
         cond(semantics.strictFloats && esLevel == ESLevel.ES5) {
           callOnModule("sjsr_package$", "froundPolyfill__D__D")
         },
-        callOnModule("sjsr_Bits$", "numberHashCode__D__I")
+        callOnModule("sjsr_Bits$", "numberHashCode__D__I"),
     )
   }
 }

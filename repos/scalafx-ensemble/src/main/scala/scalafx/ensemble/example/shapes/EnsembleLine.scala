@@ -56,7 +56,7 @@ class EnsembleLine extends EnsembleExample {
           fill = Color.White
           stroke = Color.Orange
           strokeWidth = 10d
-        }
+        },
     )
   }
 }

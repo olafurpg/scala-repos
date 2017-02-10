@@ -18,7 +18,7 @@ object CokleisliTest extends SpecLite {
             arb((_, n, _) => n),
             arb((a, b, c) => a getOrElse b),
             arb((a, b, c) => a.map(_ + b) getOrElse c),
-            arb((a, b, c) => a.map(_ - b) getOrElse c)
+            arb((a, b, c) => a.map(_ - b) getOrElse c),
         ))
   }
 
@@ -35,7 +35,7 @@ object CokleisliTest extends SpecLite {
             arb((_, n) => _ + n),
             arb((_, n) => _ - n),
             arb((a, b) => a.map(_ + b) getOrElse _),
-            arb((a, b) => a.map(_ - b) getOrElse _)
+            arb((a, b) => a.map(_ - b) getOrElse _),
         ))
   }
 

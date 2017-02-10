@@ -96,7 +96,7 @@ object Source {
         inputStream,
         bufferSize,
         () => fromFile(file, bufferSize)(codec),
-        () => inputStream.close()
+        () => inputStream.close(),
     )(codec) withDescription ("file:" + file.getAbsolutePath)
   }
 
@@ -156,7 +156,7 @@ object Source {
       inputStream: InputStream,
       bufferSize: Int = DefaultBufSize,
       reset: () => Source = null,
-      close: () => Unit = null
+      close: () => Unit = null,
   )(implicit codec: Codec): BufferedSource = {
     // workaround for default arguments being unable to refer to other parameters
     val resetFn =

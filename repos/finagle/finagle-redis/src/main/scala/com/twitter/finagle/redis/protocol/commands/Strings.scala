@@ -317,7 +317,7 @@ case class Set(key: ChannelBuffer,
               Seq(Set.PxBytes, StringToChannelBuffer(millis.toString))
             case _ => Seq()
           }) ++ (if (nx) Seq(Set.NxBytes) else Seq()) ++
-      (if (xx) Seq(Set.XxBytes) else Seq())
+      (if (xx) Seq(Set.XxBytes) else Seq()),
   )
 }
 object Set {
@@ -409,7 +409,7 @@ case class SetEx(key: ChannelBuffer, seconds: Long, value: ChannelBuffer)
             CommandBytes.SETEX,
             key,
             StringToChannelBuffer(seconds.toString),
-            value
+            value,
         ))
 }
 object SetEx {
@@ -421,7 +421,7 @@ object SetEx {
     new SetEx(
         ChannelBuffers.wrappedBuffer(args(0)),
         seconds,
-        ChannelBuffers.wrappedBuffer(list(2))
+        ChannelBuffers.wrappedBuffer(list(2)),
     )
   }
 }
@@ -450,7 +450,7 @@ case class SetRange(key: ChannelBuffer, offset: Int, value: ChannelBuffer)
             CommandBytes.SETRANGE,
             key,
             StringToChannelBuffer(offset.toString),
-            value
+            value,
         ))
 }
 object SetRange {
@@ -463,7 +463,7 @@ object SetRange {
     new SetRange(
         ChannelBuffers.wrappedBuffer(list(0)),
         offset,
-        ChannelBuffers.wrappedBuffer(value)
+        ChannelBuffers.wrappedBuffer(value),
     )
   }
 }

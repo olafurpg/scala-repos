@@ -23,8 +23,8 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
           "variant" -> list(variantWithVariants),
           "mode" -> list(rawMode(withRated = true)),
           "speed" -> list(speed),
-          "ratingRange" -> ratingRange
-      )(FilterConfig.<<)(_.>>)
+          "ratingRange" -> ratingRange,
+      )(FilterConfig.<<)(_.>>),
   )
 
   def filterConfig(implicit ctx: UserContext): Fu[FilterConfig] =
@@ -47,8 +47,8 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
           "days" -> days,
           "level" -> level,
           "color" -> color,
-          "fen" -> fen
-      )(AiConfig.<<)(_.>>).verifying("Invalid FEN", _.validFen)
+          "fen" -> fen,
+      )(AiConfig.<<)(_.>>).verifying("Invalid FEN", _.validFen),
   )
 
   def aiConfig(implicit ctx: UserContext): Fu[AiConfig] =
@@ -71,10 +71,10 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
           "days" -> days,
           "mode" -> mode(withRated = ctx.isAuth && !casualOnly),
           "color" -> color,
-          "fen" -> fen
+          "fen" -> fen,
       )(FriendConfig.<<)(_.>>)
         .verifying("Invalid clock", _.validClock)
-        .verifying("Invalid FEN", _.validFen)
+        .verifying("Invalid FEN", _.validFen),
     )
 
   def friendConfig(implicit ctx: UserContext): Fu[FriendConfig] =
@@ -94,10 +94,10 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
           "mode" -> mode(ctx.isAuth && !casualOnly),
           "membersOnly" -> boolean,
           "ratingRange" -> optional(ratingRange),
-          "color" -> nonEmptyText.verifying(Color.names contains _)
+          "color" -> nonEmptyText.verifying(Color.names contains _),
       )(HookConfig.<<)(_.>>)
         .verifying("Invalid clock", _.validClock)
-        .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited)
+        .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited),
     )
 
   def hookConfig(implicit ctx: UserContext): Fu[HookConfig] =

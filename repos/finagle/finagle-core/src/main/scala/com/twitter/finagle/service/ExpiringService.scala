@@ -36,7 +36,7 @@ object ExpiringService {
           _param: Param,
           _timer: param.Timer,
           _stats: param.Stats,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ) = {
         val param.Timer(timer) = _timer
         val ExpiringService.Param(idleTime, lifeTime) = _param
@@ -74,7 +74,7 @@ abstract class ExpiringService[Req, Rep](
     maxIdleTime: Option[Duration],
     maxLifeTime: Option[Duration],
     timer: Timer,
-    stats: StatsReceiver
+    stats: StatsReceiver,
 )
     extends ServiceProxy[Req, Rep](self) {
   private[this] var active = true

@@ -41,7 +41,7 @@ object I18n extends LilaController {
                   }
               }
             }
-          }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess)
+          }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess),
     )
   }
 

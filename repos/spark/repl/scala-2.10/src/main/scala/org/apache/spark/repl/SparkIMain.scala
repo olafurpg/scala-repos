@@ -443,7 +443,7 @@ class SparkIMain(initialSettings: Settings,
                   else io.AbstractFile.getFile(f)
                 } else {
                   io.AbstractFile.getURL(url)
-                }
+                },
             )
         })).distinct
 
@@ -749,7 +749,7 @@ class SparkIMain(initialSettings: Settings,
                 (t0 =>
                       "  " + safePos(t0, -1) + ": " + t0.shortClass +
                     "\n") mkString ""
-            }) mkString "\n"
+            }) mkString "\n",
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -1250,14 +1250,14 @@ class SparkIMain(initialSettings: Settings,
         else if (path == "$intp")
           List(
               "def $line = " + tquoted(originalLine),
-              "def $trees = Nil"
+              "def $trees = Nil",
           )
         else
           List(
               "def $line  = " + tquoted(originalLine),
               "def $req = %s.requestForReqId(%s).orNull".format(path, reqId),
               "def $trees = if ($req eq null) Nil else $req.trees".format(
-                  lineRep.readName, path, reqId)
+                  lineRep.readName, path, reqId),
           )
       }
 
@@ -1314,7 +1314,7 @@ class SparkIMain(initialSettings: Settings,
           evalResult,
           lineRep.printName,
           executionWrapper,
-          lineRep.readName + ".INSTANCE" + accessPath
+          lineRep.readName + ".INSTANCE" + accessPath,
       )
       val postamble = """
       |    )
@@ -1752,7 +1752,7 @@ class SparkIMain(initialSettings: Settings,
     TypeStrings.quieter(
         afterTyper(sym.defString),
         sym.owner.name + ".this.",
-        sym.owner.fullName + "."
+        sym.owner.fullName + ".",
     )
   }
 
@@ -1898,7 +1898,7 @@ class SparkISettings(intp: SparkIMain) extends Logging {
       "maxPrintString" -> maxPrintString,
       "maxAutoprintCompletion" -> maxAutoprintCompletion,
       "unwrapStrings" -> unwrapStrings,
-      "deprecation" -> deprecation
+      "deprecation" -> deprecation,
   )
 
   private def allSettingsString =

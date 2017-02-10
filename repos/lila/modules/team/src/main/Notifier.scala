@@ -19,7 +19,7 @@ private[team] final class Notifier(
           subject = """You have joined the team %s""".format(team.name),
           message = """Congratulation, your request to join the team was accepted!
 
-Here is the team page: %s""" format url
+Here is the team page: %s""" format url,
       )
     }
   }

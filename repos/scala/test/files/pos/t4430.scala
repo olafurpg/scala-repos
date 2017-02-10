@@ -6,6 +6,6 @@ class Crash {
 
   val q = A(
       b = S { val xxx = t; 42 },
-      a = 0
+      a = 0,
   )
 }

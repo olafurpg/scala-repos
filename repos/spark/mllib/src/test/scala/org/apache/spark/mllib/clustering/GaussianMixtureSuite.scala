@@ -30,7 +30,7 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
         Array(
             Vectors.dense(6.0, 9.0),
             Vectors.dense(5.0, 10.0),
-            Vectors.dense(4.0, 11.0)
+            Vectors.dense(4.0, 11.0),
         ))
 
     // expectations
@@ -58,8 +58,8 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
             new MultivariateGaussian(Vectors.dense(-1.0),
                                      Matrices.dense(1, 1, Array(1.0))),
             new MultivariateGaussian(Vectors.dense(1.0),
-                                     Matrices.dense(1, 1, Array(1.0)))
-        )
+                                     Matrices.dense(1, 1, Array(1.0))),
+        ),
     )
 
     val Ew = Array(1.0 / 3.0, 2.0 / 3.0)
@@ -95,7 +95,7 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
         Array(
             Vectors.sparse(3, Array(0, 2), Array(4.0, 2.0)),
             Vectors.sparse(3, Array(0, 2), Array(2.0, 4.0)),
-            Vectors.sparse(3, Array(1), Array(6.0))
+            Vectors.sparse(3, Array(1), Array(6.0)),
         ))
 
     val Ew = 1.0
@@ -132,8 +132,8 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
             new MultivariateGaussian(Vectors.dense(-1.0),
                                      Matrices.dense(1, 1, Array(1.0))),
             new MultivariateGaussian(Vectors.dense(1.0),
-                                     Matrices.dense(1, 1, Array(1.0)))
-        )
+                                     Matrices.dense(1, 1, Array(1.0))),
+        ),
     )
     val Ew = Array(1.0 / 3.0, 2.0 / 3.0)
     val Emu = Array(Vectors.dense(-4.3673), Vectors.dense(5.1604))
@@ -201,7 +201,7 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
         Vectors.dense(5.5026),
         Vectors.dense(4.5605),
         Vectors.dense(5.2043),
-        Vectors.dense(6.2734)
+        Vectors.dense(6.2734),
     )
 
     val data2: Array[Vector] = Array.tabulate(25) { i: Int =>

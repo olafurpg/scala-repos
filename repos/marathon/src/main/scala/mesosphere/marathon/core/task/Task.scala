@@ -206,7 +206,7 @@ object Task {
                 taskId = taskId,
                 agentInfo = agentInfo,
                 reservation = reservation.copy(
-                      state = Task.Reservation.State.Suspended(timeout = None))
+                      state = Task.Reservation.State.Suspended(timeout = None)),
             ))
 
       // case 3: health or state updated

@@ -35,7 +35,7 @@ trait TestCodeGenerator {
        """.stripMargin,
           args(0),
           packageName,
-          "AllTests.scala"
+          "AllTests.scala",
       )
     } catch {
       case ex: Throwable =>

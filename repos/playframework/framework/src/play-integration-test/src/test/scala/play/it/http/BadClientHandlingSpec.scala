@@ -44,7 +44,7 @@ trait BadClientHandlingSpec
       val url = new String(Random.alphanumeric.take(5 * 1024).toArray)
 
       val response = BasicHttpClient.makeRequests(port)(
-          BasicRequest("GET", "/" + url, "HTTP/1.1", Map(), "")
+          BasicRequest("GET", "/" + url, "HTTP/1.1", Map(), ""),
       )(0)
 
       response.status must_== 414
@@ -52,7 +52,7 @@ trait BadClientHandlingSpec
 
     "return a 400 error on invalid URI" in withServer() { port =>
       val response = BasicHttpClient.makeRequests(port)(
-          BasicRequest("GET", "/[", "HTTP/1.1", Map(), "")
+          BasicRequest("GET", "/[", "HTTP/1.1", Map(), ""),
       )(0)
 
       response.status must_== 400
@@ -68,7 +68,7 @@ trait BadClientHandlingSpec
         Future.successful(Results.Ok)
     }) { port =>
       val response = BasicHttpClient.makeRequests(port)(
-          BasicRequest("GET", "/[", "HTTP/1.1", Map(), "")
+          BasicRequest("GET", "/[", "HTTP/1.1", Map(), ""),
       )(0)
 
       response.status must_== 400

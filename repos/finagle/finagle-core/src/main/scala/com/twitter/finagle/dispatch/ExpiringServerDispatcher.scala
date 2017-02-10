@@ -12,7 +12,7 @@ object ExpiringServerDispatcher {
       maxLifeTime: Option[Duration],
       timer: Timer,
       statsReceiver: StatsReceiver,
-      newDispatcher: (Transport[In, Out], Service[Req, Rep]) => Closable
+      newDispatcher: (Transport[In, Out], Service[Req, Rep]) => Closable,
   ): (Transport[In, Out], Service[Req, Rep]) => Closable =
     (transport: Transport[In, Out], service: Service[Req, Rep]) =>
       new ExpiringService(

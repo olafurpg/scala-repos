@@ -152,7 +152,7 @@ private[spark] class CoarseMesosSchedulerBackend(
         sc.conf,
         sc.conf
           .getOption("spark.mesos.driver.webui.url")
-          .orElse(sc.ui.map(_.appUIAddress))
+          .orElse(sc.ui.map(_.appUIAddress)),
       )
     startScheduler(driver)
   }

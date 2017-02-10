@@ -164,7 +164,7 @@ class PatternAnnotatorTest
         List(
             Error("(x: String, y)",
                   patternTypeIncompatible("(String, Int)", "(Int, Int)")),
-            Error("x: String", incompatible("String", "Int"))
+            Error("x: String", incompatible("String", "Int")),
         ))
     assertNoWarnings(code)
   }
@@ -187,7 +187,7 @@ class PatternAnnotatorTest
         code,
         List(
             Error("(x: Int)", patternTypeIncompatible("Int", "String")),
-            Error("x: Int", incompatible("Int", "String"))
+            Error("x: Int", incompatible("Int", "String")),
         ))
     assertNoWarnings(code)
   }
@@ -431,7 +431,7 @@ class PatternAnnotatorTest
                               "wrong.number.arguments.extractor", "2", "3")),
                     Error("foo appliedTo2 ()",
                           ScalaBundle.message(
-                              "wrong.number.arguments.extractor", "2", "3"))
+                              "wrong.number.arguments.extractor", "2", "3")),
                 ))
     assertNoWarnings(code)
   }

@@ -57,7 +57,7 @@ object Validation {
           case (description, ruleViolation) =>
             Json.obj(
                 "path" -> description,
-                "errors" -> ruleViolation.map(r => JsString(r.constraint))
+                "errors" -> ruleViolation.map(r => JsString(r.constraint)),
             )
         }
     })
@@ -127,7 +127,7 @@ object Validation {
           }
         }.getOrElse(
             Failure(
-                Set(RuleViolation(url, "URL could not be resolved.", None)))
+                Set(RuleViolation(url, "URL could not be resolved.", None))),
         )
       }
     }
@@ -219,7 +219,7 @@ object Validation {
     import ViolationBuilder._
     new NullSafeValidator[T](
         test = options.contains,
-        failure = _ -> s"is not one of (${options.mkString(",")})"
+        failure = _ -> s"is not one of (${options.mkString(",")})",
     )
   }
 
@@ -227,7 +227,7 @@ object Validation {
     import ViolationBuilder._
     new NullSafeValidator[T](
         test = options.contains,
-        failure = _ -> s"is not one of (${options.mkString(",")})"
+        failure = _ -> s"is not one of (${options.mkString(",")})",
     )
   }
 

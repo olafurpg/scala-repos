@@ -37,8 +37,8 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
             "cpus" -> 8.0,
             "disk" -> 52830.0,
             "mem" -> 5078.0,
-            "ports" -> "[31000-32000]"
-        )
+            "ports" -> "[31000-32000]",
+        ),
     )
     /* "used_resources": {
         "cpus": 1.0,
@@ -51,8 +51,8 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
             "cpus" -> 1.0,
             "disk" -> 128.0,
             "mem" -> 128.0,
-            "ports" -> "[31903-31903]"
-        )
+            "ports" -> "[31903-31903]",
+        ),
     )
     /*
       "offered_resources": {
@@ -65,8 +65,8 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
         ITResources(
             "cpus" -> 0.0,
             "disk" -> 0.0,
-            "mem" -> 0.0
-        )
+            "mem" -> 0.0,
+        ),
     )
     /*
       "reserved_resources": {
@@ -84,9 +84,9 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
                 "cpus" -> 1.1,
                 "disk" -> 138.0,
                 "mem" -> 144.0,
-                "ports" -> "[31903-31903]"
-            )
-        )
+                "ports" -> "[31903-31903]",
+            ),
+        ),
     )
     /*
       "unreserved_resources": {
@@ -101,8 +101,8 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
             "cpus" -> 6.9,
             "disk" -> 52692.0,
             "mem" -> 4934.0,
-            "ports" -> "[31000-31902, 31904-32000]"
-        )
+            "ports" -> "[31000-31902, 31904-32000]",
+        ),
     )
   }
 

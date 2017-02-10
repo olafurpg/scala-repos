@@ -60,7 +60,7 @@ final class ModlogApi {
            user,
            Modlog.deletePost,
            details = Some(
-                 author.??(_ + " ") + ip.??(_ + " ") + text.take(140)
+                 author.??(_ + " ") + ip.??(_ + " ") + text.take(140),
              ))
   }
 
@@ -70,7 +70,7 @@ final class ModlogApi {
            none,
            closed ? Modlog.closeTopic | Modlog.openTopic,
            details = Some(
-                 categ + " / " + topic
+                 categ + " / " + topic,
              ))
   }
 
@@ -80,7 +80,7 @@ final class ModlogApi {
            none,
            hidden ? Modlog.hideTopic | Modlog.showTopic,
            details = Some(
-                 categ + " / " + topic
+                 categ + " / " + topic,
              ))
   }
 
@@ -118,14 +118,14 @@ final class ModlogApi {
     $count.exists(
         Json.obj(
             "user" -> userId,
-            "action" -> Modlog.unengine
+            "action" -> Modlog.unengine,
         ))
 
   def wasUnbooster(userId: String) =
     $count.exists(
         Json.obj(
             "user" -> userId,
-            "action" -> Modlog.unbooster
+            "action" -> Modlog.unbooster,
         ))
 
   def userHistory(userId: String): Fu[List[Modlog]] =

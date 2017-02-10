@@ -26,7 +26,7 @@ private final class MoveBroadcast extends Actor {
                                      play.api.libs.json.Json.obj(
                                          "id" -> move.gameId,
                                          "fen" -> move.fen,
-                                         "lm" -> move.move
+                                         "lm" -> move.move,
                                      ))
         mIds foreach { mId =>
           members get mId foreach (_.member push msg)

@@ -18,7 +18,7 @@ class TCPConnectionActor(
     connection: ActorRef,
     protocol: Protocol,
     project: ActorRef,
-    broadcaster: ActorRef
+    broadcaster: ActorRef,
 )
     extends Actor with Stash with ActorLogging {
 
@@ -81,8 +81,8 @@ class TCPConnectionActor(
         protocol.encode(
             RpcResponseEnvelope(
                 envelope.callId,
-                EnsimeServerError(s"Server error: ${t.getMessage}")
-            )
+                EnsimeServerError(s"Server error: ${t.getMessage}"),
+            ),
         )
     }
     connection ! Tcp.Write(msg, Ack)

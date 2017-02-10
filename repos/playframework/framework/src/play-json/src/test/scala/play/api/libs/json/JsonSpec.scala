@@ -39,8 +39,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
         .formatNullable[Option[Date]](
             Format(
                 Reads.optionWithNull(Reads.dateReads(dateFormat)),
-                Writes.optionWithNull(Writes.dateWrites(dateFormat))
-            )
+                Writes.optionWithNull(Writes.dateWrites(dateFormat)),
+            ),
         )
         .inmap(optopt => optopt.flatten, (opt: Option[Date]) => Some(opt)))(
       Post, unlift(Post.unapply))
@@ -49,8 +49,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
       (__ \ 'created_at).formatNullable[Date](
           Format(
               Reads.IsoDateReads,
-              Writes.dateWrites(dateFormat)
-          )
+              Writes.dateWrites(dateFormat),
+          ),
       ))(Post, unlift(Post.unapply))
 
   val mapper = new ObjectMapper()
@@ -63,18 +63,18 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "field3" -> Json.obj(
               "field31" -> true,
               "field32" -> 123.45,
-              "field33" -> Json.arr("blabla", 456L, JsNull)
-          )
+              "field33" -> Json.arr("blabla", 456L, JsNull),
+          ),
       ) must beEqualTo(
           Json.obj(
               "field2" -> "beta",
               "field3" -> Json.obj(
                   "field31" -> true,
                   "field33" -> Json.arr("blabla", 456L, JsNull),
-                  "field32" -> 123.45
+                  "field32" -> 123.45,
               ),
-              "field1" -> 123
-          )
+              "field1" -> 123,
+          ),
       )
 
       Json.obj(
@@ -83,17 +83,17 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "field3" -> Json.obj(
               "field31" -> true,
               "field32" -> 123.45,
-              "field33" -> Json.arr("blabla", JsNull)
-          )
+              "field33" -> Json.arr("blabla", JsNull),
+          ),
       ) must not equalTo
       (Json.obj(
               "field2" -> "beta",
               "field3" -> Json.obj(
                   "field31" -> true,
                   "field33" -> Json.arr("blabla", 456L),
-                  "field32" -> 123.45
+                  "field32" -> 123.45,
               ),
-              "field1" -> 123
+              "field1" -> 123,
           ))
 
       Json.obj(
@@ -102,16 +102,16 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "field3" -> Json.obj(
               "field31" -> true,
               "field32" -> 123.45,
-              "field33" -> Json.arr("blabla", 456L, JsNull)
-          )
+              "field33" -> Json.arr("blabla", 456L, JsNull),
+          ),
       ) must not equalTo
       (Json.obj(
               "field3" -> Json.obj(
                   "field31" -> true,
                   "field33" -> Json.arr("blabla", 456L, JsNull),
-                  "field32" -> 123.45
+                  "field32" -> 123.45,
               ),
-              "field1" -> 123
+              "field1" -> 123,
           ))
     }
 
@@ -319,11 +319,11 @@ object JsonSpec extends org.specs2.mutable.Specification {
       val expectedJson = JsObject(
           List(
               "foo" -> JsObject(List(
-                      "foo" -> JsArray(List[JsValue](JsString("bar")))
+                      "foo" -> JsArray(List[JsValue](JsString("bar"))),
                   )),
               "bar" -> JsObject(List(
-                      "foo" -> JsArray(List[JsValue](JsString("bar")))
-                  ))
+                      "foo" -> JsArray(List[JsValue](JsString("bar"))),
+                  )),
           ))
       Json.parse(recursiveJson) must equalTo(expectedJson)
     }
@@ -340,7 +340,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
       val js = Json.obj(
           "key1" -> "toto",
           "key2" -> Json.obj("key21" -> "tata", "key22" -> 123),
-          "key3" -> Json.arr(1, "tutu")
+          "key3" -> Json.arr(1, "tutu"),
       )
 
       Json.prettyPrint(js) must beEqualTo("""{
@@ -362,7 +362,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "key1" -> "\u2028\u2029\u2030",
           "key2" -> "\u00E1\u00E9\u00ED\u00F3\u00FA",
           "key3" -> "\u00A9\u00A3",
-          "key4" -> "\u6837\u54C1"
+          "key4" -> "\u6837\u54C1",
       )
       Json.asciiStringify(js) must beEqualTo(
           "{\"key1\":\"\\u2028\\u2029\\u2030\"," +
@@ -373,7 +373,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
     "asciiStringify should escape ascii characters properly" in {
       val js = Json.obj(
           "key1" -> "ab\n\tcd",
-          "key2" -> "\"\r"
+          "key2" -> "\"\r",
       )
       Json.asciiStringify(js) must beEqualTo(
           """{"key1":"ab\n\tcd","key2":"\"\r"}""")
@@ -387,8 +387,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "key4" -> Json.arr(1, 2.5, "value2", false, JsNull),
           "key5" -> Json.obj(
               "key6" -> "こんにちは",
-              "key7" -> BigDecimal("12345678901234567890.123456789")
-          )
+              "key7" -> BigDecimal("12345678901234567890.123456789"),
+          ),
       )
       val stream =
         new java.io.ByteArrayInputStream(js.toString.getBytes("UTF-8"))
@@ -403,8 +403,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "key4" -> Json.arr(1, 2.5, "value2", false, JsNull),
           "key5" -> Json.obj(
               "key6" -> "こんにちは",
-              "key7" -> BigDecimal("12345678901234567890.123456789")
-          )
+              "key7" -> BigDecimal("12345678901234567890.123456789"),
+          ),
       )
       val originalString = Json.stringify(original)
       val parsed = Json.parse(originalString)
@@ -435,14 +435,14 @@ object JsonSpec extends org.specs2.mutable.Specification {
               List(1, 2, 3),
               Set("alpha", "beta", "gamma"),
               Seq("alpha", "beta", "gamma"),
-              Map("key1" -> "value1", "key2" -> "value2")
+              Map("key1" -> "value1", "key2" -> "value2"),
           )) must beEqualTo(
           Json.obj(
               "key1" -> Json.arr(1, 2, 3),
               "key2" -> Json.arr("alpha", "beta", "gamma"),
               "key3" -> Json.arr("alpha", "beta", "gamma"),
-              "key4" -> Json.obj("key1" -> "value1", "key2" -> "value2")
-          )
+              "key4" -> Json.obj("key1" -> "value1", "key2" -> "value2"),
+          ),
       )
     }
 
@@ -453,8 +453,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
           "id" -> "my-id",
           "data" -> Json.obj(
               "attr1" -> "foo",
-              "attr2" -> "bar"
-          )
+              "attr2" -> "bar",
+          ),
       )
 
       implicit val testCaseWrites: Writes[TestCase] = ((__ \ "id")
@@ -469,7 +469,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
           ListMap(
               "name" -> "foo",
               "zip" -> "foo",
-              "city" -> "foo"
+              "city" -> "foo",
           ))
       val req = """{"name":"foo", "zip":"foo", "city":"foo"}"""
       test.toString must beEqualTo(Json.parse(req).toString).ignoreSpace
@@ -511,8 +511,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
               "vny" -> "foo",
               "vz" -> "foo",
               "vek" -> "foo",
-              "vev" -> "foo"
-          )
+              "vev" -> "foo",
+          ),
       )
       val req =
         """{"name": "a", "zip": "foo", "city": "foo", "address": "foo", "phone": "foo", "latitude": "foo", "longitude": "foo", "hny": "foo", "hz": "foo", "hek": "foo", "hev": "foo", "kny": "foo", "kz": "foo", "kek": "foo", "kev": "foo", "szeny": "foo", "szez": "foo", "szeek": "foo", "szeev": "foo", "csny": "foo", "csz": "foo", "csek": "foo", "csev": "foo", "pny": "foo", "pz": "foo", "pek": "foo", "pev": "foo", "szony": "foo", "szoz": "foo", "szoek": "foo", "szoev": "foo", "vny": "foo", "vz": "foo", "vek": "foo", "vev": "foo"}"""

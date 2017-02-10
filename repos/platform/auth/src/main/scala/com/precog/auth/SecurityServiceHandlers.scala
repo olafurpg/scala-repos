@@ -451,10 +451,10 @@ class SecurityServiceHandlers(
         AboutMetadata(
             ParameterMetadata('at, Some("Defaults to the current time.")),
             DescriptionMetadata(
-                "The timestamp against which permissions should be checked, in ISO8601 datetime format.")
+                "The timestamp against which permissions should be checked, in ISO8601 datetime format."),
         ),
         DescriptionMetadata(
-            "Retrieves the full set of permissions available to the authorizing API key.")
+            "Retrieves the full set of permissions available to the authorizing API key."),
     )
   }
 }

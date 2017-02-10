@@ -71,7 +71,7 @@ case class FakeRequest[A](
         id,
         tags,
         secure,
-        clientCertificateChain
+        clientCertificateChain,
     )
   }
 

@@ -317,7 +317,7 @@ class ScalaLookupItem(val element: PsiNamedElement,
                       context.getEditor,
                       new Condition[PsiFile] {
                         def value(t: PsiFile): Boolean = t == context.getFile
-                      }
+                      },
                   )
               }
             })

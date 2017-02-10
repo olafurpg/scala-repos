@@ -37,13 +37,13 @@ object JsData extends lila.Steroids {
                          "quality" -> quality.name)
             }),
                     "url" -> s"$netBaseUrl${routes.Opening.show(opening.id)}",
-                    "identified" -> identified
+                    "identified" -> identified,
                 ),
                 "pref" -> Json.obj(
-                    "coords" -> ctx.pref.coords
+                    "coords" -> ctx.pref.coords,
                 ),
                 "animation" -> Json.obj(
-                    "duration" -> ctx.pref.animationFactor * animationDuration.toMillis
+                    "duration" -> ctx.pref.animationFactor * animationDuration.toMillis,
                 ),
                 "attempt" -> attempt.map { a =>
           Json.obj("userRatingDiff" -> a.userRatingDiff, "win" -> a.win)
@@ -52,7 +52,7 @@ object JsData extends lila.Steroids {
                 "user" -> userInfos.map { i =>
           Json.obj(
               "rating" -> i.user.perfs.opening.intRating,
-              "history" -> i.history.nonEmpty.option(Json.toJson(i.chart))
+              "history" -> i.history.nonEmpty.option(Json.toJson(i.chart)),
           )
         },
                 "play" -> play)))

@@ -250,7 +250,7 @@ class SecurityServiceSpec
   val rootPermissions = Set[Permission](
       WritePermission(Path.Root, WriteAsAny),
       ReadPermission(Path.Root, WrittenByAny),
-      DeletePermission(Path.Root, WrittenByAny)
+      DeletePermission(Path.Root, WrittenByAny),
   )
 
   val rootGrants = {
@@ -263,7 +263,7 @@ class SecurityServiceSpec
             Set(),
             rootPermissions,
             new Instant(0L),
-            None
+            None,
         ))
   }
 

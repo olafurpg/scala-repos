@@ -173,7 +173,7 @@ class DeploymentActorTest
                 host = "",
                 ipAddresses = Nil,
                 ports = Nil,
-                version = app4.version.toString
+                version = app4.version.toString,
             ))
         Status.DRIVER_RUNNING
       }
@@ -191,8 +191,8 @@ class DeploymentActorTest
               queue,
               storage,
               hcManager,
-              system.eventStream
-          )
+              system.eventStream,
+          ),
       )
 
       plan.steps.zipWithIndex.foreach {
@@ -307,8 +307,8 @@ class DeploymentActorTest
               queue,
               storage,
               hcManager,
-              system.eventStream
-          )
+              system.eventStream,
+          ),
       )
 
       receiverProbe.expectMsg(DeploymentFinished(plan))
@@ -355,8 +355,8 @@ class DeploymentActorTest
               queue,
               storage,
               hcManager,
-              system.eventStream
-          )
+              system.eventStream,
+          ),
       )
 
       receiverProbe.expectMsg(DeploymentFinished(plan))
@@ -421,8 +421,8 @@ class DeploymentActorTest
               queue,
               storage,
               hcManager,
-              system.eventStream
-          )
+              system.eventStream,
+          ),
       )
 
       plan.steps.zipWithIndex.foreach {

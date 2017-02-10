@@ -23,7 +23,7 @@ import play.api.inject.Module
 
 class ComponentModule extends Module {
   def bindings(env: Environment, conf: Configuration) = Seq(
-      bind[Component].to[DefaultComponent]
+      bind[Component].to[DefaultComponent],
   )
 }
 // #component-module

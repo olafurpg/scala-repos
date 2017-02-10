@@ -35,13 +35,13 @@ class HttpsRulesSpec extends Specification {
 
     "generate a correct Strict-Transport-Security header without sub-domains" in {
       HttpsRules(Some(Duration(1440, SECONDS)), false).headers must_== List(
-          "Strict-Transport-Security" -> "max-age=1440"
+          "Strict-Transport-Security" -> "max-age=1440",
       )
     }
 
     "generate a correct Strict-Transport-Security header including sub-domains" in {
       HttpsRules(Some(Duration(1440, SECONDS)), true).headers must_== List(
-          "Strict-Transport-Security" -> "max-age=1440 ; includeSubDomains"
+          "Strict-Transport-Security" -> "max-age=1440 ; includeSubDomains",
       )
     }
   }
@@ -57,7 +57,7 @@ class ContentSecurityPolicySpec extends Specification {
     "default to allowing script eval and script sources only from self" in {
       ContentSecurityPolicy().scriptSources must_== List(
           ContentSourceRestriction.UnsafeEval,
-          ContentSourceRestriction.Self
+          ContentSourceRestriction.Self,
       )
     }
 
@@ -135,8 +135,8 @@ class ContentSecurityPolicySpec extends Specification {
                 ContentSourceRestriction.None,
                 ContentSourceRestriction.Self,
                 ContentSourceRestriction.UnsafeInline,
-                ContentSourceRestriction.UnsafeEval
-            )
+                ContentSourceRestriction.UnsafeEval,
+            ),
       ).headers(enforce = true).head._2 must_== "script-src * https://base.*.example.com data: 'none' 'self' 'unsafe-inline' 'unsafe-eval'"
     }
 
@@ -151,7 +151,7 @@ class ContentSecurityPolicySpec extends Specification {
           Nil,
           Nil,
           Nil,
-          reportUri = None
+          reportUri = None,
       ).headers(enforce = true).head._2 must_== ""
     }
 
@@ -165,7 +165,7 @@ class ContentSecurityPolicySpec extends Specification {
           mediaSources = List(ContentSourceRestriction.None),
           scriptSources = List(ContentSourceRestriction.Self),
           styleSources = List(ContentSourceRestriction.UnsafeInline),
-          reportUri = None
+          reportUri = None,
       ).headers(enforce = true).head._2 must_== "default-src 'self'; font-src https://base.*.example.com; frame-src data:; img-src *; media-src 'none'; script-src 'self'; style-src 'unsafe-inline'"
     }
 
@@ -178,7 +178,7 @@ class ContentSecurityPolicySpec extends Specification {
           mediaSources = Nil,
           scriptSources = Nil,
           styleSources = Nil,
-          reportUri = Some(new URI("/example/uri"))
+          reportUri = Some(new URI("/example/uri")),
       ).headers(enforce = true, logViolations = true).head._2 must_== "default-src 'self'; report-uri /example/uri"
     }
 
@@ -191,7 +191,7 @@ class ContentSecurityPolicySpec extends Specification {
           mediaSources = Nil,
           scriptSources = Nil,
           styleSources = Nil,
-          reportUri = Some(new java.net.URI("/example/uri"))
+          reportUri = Some(new java.net.URI("/example/uri")),
       ).headers(enforce = true, logViolations = false).head._2 must_== "default-src 'self'; report-uri /example/uri"
     }
   }

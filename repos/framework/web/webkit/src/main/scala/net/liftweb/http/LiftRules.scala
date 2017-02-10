@@ -611,7 +611,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           if (parameterName.startsWith("F"))
             logger.warn("Unmapped Lift-like parameter seen in request [%s]: %s"
                   .format(req.uri, parameterName))
-      }
+      },
   ) {}
 
   /**
@@ -790,7 +790,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * lift.cometOnSessionLost reloads the current page by default.
     */
   val noCometSessionCmd = new FactoryMaker[JsCmd](
-      () => JsCmds.Run("lift.cometOnSessionLost()")
+      () => JsCmds.Run("lift.cometOnSessionLost()"),
   ) {}
 
   /**
@@ -803,7 +803,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * lift.ajaxOnSessionLost reloads the page by default.
     */
   val noAjaxSessionCmd = new FactoryMaker[JsCmd](
-      () => JsCmds.Run("lift.ajaxOnSessionLost()")
+      () => JsCmds.Run("lift.ajaxOnSessionLost()"),
   ) {}
 
   /**
@@ -815,7 +815,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * the long polling connection
     */
   val clientActorLifespan = new FactoryMaker[LiftActor => Long](
-      () => (actor: LiftActor) => (30.minutes): Long
+      () => (actor: LiftActor) => (30.minutes): Long,
   ) {}
 
   /**
@@ -1511,7 +1511,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           (content: InputStream) => S.htmlProperties.htmlParser(content),
           identity[NodeSeq](_) // These templates are not surrounded  by default
       ),
-      ContentParser("md", MarkdownParser.parse)
+      ContentParser("md", MarkdownParser.parse),
   )
 
   /**
@@ -1868,7 +1868,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
        | '${violation.documentUri}' from referrer '${violation.referrer}':
        | '${violation.blockedUri}' was blocked because it violated the
        | directive '${violation.violatedDirective}'. The policy that specified
-       | this directive is: '${violation.originalPolicy}'.""".trim
+       | this directive is: '${violation.originalPolicy}'.""".trim,
     )
 
     Empty

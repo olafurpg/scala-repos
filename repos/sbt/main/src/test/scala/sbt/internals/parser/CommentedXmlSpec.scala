@@ -72,6 +72,6 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
        false),
       ("""
         |// a/>
-      """.stripMargin, "Xml in comment2", false, false)
+      """.stripMargin, "Xml in comment2", false, false),
   )
 }

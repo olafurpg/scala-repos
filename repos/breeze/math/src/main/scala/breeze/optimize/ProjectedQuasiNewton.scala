@@ -129,8 +129,8 @@ class ProjectedQuasiNewton(
               bbMemory = 5,
               initFeas = true,
               fvalMemory = 10,
-              projection = projection
-          )
+              projection = projection,
+          ),
     )
 
   type History = CompactHessian

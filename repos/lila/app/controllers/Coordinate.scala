@@ -21,7 +21,7 @@ object Coordinate extends LilaController {
     implicit val body = ctx.body
     env.forms.score.bindFromRequest.fold(
         err => fuccess(BadRequest),
-        data => env.api.addScore(me.id, data.isWhite, data.score)
+        data => env.api.addScore(me.id, data.isWhite, data.score),
     ) >> {
       env.api getScore me.id map { s =>
         Ok(views.html.coordinate.scoreCharts(s))
@@ -37,8 +37,8 @@ object Coordinate extends LilaController {
           Env.pref.api.setPref(
               me,
               (p: lila.pref.Pref) => p.copy(coordColor = value),
-              notifyChange = false
-          ) inject Ok(())
+              notifyChange = false,
+          ) inject Ok(()),
     )
   }
 }

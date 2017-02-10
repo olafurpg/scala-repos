@@ -155,7 +155,7 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(substring_index($"a", ".", 2)), Row("www.apache"))
     checkAnswer(
         df.selectExpr("substring_index(a, '.', 2)"),
-        Row("www.apache")
+        Row("www.apache"),
     )
   }
 

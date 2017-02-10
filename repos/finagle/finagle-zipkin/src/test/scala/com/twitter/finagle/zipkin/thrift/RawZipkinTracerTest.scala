@@ -42,7 +42,7 @@ class RawZipkinTracerTest extends FunSuite {
         ZipkinAnnotation(Time.fromSeconds(126), "cr", localEndpoint),
         ZipkinAnnotation(Time.fromSeconds(123), "ss", remoteEndpoint),
         ZipkinAnnotation(Time.fromSeconds(124), "sr", remoteEndpoint),
-        ZipkinAnnotation(Time.fromSeconds(123), "llamas", localEndpoint)
+        ZipkinAnnotation(Time.fromSeconds(123), "llamas", localEndpoint),
     )
 
     val span = Span(traceId = traceId,

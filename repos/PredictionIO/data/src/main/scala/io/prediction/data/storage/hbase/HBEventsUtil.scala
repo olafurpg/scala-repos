@@ -68,7 +68,7 @@ object HBEventsUtil {
       "eventTime" -> "et",
       "eventTimeZone" -> "etz",
       "creationTime" -> "ct",
-      "creationTimeZone" -> "ctz"
+      "creationTimeZone" -> "ctz",
   ).mapValues(Bytes.toBytes(_))
 
   def hash(entityType: String, entityId: String): Array[Byte] = {
@@ -79,7 +79,7 @@ object HBEventsUtil {
   }
 
   class RowKey(
-      val b: Array[Byte]
+      val b: Array[Byte],
   ) {
     require((b.size == 32), s"Incorrect b size: ${b.size}")
     lazy val entityHash: Array[Byte] = b.slice(0, 16)
@@ -152,7 +152,7 @@ object HBEventsUtil {
           entityType = event.entityType,
           entityId = event.entityId,
           millis = event.eventTime.getMillis,
-          uuidLow = uuidLow
+          uuidLow = uuidLow,
       )
     }
 
@@ -274,7 +274,7 @@ object HBEventsUtil {
         eventTime = eventTime,
         tags = Seq(),
         prId = prId,
-        creationTime = creationTime
+        creationTime = creationTime,
     )
   }
 

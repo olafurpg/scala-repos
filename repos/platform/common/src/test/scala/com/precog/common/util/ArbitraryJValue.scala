@@ -57,7 +57,7 @@ trait ArbitraryJValue {
       classOf[JBool],
       classOf[JString],
       classOf[JArray],
-      classOf[JObject]
+      classOf[JObject],
   )
 
   def listSize = choose(0, 5).sample.get

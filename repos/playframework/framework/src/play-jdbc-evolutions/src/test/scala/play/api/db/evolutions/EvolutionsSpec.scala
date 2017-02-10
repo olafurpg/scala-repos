@@ -170,14 +170,14 @@ object EvolutionsSpec extends Specification {
   trait WithDerbyEvolutions extends WithEvolutions {
     override lazy val database: Database = Databases(
         driver = "org.apache.derby.jdbc.EmbeddedDriver",
-        url = "jdbc:derby:memory:default;create=true"
+        url = "jdbc:derby:memory:default;create=true",
     )
   }
 
   trait WithDerbyEvolutionsSchema extends WithDerbyEvolutions {
     override lazy val evolutions: DatabaseEvolutions = new DatabaseEvolutions(
         database = database,
-        schema = "testschema"
+        schema = "testschema",
     )
   }
 
@@ -185,36 +185,36 @@ object EvolutionsSpec extends Specification {
     val a1 = Evolution(
         1,
         "create table test (id bigint not null, name varchar(255));",
-        "drop table test;"
+        "drop table test;",
     )
 
     val a2 = Evolution(
         2,
         "alter table test add column age int;",
-        "alter table test drop age;"
+        "alter table test drop age;",
     )
 
     val a3 = Evolution(
         3,
         "insert into test (id, name, age) values (1, 'alice', 42);",
-        "delete from test;"
+        "delete from test;",
     )
 
     val b1 = Evolution(
         1,
         "create table test (id bigint not null, content varchar(255));",
-        "drop table test;"
+        "drop table test;",
     )
 
     val b3 = Evolution(
         3,
         "insert into test (id, content, age) values (1, 'bob', 42);",
-        "delete from test;"
+        "delete from test;",
     )
 
     val c1 = Evolution(
         1,
-        "creaTYPOe table test (id bigint not null, name varchar(255));"
+        "creaTYPOe table test (id bigint not null, name varchar(255));",
     )
   }
 }

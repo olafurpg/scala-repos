@@ -41,9 +41,9 @@ class EventServiceSpec extends Specification {
               eventClient,
               accessKeysClient,
               channelsClient,
-              EventServerConfig()
-          )
-      )
+              EventServerConfig(),
+          ),
+      ),
   )
 
   "GET / request" should {
@@ -55,9 +55,9 @@ class EventServiceSpec extends Specification {
               200,
               HttpEntity(
                   contentType = ContentTypes.`application/json`,
-                  string = """{"status":"alive"}"""
-              )
-          )
+                  string = """{"status":"alive"}""",
+              ),
+          ),
       )
       success
     }

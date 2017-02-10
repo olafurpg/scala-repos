@@ -46,7 +46,7 @@ object ListViewWithSelectionDemo extends JFXApp {
       Person("Dennis", "O’Dell"),
       Person("Eleanor", "Rigby"),
       Person("Rocky", "Raccoon"),
-      Person("Peggy", "Sue")
+      Person("Peggy", "Sue"),
   )
 
   stage = new PrimaryStage {

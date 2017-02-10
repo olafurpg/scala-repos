@@ -1357,7 +1357,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val sym = tree.symbol
         if (sym.isPrivate) debuglog(
           "seeing private member %s, currentClass: %s, owner: %s, isAccessible: %b, isLocalName: %b".format(
-            sym, currentClass, sym.owner.enclClass, isAccessible(sym), nme.isLocalName(sym.name))
+            sym, currentClass, sym.owner.enclClass, isAccessible(sym), nme.isLocalName(sym.name)),
           )
         if (shouldMakePublic(sym) && !isAccessible(sym)) {
           debuglog("changing private flag of " + sym)
@@ -1717,7 +1717,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
             tree1,
             symbol.alias.enclClass,
             symbol.enclClass,
-            typeEnv(symbol.alias) ++ typeEnv(tree.symbol)
+            typeEnv(symbol.alias) ++ typeEnv(tree.symbol),
           )
           deriveValDef(newValDef)(transform)
           }
@@ -1777,7 +1777,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         meth,
         source.enclClass,
         symbol.enclClass,
-        typeEnv(source) ++ typeEnv(symbol)
+        typeEnv(source) ++ typeEnv(symbol),
       )
     }
 

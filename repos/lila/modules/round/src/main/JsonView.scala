@@ -64,7 +64,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                      "onGame" -> (player.isAi || socket.onGame(player.color)),
                      "checks" -> checkCount(game, player.color),
                      "hold" -> (withBlurs option hold(player)),
-                     "blurs" -> (withBlurs option blurs(game, player))
+                     "blurs" -> (withBlurs option blurs(game, player)),
                  )
                  .noNull,
                "opponent" -> Json
@@ -88,12 +88,12 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                      (!opponent.isAi && socket.isGone(opponent.color)),
                      "checks" -> checkCount(game, opponent.color),
                      "hold" -> (withBlurs option hold(opponent)),
-                     "blurs" -> (withBlurs option blurs(game, opponent))
+                     "blurs" -> (withBlurs option blurs(game, opponent)),
                  )
                  .noNull,
                "url" -> Json.obj(
                    "socket" -> s"/$fullId/socket/v$apiVersion",
-                   "round" -> s"/$fullId"
+                   "round" -> s"/$fullId",
                ),
                "pref" -> Json.obj(
                    "blindfold" -> pref.isBlindfold,
@@ -179,7 +179,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                     "checks" -> checkCount(game, player.color),
                     "berserk" -> player.berserk.option(true),
                     "hold" -> (withBlurs option hold(player)),
-                    "blurs" -> (withBlurs option blurs(game, player))
+                    "blurs" -> (withBlurs option blurs(game, player)),
                 )
                 .noNull,
               "opponent" -> Json
@@ -198,13 +198,13 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                     "checks" -> checkCount(game, opponent.color),
                     "berserk" -> opponent.berserk.option(true),
                     "hold" -> (withBlurs option hold(opponent)),
-                    "blurs" -> (withBlurs option blurs(game, opponent))
+                    "blurs" -> (withBlurs option blurs(game, opponent)),
                 )
                 .noNull,
               "orientation" -> pov.color.name,
               "url" -> Json.obj(
                   "socket" -> s"/$gameId/${color.name}/socket",
-                  "round" -> s"/$gameId/${color.name}"
+                  "round" -> s"/$gameId/${color.name}",
               ),
               "pref" -> Json.obj(
                   "animationDuration" -> animationDuration(pov, pref),
@@ -213,7 +213,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                   "replay" -> pref.replay,
                   "clockTenths" -> pref.clockTenths,
                   "clockBar" -> pref.clockBar,
-                  "showCaptured" -> pref.captured
+                  "showCaptured" -> pref.captured,
               ),
               "tv" -> tv.map { onTv =>
                 Json.obj("channel" -> onTv.channel, "flip" -> onTv.flip)
@@ -223,7 +223,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                   case lila.chat.UserLine(username, text, _) =>
                     Json.obj("u" -> username, "t" -> text)
                 })
-              }
+              },
           )
           .noNull
     }
@@ -249,18 +249,18 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                                "status" -> game.status),
             "player" -> Json.obj(
                 "id" -> owner.option(pov.playerId),
-                "color" -> color.name
+                "color" -> color.name,
             ),
             "opponent" -> Json.obj(
                 "color" -> opponent.color.name,
-                "ai" -> opponent.aiLevel
+                "ai" -> opponent.aiLevel,
             ),
             "orientation" -> orientation.name,
             "pref" -> Json.obj(
                 "animationDuration" -> animationDuration(pov, pref),
                 "highlight" -> pref.highlight,
                 "destination" -> pref.destination,
-                "coords" -> pref.coords
+                "coords" -> pref.coords,
             ),
             "path" -> pov.game.turns,
             "userAnalysis" -> true)
@@ -294,7 +294,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
     val percent = game.playerBlurPercent(player.color)
     (percent > 30) option Json.obj(
         "nb" -> player.blurs,
-        "percent" -> percent
+        "percent" -> percent,
     )
   }
 
@@ -349,7 +349,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
       .fold(
         1,
         math.max(0,
-                 math.min(1.2, ((pov.game.estimateTotalTime - 60) / 60) * 0.2))
+                 math.min(1.2, ((pov.game.estimateTotalTime - 60) / 60) * 0.2)),
     )
   }
 }
@@ -390,7 +390,7 @@ object JsonView {
       Json.obj(
           "eco" -> o.opening.eco,
           "name" -> o.opening.name,
-          "ply" -> o.ply
+          "ply" -> o.ply,
       )
     }
 }

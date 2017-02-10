@@ -20,7 +20,7 @@ class TFinagleBinaryProtocolTest
 
   private def assertSerializedBytes(
       expectedBytes: Array[Byte],
-      trans: TMemoryBuffer
+      trans: TMemoryBuffer,
   ) {
     // 4 bytes for the string length
     trans.length() should be(expectedBytes.length + 4)
@@ -30,7 +30,7 @@ class TFinagleBinaryProtocolTest
 
   private def assertSerializedBytes(
       expected: String,
-      trans: TMemoryBuffer
+      trans: TMemoryBuffer,
   ) {
     val expectedBytes = expected.getBytes(Charsets.UTF_8)
     assertSerializedBytes(expectedBytes, trans)

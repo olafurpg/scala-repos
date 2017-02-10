@@ -488,7 +488,7 @@ trait StreamTest extends QueryTest with Timeouts {
     def test(
         expectedBehavior: ExpectedBehavior,
         awaitTermFunc: () => Unit,
-        testTimeout: Span = DEFAULT_TEST_TIMEOUT
+        testTimeout: Span = DEFAULT_TEST_TIMEOUT,
     ): Unit = {
 
       expectedBehavior match {

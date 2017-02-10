@@ -81,13 +81,13 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def traverse[G[_]: Applicative, B](f: (=> A) => G[B]): G[LazyOption[B]] =
     fold(
         some = x => Applicative[G].map(f(x))(b => lazySome(b)),
-        none = Applicative[G].point(lazyNone[B])
+        none = Applicative[G].point(lazyNone[B]),
     )
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B =
     fold(
         some = a => f(a, z),
-        none = z
+        none = z,
     )
 
   def zip[B](b: => LazyOption[B]): LazyOption[(A, B)] =

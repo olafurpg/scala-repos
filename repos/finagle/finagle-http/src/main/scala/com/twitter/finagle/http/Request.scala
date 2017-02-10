@@ -305,7 +305,7 @@ object Request {
       version: Version,
       method: Method,
       uri: String,
-      reader: Reader
+      reader: Reader,
   ): Request = {
     val httpReq = new DefaultHttpRequest(from(version), from(method), uri)
     httpReq.setChunked(true)
@@ -315,7 +315,7 @@ object Request {
   private[http] def apply(
       reqIn: HttpRequest,
       readerIn: Reader,
-      remoteAddr: InetSocketAddress
+      remoteAddr: InetSocketAddress,
   ): Request = new Request {
     override val reader = readerIn
     val httpRequest = reqIn

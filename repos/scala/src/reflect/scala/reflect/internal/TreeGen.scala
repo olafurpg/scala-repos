@@ -424,7 +424,7 @@ abstract class TreeGen {
               // position of TypeTree, it would still be NoPosition. That's what the author meant.
               tpt = atPos(vdef.pos.focus)(
                     TypeTree() setOriginal tpt setPos tpt.pos.focus),
-              rhs = EmptyTree
+              rhs = EmptyTree,
           )
       }
     val lvdefs =
@@ -540,7 +540,7 @@ abstract class TreeGen {
             }),
             atPos(npos) {
               New(Ident(x) setPos npos.focus, Nil)
-            }
+            },
         )
       }
     }
@@ -868,7 +868,7 @@ abstract class TreeGen {
                       CaseDef(pat1,
                               EmptyTree,
                               mkTuple(vars map (_._1) map Ident.apply))
-                    }
+                    },
                 ))
         }
         vars match {
@@ -913,7 +913,7 @@ abstract class TreeGen {
     else {
       val cases = List(
           CaseDef(pat.duplicate, EmptyTree, Literal(Constant(true))),
-          CaseDef(Ident(nme.WILDCARD), EmptyTree, Literal(Constant(false)))
+          CaseDef(Ident(nme.WILDCARD), EmptyTree, Literal(Constant(false))),
       )
       val visitor = mkVisitor(
           cases, checkExhaustive = false, nme.CHECK_IF_REFUTABLE_STRING)

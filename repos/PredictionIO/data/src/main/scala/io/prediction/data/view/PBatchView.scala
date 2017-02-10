@@ -56,7 +56,7 @@ private[prediction] case class SetProp(val fields: Map[String, PropTime],
 
     SetProp(
         fields = combinedFields,
-        t = combinedT
+        t = combinedT,
     )
   }
 }
@@ -78,7 +78,7 @@ private[prediction] case class UnsetProp(fields: Map[String, Long])
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
 
     UnsetProp(
-        fields = combinedFields
+        fields = combinedFields,
     )
   }
 }
@@ -92,7 +92,7 @@ private[prediction] case class DeleteEntity(t: Long) extends Serializable {
 private[prediction] case class EventOp(
     val setProp: Option[SetProp] = None,
     val unsetProp: Option[UnsetProp] = None,
-    val deleteEntity: Option[DeleteEntity] = None
+    val deleteEntity: Option[DeleteEntity] = None,
 )
     extends Serializable {
 
@@ -100,7 +100,7 @@ private[prediction] case class EventOp(
     EventOp(
         setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
         unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
-        deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _)
+        deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _),
     )
   }
 
@@ -142,18 +142,18 @@ private[prediction] object EventOp {
             e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
 
           EventOp(
-              setProp = Some(SetProp(fields = fields, t = t))
+              setProp = Some(SetProp(fields = fields, t = t)),
           )
         }
       case "$unset" => {
           val fields = e.properties.fields.mapValues(jv => t).map(identity)
           EventOp(
-              unsetProp = Some(UnsetProp(fields = fields))
+              unsetProp = Some(UnsetProp(fields = fields)),
           )
         }
       case "$delete" => {
           EventOp(
-              deleteEntity = Some(DeleteEntity(t))
+              deleteEntity = Some(DeleteEntity(t)),
           )
         }
       case _ => {
@@ -185,7 +185,7 @@ class PBatchView(val appId: Int,
   def aggregateProperties(
       entityType: String,
       startTimeOpt: Option[DateTime] = None,
-      untilTimeOpt: Option[DateTime] = None
+      untilTimeOpt: Option[DateTime] = None,
   ): RDD[(String, DataMap)] = {
 
     _events
@@ -197,7 +197,7 @@ class PBatchView(val appId: Int,
           // within same partition
           seqOp = { case (u, v) => u ++ v },
           // across partition
-          combOp = { case (accu, u) => accu ++ u }
+          combOp = { case (accu, u) => accu ++ u },
       )
       .mapValues(_.toDataMap)
       .filter { case (k, v) => v.isDefined }

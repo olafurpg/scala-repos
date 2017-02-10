@@ -83,7 +83,7 @@ private[server] class ForwardedHeaderHandler(
           configuration.parseEntry(entry) match {
             case Left(error) =>
               ForwardedHeaderHandler.logger.debug(
-                  s"Error with info in forwarding header $entry, using $prev instead: $error."
+                  s"Error with info in forwarding header $entry, using $prev instead: $error.",
               )
               prev
             case Right(connection) =>

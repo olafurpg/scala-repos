@@ -70,7 +70,7 @@ trait EnumeratorT[E, F[_]] { self =>
                     k(eofInput) >>== { s =>
                     s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
                 },
-                done = (a, _) => step.mapCont(f => f(elInput(a)))
+                done = (a, _) => step.mapCont(f => f(elInput(a))),
             )
 
             iterateeT(
@@ -211,7 +211,7 @@ trait EnumeratorTFunctions {
                   val i = get()
                   if (gotdata(i)) k(elInput(i.map(render))) >>== apply[A]
                   else s.pointI
-              }
+              },
         )
     }
 
@@ -244,7 +244,7 @@ trait EnumeratorTFunctions {
           s.mapCont(
               k =>
                 if (limit > pos) k(elInput(a(pos))) >>== loop(pos + 1)
-                else s.pointI
+                else s.pointI,
           )
         }
         loop(min)

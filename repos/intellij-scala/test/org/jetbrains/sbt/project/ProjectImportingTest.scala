@@ -60,7 +60,7 @@ class ProjectImportingTest extends ImportingTestCase with InexactMatch {
           libraries += unmanagedLibrary
           libraryDependencies += unmanagedLibrary
         }
-      }
+      },
   )
 
   def testSharedSources() = runTest(
@@ -79,7 +79,7 @@ class ProjectImportingTest extends ImportingTestCase with InexactMatch {
         }
 
         modules := Seq(foo, bar, sharedSourcesModule)
-      }
+      },
   )
 
   def testExcludedDirectories() = runTest(
@@ -87,9 +87,9 @@ class ProjectImportingTest extends ImportingTestCase with InexactMatch {
         modules += new module("root") {
           excluded := Seq(
               "directory-to-exclude-1",
-              "directory/to/exclude/2"
+              "directory/to/exclude/2",
           )
         }
-      }
+      },
   )
 }

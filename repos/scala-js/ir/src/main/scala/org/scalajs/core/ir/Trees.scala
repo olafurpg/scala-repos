@@ -129,7 +129,7 @@ object Trees {
       "synchronized",
       "throws",
       "transient",
-      "volatile"
+      "volatile",
   )
 
   // Definitions

@@ -5,7 +5,7 @@ object Bar extends App {
   object Bla {
     val foo: Foo = Foo(
         bar = "Bar",
-        baz = 123
+        baz = 123,
     )
 
     val fooUpd = foo.copy(bar = foo.bar.reverse)

@@ -122,7 +122,7 @@ abstract class HadoopFsRelationTest
         .add("f2",
              ArrayType(BooleanType, containsNull = true),
              nullable = true),
-      new MyDenseVectorUDT()
+      new MyDenseVectorUDT(),
   ).filter(supportsDataType)
 
   for (dataType <- supportedDataTypes) {
@@ -134,7 +134,7 @@ abstract class HadoopFsRelationTest
           .forType(
               dataType = dataType,
               nullable = true,
-              new Random(System.nanoTime())
+              new Random(System.nanoTime()),
           )
           .getOrElse {
             fail(s"Failed to create data generator for schema $dataType")
@@ -411,7 +411,7 @@ abstract class HadoopFsRelationTest
     withTable("t") {
       checkAnswer(
           sqlContext.table("t").sort('id),
-          Row(0, true) :: Row(1, false) :: Nil
+          Row(0, true) :: Row(1, false) :: Nil,
       )
     }
   }
@@ -546,7 +546,7 @@ abstract class HadoopFsRelationTest
           s"${file.getCanonicalFile}/p1=1/p2=foo",
           s"${file.getCanonicalFile}/p1=2/p2=foo",
           s"${file.getCanonicalFile}/p1=1/p2=bar",
-          s"${file.getCanonicalFile}/p1=2/p2=bar"
+          s"${file.getCanonicalFile}/p1=2/p2=bar",
       ).map { p =>
         val path = new Path(p)
         val fs =

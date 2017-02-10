@@ -53,7 +53,7 @@ private final class Storage(coll: Coll) {
     coll
       .aggregate(
           Match(BSONDocument(F.userId -> userId)),
-          List(GroupField(F.perf)("nb" -> SumValue(1)))
+          List(GroupField(F.perf)("nb" -> SumValue(1))),
       )
       .map {
         _.documents.flatMap { doc =>

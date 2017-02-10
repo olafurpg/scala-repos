@@ -71,7 +71,7 @@ class EntityMap[A](
 
   def this(idToData: Map[String, A]) = this(
       idToData,
-      BiMap.stringLong(idToData.keySet)
+      BiMap.stringLong(idToData.keySet),
   )
 
   def data(id: String): A = idToData(id)

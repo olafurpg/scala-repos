@@ -205,9 +205,9 @@ class GroupsResource @Inject()(groupManager: GroupManager,
           ok(
               Json
                 .obj(
-                    "steps" -> DeploymentPlan(originalGroup, updatedGroup).steps
+                    "steps" -> DeploymentPlan(originalGroup, updatedGroup).steps,
                 )
-                .toString()
+                .toString(),
             )
         } else {
           val (deployment, _) =
@@ -232,7 +232,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
               PathId.empty,
               clearRootGroup,
               Timestamp.now(),
-              force
+              force,
           ))
       deploymentResult(deployment)
   }
@@ -277,7 +277,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
         .map(_.update(group.id, Predef.identity, newVersion))
       versionedGroup.getOrElse(
           throw new IllegalArgumentException(
-              s"Group $group.id not available in version $targetVersion")
+              s"Group $group.id not available in version $targetVersion"),
       )
     }
 

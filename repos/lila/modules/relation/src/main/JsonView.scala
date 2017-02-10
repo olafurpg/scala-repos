@@ -12,7 +12,7 @@ object JsonView {
             "user" -> r.user,
             "nbGames" -> r.nbGames,
             "followable" -> r.followable,
-            "relation" -> r.relation
+            "relation" -> r.relation,
         )
         .noNull
     }

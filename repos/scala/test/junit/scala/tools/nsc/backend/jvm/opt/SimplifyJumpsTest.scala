@@ -23,7 +23,7 @@ class SimplifyJumpsTest {
         Label(1), // multiple labels OK
         Label(2),
         Label(3),
-        Op(RETURN)
+        Op(RETURN),
     )
     val method = genMethod()(ops: _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
@@ -38,11 +38,11 @@ class SimplifyJumpsTest {
         Label(1),
         Label(2),
         Label(3),
-        Op(ATHROW)
+        Op(ATHROW),
     )
     val method = genMethod()(
         Op(ACONST_NULL) :: Jump(GOTO, Label(2)) :: // replaced by ATHROW
-        rest: _*
+        rest: _*,
     )
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(
@@ -65,7 +65,7 @@ class SimplifyJumpsTest {
         Op(ATHROW),
         Label(4),
         Op(POP),
-        Op(RETURN)
+        Op(RETURN),
     )
     val method = genMethod(handlers = handler)(initialInstrs: _*)
     assertFalse(LocalOptImpls.simplifyJumps(method))
@@ -81,7 +81,7 @@ class SimplifyJumpsTest {
   def simplifyBranchOverGoto(): Unit = {
     val begin = List(
         VarOp(ILOAD, 1),
-        Jump(IFGE, Label(2))
+        Jump(IFGE, Label(2)),
     )
     val rest = List(
         Jump(GOTO, Label(3)),
@@ -91,7 +91,7 @@ class SimplifyJumpsTest {
         Op(RETURN),
         Label(3),
         VarOp(ILOAD, 1),
-        Op(IRETURN)
+        Op(IRETURN),
     )
     val method = genMethod()(begin ::: rest: _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
@@ -128,7 +128,7 @@ class SimplifyJumpsTest {
           Label(2),
           Op(RETURN),
           Label(3),
-          Op(RETURN)
+          Op(RETURN),
       )
 
     // ensures that the goto is safely removed. ASM supports removing while iterating, but not the
@@ -147,7 +147,7 @@ class SimplifyJumpsTest {
         Label(1),
         Label(2),
         VarOp(ILOAD, 1),
-        Op(IRETURN)
+        Op(IRETURN),
     )
     val method = genMethod()(ops: _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
@@ -169,7 +169,7 @@ class SimplifyJumpsTest {
         Op(RETURN),
         Label(3),
         VarOp(ILOAD, 1),
-        Op(IRETURN)
+        Op(IRETURN),
     )
     val method = genMethod()(ops(1, 2, 3): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
@@ -190,7 +190,7 @@ class SimplifyJumpsTest {
         Label(3),
         Jump(GOTO, Label(4)),
         Label(2),
-        Jump(GOTO, Label(3))
+        Jump(GOTO, Label(3)),
     )
 
     val method = genMethod()(ops(2): _*)
@@ -209,7 +209,7 @@ class SimplifyJumpsTest {
         Op(IRETURN),
         Label(1),
         VarOp(ILOAD, 1),
-        Op(IRETURN)
+        Op(IRETURN),
     )
 
     val method = genMethod()(ops(Jump(IFGE, Label(1))): _*)
@@ -222,7 +222,7 @@ class SimplifyJumpsTest {
     def ops(br: List[Instruction]) =
       List(VarOp(ILOAD, 1), VarOp(ILOAD, 2)) ::: br ::: List(
           Label(1),
-          Jump(GOTO, Label(1))
+          Jump(GOTO, Label(1)),
       )
     val method = genMethod()(ops(List(Jump(IF_ICMPGE, Label(1)))): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))

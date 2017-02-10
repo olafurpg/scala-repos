@@ -48,7 +48,7 @@ object ScalaExtendingPlay extends Specification {
     def bindings(environment: Environment, configuration: Configuration) = {
       Seq(
           bind[Langs].to[DefaultLangs],
-          bind[MessagesApi].to[MyMessagesApi]
+          bind[MessagesApi].to[MyMessagesApi],
       )
     }
   }

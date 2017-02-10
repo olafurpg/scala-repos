@@ -20,7 +20,7 @@ package object netty4 {
   // global worker thread pool for finagle clients and servers.
   private[netty4] val Executor: ExecutorService =
     Executors.newCachedThreadPool(
-        new NamedPoolThreadFactory("finagle/netty4", makeDaemons = true)
+        new NamedPoolThreadFactory("finagle/netty4", makeDaemons = true),
     )
 
   private[netty4] object WorkerPool

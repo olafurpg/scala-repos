@@ -28,7 +28,7 @@ class DynamicSynonymFilterSpec extends EnsimeSpec {
       "kicked the bucket",
       "shuffled off his mortal coil",
       "run down the curtain and joined the bleedin choir invisible",
-      "ex-parrot"
+      "ex-parrot",
   )
   val engine = new SynonymEngine {
     def synonyms(term: String) =

@@ -55,7 +55,7 @@ class EnsembleDropShadow extends EnsembleExample {
           text = "Ensemble Drop Shadow 2"
           font = new Font("Verdana", 20)
           effect = new DropShadow()
-        }
+        },
     )
   }
 }

@@ -22,13 +22,13 @@ object Volume {
         PersistentVolume(
             containerPath = containerPath,
             persistent = persistentVolumeInfo,
-            mode = mode
+            mode = mode,
         )
       case None =>
         DockerVolume(
             containerPath = containerPath,
             hostPath = hostPath.getOrElse(""),
-            mode = mode
+            mode = mode,
         )
     }
 
@@ -42,13 +42,13 @@ object Volume {
         PersistentVolume(
             containerPath = proto.getContainerPath,
             persistent = persistentVolumeInfo,
-            mode = proto.getMode
+            mode = proto.getMode,
         )
       case None =>
         DockerVolume(
             containerPath = proto.getContainerPath,
             hostPath = proto.getHostPath,
-            mode = proto.getMode
+            mode = proto.getMode,
         )
     }
   }
@@ -57,7 +57,7 @@ object Volume {
     DockerVolume(
         containerPath = proto.getContainerPath,
         hostPath = proto.getHostPath,
-        mode = proto.getMode
+        mode = proto.getMode,
     )
 
   def unapply(volume: Volume)

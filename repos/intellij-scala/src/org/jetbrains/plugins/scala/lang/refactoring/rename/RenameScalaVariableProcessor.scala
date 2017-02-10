@@ -76,7 +76,7 @@ class RenameScalaVariableProcessor
                         prefix + StringUtil.capitalize(
                             ScalaNamesUtil.toJavaName(newName))
                       allRenames.put(wrapper, newBeanName)
-                  }
+                  },
               )
             case _ =>
           }

@@ -14,7 +14,7 @@ class TaskStatsByVersionFormatTest
       maybeStartedAfterLastScaling = None,
       maybeWithLatestConfig = None,
       maybeWithOutdatedConfig = None,
-      maybeTotalSummary = None
+      maybeTotalSummary = None,
   )
 
   private[this] val fullTaskStats = TaskStats(
@@ -22,14 +22,14 @@ class TaskStatsByVersionFormatTest
             tasksStaged = 1,
             tasksRunning = 2,
             tasksHealthy = 3,
-            tasksUnhealthy = 4
+            tasksUnhealthy = 4,
         ),
       maybeLifeTime = Some(
             TaskLifeTime(
                 averageSeconds = 20.0,
-                medianSeconds = 10.0
-            )
-        )
+                medianSeconds = 10.0,
+            ),
+        ),
   )
 
   test("empty stats get rendered correctly") {
@@ -52,13 +52,13 @@ class TaskStatsByVersionFormatTest
                       "staged" -> 1,
                       "running" -> 2,
                       "healthy" -> 3,
-                      "unhealthy" -> 4
+                      "unhealthy" -> 4,
                   ),
                   "lifeTime" -> Json.obj(
                       "averageSeconds" -> 20.0,
-                      "medianSeconds" -> 10.0
-                  )
-              )
+                      "medianSeconds" -> 10.0,
+                  ),
+              ),
           ))
   }
 
@@ -76,9 +76,9 @@ class TaskStatsByVersionFormatTest
                       "staged" -> 1,
                       "running" -> 2,
                       "healthy" -> 3,
-                      "unhealthy" -> 4
-                  )
-              )
+                      "unhealthy" -> 4,
+                  ),
+              ),
           ))
   }
 
@@ -92,7 +92,7 @@ class TaskStatsByVersionFormatTest
         maybeWithOutdatedConfig = Some(fullTaskStats.copy(
                   fullTaskStats.counts.copy(tasksRunning = 300))),
         maybeTotalSummary = Some(fullTaskStats.copy(
-                  fullTaskStats.counts.copy(tasksRunning = 500)))
+                  fullTaskStats.counts.copy(tasksRunning = 500))),
     )
 
     When("serializing to JSON")

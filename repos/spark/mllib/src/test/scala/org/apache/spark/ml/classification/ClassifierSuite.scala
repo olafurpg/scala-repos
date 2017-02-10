@@ -26,6 +26,6 @@ object ClassifierSuite {
     */
   val allParamSettings: Map[String, Any] = Map(
       "predictionCol" -> "myPrediction",
-      "rawPredictionCol" -> "myRawPrediction"
+      "rawPredictionCol" -> "myRawPrediction",
   )
 }

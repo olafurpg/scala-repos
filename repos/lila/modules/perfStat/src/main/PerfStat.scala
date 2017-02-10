@@ -30,7 +30,7 @@ case class PerfStat(_id: String, // userId/perfId
                 ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
           count = count(pov),
           resultStreak = resultStreak agg pov,
-          playStreak = playStreak agg pov
+          playStreak = playStreak agg pov,
       )
     }
 }
@@ -50,7 +50,7 @@ object PerfStat {
       count = Count.init,
       resultStreak = ResultStreak(win = Streaks.init, loss = Streaks.init),
       playStreak = PlayStreak(
-            nb = Streaks.init, time = Streaks.init, lastDate = none)
+            nb = Streaks.init, time = Streaks.init, lastDate = none),
   )
 }
 
@@ -81,7 +81,7 @@ object PlayStreak {
 case class Streaks(cur: Streak, max: Streak) {
   def apply(cont: Boolean, pov: Pov)(v: Int) =
     copy(
-        cur = cur(cont, pov)(v)
+        cur = cur(cont, pov)(v),
     ).setMax
   def reset = copy(cur = Streak.init)
   private def setMax = copy(max = if (cur.v >= max.v) cur else max)
@@ -172,7 +172,7 @@ case class Results(results: List[Result]) {
                     opInt,
                     UserId(~pov.opponent.userId),
                     pov.game.updatedAtOrCreatedAt,
-                    pov.game.id
+                    pov.game.id,
                 ) :: results).sortBy(_.opInt * comp) take Results.nb)
     }
 }

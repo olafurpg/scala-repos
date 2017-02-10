@@ -29,7 +29,7 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
     val localTermFrequencies = Seq(
         Vectors.sparse(n, Array(1, 3), Array(1.0, 2.0)),
         Vectors.dense(0.0, 1.0, 2.0, 3.0),
-        Vectors.sparse(n, Array(1), Array(1.0))
+        Vectors.sparse(n, Array(1), Array(1.0)),
     )
     val m = localTermFrequencies.size
     val termFrequencies = sc.parallelize(localTermFrequencies, 2)
@@ -71,7 +71,7 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
     val localTermFrequencies = Seq(
         Vectors.sparse(n, Array(1, 3), Array(1.0, 2.0)),
         Vectors.dense(0.0, 1.0, 2.0, 3.0),
-        Vectors.sparse(n, Array(1), Array(1.0))
+        Vectors.sparse(n, Array(1), Array(1.0)),
     )
     val m = localTermFrequencies.size
     val termFrequencies = sc.parallelize(localTermFrequencies, 2)

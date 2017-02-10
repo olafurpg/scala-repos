@@ -2,17 +2,17 @@ import scala.{specialized => spec}
 
 class C1A[
     @spec(Double, Int, AnyRef) A,
-    @spec(Double, Int, AnyRef) B
+    @spec(Double, Int, AnyRef) B,
 ]
 
 class C1B[
     @spec(Double, Int, AnyRef) A,
-    @spec(Double, Int, AnyRef) B
+    @spec(Double, Int, AnyRef) B,
 ](v: A)
 
 class C1C[
     @spec(Double, Int, AnyRef) A,
-    @spec(Double, Int, AnyRef) B
+    @spec(Double, Int, AnyRef) B,
 ](v: A, w: B)
 
 object Test {

@@ -151,7 +151,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
         receiveTaskStatusUpdate,
         receiveGetCurrentCount,
         receiveAddCount,
-        receiveProcessOffers
+        receiveProcessOffers,
     ).reduce(_.orElse[Any, Unit](_))
   }
 
@@ -195,7 +195,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
           import context.dispatcher
           recheckBackOff = Some(
               context.system.scheduler.scheduleOnce(
-                  now until delayUntil, self, RecheckIfBackOffUntilReached)
+                  now until delayUntil, self, RecheckIfBackOffUntilReached),
           )
         }
 
@@ -306,7 +306,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
               "getting new app definition config for '{}', version {} with {} initial tasks",
               app.id,
               app.version,
-              addCount
+              addCount,
           )
 
           suspendMatchingUntilWeGetBackoffDelayUpdate()
@@ -315,7 +315,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
               "scaling change for '{}', version {} with {} initial tasks",
               app.id,
               app.version,
-              addCount
+              addCount,
           )
         }
       } else {
@@ -346,7 +346,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
         // don't count tasks that are not launched in the tasksMap
         tasksLaunched = tasksMap.values.count(_.launched.isDefined) -
           inFlightTaskOperations.size,
-        backOffUntil.getOrElse(clock.now())
+        backOffUntil.getOrElse(clock.now()),
     )
   }
 
@@ -403,7 +403,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
   private[this] def scheduleTaskOpTimeout(taskOp: TaskOp): Unit = {
     val reject = TaskOpSourceDelegate.TaskOpRejected(
         taskOp,
-        AppTaskLauncherActor.TASK_OP_REJECTED_TIMEOUT_REASON
+        AppTaskLauncherActor.TASK_OP_REJECTED_TIMEOUT_REASON,
     )
     val cancellable = scheduleTaskOperationTimeout(context, reject)
     inFlightTaskOperations += taskOp.taskId -> cancellable

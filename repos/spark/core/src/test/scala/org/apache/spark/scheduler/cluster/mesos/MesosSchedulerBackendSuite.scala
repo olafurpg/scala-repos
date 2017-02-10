@@ -251,13 +251,13 @@ class MesosSchedulerBackendSuite
         new WorkerOffer(
             mesosOffers.get(0).getSlaveId.getValue,
             mesosOffers.get(0).getHostname,
-            (minCpu - backend.mesosExecutorCores).toInt
+            (minCpu - backend.mesosExecutorCores).toInt,
         ))
     expectedWorkerOffers.append(
         new WorkerOffer(
             mesosOffers.get(2).getSlaveId.getValue,
             mesosOffers.get(2).getHostname,
-            (minCpu - backend.mesosExecutorCores).toInt
+            (minCpu - backend.mesosExecutorCores).toInt,
         ))
     val taskDesc = new TaskDescription(
         1L, 0, "s1", "n1", 0, ByteBuffer.wrap(new Array[Byte](0)))
@@ -270,8 +270,8 @@ class MesosSchedulerBackendSuite
         driver.launchTasks(
             Matchers.eq(Collections.singleton(mesosOffers.get(0).getId)),
             capture.capture(),
-            any(classOf[Filters])
-        )
+            any(classOf[Filters]),
+        ),
     ).thenReturn(Status.valueOf(1))
     when(driver.declineOffer(mesosOffers.get(1).getId))
       .thenReturn(Status.valueOf(1))
@@ -283,7 +283,7 @@ class MesosSchedulerBackendSuite
     verify(driver, times(1)).launchTasks(
         Matchers.eq(Collections.singleton(mesosOffers.get(0).getId)),
         capture.capture(),
-        any(classOf[Filters])
+        any(classOf[Filters]),
     )
     verify(driver, times(1)).declineOffer(mesosOffers.get(1).getId)
     verify(driver, times(1)).declineOffer(mesosOffers.get(2).getId)
@@ -382,8 +382,8 @@ class MesosSchedulerBackendSuite
         driver.launchTasks(
             Matchers.eq(Collections.singleton(mesosOffers.get(0).getId)),
             capture.capture(),
-            any(classOf[Filters])
-        )
+            any(classOf[Filters]),
+        ),
     ).thenReturn(Status.valueOf(1))
 
     backend.resourceOffers(driver, mesosOffers)
@@ -391,7 +391,7 @@ class MesosSchedulerBackendSuite
     verify(driver, times(1)).launchTasks(
         Matchers.eq(Collections.singleton(mesosOffers.get(0).getId)),
         capture.capture(),
-        any(classOf[Filters])
+        any(classOf[Filters]),
     )
 
     assert(capture.getValue.size() === 1)

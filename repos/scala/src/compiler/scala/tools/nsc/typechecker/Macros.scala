@@ -199,7 +199,7 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           "isBlackbox" -> isBlackbox,
           "className" -> className,
           "methodName" -> macroImpl.name.toString,
-          "signature" -> signature
+          "signature" -> signature,
       )
 
       // the shape of the nucleus is chosen arbitrarily. it doesn't carry any payload.

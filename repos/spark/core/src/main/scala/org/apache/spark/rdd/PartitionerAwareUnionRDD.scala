@@ -30,7 +30,7 @@ import org.apache.spark.util.Utils
   */
 private[spark] class PartitionerAwareUnionRDDPartition(
     @transient val rdds: Seq[RDD[_]],
-    val idx: Int
+    val idx: Int,
 )
     extends Partition {
   var parents = rdds.map(_.partitions(idx)).toArray
@@ -57,7 +57,7 @@ private[spark] class PartitionerAwareUnionRDDPartition(
   */
 private[spark] class PartitionerAwareUnionRDD[T : ClassTag](
     sc: SparkContext,
-    var rdds: Seq[RDD[T]]
+    var rdds: Seq[RDD[T]],
 )
     extends RDD[T](sc, rdds.map(x => new OneToOneDependency(x))) {
   require(rdds.length > 0)

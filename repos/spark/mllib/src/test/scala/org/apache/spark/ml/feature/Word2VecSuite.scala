@@ -54,7 +54,7 @@ class Word2VecSuite
             1.0309048891067505, -1.29472815990448, 0.22276712954044342),
         "c" -> Array(-0.08456747233867645,
                      0.5137411952018738,
-                     0.11731560528278351)
+                     0.11731560528278351),
     )
 
     val expected = doc.map { sentence =>
@@ -104,7 +104,7 @@ class Word2VecSuite
             1.0309048891067505, -1.29472815990448, 0.22276712954044342),
         "c" -> Array(-0.08456747233867645,
                      0.5137411952018738,
-                     0.11731560528278351)
+                     0.11731560528278351),
     )
     val expectedVectors =
       codes.toSeq.sortBy(_._1).map { case (w, v) => Vectors.dense(v) }
@@ -134,7 +134,7 @@ class Word2VecSuite
         Vectors.dense(
             0.32463887333869934, -0.9306551218032837, 1.393115520477295),
         Vectors.dense(
-            -0.27150997519493103, 0.4372006058692932, -0.13465698063373566)
+            -0.27150997519493103, 0.4372006058692932, -0.13465698063373566),
     )
 
     realVectors.zip(magicExpected).foreach {
@@ -245,7 +245,7 @@ class Word2VecSuite
         ("china", Array(0.50f, 0.50f, 0.50f, 0.50f)),
         ("japan", Array(0.40f, 0.50f, 0.50f, 0.50f)),
         ("taiwan", Array(0.60f, 0.50f, 0.50f, 0.50f)),
-        ("korea", Array(0.45f, 0.60f, 0.60f, 0.60f))
+        ("korea", Array(0.45f, 0.60f, 0.60f, 0.60f)),
     )
     val oldModel = new OldWord2VecModel(word2VecMap)
     val instance = new Word2VecModel("myWord2VecModel", oldModel)

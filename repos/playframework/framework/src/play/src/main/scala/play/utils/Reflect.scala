@@ -64,13 +64,13 @@ object Reflect {
       case Some(Left(direct)) =>
         Seq(
             bind[ScalaTrait].to(direct),
-            bind[JavaInterface].to[JavaDelegate]
+            bind[JavaInterface].to[JavaDelegate],
         )
       // Implements the java interface
       case Some(Right(java)) =>
         Seq(
             bind[ScalaTrait].to[JavaAdapter],
-            bind[JavaInterface].to(java)
+            bind[JavaInterface].to(java),
         )
 
       case None => Nil

@@ -140,7 +140,7 @@ object MultipleShapeDrawingDemo extends JFXApp {
                   strokeWidth = 3
                 }
                 toggleGroup = alignToggleGroup
-              }
+              },
           )
 
           // Subscription to the current mouse event handler

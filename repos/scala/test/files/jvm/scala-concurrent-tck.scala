@@ -666,7 +666,7 @@ trait Promises extends TestBase {
 }
 
 trait Exceptions extends TestBase {
-  import ExecutionContext.Implicits._
+  import ExecutionContext.Implicits._,
 }
 
 trait GlobalExecutionContext extends TestBase {

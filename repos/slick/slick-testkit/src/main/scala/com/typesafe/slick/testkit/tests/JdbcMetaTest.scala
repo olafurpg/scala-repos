@@ -71,7 +71,7 @@ class JdbcMetaTest extends AsyncTest[JdbcTestDB] {
                       ifCap(tcap.jdbcMetaGetIndexInfo)(t.getIndexInfo()),
                       t.getTablePrivileges,
                       t.getBestRowIdentifier(
-                          MBestRowIdentifierColumn.Scope.Session)
+                          MBestRowIdentifierColumn.Scope.Session),
                   )
               })
           }

@@ -17,7 +17,7 @@ object ForumPost extends LilaController with ForumController {
           Env.forumSearch(text, page, isGranted(_.StaffForum), ctx.troll) map {
             paginator =>
               html.forum.search(text, paginator)
-          }
+          },
       )
     }
   }
@@ -55,7 +55,7 @@ object ForumPost extends LilaController with ForumController {
                     data =>
                       postApi.makePost(categ, topic, data) map { post =>
                         Redirect(routes.ForumPost.redirect(post.id))
-                    }
+                    },
                 )
           }
         }

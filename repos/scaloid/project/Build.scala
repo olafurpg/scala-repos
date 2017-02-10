@@ -60,13 +60,13 @@ object ScaloidBuild extends Build {
       scalacOptions := Seq(
           "-target:jvm-1.6",
           "-deprecation",
-          "-feature"
+          "-feature",
       ),
       javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
       resolvers += "Android Repository" at
       (new File(System.getenv("ANDROID_HOME")) / "extras" / "android" / "m2repository").getCanonicalFile.toURI.toString,
       addCompilerPlugin(
-          "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+          "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
   )
 
   // configure prompt to show current project

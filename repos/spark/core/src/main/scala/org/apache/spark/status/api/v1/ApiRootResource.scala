@@ -258,7 +258,7 @@ private[v1] class NotFoundException(msg: String)
         Response
           .status(Response.Status.NOT_FOUND)
           .entity(ErrorWrapper(msg))
-          .build()
+          .build(),
       )
 
 private[v1] class BadParameterException(msg: String)
@@ -267,7 +267,7 @@ private[v1] class BadParameterException(msg: String)
         Response
           .status(Response.Status.BAD_REQUEST)
           .entity(ErrorWrapper(msg))
-          .build()
+          .build(),
       ) {
   def this(param: String, exp: String, actual: String) = {
     this(

@@ -50,7 +50,7 @@ final class ProcessIO(
     val writeInput: OutputStream => Unit,
     val processOutput: InputStream => Unit,
     val processError: InputStream => Unit,
-    val daemonizeThreads: Boolean
+    val daemonizeThreads: Boolean,
 ) {
   def this(in: OutputStream => Unit,
            out: InputStream => Unit,

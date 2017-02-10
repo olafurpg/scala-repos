@@ -39,7 +39,7 @@ private[finagle] object StabilizingAddr {
       pulse: Offer[State.Health],
       grace: Duration,
       statsReceiver: StatsReceiver = NullStatsReceiver,
-      timer: Timer = DefaultTimer.twitter
+      timer: Timer = DefaultTimer.twitter,
   ): Offer[Addr] = new Offer[Addr] {
     import State._
 
@@ -126,7 +126,7 @@ private[finagle] object StabilizingAddr {
             stabilized.send(addr) map { _ =>
               loop(remq, h, active, false, srcAddr)
             }
-          }
+          },
       )
     }
 

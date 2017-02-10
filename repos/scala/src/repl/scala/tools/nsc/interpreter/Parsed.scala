@@ -32,7 +32,7 @@ trait Delimited { self: Parsed =>
 class Parsed private (
     val buffer: String,
     val cursor: Int,
-    val delimited: Char => Boolean
+    val delimited: Char => Boolean,
 )
     extends Delimited {
   def isEmpty = args.isEmpty

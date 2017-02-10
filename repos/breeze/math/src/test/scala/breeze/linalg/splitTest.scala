@@ -39,19 +39,19 @@ class splitTest extends FunSuite {
         (0, 1, 2, 3, 4, 5),
         (3, 4, 5, 6, 7, 8),
         (3, 4, 5, 6, 7, 8),
-        (5, 4, 5, 9, 7, 8)
+        (5, 4, 5, 9, 7, 8),
     )
     val expectedResult = List(DenseMatrix(
                                   (0, 1, 2),
                                   (3, 4, 5),
                                   (3, 4, 5),
-                                  (5, 4, 5)
+                                  (5, 4, 5),
                               ),
                               DenseMatrix(
                                   (3, 4, 5),
                                   (6, 7, 8),
                                   (6, 7, 8),
-                                  (9, 7, 8)
+                                  (9, 7, 8),
                               ))
     assert(hsplit(mbig, 2) == expectedResult)
   }
@@ -60,15 +60,15 @@ class splitTest extends FunSuite {
         (0, 1, 2, 3, 4, 5),
         (3, 4, 5, 6, 7, 8),
         (3, 4, 5, 6, 7, 8),
-        (5, 4, 5, 9, 7, 8)
+        (5, 4, 5, 9, 7, 8),
     )
     val expectedResult = List(DenseMatrix(
                                   (0, 1, 2, 3, 4, 5),
-                                  (3, 4, 5, 6, 7, 8)
+                                  (3, 4, 5, 6, 7, 8),
                               ),
                               DenseMatrix(
                                   (3, 4, 5, 6, 7, 8),
-                                  (5, 4, 5, 9, 7, 8)
+                                  (5, 4, 5, 9, 7, 8),
                               ))
     assert(vsplit(mbig, 2) == expectedResult)
   }

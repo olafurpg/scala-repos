@@ -48,7 +48,7 @@ object Round extends LilaController with TheftPrevention {
                     uid,
                     ~get("ran"),
                     ctx.me,
-                    ctx.ip
+                    ctx.ip,
                 ) map Right.apply
               case None => fuccess(Left(NotFound))
             }
@@ -85,7 +85,7 @@ object Round extends LilaController with TheftPrevention {
                   }
               }
             }.mon(_.http.response.player.website),
-              notFound
+              notFound,
           ),
         api = apiVersion =>
             {
@@ -95,7 +95,7 @@ object Round extends LilaController with TheftPrevention {
                 .player(pov, apiVersion)
                 .map { Ok(_) }
                 .mon(_.http.response.player.mobile)
-        }
+        },
     ) map NoCache
 
   def player(fullId: String) = Open { implicit ctx =>
@@ -205,7 +205,7 @@ object Round extends LilaController with TheftPrevention {
                 Env.api.roundApi.watcher(
                     pov, apiVersion, tv = none, withOpening = false) map {
                 Ok(_)
-            }
+            },
         ) map NoCache
     }
 

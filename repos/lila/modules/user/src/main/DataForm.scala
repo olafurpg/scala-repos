@@ -7,7 +7,7 @@ object DataForm {
 
   val note = Form(
       single(
-          "text" -> nonEmptyText(minLength = 3, maxLength = 2000)
+          "text" -> nonEmptyText(minLength = 3, maxLength = 2000),
       ))
 
   val profile = Form(
@@ -17,7 +17,7 @@ object DataForm {
           "location" -> optional(nonEmptyText(maxLength = 80)),
           "bio" -> optional(nonEmptyText(maxLength = 400)),
           "firstName" -> nameField,
-          "lastName" -> nameField
+          "lastName" -> nameField,
       )(Profile.apply)(Profile.unapply))
 
   def profileOf(user: User) = profile fill user.profileOrDefault
@@ -32,10 +32,10 @@ object DataForm {
       mapping(
           "oldPasswd" -> nonEmptyText,
           "newPasswd1" -> nonEmptyText(minLength = 2),
-          "newPasswd2" -> nonEmptyText(minLength = 2)
+          "newPasswd2" -> nonEmptyText(minLength = 2),
       )(Passwd.apply)(Passwd.unapply).verifying(
           "the new passwords don't match",
-          _.samePasswords
+          _.samePasswords,
       ))
 
   val title = Form(single("title" -> optional(nonEmptyText)))

@@ -87,7 +87,7 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
       path: String,
       shardId: Int,
       addr: InetSocketAddress,
-      endpoint: Option[String]
+      endpoint: Option[String],
   ): Future[Announcement] = {
     val zkHosts = factory.hostSet(hosts)
     if (zkHosts.isEmpty)
@@ -101,7 +101,7 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
       path: String,
       shardId: Int,
       addr: InetSocketAddress,
-      endpoint: Option[String]
+      endpoint: Option[String],
   ): Future[Announcement] = {
     val conf =
       serverSets find { s =>

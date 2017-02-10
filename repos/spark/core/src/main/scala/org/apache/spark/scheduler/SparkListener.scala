@@ -330,7 +330,7 @@ class StatsReportListener extends SparkListener with Logging {
     val failureReason = info.failureReason.map("(" + _ + ")").getOrElse("")
     val timeTaken = info.submissionTime
       .map(
-          x => info.completionTime.getOrElse(System.currentTimeMillis()) - x
+          x => info.completionTime.getOrElse(System.currentTimeMillis()) - x,
       )
       .getOrElse("-")
 

@@ -88,7 +88,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
         if (full) FullManifestModule else PartialManifestModule,
         newTermName(constructor),
         List(tparg),
-        args
+        args,
     )
 
   /** Make a synchronized block on 'monitor'. */
@@ -135,7 +135,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
         PredefModule,
         wrapArrayMethodName(elemtp),
         if (isPrimitiveValueType(elemtp)) Nil else List(elemtp),
-        List(tree)
+        List(tree),
     )
   }
 

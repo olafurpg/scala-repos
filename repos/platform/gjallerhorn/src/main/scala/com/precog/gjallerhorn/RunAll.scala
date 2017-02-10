@@ -26,6 +26,6 @@ object RunAll extends Runner {
       new MetadataTask(settings),
       new AnalyticsTask(settings),
       new IngestTask(settings),
-      new ScenariosTask(settings)
+      new ScenariosTask(settings),
   )
 }

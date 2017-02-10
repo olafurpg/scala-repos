@@ -43,7 +43,7 @@ private[tournament] case class WaitingUsers(hash: Map[String, DateTime],
         clock = clock,
         hash = hash.filterKeys(us.contains) ++ us
             .filterNot(hash.contains)
-            .map { _ -> newDate }
+            .map { _ -> newDate },
       )
   }
 

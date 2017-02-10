@@ -19,7 +19,7 @@ object CSRF {
       .getOrElse(sys.error("No CSRF token present!"))
     new Call(
         call.method,
-        s"${call.url}${if (call.url.contains("?")) "&" else "?"}${token.name}=${token.value}"
+        s"${call.url}${if (call.url.contains("?")) "&" else "?"}${token.name}=${token.value}",
     )
   }
 

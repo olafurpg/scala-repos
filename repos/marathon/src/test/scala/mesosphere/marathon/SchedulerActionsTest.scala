@@ -34,7 +34,7 @@ class SchedulerActionsTest
         queue,
         system.eventStream,
         TestProbe().ref,
-        mock[MarathonConf]
+        mock[MarathonConf],
     )
 
     val app = AppDefinition(id = PathId("/myapp"))
@@ -76,7 +76,7 @@ class SchedulerActionsTest
         queue,
         system.eventStream,
         TestProbe().ref,
-        mock[MarathonConf]
+        mock[MarathonConf],
     )
 
     val app = AppDefinition(id = PathId("/myapp"))
@@ -92,7 +92,7 @@ class SchedulerActionsTest
         Set(
             runningTask,
             stagedTask,
-            stagedTaskWithSlaveId
+            stagedTaskWithSlaveId,
         ).flatMap(_.launched.flatMap(_.status.mesosStatus)).asJava)
     verify(driver).reconcileTasks(java.util.Arrays.asList())
   }
@@ -112,7 +112,7 @@ class SchedulerActionsTest
         queue,
         system.eventStream,
         TestProbe().ref,
-        mock[MarathonConf]
+        mock[MarathonConf],
     )
 
     val app = AppDefinition(id = PathId("/myapp"))
@@ -144,7 +144,7 @@ class SchedulerActionsTest
         queue,
         system.eventStream,
         TestProbe().ref,
-        mock[MarathonConf]
+        mock[MarathonConf],
     )
 
     val app = AppDefinition(id = PathId("/myapp"))

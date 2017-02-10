@@ -78,7 +78,7 @@ sealed abstract class LazyEither[+A, +B] {
       f: B => G[C]): G[LazyEither[AA, C]] =
     fold(
         left = x => Applicative[G].point(LazyEither.lazyLeft[C](x)),
-        right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c))
+        right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c)),
     )
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
@@ -228,17 +228,17 @@ sealed abstract class LazyEitherInstances {
             a => LazyEither.lazyLeft(LazyEither.lazyLeft(a)),
             _.fold(
                 b => LazyEither.lazyLeft(LazyEither.lazyRight(b)),
-                LazyEither.lazyRight(_)
-            )
+                LazyEither.lazyRight(_),
+            ),
         )
 
       def reassociateRight[A, B, C](f: LazyEither[LazyEither[A, B], C]) =
         f.fold(
             _.fold(
                 LazyEither.lazyLeft(_),
-                b => LazyEither.lazyRight(LazyEither.lazyLeft(b))
+                b => LazyEither.lazyRight(LazyEither.lazyLeft(b)),
             ),
-            c => LazyEither.lazyRight(LazyEither.lazyRight(c))
+            c => LazyEither.lazyRight(LazyEither.lazyRight(c)),
         )
     }
 
@@ -252,7 +252,7 @@ sealed abstract class LazyEitherInstances {
           f: A => G[C], g: B => G[D]): G[LazyEither[C, D]] =
         fab.fold(
             a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
-            b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))
+            b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d)),
         )
     }
 }

@@ -85,7 +85,7 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
   val arbNettyVersion = Gen.oneOf(
       HttpVersion.HTTP_1_0,
       HttpVersion.HTTP_1_1,
-      new HttpVersion("SECURE-HTTP/1.4", true)
+      new HttpVersion("SECURE-HTTP/1.4", true),
   )
 
   val arbNettyResponse = for {

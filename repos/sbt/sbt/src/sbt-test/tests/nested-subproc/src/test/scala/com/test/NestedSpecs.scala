@@ -4,7 +4,7 @@ import org.scalatest._
 
 class NestedSpecs
     extends Suites(
-        new TestSpec
+        new TestSpec,
     )
 
 @DoNotDiscover

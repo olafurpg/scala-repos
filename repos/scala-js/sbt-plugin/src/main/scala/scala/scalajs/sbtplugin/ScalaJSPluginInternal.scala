@@ -110,7 +110,7 @@ object ScalaJSPluginInternal {
 
   val stageKeys: Map[Stage, TaskKey[Attributed[File]]] = Map(
       Stage.FastOpt -> fastOptJS,
-      Stage.FullOpt -> fullOptJS
+      Stage.FullOpt -> fullOptJS,
   )
 
   /** A JS expression that detects the global scope just like Scala.js */
@@ -280,26 +280,26 @@ object ScalaJSPluginInternal {
         } tag ((usesScalaJSLinkerTag in key).value)
       },
       key <<= key.dependsOn(packageJSDependencies, packageScalaJSLauncher),
-      scalaJSLinkedFile in key := new FileVirtualJSFile(key.value.data)
+      scalaJSLinkedFile in key := new FileVirtualJSFile(key.value.data),
   )
 
   private def dispatchSettingKeySettings[T](key: SettingKey[T]) = Seq(
       key <<= Def.settingDyn {
         val stageKey = stageKeys(scalaJSStage.value)
         Def.setting { (key in stageKey).value }
-      }
+      },
   )
 
   private def dispatchTaskKeySettings[T](key: TaskKey[T]) = Seq(
       key <<= Def.taskDyn {
         val stageKey = stageKeys(scalaJSStage.value)
         Def.task { (key in stageKey).value }
-      }
+      },
   )
 
   private def scalajspSettings: Seq[Setting[_]] = {
     case class Options(
-        infos: Boolean = false
+        infos: Boolean = false,
     )
 
     val optionsParser: Parser[Options] = {
@@ -339,7 +339,7 @@ object ScalaJSPluginInternal {
           stdout.flush()
 
           logIRCacheStats(streams.value.log)
-        }
+        },
     )
   }
 
@@ -386,7 +386,7 @@ object ScalaJSPluginInternal {
 
   val scalaJSConfigSettings: Seq[Setting[_]] =
     Seq(
-        incOptions ~= scalaJSPatchIncOptions
+        incOptions ~= scalaJSPatchIncOptions,
     ) ++
     (scalajspSettings ++ stageKeys.flatMap((scalaJSStageSettings _).tupled) ++ dispatchTaskKeySettings(
             scalaJSLinkedFile) ++ dispatchSettingKeySettings(scalaJSLinker) ++ dispatchSettingKeySettings(
@@ -517,7 +517,7 @@ object ScalaJSPluginInternal {
         console <<= console.dependsOn(Def.task(
                 streams.value.log.warn(
                     "Scala REPL doesn't work with Scala.js. You " +
-                    "are running a JVM REPL. JavaScript things won't work.")
+                    "are running a JVM REPL. JavaScript things won't work."),
             )),
         scalaJSNativeLibraries := {
           collectFromClasspath(fullClasspath.value,
@@ -653,7 +653,7 @@ object ScalaJSPluginInternal {
                 env.loadLibs(libs :+ ResolvedJSDependency.minimal(file))
               }
           }
-        }
+        },
     )
 
   /** Run a class in a given environment using a given launcher */
@@ -744,7 +744,7 @@ object ScalaJSPluginInternal {
               memLauncher(mainClass),
               streams.value.log,
               scalaJSConsole.value)
-      }
+      },
   )
 
   val scalaJSCompileSettings = (scalaJSConfigSettings ++ scalaJSRunSettings)
@@ -775,7 +775,7 @@ object ScalaJSPluginInternal {
       // Override default to avoid triggering a test:fastOptJS in a test:compile
       // without loosing autocompletion.
       definedTestNames <<=
-        definedTests map (_.map(_.name).distinct) storeAs definedTestNames triggeredBy loadedJSEnv
+        definedTests map (_.map(_.name).distinct) storeAs definedTestNames triggeredBy loadedJSEnv,
   )
 
   val scalaJSTestBuildSettings =
@@ -792,7 +792,7 @@ object ScalaJSPluginInternal {
       // add all the webjars your jsDependencies depend upon
       libraryDependencies ++= jsDependencies.value.collect {
         case JarJSModuleID(module, _) => module
-      }
+      },
   )
 
   val scalaJSDefaultBuildConfigs =
@@ -805,7 +805,7 @@ object ScalaJSPluginInternal {
 
   val phantomJSJettyModules = Seq(
       "org.eclipse.jetty" % "jetty-websocket" % "8.1.16.v20140903",
-      "org.eclipse.jetty" % "jetty-server" % "8.1.16.v20140903"
+      "org.eclipse.jetty" % "jetty-server" % "8.1.16.v20140903",
   )
 
   val scalaJSProjectBaseSettings =
@@ -846,7 +846,7 @@ object ScalaJSPluginInternal {
           new PhantomJettyClassLoader(jettyLoader, getClass.getClassLoader)
         },
         scalaJSJavaSystemProperties := Nil,
-        scalaJSConfigurationLibs := Nil
+        scalaJSConfigurationLibs := Nil,
     )
 
   val scalaJSAbstractSettings: Seq[Setting[_]] =
@@ -864,6 +864,6 @@ object ScalaJSPluginInternal {
       libraryDependencies +=
         "org.scala-js" %% "scalajs-library" % scalaJSVersion,
       // and you will want to be cross-compiled on the Scala.js binary version
-      crossVersion := ScalaJSCrossVersion.binary
+      crossVersion := ScalaJSCrossVersion.binary,
   )
 }

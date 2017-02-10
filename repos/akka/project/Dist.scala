@@ -61,7 +61,7 @@ object Dist {
         (dir, v, sbv) =>
           dir / ("akka_" + sbv + "-" + v + ".zip")
       },
-      dist <<= distTask
+      dist <<= distTask,
   )
 
   def docsProject: ProjectReference = LocalProject(AkkaBuild.docs.id)

@@ -94,7 +94,7 @@ case class AppDefinition(
         taskId = None,
         host = None,
         ports = Seq.empty,
-        envPrefix = None
+        envPrefix = None,
     )
     val cpusResource = ScalarResource(Resource.CPUS, cpus)
     val memResource = ScalarResource(Resource.MEM, mem)
@@ -193,7 +193,7 @@ case class AppDefinition(
         FullVersionInfo(
             version = Timestamp(proto.getVersion),
             lastScalingAt = Timestamp(proto.getLastScalingAt),
-            lastConfigChangeAt = Timestamp(proto.getLastConfigChangeAt)
+            lastConfigChangeAt = Timestamp(proto.getLastConfigChangeAt),
         )
       else OnlyVersion(Timestamp(proto.getVersion))
 
@@ -252,7 +252,7 @@ case class AppDefinition(
             .map(PathId.apply)
             .toSet,
         ipAddress = ipAddressOption,
-        residency = residencyOption
+        residency = residencyOption,
     )
   }
 
@@ -407,7 +407,7 @@ object AppDefinition {
     def forNewConfig(newVersion: Timestamp): FullVersionInfo = FullVersionInfo(
         version = newVersion,
         lastScalingAt = newVersion,
-        lastConfigChangeAt = newVersion
+        lastConfigChangeAt = newVersion,
     )
   }
 

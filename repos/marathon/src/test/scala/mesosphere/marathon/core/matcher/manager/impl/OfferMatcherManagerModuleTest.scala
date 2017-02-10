@@ -134,7 +134,7 @@ class OfferMatcherManagerModuleTest
             makeOneCPUTask("task1_1"),
             makeOneCPUTask("task1_2"),
             makeOneCPUTask("task2_1"),
-            makeOneCPUTask("task2_2")
+            makeOneCPUTask("task2_2"),
         ))
   }
 

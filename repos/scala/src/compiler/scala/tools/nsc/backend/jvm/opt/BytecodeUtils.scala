@@ -368,7 +368,7 @@ object BytecodeUtils {
                 localVariable.signature,
                 labelMap(localVariable.start),
                 labelMap(localVariable.end),
-                localVariable.index + shift
+                localVariable.index + shift,
           ))
       .toList
   }
@@ -388,7 +388,7 @@ object BytecodeUtils {
                 labelMap(tryCatch.start),
                 labelMap(tryCatch.end),
                 labelMap(tryCatch.handler),
-                tryCatch.`type`
+                tryCatch.`type`,
           ))
       .toList
   }

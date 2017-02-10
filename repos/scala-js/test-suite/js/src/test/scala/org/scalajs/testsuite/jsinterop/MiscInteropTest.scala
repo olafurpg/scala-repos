@@ -173,7 +173,7 @@ class MiscInteropTest {
   @Test def should_allow_to_define_direct_subtraits_of_js_Any(): Unit = {
     val f = js.Dynamic
       .literal(
-          foo = (x: Int) => x + 1
+          foo = (x: Int) => x + 1,
       )
       .asInstanceOf[DirectSubtraitOfJSAny]
 
@@ -183,7 +183,7 @@ class MiscInteropTest {
   @Test def should_allow_to_define_direct_subclasses_of_js_Any(): Unit = {
     val f = js.Dynamic
       .literal(
-          bar = (x: Int) => x + 2
+          bar = (x: Int) => x + 2,
       )
       .asInstanceOf[DirectSubclassOfJSAny]
 

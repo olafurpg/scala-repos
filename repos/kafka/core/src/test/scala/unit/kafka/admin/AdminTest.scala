@@ -105,7 +105,7 @@ class AdminTest extends ZooKeeperTestHarness with Logging with RackAwareTest {
         8 -> List(3, 0, 1),
         9 -> List(4, 1, 2),
         10 -> List(1, 2, 3),
-        11 -> List(1, 3, 4)
+        11 -> List(1, 3, 4),
     )
     val leaderForPartitionMap = immutable.Map(
         0 -> 0,
@@ -119,7 +119,7 @@ class AdminTest extends ZooKeeperTestHarness with Logging with RackAwareTest {
         8 -> 3,
         9 -> 4,
         10 -> 1,
-        11 -> 1
+        11 -> 1,
     )
     val topic = "test"
     TestUtils.createBrokersInZk(zkUtils, List(0, 1, 2, 3, 4))

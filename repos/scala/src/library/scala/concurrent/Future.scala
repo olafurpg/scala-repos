@@ -544,7 +544,7 @@ object Future {
       classOf[Long] -> classOf[java.lang.Long],
       classOf[Float] -> classOf[java.lang.Float],
       classOf[Double] -> classOf[java.lang.Double],
-      classOf[Unit] -> classOf[scala.runtime.BoxedUnit]
+      classOf[Unit] -> classOf[scala.runtime.BoxedUnit],
   )
 
   /** A Future which is never completed.

@@ -71,12 +71,12 @@ sed diam nonumy eirmod tempor invidunt ut</p>
 
 test
 
-test"""
+test""",
     ) should equal(
         """<p>test</p>
 <p>test</p>
 <p>test</p>
-"""
+""",
     )
   }
 
@@ -92,7 +92,7 @@ test"""
 <li>bar</li>
 <li>baz</li>
 </ul>
-"""
+""",
     )
     apply("+ foo\n+ bar\n+ baz\n") should equal(
         """<ul>
@@ -100,7 +100,7 @@ test"""
 <li>bar</li>
 <li>baz</li>
 </ul>
-"""
+""",
     )
     apply("- foo\n- bar\n- baz\n") should equal(
         """<ul>
@@ -108,7 +108,7 @@ test"""
 <li>bar</li>
 <li>baz</li>
 </ul>
-"""
+""",
     )
     apply("- foo\n+ bar\n* baz\n") should equal(
         """<ul>
@@ -116,7 +116,7 @@ test"""
 <li>bar</li>
 <li>baz</li>
 </ul>
-"""
+""",
     )
     apply("1. foo\n22. bar\n10. baz\n") should equal(
         """<ol>
@@ -124,7 +124,7 @@ test"""
 <li>bar</li>
 <li>baz</li>
 </ol>
-"""
+""",
     )
     apply("* foo\n\n* bar\n\n* baz\n\n") should equal(
         """<ul>
@@ -135,7 +135,7 @@ test"""
 <li><p>baz</p>
 </li>
 </ul>
-"""
+""",
     )
     apply("* foo\n\n* bar\n* baz\n") should equal(
         """<ul>
@@ -145,7 +145,7 @@ test"""
 </li>
 <li>baz</li>
 </ul>
-"""
+""",
     )
     apply("""* foo
 
@@ -163,7 +163,7 @@ test"""
 <li><p>bam</p>
 </li>
 </ul>
-"""
+""",
     )
     apply("""* foo
         		
@@ -181,7 +181,7 @@ test"""
 <li><p>bam</p>
 </li>
 </ul>
-"""
+""",
     )
   }
 
@@ -195,7 +195,7 @@ paragraph""") should equal(
 <li>b</li>
 </ol>
 <p>paragraph</p>
-"""
+""",
     )
   }
 
@@ -206,7 +206,7 @@ paragraph""") should equal(
 </blockquote>
 <p>baz</p>
 </blockquote>
-"""
+""",
     )
   }
 
@@ -278,7 +278,7 @@ System.out.println("Hello World!");
 -----------
 but this is:
 ```         
-"""
+""",
     ) should equal(
         """<pre><code>System.out.println(&quot;Hello World!&quot;);
     
@@ -293,7 +293,7 @@ but this is:
 -----------
 but this is:
 </code></pre>
-"""
+""",
     )
 
     apply(
@@ -302,14 +302,14 @@ System.out.println("Hello World!");
 ```
 And now to something completely different.
     old style code
-"""
+""",
     ) should equal(
         """<pre><code>System.out.println(&quot;Hello World!&quot;);
 </code></pre>
 <p>And now to something completely different.</p>
 <pre><code>old style code
 </code></pre>
-"""
+""",
     )
 
     apply(
@@ -319,7 +319,7 @@ No need to end blocks
 
 And now to something completely different.
     old style code
-"""
+""",
     ) should equal(
         """<pre><code>System.out.println(&quot;Hello World!&quot;);
 No need to end blocks
@@ -327,7 +327,7 @@ No need to end blocks
 And now to something completely different.
     old style code
 </code></pre>
-"""
+""",
     )
 
     apply(
@@ -338,7 +338,7 @@ No need to end blocks
 
 And now to something completely different.
     old style code
-"""
+""",
     ) should equal(
         """<p>Some text first</p>
 <pre><code>System.out.println(&quot;Hello World!&quot;);
@@ -347,7 +347,7 @@ No need to end blocks
 And now to something completely different.
     old style code
 </code></pre>
-"""
+""",
     )
   }
 }

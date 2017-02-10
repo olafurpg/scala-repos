@@ -49,9 +49,9 @@ object AsyncMeter {
   def newMeter(
       burstSize: Int,
       burstDuration: Duration,
-      maxWaiters: Int
+      maxWaiters: Int,
   )(
-      implicit timer: Timer
+      implicit timer: Timer,
   ): AsyncMeter = new AsyncMeter(burstSize, burstDuration, maxWaiters)
 
   /**

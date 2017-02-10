@@ -94,7 +94,7 @@ class AppDefinitionValidatorTest
   private[this] def testInvalid(id: String): Unit = {
     val app = AppDefinition(
         id = PathId(id),
-        cmd = Some("true")
+        cmd = Some("true"),
     )
 
     val result = validate(app)
@@ -145,9 +145,9 @@ class AppDefinitionValidatorTest
         healthChecks = Set(
               HealthCheck(
                   protocol = HealthCheckDefinition.Protocol.COMMAND,
-                  command = Some(Command("curl http://localhost:$PORT"))
-              )
-          )
+                  command = Some(Command("curl http://localhost:$PORT")),
+              ),
+          ),
     )
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
@@ -252,7 +252,7 @@ class AppDefinitionValidatorTest
                                       "mesos_authentication_secret_file")
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validPersistentVolume)
+        volumes = Seq(f.validPersistentVolume),
     )
     assert(validate(container).isSuccess)
   }
@@ -261,7 +261,7 @@ class AppDefinitionValidatorTest
     AllConf.SuppliedOptionNames = Set.empty
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validPersistentVolume)
+        volumes = Seq(f.validPersistentVolume),
     )
     assert(validate(container).isFailure)
   }
@@ -269,7 +269,7 @@ class AppDefinitionValidatorTest
   test("docker volume with missing containerPath is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validDockerVolume.copy(containerPath = ""))
+        volumes = Seq(f.validDockerVolume.copy(containerPath = "")),
     )
     assert(validate(container).isFailure)
   }
@@ -277,7 +277,7 @@ class AppDefinitionValidatorTest
   test("docker volume with missing hostPath is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validDockerVolume.copy(hostPath = ""))
+        volumes = Seq(f.validDockerVolume.copy(hostPath = "")),
     )
     assert(validate(container).isFailure)
   }
@@ -285,7 +285,7 @@ class AppDefinitionValidatorTest
   test("persistent volume with missing containerPath is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-        volumes = Seq(f.validPersistentVolume.copy(containerPath = ""))
+        volumes = Seq(f.validPersistentVolume.copy(containerPath = "")),
     )
     assert(validate(container).isFailure)
   }
@@ -294,7 +294,7 @@ class AppDefinitionValidatorTest
     val f = new Fixture
     val container = f.validDockerContainer.copy(
         volumes = Seq(
-              f.validPersistentVolume.copy(mode = mesos.Volume.Mode.RO))
+              f.validPersistentVolume.copy(mode = mesos.Volume.Mode.RO)),
     )
     assert(validate(container).isFailure)
   }
@@ -303,7 +303,7 @@ class AppDefinitionValidatorTest
     val f = new Fixture
     val container = f.validDockerContainer.copy(
         volumes = Seq(f.validPersistentVolume.copy(
-                  persistent = PersistentVolumeInfo(0)))
+                  persistent = PersistentVolumeInfo(0))),
     )
     assert(validate(container).isFailure)
   }
@@ -312,7 +312,7 @@ class AppDefinitionValidatorTest
     val f = new Fixture
     val container = f.validDockerContainer.copy(
         volumes = Seq(f.validPersistentVolume.copy(
-                  persistent = PersistentVolumeInfo(-1)))
+                  persistent = PersistentVolumeInfo(-1))),
     )
     assert(validate(container).isFailure)
   }
@@ -401,25 +401,25 @@ class AppDefinitionValidatorTest
     def validDockerContainer: Container = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,
         volumes = Nil,
-        docker = Some(Docker(image = "foo/bar:latest"))
+        docker = Some(Docker(image = "foo/bar:latest")),
     )
 
     def invalidDockerContainer: Container = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,
         volumes = Nil,
-        docker = None
+        docker = None,
     )
 
     def validMesosContainer: Container = Container(
         `type` = mesos.ContainerInfo.Type.MESOS,
         volumes = Nil,
-        docker = None
+        docker = None,
     )
 
     def invalidMesosContainer: Container = Container(
         `type` = mesos.ContainerInfo.Type.MESOS,
         volumes = Nil,
-        docker = Some(Docker(image = "foo/bar:latest"))
+        docker = Some(Docker(image = "foo/bar:latest")),
     )
 
     // scalastyle:off magic.number
@@ -446,7 +446,7 @@ class AppDefinitionValidatorTest
           residency = Some(
                 Residency(
                     123,
-                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
+                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT)),
       )
     }
     val vol1 = persistentVolume("foo")

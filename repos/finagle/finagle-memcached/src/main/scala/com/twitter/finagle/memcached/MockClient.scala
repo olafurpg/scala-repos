@@ -73,7 +73,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
           } else {
             false
           }
-        }
+        },
     )
 
   /**
@@ -90,7 +90,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
             case None =>
               false
           }
-        }
+        },
     )
 
   /**
@@ -107,7 +107,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
             case None =>
               false
           }
-        }
+        },
     )
 
   /**
@@ -123,7 +123,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
           } else {
             false
           }
-        }
+        },
     )
 
   /**
@@ -136,7 +136,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
       flags: Int,
       expiry: Time,
       value: Buf,
-      casUnique: Buf
+      casUnique: Buf,
   ): Future[CasResult] =
     Future.value(
         map.synchronized {
@@ -149,7 +149,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
             case Some(_) => CasResult.Exists
             case None => CasResult.NotFound
           }
-        }
+        },
     )
 
   def delete(key: String): Future[JBoolean] =
@@ -161,7 +161,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
           } else {
             false
           }
-        }
+        },
     )
 
   def incr(key: String, delta: Long): Future[Option[JLong]] =
@@ -183,7 +183,7 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
             case None =>
               None
           }
-        }
+        },
     )
 
   def decr(key: String, delta: Long): Future[Option[JLong]] =

@@ -139,7 +139,7 @@ private[impl] class TaskUpdateActor(
           metrics.timedOutOpsMeter.mark()
           op.sender ! Status.Failure(
               new TimeoutException(
-                  s"Timeout: ${op.action} for app [${op.appId}] and ${op.taskId}.")
+                  s"Timeout: ${op.action} for app [${op.appId}] and ${op.taskId}."),
           )
           Future.successful(())
         } else metrics.processOpTimer.timeFuture(processor.process(op))

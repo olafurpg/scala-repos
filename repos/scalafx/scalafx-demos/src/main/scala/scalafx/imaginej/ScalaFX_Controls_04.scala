@@ -93,7 +93,7 @@ object ScalaFX_Controls_04 extends JFXApp {
     children = List(
         minorToggleButton,
         majorToggleButton,
-        criticalToggleButton
+        criticalToggleButton,
     )
   }
 
@@ -112,7 +112,7 @@ object ScalaFX_Controls_04 extends JFXApp {
     children = List(
         priorityLabel,
         hBox,
-        rectangle
+        rectangle,
     )
   }
 

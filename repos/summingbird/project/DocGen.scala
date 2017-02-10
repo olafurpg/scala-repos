@@ -50,7 +50,7 @@ object DocGen {
         },
         Unidoc.unidocDirectory := file(docDirectory),
         gitRemoteRepo := "git@github.com:twitter/" + aggregateName + ".git",
-        ghkeys.synchLocal <<= syncLocal
+        ghkeys.synchLocal <<= syncLocal,
     )
 
   lazy val publishSettings =

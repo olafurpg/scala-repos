@@ -16,14 +16,14 @@ private[lease] class MemorySpace(
     maxDiscount: StorageUnit,
     rSnooper: RequestSnooper,
     lr: LogsReceiver,
-    rnd: GenerationalRandom
+    rnd: GenerationalRandom,
 ) {
   def this(
       info: JvmInfo,
       minDiscount: StorageUnit,
       maxDiscount: StorageUnit,
       rSnooper: RequestSnooper,
-      lr: LogsReceiver
+      lr: LogsReceiver,
   ) =
     this(info,
          minDiscount,
@@ -36,7 +36,7 @@ private[lease] class MemorySpace(
       info: JvmInfo,
       minDiscount: StorageUnit,
       maxDiscount: StorageUnit,
-      rSnooper: RequestSnooper
+      rSnooper: RequestSnooper,
   ) = this(info, minDiscount, maxDiscount, rSnooper, NullLogsReceiver)
 
   private[this] val printableZeroBytes = 0.bytes.toString

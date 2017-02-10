@@ -275,7 +275,7 @@ class SolvingTest {
     val expected = Seq(
         Map(pSym -> false, qSym -> false),
         Map(pSym -> true, qSym -> false),
-        Map(pSym -> true, qSym -> true)
+        Map(pSym -> true, qSym -> true),
     ).sorted
 
     assertEquals(expected, expanded)
@@ -589,7 +589,7 @@ class SolvingTest {
 
       Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))),
 
-      sym("V3=scala.collection.immutable.::[?]")
+      sym("V3=scala.collection.immutable.::[?]"),
     )
 
     formulas foreach { f =>

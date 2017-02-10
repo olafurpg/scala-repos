@@ -32,7 +32,7 @@ class Cached211Test {
     implicit val a = new Foo[String] {}
     implicit val b = new Foo[String] {}
     illTyped(
-        "cachedImplicit[Foo[String]]"
+        "cachedImplicit[Foo[String]]",
     )
   }
 }

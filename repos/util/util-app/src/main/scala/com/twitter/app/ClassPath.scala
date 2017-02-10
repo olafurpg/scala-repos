@@ -85,7 +85,7 @@ private object ClassPath {
       uri: URI,
       loader: ClassLoader,
       buf: mutable.Buffer[Info],
-      seenUris: mutable.Set[URI]
+      seenUris: mutable.Set[URI],
   ): Unit = {
     if (uri.getScheme != "file") return
     val f = new File(uri)
@@ -99,7 +99,7 @@ private object ClassPath {
       dir: File,
       loader: ClassLoader,
       prefix: String,
-      buf: mutable.Buffer[Info]
+      buf: mutable.Buffer[Info],
   ): Unit = {
     if (ignoredPackages.contains(prefix)) {
       println("ignored " + prefix)
@@ -115,7 +115,7 @@ private object ClassPath {
       file: File,
       loader: ClassLoader,
       buf: mutable.Buffer[Info],
-      seenUris: mutable.Set[URI]
+      seenUris: mutable.Set[URI],
   ): Unit = {
     val jarFile = try new JarFile(file) catch {
       case _: IOException => return // not a Jar file

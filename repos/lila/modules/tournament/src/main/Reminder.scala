@@ -29,7 +29,7 @@ private[tournament] final class Reminder(renderer: ActorSelection)
                               Json.obj("t" -> "tournamentReminder",
                                        "d" -> Json.obj(
                                            "id" -> tour.id,
-                                           "html" -> html.toString
+                                           "html" -> html.toString,
                                        ))),
                       'users)
       }

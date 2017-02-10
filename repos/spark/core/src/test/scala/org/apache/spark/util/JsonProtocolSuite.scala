@@ -104,7 +104,7 @@ class JsonProtocolSuite extends SparkFunSuite {
                 ("Job throughput", "80000 jobs/s, regardless of job type")),
             "System Properties" -> Seq(("Username", "guest"),
                                        ("Password", "guest")),
-            "Classpath Entries" -> Seq(("Super library", "/tmp/super_library"))
+            "Classpath Entries" -> Seq(("Super library", "/tmp/super_library")),
         ))
     val blockManagerAdded = SparkListenerBlockManagerAdded(
         1L, BlockManagerId("Stars", "In your multitude...", 300), 500)
@@ -976,7 +976,7 @@ private[spark] object JsonProtocolSuite extends Assertions {
     Array[StackTraceElement](
         new StackTraceElement("Apollo", "Venus", "Mercury", 42),
         new StackTraceElement("Afollo", "Vemus", "Mercurry", 420),
-        new StackTraceElement("Ayollo", "Vesus", "Blackberry", 4200)
+        new StackTraceElement("Ayollo", "Vesus", "Blackberry", 4200),
     )
   }
 

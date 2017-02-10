@@ -30,7 +30,7 @@ object AclCommand {
   val ResourceTypeToValidOperations = Map[ResourceType, Set[Operation]](
       Topic -> Set(Read, Write, Describe, All),
       Group -> Set(Read, All),
-      Cluster -> Set(Create, ClusterAction, All)
+      Cluster -> Set(Create, ClusterAction, All),
   )
 
   def main(args: Array[String]) {

@@ -541,7 +541,7 @@ trait ColumnarTableModule[M[+ _]]
                   M.point(StreamT.Done)
                 }
               }
-            } yield back
+            } yield back,
         )
 
       stream(sliceTransform.initial, slices)
@@ -742,7 +742,7 @@ trait ColumnarTableModule[M[+ _]]
               }
             }
           },
-          ExactSize(values.length)
+          ExactSize(values.length),
       )
     }
 
@@ -790,7 +790,7 @@ trait ColumnarTableModule[M[+ _]]
             readStarts.getAndIncrement
             slices0.map(s => { blockReads.getAndIncrement; s })
           })
-          .point[M]
+          .point[M],
       )
 
     /**
@@ -813,7 +813,7 @@ trait ColumnarTableModule[M[+ _]]
 
             reducer.reduce(schema, 0 until s.size)
           },
-          monoid.zero
+          monoid.zero,
       )
     }
 
@@ -1784,7 +1784,7 @@ trait ColumnarTableModule[M[+ _]]
                   M.point(StreamT.Done)
                 }
               }
-            } yield back
+            } yield back,
         )
 
         val slices0 = StreamT.wrapEffect(this.sort(spec) map { sorted =>
@@ -1948,7 +1948,7 @@ trait ColumnarTableModule[M[+ _]]
 
       val keyTrans = OuterObjectConcat(
           WrapObject(partitionBy, "0"),
-          WrapObject(Leaf(Source), "1")
+          WrapObject(Leaf(Source), "1"),
       )
 
       this.transform(keyTrans).compact(TransSpec1.Id).slices.uncons map {

@@ -75,7 +75,7 @@ class MapWithStateSuite
         expectedData: Option[Int],
         shouldBeUpdated: Boolean = false,
         shouldBeRemoved: Boolean = false,
-        shouldBeTimingOut: Boolean = false
+        shouldBeTimingOut: Boolean = false,
     ): Unit = {
       if (expectedData.isDefined) {
         assert(state.exists)
@@ -145,7 +145,7 @@ class MapWithStateSuite
         Seq("a", "b", "c"),
         Seq("a", "b"),
         Seq("a"),
-        Seq()
+        Seq(),
     )
 
     val outputData = Seq(
@@ -155,7 +155,7 @@ class MapWithStateSuite
         Seq(3, 2, 1),
         Seq(4, 3),
         Seq(5),
-        Seq()
+        Seq(),
     )
 
     val stateData = Seq(
@@ -165,7 +165,7 @@ class MapWithStateSuite
         Seq(("a", 3), ("b", 2), ("c", 1)),
         Seq(("a", 4), ("b", 3), ("c", 1)),
         Seq(("a", 5), ("b", 3), ("c", 1)),
-        Seq(("a", 5), ("b", 3), ("c", 1))
+        Seq(("a", 5), ("b", 3), ("c", 1)),
     )
 
     // state maintains running count, and updated count is returned
@@ -188,7 +188,7 @@ class MapWithStateSuite
         Seq("a", "b", "c"),
         Seq("a", "b"),
         Seq("a"),
-        Seq()
+        Seq(),
     )
 
     val outputData = Seq(
@@ -198,7 +198,7 @@ class MapWithStateSuite
         Seq("aa", "bb", "cc"),
         Seq("aa", "bb"),
         Seq("aa"),
-        Seq()
+        Seq(),
     )
 
     val stateData = Seq(
@@ -208,7 +208,7 @@ class MapWithStateSuite
         Seq(("a", 3), ("b", 2), ("c", 1)),
         Seq(("a", 4), ("b", 3), ("c", 1)),
         Seq(("a", 5), ("b", 3), ("c", 1)),
-        Seq(("a", 5), ("b", 3), ("c", 1))
+        Seq(("a", 5), ("b", 3), ("c", 1)),
     )
 
     // state maintains running count, key string doubled and returned
@@ -289,7 +289,7 @@ class MapWithStateSuite
         Seq("a", "b", "c"),
         Seq("a", "b"),
         Seq("a"),
-        Seq()
+        Seq(),
     )
 
     val outputData = Seq(
@@ -299,7 +299,7 @@ class MapWithStateSuite
         Seq(("a", 3), ("b", 2), ("c", 1)),
         Seq(("a", 4), ("b", 3)),
         Seq(("a", 5)),
-        Seq()
+        Seq(),
     )
 
     val stateData = Seq(
@@ -309,7 +309,7 @@ class MapWithStateSuite
         Seq(("a", 3), ("b", 2), ("c", 1)),
         Seq(("a", 4), ("b", 3), ("c", 1)),
         Seq(("a", 5), ("b", 3), ("c", 1)),
-        Seq(("a", 5), ("b", 3), ("c", 1))
+        Seq(("a", 5), ("b", 3), ("c", 1)),
     )
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
@@ -337,7 +337,7 @@ class MapWithStateSuite
         Seq("a", "b", "c"),
         Seq("a", "b"),
         Seq("a"),
-        Seq()
+        Seq(),
     )
 
     val outputData = Seq.fill(inputData.size)(Seq.empty[Int])
@@ -349,7 +349,7 @@ class MapWithStateSuite
         Seq(("a", 8), ("b", 12), ("c", -19), ("d", 0)),
         Seq(("a", 9), ("b", 13), ("c", -19), ("d", 0)),
         Seq(("a", 10), ("b", 13), ("c", -19), ("d", 0)),
-        Seq(("a", 10), ("b", 13), ("c", -19), ("d", 0))
+        Seq(("a", 10), ("b", 13), ("c", -19), ("d", 0)),
     )
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
@@ -375,7 +375,7 @@ class MapWithStateSuite
         Seq("a", "b", "c"), // a and c will be removed
         Seq("a", "b"), // b will be removed
         Seq("a"), // a will be removed
-        Seq()
+        Seq(),
     )
 
     // States that were removed
@@ -387,7 +387,7 @@ class MapWithStateSuite
         Seq("a", "c"),
         Seq("b"),
         Seq("a"),
-        Seq()
+        Seq(),
     )
 
     val stateData = Seq(
@@ -398,7 +398,7 @@ class MapWithStateSuite
         Seq(("b", 1)),
         Seq(("a", 1)),
         Seq(),
-        Seq()
+        Seq(),
     )
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
@@ -465,7 +465,7 @@ class MapWithStateSuite
     def testCheckpointDuration(
         batchDuration: Duration,
         expectedCheckpointDuration: Duration,
-        explicitCheckpointDuration: Option[Duration] = None
+        explicitCheckpointDuration: Option[Duration] = None,
     ): Unit = {
       val ssc = new StreamingContext(sc, batchDuration)
 
@@ -509,7 +509,7 @@ class MapWithStateSuite
         Seq("a", "b", "c"),
         Seq("a", "b"),
         Seq("a"),
-        Seq()
+        Seq(),
     )
 
     val stateData = Seq(
@@ -519,7 +519,7 @@ class MapWithStateSuite
         Seq(("a", 3), ("b", 2), ("c", 1)),
         Seq(("a", 4), ("b", 3), ("c", 1)),
         Seq(("a", 5), ("b", 3), ("c", 1)),
-        Seq(("a", 5), ("b", 3), ("c", 1))
+        Seq(("a", 5), ("b", 3), ("c", 1)),
     )
 
     def operation(dstream: DStream[String]): DStream[(String, Int)] = {
@@ -552,7 +552,7 @@ class MapWithStateSuite
       input: Seq[Seq[K]],
       mapWithStateSpec: StateSpec[K, Int, S, T],
       expectedOutputs: Seq[Seq[T]],
-      expectedStateSnapshots: Seq[Seq[(K, S)]]
+      expectedStateSnapshots: Seq[Seq[(K, S)]],
   ): Unit = {
     require(expectedOutputs.size == expectedStateSnapshots.size)
 
@@ -565,7 +565,7 @@ class MapWithStateSuite
   private def getOperationOutput[K : ClassTag, S : ClassTag, T : ClassTag](
       input: Seq[Seq[K]],
       mapWithStateSpec: StateSpec[K, Int, S, T],
-      numBatches: Int
+      numBatches: Int,
   ): (Seq[Seq[T]], Seq[Seq[(K, S)]]) = {
 
     // Setup the stream computation

@@ -230,7 +230,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
             columns,
             primaryKey.toSeq,
             foreignKeys,
-            indices
+            indices,
         )
       }
 
@@ -401,7 +401,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
             foreignKeys.filter(_.referencedTable == referencedTable)
           require(
               fksToSameTable.filter(_.model.name.isEmpty).size <= 1,
-              s"Found multiple unnamed foreign keys to same table, please manually provide names using overrides. ${referencingTable.model.name.table} -> ${referencedTable.model.name.table}"
+              s"Found multiple unnamed foreign keys to same table, please manually provide names using overrides. ${referencingTable.model.name.table} -> ${referencedTable.model.name.table}",
           )
           val baseName = referencedTable.TableClass.rawName.uncapitalize + "Fk"
           disambiguateTerm(
@@ -594,7 +594,7 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
       // Table
       Seq("O", "tableIdentitySymbol", "tableProvider"),
       // generated code
-      Seq("_tableTag")
+      Seq("_tableTag"),
   ).flatten
   /* currently disambiguated using overloading
   /** Existing term member names in Table[_] that take parameters */

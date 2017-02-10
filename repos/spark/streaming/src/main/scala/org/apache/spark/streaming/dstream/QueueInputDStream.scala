@@ -29,7 +29,7 @@ private[streaming] class QueueInputDStream[T : ClassTag](
     ssc: StreamingContext,
     val queue: Queue[RDD[T]],
     oneAtATime: Boolean,
-    defaultRDD: RDD[T]
+    defaultRDD: RDD[T],
 )
     extends InputDStream[T](ssc) {
 

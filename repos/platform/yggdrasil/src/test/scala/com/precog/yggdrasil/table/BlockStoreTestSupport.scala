@@ -172,7 +172,7 @@ trait BaseBlockStoreTestModule[M[+ _]]
               case (innerSpec, index: CPathIndex) =>
                 DerefArrayStatic(innerSpec, index)
             },
-            "%09d".format(idx)
+            "%09d".format(idx),
         )
     }: _*)
 }

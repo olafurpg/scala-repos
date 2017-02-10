@@ -6,7 +6,7 @@ import org.scalajs.testinterface.TestUtils
 
 final class DummyTask(
     val taskDef: TaskDef,
-    runner: BaseRunner
+    runner: BaseRunner,
 )
     extends Task {
 

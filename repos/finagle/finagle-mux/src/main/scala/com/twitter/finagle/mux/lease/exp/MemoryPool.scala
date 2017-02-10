@@ -27,7 +27,7 @@ private[lease] class FakeMemoryPool(original: MemoryPoolInfo)
 
 private[lease] class FakeGarbageCollectorMXBean(
     @volatile var getCollectionCount: Long,
-    @volatile var getCollectionTime: Long
+    @volatile var getCollectionTime: Long,
 )
     extends GarbageCollectorMXBean {
   private[this] def ??? =

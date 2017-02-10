@@ -338,7 +338,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     for (injector <- injectors) {
       loadedInjectors.getOrElseUpdate(
           getClass.getClassLoader.loadClass(injector.iface),
-          mutable.HashSet(injector.impl)
+          mutable.HashSet(injector.impl),
       ) += injector.impl
     }
   }
@@ -428,7 +428,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
                     extractInjectorSources(new File(manifest.jarPath),
                                            injectorDescriptor),
                     getInjectorCacheDir(manifest)(injectorDescriptor),
-                    module
+                    module,
                 )
                 numSuccessful += 1
                 loadInjector(manifest, injectorDescriptor)

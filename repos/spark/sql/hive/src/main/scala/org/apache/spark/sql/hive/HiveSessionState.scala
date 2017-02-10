@@ -94,7 +94,7 @@ private[hive] class HiveSessionState(ctx: HiveContext)
             BasicOperators,
             BroadcastNestedLoop,
             CartesianProduct,
-            DefaultJoin
+            DefaultJoin,
         )
       }
     }

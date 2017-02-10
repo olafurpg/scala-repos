@@ -276,7 +276,7 @@ private object BisectingKMeans extends Serializable {
     assignments
       .aggregateByKey(new ClusterSummaryAggregator(d))(
           seqOp = (agg, v) => agg.add(v),
-          combOp = (agg1, agg2) => agg1.merge(agg2)
+          combOp = (agg1, agg2) => agg1.merge(agg2),
       )
       .mapValues(_.summary)
       .collect()

@@ -112,7 +112,7 @@ object Account {
     Set[Permission](
         WritePermission(accountPath, WriteAsAny),
         DeletePermission(accountPath, WrittenByAny),
-        ReadPermission(Path.Root, WrittenByAccount(accountId))
+        ReadPermission(Path.Root, WrittenByAccount(accountId)),
     )
   }
 }

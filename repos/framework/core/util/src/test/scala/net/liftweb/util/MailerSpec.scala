@@ -72,7 +72,7 @@ object MailerSpec extends Specification {
             From("sender@nowhere.com"),
             Subject("This is a simple email"),
             To("recipient@nowhere.com"),
-            PlainMailBodyType("Here is some plain text.")
+            PlainMailBodyType("Here is some plain text."),
         )
       }
 
@@ -86,7 +86,7 @@ object MailerSpec extends Specification {
             Subject("This is a multipart email"),
             To("recipient@nowhere.com"),
             PlainMailBodyType("Here is some plain text."),
-            PlainMailBodyType("Here is some more plain text.")
+            PlainMailBodyType("Here is some more plain text."),
         )
       }
 
@@ -100,7 +100,7 @@ object MailerSpec extends Specification {
             Subject("This is a rich email"),
             To("recipient@nowhere.com"),
             XHTMLMailBodyType(
-                <html> <body>Here is some rich text</body> </html>)
+                <html> <body>Here is some rich text</body> </html>),
         )
       }
 
@@ -111,7 +111,7 @@ object MailerSpec extends Specification {
       val attachmentBytes = Source
         .fromInputStream(
             getClass.getClassLoader.getResourceAsStream(
-                "net/liftweb/util/Html5ParserSpec.page1.html")
+                "net/liftweb/util/Html5ParserSpec.page1.html"),
         )
         .map(_.toByte)
         .toArray
@@ -125,8 +125,8 @@ object MailerSpec extends Specification {
                 PlusImageHolder("awesome.pdf",
                                 "text/html",
                                 attachmentBytes,
-                                true)
-            )
+                                true),
+            ),
         )
       }
 

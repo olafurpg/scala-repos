@@ -224,7 +224,7 @@ abstract class GenJSCode
             withScopedVars(
                 currentClassInfoBuilder := new ClassInfoBuilder,
                 currentClassSym := sym,
-                unexpectedMutatedFields := mutable.Set.empty
+                unexpectedMutatedFields := mutable.Set.empty,
             ) {
               val tree =
                 if (isRawJSType(sym.tpe)) {
@@ -548,7 +548,7 @@ abstract class GenJSCode
           currentMethodSym := sym,
           methodTailJumpThisSym := NoSymbol,
           fakeTailJumpParamRepl := (NoSymbol, NoSymbol),
-          enclosingLabelDefParams := Map.empty
+          enclosingLabelDefParams := Map.empty,
       ) {
         assert(vparamss.isEmpty || vparamss.tail.isEmpty,
                "Malformed parameter list: " + vparamss)
@@ -591,7 +591,7 @@ abstract class GenJSCode
           withScopedVars(
               currentMethodInfoBuilder := createInfoBuilder(),
               mutableLocalVars := mutable.Set.empty,
-              mutatedLocalVars := mutable.Set.empty
+              mutatedLocalVars := mutable.Set.empty,
           ) {
             def isTraitImplForwarder = dd.rhs match {
               case app: Apply => foreignIsImplClass(app.symbol.owner)
@@ -813,7 +813,7 @@ abstract class GenJSCode
 
       withNewLocalNameScope {
         withScopedVars(
-            currentMethodInfoBuilder := new MethodInfoBuilder
+            currentMethodInfoBuilder := new MethodInfoBuilder,
         ) {
           currentMethodInfoBuilder.setEncodedName(proxyIdent.name)
 
@@ -893,7 +893,7 @@ abstract class GenJSCode
                   Seq(methodTailJumpThisSym := NoSymbol,
                       fakeTailJumpParamRepl :=
                       (thisDef.symbol, initialThis.symbol))
-              }): _*
+              }): _*,
           ) {
             val innerBody = js.Block(otherStats.map(genStat) :+
                 (if (bodyIsStat) genStat(rhs)
@@ -1234,7 +1234,7 @@ abstract class GenJSCode
 
           withScopedVars(
               enclosingLabelDefParams := enclosingLabelDefParams.get +
-              (tree.symbol -> labelParamSyms)
+              (tree.symbol -> labelParamSyms),
           ) {
             val bodyType = toIRType(tree.tpe)
             val labelIdent = encodeLabelSym(tree.symbol)
@@ -2669,7 +2669,7 @@ abstract class GenJSCode
               (StringClass, StringClass),
               (BoxedDoubleClass, NumberReflectiveCallClass),
               (BoxedBooleanClass, BooleanReflectiveCallClass),
-              (BoxedLongClass, LongReflectiveCallClass)
+              (BoxedLongClass, LongReflectiveCallClass),
           )
           implMethodSym = matchingSymIn(reflBoxClass)
               if implMethodSym != NoSymbol && implMethodSym.isPublic
@@ -3126,7 +3126,7 @@ abstract class GenJSCode
           nme.UNARY_+ -> js.JSUnaryOp.+,
           nme.UNARY_- -> js.JSUnaryOp.-,
           nme.UNARY_~ -> js.JSUnaryOp.~,
-          nme.UNARY_! -> js.JSUnaryOp.!
+          nme.UNARY_! -> js.JSUnaryOp.!,
       )
 
       def unapply(name: TermName): Option[js.JSUnaryOp.Code] =
@@ -3151,7 +3151,7 @@ abstract class GenJSCode
           nme.GT -> js.JSBinaryOp.>,
           nme.GE -> js.JSBinaryOp.>=,
           nme.ZAND -> js.JSBinaryOp.&&,
-          nme.ZOR -> js.JSBinaryOp.||
+          nme.ZOR -> js.JSBinaryOp.||,
       )
 
       def unapply(name: TermName): Option[js.JSBinaryOp.Code] =
@@ -3492,7 +3492,7 @@ abstract class GenJSCode
           s"tryGenAndRecordAnonFunctionClass called with non-anonymous function $cd")
 
       withScopedVars(
-          currentClassSym := sym
+          currentClassSym := sym,
       ) {
         val (functionMakerBase, functionInfo, arity) =
           tryGenAndRecordAnonFunctionClassGeneric(cd) { msg =>
@@ -3575,7 +3575,7 @@ abstract class GenJSCode
              s"genAndRecordRawJSFunctionClass called with non-JS function $cd")
 
       withScopedVars(
-          currentClassSym := sym
+          currentClassSym := sym,
       ) {
         val (functionMaker, functionInfo, _) =
           tryGenAndRecordAnonFunctionClassGeneric(cd) { msg =>
@@ -3682,7 +3682,7 @@ abstract class GenJSCode
 
         val (applyMethod, methodInfoBuilder) = withScopedVars(
             paramAccessorLocals := (paramAccessors zip ctorParamDefs).toMap,
-            tryingToGenMethodAsJSFunction := true
+            tryingToGenMethodAsJSFunction := true,
         ) {
           try {
             genMethodWithInfoBuilder(applyDef).getOrElse(
@@ -3694,7 +3694,7 @@ abstract class GenJSCode
         }
 
         withScopedVars(
-            currentMethodInfoBuilder := methodInfoBuilder
+            currentMethodInfoBuilder := methodInfoBuilder,
         ) {
           // Fourth step: patch the body to unbox parameters and box result
 
@@ -4027,7 +4027,7 @@ abstract class GenJSCode
         getMemberIfDefined(ListClass, nme.flatMap),
         getMemberIfDefined(ListClass, newTermName("collect")),
         getMemberIfDefined(ccClass, nme.map),
-        getMemberIfDefined(ccClass, nme.flatMap)
+        getMemberIfDefined(ccClass, nme.flatMap),
     ) - NoSymbol
   }
 

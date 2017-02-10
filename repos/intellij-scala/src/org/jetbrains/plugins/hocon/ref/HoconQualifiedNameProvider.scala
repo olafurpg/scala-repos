@@ -20,7 +20,7 @@ class HoconQualifiedNameProvider extends QualifiedNameProvider {
           field =>
             field.keysInAllPaths
               .map(_.iterator.map(_.getText).mkString("."))
-              .orNull
+              .orNull,
         )
     case _ => null
   }

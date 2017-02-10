@@ -19,7 +19,7 @@ class Statements(indent: Int) {
   val ENDMARKER: P0 = P(End)
 
   val single_input: P[Seq[Ast.stmt]] = P(
-      NEWLINE.map(_ => Nil) | simple_stmt | compound_stmt.map(Seq(_)) ~ NEWLINE
+      NEWLINE.map(_ => Nil) | simple_stmt | compound_stmt.map(Seq(_)) ~ NEWLINE,
   )
 
   val indents = P("\n" ~~ " ".repX(indent))
@@ -33,7 +33,7 @@ class Statements(indent: Int) {
   def collapse_dotted_name(name: Seq[Ast.identifier]): Ast.expr = {
     name.tail
       .foldLeft[Ast.expr](Ast.expr.Name(name.head, Ast.expr_context.Load))(
-        (x, y) => Ast.expr.Attribute(x, y, Ast.expr_context.Load)
+        (x, y) => Ast.expr.Attribute(x, y, Ast.expr_context.Load),
     )
   }
 
@@ -65,7 +65,7 @@ class Statements(indent: Int) {
 
   val simple_stmt: P[Seq[Ast.stmt]] = P(small_stmt.rep(1, sep = ";") ~ ";".?)
   val small_stmt: P[Ast.stmt] = P(
-      print_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | exec_stmt | assert_stmt | expr_stmt
+      print_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | exec_stmt | assert_stmt | expr_stmt,
   )
   val expr_stmt: P[Ast.stmt] = {
     val aug = P(testlist ~ augassign ~ (yield_expr | testlist.map(tuplize)))
@@ -75,7 +75,7 @@ class Statements(indent: Int) {
         aug.map { case (a, b, c) => Ast.stmt.AugAssign(tuplize(a), b, c) } | assign.map {
           case (a, Nil) => Ast.stmt.Expr(tuplize(a))
           case (a, b) => Ast.stmt.Assign(Seq(tuplize(a)) ++ b.init, b.last)
-        }
+        },
     )
   }
 
@@ -87,7 +87,7 @@ class Statements(indent: Int) {
             Ast.operator.Mod) | "&=".!.map(_ => Ast.operator.BitAnd) | "|=".!
         .map(_ => Ast.operator.BitOr) | "^=".!.map(_ => Ast.operator.BitXor) | "<<=".!
         .map(_ => Ast.operator.LShift) | ">>=".!.map(_ => Ast.operator.RShift) | "**=".!
-        .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
+        .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv),
   )
 
   val print_stmt: P[Ast.stmt.Print] = {
@@ -194,7 +194,7 @@ class Statements(indent: Int) {
         Ast.stmt.TryFinally(
             Seq(Ast.stmt.TryExcept(
                     tryBlock, excepts, elseBlock.toSeq.flatten)),
-            finallyBlock
+            finallyBlock,
         )
     }
   }

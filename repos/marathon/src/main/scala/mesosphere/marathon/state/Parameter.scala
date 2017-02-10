@@ -12,6 +12,6 @@ object Parameter {
   def apply(proto: mesos.Parameter): Parameter =
     Parameter(
         proto.getKey,
-        proto.getValue
+        proto.getValue,
     )
 }

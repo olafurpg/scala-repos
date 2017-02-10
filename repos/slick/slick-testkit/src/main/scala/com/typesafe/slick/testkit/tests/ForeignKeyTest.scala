@@ -33,7 +33,7 @@ class ForeignKeyTest extends AsyncTest[RelationalTestDB] {
           (1, "Scala"),
           (2, "ScalaQuery"),
           (3, "Windows"),
-          (4, "Software")
+          (4, "Software"),
       )
       _ <- posts.map(p => (p.title, p.category)) ++= Seq(
           ("Test Post", None),
@@ -41,7 +41,7 @@ class ForeignKeyTest extends AsyncTest[RelationalTestDB] {
           ("Efficient Parameterized Queries in ScalaQuery", Some(2)),
           ("Removing Libraries and HomeGroup icons from the Windows 7 desktop",
            Some(3)),
-          ("A ScalaQuery Update", Some(2))
+          ("A ScalaQuery Update", Some(2)),
       )
       q1 = (for {
         p <- posts
@@ -92,11 +92,11 @@ class ForeignKeyTest extends AsyncTest[RelationalTestDB] {
       _ <- bs ++= Seq(
           (1, 2, "b12"),
           (3, 4, "b34"),
-          (5, 6, "b56")
+          (5, 6, "b56"),
       )
       _ <- as ++= Seq(
           (1, 2, "a12"),
-          (3, 4, "a34")
+          (3, 4, "a34"),
       )
       q1 = (for {
         a <- as

@@ -13,7 +13,7 @@ object Common {
         unmanagedSourceDirectories in Test += baseDirectory.value / "test",
         unmanagedResourceDirectories in Compile +=
           baseDirectory.value / "resources",
-        libraryDependencies += Dependencies.junitInterface
+        libraryDependencies += Dependencies.junitInterface,
     )
 
   def newProject(projectName: String): Project =
@@ -55,9 +55,9 @@ object Common {
           s"-Didea.system.path=$testSystemDir",
           s"-Didea.config.path=$testConfigDir",
           s"-Dsbt.ivy.home=$ivyHomeDir",
-          s"-Dplugin.path=${packagedPluginDir.value}"
+          s"-Dplugin.path=${packagedPluginDir.value}",
       ),
       envVars in Test += "NO_FS_ROOTS_ACCESS_CHECK" -> "yes",
-      fullClasspath in Test <<= fullClasspath.in(Test).map(filterTestClasspath)
+      fullClasspath in Test <<= fullClasspath.in(Test).map(filterTestClasspath),
   )
 }

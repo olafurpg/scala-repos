@@ -85,7 +85,7 @@ class EnsembleColorPicker extends EnsembleExample {
           spacing = 20
           padding = Insets(20)
           children = Seq(labelColor, buttonColor)
-        }
+        },
       )
     }
   }

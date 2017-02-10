@@ -66,7 +66,7 @@ class RowTest extends FunSpec with Matchers {
     it("getValuesMap() retrieves values of multiple fields as a Map(field -> value)") {
       val expected = Map(
           "col1" -> "value1",
-          "col2" -> "value2"
+          "col2" -> "value2",
       )
       sampleRow.getValuesMap(List("col1", "col2")) shouldBe expected
     }
@@ -74,7 +74,7 @@ class RowTest extends FunSpec with Matchers {
     it("getValuesMap() retrieves null value on non AnyVal Type") {
       val expected = Map(
           "col1" -> null,
-          "col2" -> "value2"
+          "col2" -> "value2",
       )
       sampleRowWithoutCol3.getValuesMap[String](List("col1", "col2")) shouldBe expected
     }

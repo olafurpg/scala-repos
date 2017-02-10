@@ -35,7 +35,7 @@ sealed abstract class BaseUserContext(
   override def toString = "%s %s %s".format(
       me.fold("Anonymous")(_.username),
       req.remoteAddress,
-      req.headers.get("User-Agent") | "?"
+      req.headers.get("User-Agent") | "?",
   )
 }
 

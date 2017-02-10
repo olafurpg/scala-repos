@@ -617,7 +617,7 @@ class RecordTests {
     val ps = List(
         ("name" ->> "Mel") :: ("age" ->> 90L) :: ("teeth" ->> 2) :: HNil,
         ("name" ->> "Jude") :: ("age" ->> 99L) :: ("teeth" ->> 3) :: HNil,
-        ("name" ->> "Bif") :: ("age" ->> 1L) :: ("teeth" ->> 1) :: HNil
+        ("name" ->> "Bif") :: ("age" ->> 1L) :: ("teeth" ->> 1) :: HNil,
     )
 
     ps.sortBy(_ ("age"))

@@ -52,7 +52,7 @@ class TaskStartActorTest
 
   for ((counts, description) <- Seq(
       None -> "with no item in queue",
-      Some(LaunchQueueTestHelper.zeroCounts) -> "with zero count queue item"
+      Some(LaunchQueueTestHelper.zeroCounts) -> "with zero count queue item",
   )) {
     test(s"Start success $description") {
       val promise = Promise[Unit]()
@@ -94,7 +94,7 @@ class TaskStartActorTest
   for ((counts, description) <- Seq(
       Some(LaunchQueueTestHelper.zeroCounts.copy(tasksLeftToLaunch = 1)) -> "with one task left to launch",
       Some(LaunchQueueTestHelper.zeroCounts.copy(taskLaunchesInFlight = 1)) -> "with one task in flight",
-      Some(LaunchQueueTestHelper.zeroCounts.copy(tasksLaunched = 1)) -> "with one task already running"
+      Some(LaunchQueueTestHelper.zeroCounts.copy(tasksLaunched = 1)) -> "with one task already running",
   )) {
     test(s"Start success $description") {
       val promise = Promise[Unit]()
@@ -112,7 +112,7 @@ class TaskStartActorTest
               system.eventStream,
               app,
               app.instances,
-              promise
+              promise,
           ))
 
       watch(ref)
@@ -204,7 +204,7 @@ class TaskStartActorTest
     val app = AppDefinition(
         "/myApp".toPath,
         instances = 5,
-        healthChecks = Set(HealthCheck())
+        healthChecks = Set(HealthCheck()),
     )
     when(launchQueue.get(app.id)).thenReturn(None)
 
@@ -237,7 +237,7 @@ class TaskStartActorTest
     val app = AppDefinition(
         "/myApp".toPath,
         instances = 0,
-        healthChecks = Set(HealthCheck())
+        healthChecks = Set(HealthCheck()),
     )
     when(launchQueue.get(app.id)).thenReturn(None)
 
@@ -382,7 +382,7 @@ class TaskStartActorTest
             ports = Nil,
             // The version does not match the app.version so that it is filtered in StartingBehavior.
             // does that make sense?
-            version = outdatedTask.launched.get.appVersion.toString
+            version = outdatedTask.launched.get.appVersion.toString,
         ))
 
     // sync will reschedule task

@@ -444,7 +444,7 @@ abstract class ExplicitOuter
           super.transform(
               deriveTemplate(tree)(decls =>
                     if (newDefs.isEmpty) decls
-                    else decls ::: newDefs.toList)
+                    else decls ::: newDefs.toList),
           )
         case DefDef(_, _, _, vparamss, _, rhs) =>
           if (sym.isClassConstructor) {

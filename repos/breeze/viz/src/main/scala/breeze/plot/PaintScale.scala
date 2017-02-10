@@ -126,7 +126,7 @@ object PaintScale {
         "#e377c2",
         "#7f7f7f",
         "#bcbd22",
-        "#17becf"
+        "#17becf",
     ).map(Color.decode)
 
     val blue = values(0)
@@ -156,7 +156,7 @@ object PaintScale {
           "#f7b6d2",
           "#c7c7c7",
           "#dbdb8d",
-          "#9edae5"
+          "#9edae5",
       ).map(Color.decode)
 
     val lightblue = values(10)

@@ -49,7 +49,7 @@ class EnsemblePolyline extends EnsembleExample {
       children = List(
           polyObj(Polyline(45, 10, 10, 80, 45, 80), Color.Azure),
           polyObj(Polyline(135, 15, 160, 30, 160, 60, 135, 110, 110, 30),
-                  Color.White)
+                  Color.White),
       )
     }
   }

@@ -26,7 +26,7 @@ import nak.regress.LinearRegression
   */
 case class RegressionStrategyParams(
     indicators: Seq[(String, BaseIndicator)],
-    maxTrainingWindowSize: Int
+    maxTrainingWindowSize: Int,
 )
     extends Params
 
@@ -46,7 +46,7 @@ class RegressionStrategy(params: RegressionStrategyParams)
     val m = DenseMatrix.create[Double](
         retF1d.length,
         calculatedData.length + 1,
-        array
+        array,
     )
     val result = LinearRegression.regress(m, target)
     result

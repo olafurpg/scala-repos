@@ -30,7 +30,7 @@ object DottyDownloader extends Downloader {
                 e.getChild("groupId").getText,
                 e.getChild("artifactId").getText,
                 e.getChild("version").getText,
-                Option(e.getChild("scope")).map(_.getText)
+                Option(e.getChild("scope")).map(_.getText),
             )).toOption
       case _ => None
     }
@@ -56,7 +56,7 @@ object DottyDownloader extends Downloader {
   override protected def sbtCommandsFor(version: String) =
     Seq(
         s"""set resolvers := Seq("JFrog OSS Snapshots" at "$RepositoryUrl")""",
-        s"""set libraryDependencies := Seq("$GroupId" % "$ArtifactId" % "$version")"""
+        s"""set libraryDependencies := Seq("$GroupId" % "$ArtifactId" % "$version")""",
     ) ++ super.sbtCommandsFor(version)
 }
 

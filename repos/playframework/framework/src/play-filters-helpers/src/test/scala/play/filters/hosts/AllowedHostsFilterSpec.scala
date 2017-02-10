@@ -46,7 +46,7 @@ object AllowedHostsFilterSpec extends PlaySpecification {
       .overrides(
           bind[Router].to(
               Router.from { case request => Action(result(request)) }),
-          bind[HttpFilters].to[Filters]
+          bind[HttpFilters].to[Filters],
       )
       .build()
   }

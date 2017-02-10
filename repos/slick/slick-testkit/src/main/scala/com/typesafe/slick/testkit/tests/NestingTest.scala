@@ -27,7 +27,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
         (3, "3", "b", 5),
         (1, "1", "c", 5),
         (2, "2", "c", 5),
-        (3, "3", "c", 5)
+        (3, "3", "c", 5),
     )
     val res1b = res1.map { case (a, b, c, d) => ((a, b), (c, d)) }
 
@@ -74,7 +74,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
         q1d.result.map(_ shouldBe res1b),
         q2a.result.map(v => v.toSet shouldBe res2),
         q2b.result.map(v => v.toSet shouldBe res2),
-        q2c.result.map(v => v.toSet shouldBe res2)
+        q2c.result.map(v => v.toSet shouldBe res2),
     )
   }
 
@@ -122,7 +122,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
         mark("q2a2", q2a2.result).map(_ shouldBe r.map(t => Some(Some(t._1)))),
         mark("q3", q3.result).map(_ shouldBe r.map(t => t._3)),
         mark("q4", q4.result).map(_ shouldBe r.map(t => Some(t._3))),
-        mark("q5", q5.result).map(_ shouldBe r.map(t => (t._3, Some(t._2))))
+        mark("q5", q5.result).map(_ shouldBe r.map(t => (t._3, Some(t._2)))),
     )
 
     // Get plain values out
@@ -146,7 +146,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
           .map(_ shouldBe r.map(t => t._3).filter(_.isDefined).map(_.get)),
         mark("a4b", q4b.result).map(_ shouldBe r
               .map(t => Some(t._3))
-              .map(_.getOrElse(None: Option[String])))
+              .map(_.getOrElse(None: Option[String]))),
       )
 
     // Unpack result types
@@ -164,7 +164,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
         mark("q2c", q2c.result)
           .map(_ shouldBe r.map(t => Some(t._1)).map(_.map(_ + 42))),
         mark("q3c", q3c.result)
-          .map(_ shouldBe r.map(t => t._3).map(_.map(_ + 10)))
+          .map(_ shouldBe r.map(t => t._3).map(_.map(_ + 10))),
     )
 
     // Use Option.map
@@ -204,7 +204,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
           .named("q4d")
           .map(_ shouldBe r
                 .map(t => Some(t._3))
-                .map(_.filter(_.isDefined).map(_.get)))
+                .map(_.filter(_.isDefined).map(_.get))),
         )
 
     // Use Option.flatMap
@@ -256,7 +256,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
             io.flatMap { i =>
               Some(i)
             }
-          })
+          }),
       )
 
     // Use Option.flatten
@@ -327,7 +327,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
                 .map { io =>
               Some(io)
             }
-                .map(_.flatten))
+                .map(_.flatten)),
         )
 
     setup >> t1 >> t2 >> t3 >> t4 >> t5 >> t6
@@ -359,7 +359,7 @@ class NestingTest extends AsyncTest[RelationalTestDB] {
         chords.schema.create,
         chords ++= allChords,
         (minorChords ++ otherChords).result
-          .map(_.toSet shouldBe allChords.map(c => (c.name, c.popularOptions)))
+          .map(_.toSet shouldBe allChords.map(c => (c.name, c.popularOptions))),
     )
   }
 }

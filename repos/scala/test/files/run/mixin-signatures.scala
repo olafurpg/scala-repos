@@ -83,7 +83,7 @@ object Test {
     val str =
       List(
           if (m.isBridge) "<bridge>" else "",
-          if (m.isSynthetic) "<synthetic>" else ""
+          if (m.isSynthetic) "<synthetic>" else "",
       ) filterNot (_ == "") mkString " "
 
     if (str == "") "" else " " + str

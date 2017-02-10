@@ -424,7 +424,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                   if (settings.debug || printLubs) {
                     Console.println(
                         "Malformed lub: " + lubRefined + "\n" + "Argument " +
-                        t + " does not conform.  Falling back to " + lubBase
+                        t + " does not conform.  Falling back to " + lubBase,
                     )
                   }
                   false

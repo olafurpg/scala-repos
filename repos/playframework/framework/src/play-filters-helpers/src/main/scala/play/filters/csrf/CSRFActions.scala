@@ -167,7 +167,7 @@ class CSRFAction(
           .prefixAndTail(0)
           .map(_._2)
           .concatSubstreams
-          .toMat(Sink.head[Source[ByteString, _]])(Keep.right)
+          .toMat(Sink.head[Source[ByteString, _]])(Keep.right),
       ).mapFuture { validatedBodySource =>
       action(request).run(validatedBodySource)
     }.recoverWith {
@@ -458,7 +458,7 @@ object CSRFAction {
     request.copy(
         tags = request.tags ++ Map(
               Token.NameRequestTag -> token.name,
-              Token.RequestTag -> token.value
+              Token.RequestTag -> token.value,
           ))
   }
 
@@ -541,7 +541,7 @@ object CSRFAction {
               }
             }.getOrElse {
               result.withSession(result.session(request) - config.tokenName)
-            }
+            },
         )(_ => result)
     }
   }

@@ -14,7 +14,7 @@ object OSGi {
   // a pain. Create bundles but publish them to the normal .../jars directory.
   def osgiSettings = defaultOsgiSettings ++ Seq(
       packagedArtifact in (Compile, packageBin) <<=
-        (artifact in (Compile, packageBin), OsgiKeys.bundle).identityMap
+        (artifact in (Compile, packageBin), OsgiKeys.bundle).identityMap,
   )
 
   val actor =
@@ -29,7 +29,7 @@ object OSGi {
             configImport(),
             "*"),
         // dynamicImportPackage needed for loading classes defined in configuration
-        OsgiKeys.dynamicImportPackage := Seq("*")
+        OsgiKeys.dynamicImportPackage := Seq("*"),
     )
 
   val agent = exports(Seq("akka.agent.*"))
@@ -110,7 +110,7 @@ object OSGi {
   def exports(packages: Seq[String] = Seq(), imports: Seq[String] = Nil) =
     osgiSettings ++ Seq(
         OsgiKeys.importPackage := imports ++ scalaVersion(defaultImports).value,
-        OsgiKeys.exportPackage := packages
+        OsgiKeys.exportPackage := packages,
     )
   def defaultImports(scalaVersion: String) =
     Seq("!sun.misc",

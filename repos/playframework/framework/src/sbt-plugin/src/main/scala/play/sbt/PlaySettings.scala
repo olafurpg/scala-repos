@@ -30,13 +30,13 @@ object PlaySettings {
       TwirlKeys.templateImports ++=
         TemplateImports.defaultJavaTemplateImports.asScala,
       RoutesKeys.routesImport ++= Seq(
-          "play.libs.F"
-      )
+          "play.libs.F",
+      ),
   )
 
   lazy val defaultScalaSettings = Seq[Setting[_]](
       TwirlKeys.templateImports ++=
-        TemplateImports.defaultScalaTemplateImports.asScala
+        TemplateImports.defaultScalaTemplateImports.asScala,
   )
 
   /** Ask SBT to manage the classpath for the given configuration. */
@@ -228,7 +228,7 @@ object PlaySettings {
         // Adds the Play application directory to the command line args passed to Play
         bashScriptExtraDefines += "addJava \"-Duser.dir=$(realpath \"$(cd \"${app_home}/..\"; pwd -P)\"  $(is_cygwin && echo \"fix\"))\"\n",
         generateSecret <<= ApplicationSecretGenerator.generateSecretTask,
-        updateSecret <<= ApplicationSecretGenerator.updateSecretTask
+        updateSecret <<= ApplicationSecretGenerator.updateSecretTask,
     ) ++ inConfig(Compile)(externalizedSettings)
 
   /**
@@ -256,6 +256,6 @@ object PlaySettings {
           }
         },
         artifactClassifier in playJarSansExternalized :=
-          Option("sans-externalized")
+          Option("sans-externalized"),
     )
 }

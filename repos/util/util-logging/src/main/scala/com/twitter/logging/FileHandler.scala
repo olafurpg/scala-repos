@@ -88,7 +88,7 @@ object FileHandler {
       append: Boolean = true,
       rotateCount: Int = -1,
       formatter: Formatter = new Formatter(),
-      level: Option[Level] = None
+      level: Option[Level] = None,
   ) =
     () =>
       new FileHandler(
@@ -254,7 +254,7 @@ class FileHandler(path: String,
               def accept(f: File, fname: String): Boolean =
                 fname != name && fname.startsWith(prefixName) &&
                 fname.endsWith(filenameSuffix)
-            }
+            },
         )
         .sortBy(_.getName)
 

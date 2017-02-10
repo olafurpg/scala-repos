@@ -76,7 +76,7 @@ object VanishingCircles extends JFXApp {
       at(40 s) {
         Set(
             circle.centerX -> random * stage.width(),
-            circle.centerY -> random * stage.height()
+            circle.centerY -> random * stage.height(),
         )
       }
   }.play()

@@ -80,7 +80,7 @@ class CountMinSketchSuite extends FunSuite {
 
       assert(
           probCorrect > confidence,
-          s"Confidence not reached: required $confidence, reached $probCorrect"
+          s"Confidence not reached: required $confidence, reached $probCorrect",
       )
     }
   }

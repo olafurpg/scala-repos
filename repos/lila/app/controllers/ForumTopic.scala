@@ -34,7 +34,7 @@ object ForumTopic extends LilaController with ForumController {
               data =>
                 topicApi.makeTopic(categ, data) map { topic =>
                   Redirect(routes.ForumTopic.show(categ.slug, topic.slug, 1))
-              }
+              },
           )
         }
       }

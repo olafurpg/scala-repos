@@ -14,7 +14,7 @@ object PomTest extends Build {
             "e" % "e" % "1.0" % "custom",
             "f" % "f" % "1.0" % "custom,optional,runtime",
             "g" % "g" % "1.0" % "custom,runtime" classifier "foo",
-            "h" % "h" % "1.0" % "custom,optional,runtime" classifier "foo"
+            "h" % "h" % "1.0" % "custom,optional,runtime" classifier "foo",
         ))
 
   def checkPom = makePom map { pom =>
@@ -26,7 +26,7 @@ object PomTest extends Build {
         ("e", None, false, None),
         ("f", Some("runtime"), true, None),
         ("g", Some("runtime"), false, Some("foo")),
-        ("h", Some("runtime"), true, Some("foo"))
+        ("h", Some("runtime"), true, Some("foo")),
     )
     val loaded = xml.XML.loadFile(pom)
     val deps = loaded \\ "dependency"

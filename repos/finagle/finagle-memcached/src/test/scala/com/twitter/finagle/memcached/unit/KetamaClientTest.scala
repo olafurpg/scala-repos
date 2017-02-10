@@ -49,7 +49,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
         CacheNode("10.0.1.5", 11211, 1000) -> newMock(),
         CacheNode("10.0.1.6", 11211, 800) -> newMock(),
         CacheNode("10.0.1.7", 11211, 950) -> newMock(),
-        CacheNode("10.0.1.8", 11211, 100) -> newMock()
+        CacheNode("10.0.1.8", 11211, 100) -> newMock(),
     )
 
     def newService(node: CacheNode) = clients.get(node).get
@@ -119,7 +119,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       val nodeKeyB = KetamaClientKey(nodeB.host, nodeB.port, nodeB.weight)
       val services = Map(
           nodeA -> serviceA,
-          nodeB -> serviceB
+          nodeB -> serviceB,
       )
       val mutableGroup = Group.mutable(services.keys.toSeq: _*)
 

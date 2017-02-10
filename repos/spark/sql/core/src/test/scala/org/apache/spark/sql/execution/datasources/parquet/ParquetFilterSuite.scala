@@ -583,7 +583,7 @@ class ParquetFilterSuite
         Seq(
             StructField("a", IntegerType, nullable = false),
             StructField("b", StringType, nullable = true),
-            StructField("c", DoubleType, nullable = true)
+            StructField("c", DoubleType, nullable = true),
         ))
 
     assertResult(Some(and(lt(intColumn("a"), 10: Integer),

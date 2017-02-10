@@ -24,7 +24,7 @@ final class DBModule extends Module {
     val dbs =
       configuration.getConfig(dbKey).getOrElse(Configuration.empty).subKeys
     Seq(
-        bind[DBApi].toProvider[DBApiProvider]
+        bind[DBApi].toProvider[DBApiProvider],
     ) ++ namedDatabaseBindings(dbs) ++ defaultDatabaseBinding(default, dbs)
   }
 

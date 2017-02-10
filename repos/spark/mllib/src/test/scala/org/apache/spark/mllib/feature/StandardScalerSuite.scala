@@ -31,7 +31,7 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
   val constantData = Array(
       Vectors.dense(2.0),
       Vectors.dense(2.0),
-      Vectors.dense(2.0)
+      Vectors.dense(2.0),
   )
 
   val sparseData = Array(
@@ -40,7 +40,7 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       Vectors.sparse(3, Seq((1, -5.1))),
       Vectors.sparse(3, Seq((0, 3.8), (2, 1.9))),
       Vectors.sparse(3, Seq((0, 1.7), (1, -0.6))),
-      Vectors.sparse(3, Seq((1, 1.9)))
+      Vectors.sparse(3, Seq((1, 1.9))),
   )
 
   val denseData = Array(
@@ -49,7 +49,7 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       Vectors.dense(0.0, -5.1, 0.0),
       Vectors.dense(3.8, 0.0, 1.9),
       Vectors.dense(1.7, -0.6, 0.0),
-      Vectors.dense(0.0, 1.9, 0.0)
+      Vectors.dense(0.0, 1.9, 0.0),
   )
 
   private def computeSummary(

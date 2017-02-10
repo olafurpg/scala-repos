@@ -56,7 +56,7 @@ case class DescribeCommand(table: TableIdentifier, isExtended: Boolean)
                          nullable = true,
                          new MetadataBuilder()
                            .putString("comment", "comment of the column")
-                           .build())()
+                           .build())(),
     )
 }
 

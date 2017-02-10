@@ -51,7 +51,7 @@ object KMeansExample {
               (3, Vectors.dense(0.2, 0.2, 0.2)),
               (4, Vectors.dense(9.0, 9.0, 9.0)),
               (5, Vectors.dense(9.1, 9.1, 9.1)),
-              (6, Vectors.dense(9.2, 9.2, 9.2))
+              (6, Vectors.dense(9.2, 9.2, 9.2)),
           ))
       .toDF("id", "features")
 

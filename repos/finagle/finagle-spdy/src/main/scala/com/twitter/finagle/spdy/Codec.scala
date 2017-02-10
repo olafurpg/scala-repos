@@ -80,7 +80,7 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
       override def prepareConnFactory(
           underlying: ServiceFactory[HttpRequest, HttpResponse],
-          params: Stack.Params
+          params: Stack.Params,
       ): ServiceFactory[HttpRequest, HttpResponse] = {
         new GenerateSpdyStreamId andThen super.prepareConnFactory(
             underlying, params)
@@ -115,7 +115,7 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
       override def prepareConnFactory(
           underlying: ServiceFactory[HttpRequest, HttpResponse],
-          params: Stack.Params
+          params: Stack.Params,
       ): ServiceFactory[HttpRequest, HttpResponse] = {
         new AnnotateSpdyStreamId andThen super.prepareConnFactory(
             underlying, params)
@@ -123,7 +123,7 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
       override def newServerDispatcher(
           transport: Transport[Any, Any],
-          service: Service[HttpRequest, HttpResponse]
+          service: Service[HttpRequest, HttpResponse],
       ): Closable =
         new SpdyServerDispatcher(
             Transport.cast[HttpResponse, HttpRequest](transport), service)

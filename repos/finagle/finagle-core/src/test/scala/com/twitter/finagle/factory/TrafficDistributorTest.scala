@@ -97,7 +97,7 @@ private object TrafficDistributorTest {
     def newDist(
         dest: Var[Activity.State[Set[Address]]],
         eagerEviction: Boolean = true,
-        statsReceiver: StatsReceiver = NullStatsReceiver
+        statsReceiver: StatsReceiver = NullStatsReceiver,
     ): ServiceFactory[Int, Int] = {
       new TrafficDistributor[Int, Int](
           dest = Activity(dest),
@@ -105,7 +105,7 @@ private object TrafficDistributorTest {
           newBalancer = newBalancer,
           eagerEviction = eagerEviction,
           statsReceiver = statsReceiver,
-          rng = Rng("seed".hashCode)
+          rng = Rng("seed".hashCode),
       )
     }
 
@@ -221,7 +221,7 @@ class TrafficDistributorTest extends FunSuite {
     val newAddrs = Set(
         WeightedAddress(Address(6), existingWeight),
         WeightedAddress(Address(7), existingWeight),
-        WeightedAddress(Address(8), existingWeight)
+        WeightedAddress(Address(8), existingWeight),
     )
     val update: Set[Address] = init ++ newAddrs
     dest() = Activity.Ok(update)
@@ -355,7 +355,7 @@ class TrafficDistributorTest extends FunSuite {
               _, NullStatsReceiver, new NoBrokersAvailableException("test")),
         eagerEviction = true,
         statsReceiver = NullStatsReceiver,
-        rng = Rng("seed".hashCode)
+        rng = Rng("seed".hashCode),
     )
 
     assert(dist.status == Status.Open)

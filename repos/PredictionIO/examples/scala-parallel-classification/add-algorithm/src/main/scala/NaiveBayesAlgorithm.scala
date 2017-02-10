@@ -9,7 +9,7 @@ import org.apache.spark.mllib.classification.NaiveBayesModel
 import org.apache.spark.mllib.linalg.Vectors
 
 case class NaiveBayesAlgorithmParams(
-    lambda: Double
+    lambda: Double,
 )
     extends Params
 

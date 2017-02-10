@@ -39,7 +39,7 @@ object BasicIO {
   private[process] final class Streamed[T](
       val process: T => Unit,
       val done: Int => Unit,
-      val stream: () => Stream[T]
+      val stream: () => Stream[T],
   )
 
   private[process] object Streamed {

@@ -49,7 +49,7 @@ trait ArbitrarySexp {
       genSexpSymbol,
       arbitrary[Double].map(SexpNumber(_)),
       //arbitrary[BigDecimal].map(SexpNumber(_)),
-      oneOf(SexpNil, SexpPosInf, SexpNegInf, SexpNaN)
+      oneOf(SexpNil, SexpPosInf, SexpNegInf, SexpNaN),
   )
 
   def genSexpCons(level: Int): Gen[SexpCons] =
@@ -75,7 +75,7 @@ trait ArbitrarySexp {
             genSexpAtom,
             genSexpCons(level + 1),
             genSexpList(level + 1),
-            genSexpData(level + 1)
+            genSexpData(level + 1),
         )
       }
 

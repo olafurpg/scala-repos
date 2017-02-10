@@ -256,7 +256,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
         Seq(akkaActor.artifacts(Artifact(akkaActor.name, "javadoc"),
                                 Artifact(akkaActor.name, "sources"))),
         Some("2.10.2"),
-        defaultUpdateOptions
+        defaultUpdateOptions,
     )
     val report = ivyUpdate(m)
     val jars = for {
@@ -277,7 +277,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
         ModuleID("com.example", "test-it", "1.0-SNAPSHOT", Some("compile")),
         Seq(),
         None,
-        defaultUpdateOptions.withLatestSnapshots(true)
+        defaultUpdateOptions.withLatestSnapshots(true),
     )
     sbt.io.IO.withTemporaryDirectory { dir =>
       val pomFile = new java.io.File(dir, "pom.xml")
@@ -299,7 +299,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
               Resolver.publishMavenLocal,
               Map(
                   Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
-                  Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
+                  Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile,
               )))
     }
     val baseLocalMavenDir: java.io.File = Resolver.publishMavenLocal.rootFile

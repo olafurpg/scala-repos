@@ -23,7 +23,7 @@ final class DonationApi(coll: Coll,
     coll
       .aggregate(Match(decentAmount ++ BSONDocument("userId" -> userId)),
                  List(
-                     Group(BSONNull)("net" -> SumField("net"))
+                     Group(BSONNull)("net" -> SumField("net")),
                  ))
       .map {
         ~_.documents.headOption.flatMap { _.getAs[Int]("net") }
@@ -75,9 +75,9 @@ final class DonationApi(coll: Coll,
       .find(
           BSONDocument("date" -> BSONDocument(
                   "$gte" -> from,
-                  "$lt" -> to
+                  "$lt" -> to,
               )),
-          BSONDocument("net" -> true, "_id" -> false)
+          BSONDocument("net" -> true, "_id" -> false),
       )
       .cursor[BSONDocument]()
       .collect[List]() map2 { (obj: BSONDocument) =>

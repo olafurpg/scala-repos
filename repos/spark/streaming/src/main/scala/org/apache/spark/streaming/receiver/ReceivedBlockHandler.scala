@@ -114,7 +114,7 @@ private[streaming] class BlockManagerBasedBlockHandler(
 private[streaming] case class WriteAheadLogBasedStoreResult(
     blockId: StreamBlockId,
     numRecords: Option[Long],
-    walRecordHandle: WriteAheadLogRecordHandle
+    walRecordHandle: WriteAheadLogRecordHandle,
 )
     extends ReceivedBlockStoreResult
 
@@ -129,7 +129,7 @@ private[streaming] class WriteAheadLogBasedBlockHandler(
     conf: SparkConf,
     hadoopConf: Configuration,
     checkpointDir: String,
-    clock: Clock = new SystemClock
+    clock: Clock = new SystemClock,
 )
     extends ReceivedBlockHandler with Logging {
 

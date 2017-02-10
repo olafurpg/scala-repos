@@ -182,7 +182,7 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
             space,
             maxWait,
             () => npending,
-            log
+            log,
         )
       }
 

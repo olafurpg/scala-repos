@@ -254,7 +254,7 @@ class ConvertibleToMethodValueInspectionTest
         |    list.map(objA.foo(_))
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 

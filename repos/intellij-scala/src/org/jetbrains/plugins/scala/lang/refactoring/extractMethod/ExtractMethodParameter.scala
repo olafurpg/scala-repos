@@ -37,7 +37,7 @@ object ExtractMethodParameter {
         newName = variableData.name,
         fromElement = element,
         tp = variableData.scType,
-        passAsParameter = variableData.passAsParameter
+        passAsParameter = variableData.passAsParameter,
     )
   }
 }

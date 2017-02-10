@@ -37,7 +37,7 @@ object Importer extends LilaController {
             case e =>
               logger.branch("importer").warn("sendGame", e)
               Redirect(routes.Importer.importGame)
-        }
+        },
     )
   }
 

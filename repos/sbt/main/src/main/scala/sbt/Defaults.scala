@@ -80,14 +80,14 @@ object Defaults extends BuildCommon {
   def buildCore: Seq[Setting[_]] = thisBuildCore ++ globalCore
   def thisBuildCore: Seq[Setting[_]] =
     inScope(GlobalScope.copy(project = Select(ThisBuild)))(Seq(
-            managedDirectory := baseDirectory.value / "lib_managed"
+            managedDirectory := baseDirectory.value / "lib_managed",
         ))
   @deprecated("Use AutoPlugins and globalSbtCore instead.", "0.13.2")
   lazy val globalCore: Seq[Setting[_]] =
     globalDefaults(
         defaultTestTasks(test) ++ defaultTestTasks(testOnly) ++ defaultTestTasks(
             testQuick) ++ Seq(
-            excludeFilter :== HiddenFileFilter
+            excludeFilter :== HiddenFileFilter,
         ) ++ globalIvyCore ++ globalJvmCore) ++ globalSbtCore
 
   private[sbt] lazy val globalJvmCore: Seq[Setting[_]] = Seq(
@@ -118,7 +118,7 @@ object Defaults extends BuildCommon {
       includeFilter in unmanagedSources :== "*.java" | "*.scala",
       includeFilter in unmanagedJars :==
         "*.jar" | "*.so" | "*.dll" | "*.jnilib" | "*.zip",
-      includeFilter in unmanagedResources :== AllPassFilter
+      includeFilter in unmanagedResources :== AllPassFilter,
   )
 
   private[sbt] lazy val globalIvyCore: Seq[Setting[_]] = Seq(
@@ -145,7 +145,7 @@ object Defaults extends BuildCommon {
       pomAllRepositories :== false,
       pomIncludeRepository :== Classpaths.defaultRepositoryFilter,
       updateOptions := UpdateOptions(),
-      forceUpdatePeriod :== None
+      forceUpdatePeriod :== None,
   )
 
   /** Core non-plugin settings for sbt builds.  These *must* be on every build or the sbt engine will fail to run at all. */
@@ -202,13 +202,13 @@ object Defaults extends BuildCommon {
             .get("sbt.task.forcegc")
             .map(java.lang.Boolean.parseBoolean)
             .getOrElse(GCUtil.defaultForceGarbageCollection),
-          minForcegcInterval :== GCUtil.defaultMinForcegcInterval
+          minForcegcInterval :== GCUtil.defaultMinForcegcInterval,
       ))
   def defaultTestTasks(key: Scoped): Seq[Setting[_]] =
     inTask(key)(
         Seq(
             tags := Seq(Tags.Test -> 1),
-            logBuffered := true
+            logBuffered := true,
         ))
   // TODO: This should be on the new default settings for a project.
   def projectCore: Seq[Setting[_]] = Seq(
@@ -216,7 +216,7 @@ object Defaults extends BuildCommon {
       logManager :=
         LogManager.defaults(extraLoggers.value, StandardMain.console),
       onLoadMessage <<= onLoadMessage or (name, thisProjectRef)(
-          "Set current project to " + _ + " (in build " + _.build + ")")
+          "Set current project to " + _ + " (in build " + _.build + ")"),
   )
   def paths = Seq(
       baseDirectory := thisProject.value.base,
@@ -226,7 +226,7 @@ object Defaults extends BuildCommon {
       sourceManaged := crossTarget.value / "src_managed",
       resourceManaged := crossTarget.value / "resource_managed",
       cacheDirectory :=
-        crossTarget.value / CacheDirectoryName / thisProject.value.id / "global"
+        crossTarget.value / CacheDirectoryName / thisProject.value.id / "global",
   )
 
   lazy val configPaths =
@@ -249,7 +249,7 @@ object Defaults extends BuildCommon {
       sourceGenerators :== Nil,
       sourceDirectories <<= Classpaths.concatSettings(
           unmanagedSourceDirectories, managedSourceDirectories),
-      sources <<= Classpaths.concat(unmanagedSources, managedSources)
+      sources <<= Classpaths.concat(unmanagedSources, managedSources),
   )
   lazy val resourceConfigPaths = Seq(
       resourceDirectory := sourceDirectory.value / "resources",
@@ -266,7 +266,7 @@ object Defaults extends BuildCommon {
       resourceGenerators <+=
         (discoveredSbtPlugins, resourceManaged) map PluginDiscovery.writeDescriptors,
       managedResources <<= generate(resourceGenerators),
-      resources <<= Classpaths.concat(managedResources, unmanagedResources)
+      resources <<= Classpaths.concat(managedResources, unmanagedResources),
   )
   lazy val outputConfigPaths = Seq(
       cacheDirectory :=
@@ -274,7 +274,7 @@ object Defaults extends BuildCommon {
       classDirectory := crossTarget.value /
       (prefix(configuration.value.name) + "classes"),
       target in doc := crossTarget.value /
-      (prefix(configuration.value.name) + "api")
+      (prefix(configuration.value.name) + "api"),
   )
   def addBaseSources = Seq(
       unmanagedSources := {
@@ -283,7 +283,7 @@ object Defaults extends BuildCommon {
         val excl = (excludeFilter in unmanagedSources).value
         if (sourcesInBase.value)
           (srcs +++ baseDirectory.value * (f -- excl)).get else srcs
-      }
+      },
   )
 
   def compileBase =
@@ -305,7 +305,7 @@ object Defaults extends BuildCommon {
                                                 streams.value.log)
         },
         scalaCompilerBridgeSource := Compiler.defaultCompilerBridgeSource(
-            scalaVersion.value)
+            scalaVersion.value),
     )
   // must be a val: duplication detected by object identity
   private[this] lazy val compileBaseGlobal: Seq[Setting[_]] =
@@ -322,7 +322,7 @@ object Defaults extends BuildCommon {
             derive(crossScalaVersions := Seq(scalaVersion.value)),
             derive(compilersSetting),
             derive(
-                scalaBinaryVersion := binaryScalaVersion(scalaVersion.value))
+                scalaBinaryVersion := binaryScalaVersion(scalaVersion.value)),
         ))
 
   def makeCrossSources(scalaSrcDir: File,
@@ -383,12 +383,12 @@ object Defaults extends BuildCommon {
           pickMainClassOrWarn(discoveredMainClasses.value, streams.value.log),
         run <<= runTask(fullClasspath, mainClass in run, runner in run),
         runMain <<= runMainTask(fullClasspath, runner in run),
-        copyResources <<= copyResourcesTask
+        copyResources <<= copyResourcesTask,
     )
   private[this] lazy val configGlobal = globalDefaults(
       Seq(
           initialCommands :== "",
-          cleanupCommands :== ""
+          cleanupCommands :== "",
       ))
 
   lazy val projectTasks: Seq[Setting[_]] = Seq(
@@ -397,7 +397,7 @@ object Defaults extends BuildCommon {
       clean := doClean(cleanFiles.value, cleanKeepFiles.value),
       consoleProject <<= consoleProjectTask,
       watchTransitiveSources <<= watchTransitiveSourcesTask,
-      watch <<= watchSetting
+      watch <<= watchSetting,
   )
 
   def generate(generators: SettingKey[Seq[Task[Seq[File]]]])
@@ -524,7 +524,7 @@ object Defaults extends BuildCommon {
             testListeners :== Nil,
             testOptions :== Nil,
             testResultLogger :== TestResultLogger.Default,
-            testFilter in testOnly :== (selectedFilter _)
+            testFilter in testOnly :== (selectedFilter _),
         ))
   lazy val testTasks: Seq[Setting[_]] =
     testTaskOptions(test) ++ testTaskOptions(testOnly) ++ testTaskOptions(
@@ -560,7 +560,7 @@ object Defaults extends BuildCommon {
           trl.run(streams.value.log, executeTests.value, taskName)
         },
         testOnly <<= inputTests(testOnly),
-        testQuick <<= inputTests(testQuick)
+        testQuick <<= inputTests(testQuick),
     )
   lazy val TaskGlobal: Scope = ThisScope.copy(task = Global)
   lazy val ConfigGlobal: Scope = ThisScope.copy(config = Global)
@@ -579,9 +579,9 @@ object Defaults extends BuildCommon {
         },
             testOptions := Tests.Listeners(testListeners.value) +:
             (testOptions in TaskGlobal).value,
-            testExecution <<= testExecutionTask(key)
+            testExecution <<= testExecutionTask(key),
         )) ++ inScope(GlobalScope)(Seq(
-            derive(testGrouping <<= singleTestGroupDefault)
+            derive(testGrouping <<= singleTestGroupDefault),
         ))
   @deprecated(
       "Doesn't provide for closing the underlying resources.", "0.13.1")
@@ -846,11 +846,11 @@ object Defaults extends BuildCommon {
 
   lazy val packageBase: Seq[Setting[_]] =
     Seq(
-        artifact := Artifact(moduleName.value)
+        artifact := Artifact(moduleName.value),
     ) ++ Defaults.globalDefaults(
         Seq(
             packageOptions :== Nil,
-            artifactName :== (Artifact.artifactName _)
+            artifactName :== (Artifact.artifactName _),
         ))
 
   lazy val packageConfig: Seq[Setting[_]] =
@@ -979,7 +979,7 @@ object Defaults extends BuildCommon {
             mappings <<= mappingsTask,
             packagedArtifact := (artifact.value -> key.value),
             artifact <<= artifactSetting,
-            artifactPath <<= artifactPathSetting(artifact)
+            artifactPath <<= artifactPathSetting(artifact),
         ))
   def packageTask: Initialize[Task[File]] =
     (packageConfiguration, streams) map { (config, s) =>
@@ -1137,7 +1137,7 @@ object Defaults extends BuildCommon {
             case _ => () // do nothing
           }
           out
-        }
+        },
         ))
 
   def mainRunTask =
@@ -1267,7 +1267,7 @@ object Defaults extends BuildCommon {
         compileInputs := new Inputs(compilers.value,
                                     compileOptions.value,
                                     compileIncSetup.value,
-                                    previousCompile.value)
+                                    previousCompile.value),
     )
   }
   def compileAnalysisSettings: Seq[Setting[_]] = Seq(
@@ -1281,7 +1281,7 @@ object Defaults extends BuildCommon {
             new PreviousResult(Maybe.nothing[CompileAnalysis],
                                Maybe.nothing[MiniSetup])
         }
-      }
+      },
   )
 
   def printWarningsTask: Initialize[Task[Unit]] =
@@ -1452,7 +1452,7 @@ object Defaults extends BuildCommon {
     projectCore ++ disableAggregation ++ Seq(
         // Missing but core settings
         baseDirectory := thisProject.value.base,
-        target := baseDirectory.value / "target"
+        target := baseDirectory.value / "target",
     )
   @deprecated(
       "Default settings split into coreDefaultSettings and IvyModule/JvmModule plugins.",
@@ -1487,7 +1487,7 @@ object Classpaths {
           findClasspathConfig(internalConfigurationMap.value,
                               configuration.value,
                               classpathConfiguration.?.value,
-                              update.value)
+                              update.value),
     )
   private[this] def classpaths: Seq[Setting[_]] =
     Seq(
@@ -1505,7 +1505,7 @@ object Classpaths {
           findUnmanagedJars(configuration.value,
                             unmanagedBase.value,
                             includeFilter in unmanagedJars value,
-                            excludeFilter in unmanagedJars value)
+                            excludeFilter in unmanagedJars value),
     ).map(exportClasspath)
 
   private[this] def exportClasspath(
@@ -1558,12 +1558,12 @@ object Classpaths {
         Seq(
             publishMavenStyle :== true,
             publishArtifact :== true,
-            publishArtifact in Test :== false
+            publishArtifact in Test :== false,
         ))
 
   val jvmPublishSettings: Seq[Setting[_]] = Seq(
       artifacts <<= artifactDefs(defaultArtifactTasks),
-      packagedArtifacts <<= packaged(defaultArtifactTasks)
+      packagedArtifacts <<= packaged(defaultArtifactTasks),
   )
 
   val ivyPublishSettings: Seq[Setting[_]] =
@@ -1582,7 +1582,7 @@ object Classpaths {
         deliverLocal <<= deliverTask(deliverLocalConfiguration),
         publish <<= publishTask(publishConfiguration, deliver),
         publishLocal <<= publishTask(publishLocalConfiguration, deliverLocal),
-        publishM2 <<= publishTask(publishM2Configuration, deliverLocal)
+        publishM2 <<= publishTask(publishM2Configuration, deliverLocal),
     )
   @deprecated(
       "This has been split into jvmPublishSettings and ivyPublishSettings.",
@@ -1628,7 +1628,7 @@ object Classpaths {
               id.groupID, id.name, sbtVersion.value, crossVersion = cross)
           CrossVersion(scalaVersion, binVersion)(base)
             .copy(crossVersion = CrossVersion.Disabled)
-        }
+        },
         ))
 
   val ivyBaseSettings: Seq[Setting[_]] =
@@ -1862,7 +1862,7 @@ object Classpaths {
                   Vector.empty,
                   s.log)
           }
-        } tag (Tags.Update, Tags.Network)
+        } tag (Tags.Update, Tags.Network),
     )
 
   val jvmBaseSettings: Seq[Setting[_]] = Seq(
@@ -1888,7 +1888,7 @@ object Classpaths {
                                           version,
                                           isDotty) ++ pluginAdjust
         }
-      }
+      },
   )
   @deprecated("Split into ivyBaseSettings and jvmBaseSettings.", "0.13.2")
   val baseSettings: Seq[Setting[_]] = ivyBaseSettings ++ jvmBaseSettings
@@ -1944,7 +1944,7 @@ object Classpaths {
     Defaults.globalDefaults(
         Seq(
             transitiveClassifiers in updateSbtClassifiers ~=
-            (_.filter(_ != DocClassifier))
+            (_.filter(_ != DocClassifier)),
         ))
   def sbtClassifiersTasks =
     sbtClassifiersGlobalDefaults ++ inTask(updateSbtClassifiers)(
@@ -2015,7 +2015,7 @@ object Classpaths {
                   Some(depDir),
                   s.log)
           }
-        } tag (Tags.Update, Tags.Network)
+        } tag (Tags.Update, Tags.Network),
         )) ++ Seq(bootIvyConfiguration :=
         (ivyConfiguration in updateSbtClassifiers).value)
 
@@ -2575,7 +2575,7 @@ object Classpaths {
       modifyForPlugin(plugin, ModuleID(org, ScalaArtifacts.LibraryID, version)) :: Nil
     else Nil
   def addUnmanagedLibrary: Seq[Setting[_]] = Seq(
-      unmanagedJars in Compile <++= unmanagedScalaLibrary
+      unmanagedJars in Compile <++= unmanagedScalaLibrary,
   )
   def unmanagedScalaLibrary: Initialize[Task[Seq[File]]] =
     Def.taskDyn {
@@ -2633,7 +2633,7 @@ object Classpaths {
         val existing = options.toSet
         if (autoCompilerPlugins.value)
           options ++ newPlugins.filterNot(existing) else options
-      }
+      },
   )
 
   @deprecated(

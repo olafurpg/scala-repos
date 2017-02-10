@@ -165,7 +165,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
                 serde = Some(classOf[
                           org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe]
                         .getName()),
-                serdeProperties = Map.empty
+                serdeProperties = Map.empty,
             ))
 
       client.createTable(table, ignoreIfExists = false)

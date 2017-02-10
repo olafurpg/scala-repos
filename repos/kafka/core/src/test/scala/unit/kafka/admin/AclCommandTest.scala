@@ -48,7 +48,7 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
       TopicResources -> Array("--topic", "test-1", "--topic", "test-2"),
       Set(Resource.ClusterResource) -> Array("--cluster"),
       GroupResources -> Array(
-          "--group", "testGroup-1", "--group", "testGroup-2")
+          "--group", "testGroup-1", "--group", "testGroup-2"),
   )
 
   private val ResourceToOperations =
@@ -64,20 +64,20 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
         (Set(Create, ClusterAction),
             Array("--operation", "Create", "--operation", "ClusterAction")),
         GroupResources ->
-        (Set(Read).toSet[Operation], Array("--operation", "Read"))
+        (Set(Read).toSet[Operation], Array("--operation", "Read")),
     )
 
   private val ProducerResourceToAcls = Map[Set[Resource], Set[Acl]](
       TopicResources -> AclCommand.getAcls(
           Users, Allow, Set(Write, Describe), Hosts),
       Set(Resource.ClusterResource) -> AclCommand.getAcls(
-          Users, Allow, Set(Create), Hosts)
+          Users, Allow, Set(Create), Hosts),
   )
 
   private val ConsumerResourceToAcls = Map[Set[Resource], Set[Acl]](
       TopicResources -> AclCommand.getAcls(
           Users, Allow, Set(Read, Describe), Hosts),
-      GroupResources -> AclCommand.getAcls(Users, Allow, Set(Read), Hosts)
+      GroupResources -> AclCommand.getAcls(Users, Allow, Set(Read), Hosts),
   )
 
   private val CmdToResourcesToAcl = Map[
@@ -87,7 +87,7 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
       Array[String]("--producer", "--consumer") -> ConsumerResourceToAcls.map {
         case (k, v) =>
           k -> (v ++ ProducerResourceToAcls.getOrElse(k, Set.empty[Acl]))
-      }
+      },
   )
 
   @Test

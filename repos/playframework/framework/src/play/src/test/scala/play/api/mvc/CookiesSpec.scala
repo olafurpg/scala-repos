@@ -119,7 +119,7 @@ object CookiesSpec extends Specification {
       cookies.toSet must_== Set(
           Cookie("foo", "fooValue2"),
           Cookie("bar", "barValue2"),
-          Cookie("baz", "bazValue")
+          Cookie("baz", "bazValue"),
       )
     }
     "return one cookie for each name" in {
@@ -128,13 +128,13 @@ object CookiesSpec extends Specification {
             Cookie("foo", "foo1"),
             Cookie("foo", "foo2"),
             Cookie("bar", "bar"),
-            Cookie("baz", "baz")
+            Cookie("baz", "baz"),
         )
         .cookies
       cookies.toSet must_== Set(
           Cookie("foo", "foo2"),
           Cookie("bar", "bar"),
-          Cookie("baz", "baz")
+          Cookie("baz", "baz"),
       )
     }
   }

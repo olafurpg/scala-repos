@@ -65,7 +65,7 @@ class HttpEventStreamActor(leaderInfo: LeaderInfo,
         handleLeadership,
         cleanupHandlerActors,
         newConnectionBehaviour,
-        warnAboutUnknownMessages
+        warnAboutUnknownMessages,
     ).reduceLeft {
       // Prevent fatal warning about deriving type Any as type parameter
       _.orElse[Any, Unit](_)

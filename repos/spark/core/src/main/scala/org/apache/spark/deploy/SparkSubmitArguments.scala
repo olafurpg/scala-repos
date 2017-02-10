@@ -588,7 +588,7 @@ private[deploy] class SparkSubmitArguments(
         |                              the node running the Application Master via the Secure
         |                              Distributed Cache, for renewing the login tickets and the
         |                              delegation tokens periodically.
-      """.stripMargin
+      """.stripMargin,
     )
 
     if (SparkSubmit.isSqlShell(mainClass)) {

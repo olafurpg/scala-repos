@@ -44,7 +44,7 @@ class WeightedLeastSquaresSuite
             Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
             Instance(19.0, 2.0, Vectors.dense(1.0, 7.0)),
             Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
-            Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
+            Instance(29.0, 4.0, Vectors.dense(3.0, 13.0)),
         ),
         2)
 
@@ -60,7 +60,7 @@ class WeightedLeastSquaresSuite
             Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
             Instance(17.0, 2.0, Vectors.dense(1.0, 7.0)),
             Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
-            Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
+            Instance(17.0, 4.0, Vectors.dense(3.0, 13.0)),
         ),
         2)
   }

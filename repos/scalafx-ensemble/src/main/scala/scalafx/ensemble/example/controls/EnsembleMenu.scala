@@ -62,7 +62,7 @@ class EnsembleMenu extends EnsembleExample {
               }
               items = List(
                   new MenuItem("Type Safe"),
-                  new MenuItem("Martin Odersky")
+                  new MenuItem("Martin Odersky"),
               )
             },
             new Menu("Features") {
@@ -78,10 +78,10 @@ class EnsembleMenu extends EnsembleExample {
                           (if (fooMenuItem.visible())
                              "" else "not") + " visible")
                     }
-                  }
+                  },
               )
             },
-            new MenuItem("ScalaFX")
+            new MenuItem("ScalaFX"),
         )
       })
     }

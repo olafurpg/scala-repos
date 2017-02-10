@@ -99,9 +99,9 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
     new ThriftClientRequest(
         ByteArrays.concat(
             OutputBuffer.messageToArray(header, protocolFactory),
-            baseRequest.message
+            baseRequest.message,
         ),
-        baseRequest.oneway
+        baseRequest.oneway,
     )
   }
 

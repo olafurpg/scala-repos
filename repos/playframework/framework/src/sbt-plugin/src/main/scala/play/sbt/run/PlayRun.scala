@@ -78,7 +78,7 @@ object PlayRun {
               .get
               .toEither
               .right
-              .toOption
+              .toOption,
       )
 
     val runSbtTask: String => AnyRef = (task: String) =>
@@ -110,7 +110,7 @@ object PlayRun {
         devSettings.value,
         args,
         runSbtTask,
-        (mainClass in (Compile, Keys.run)).value.get
+        (mainClass in (Compile, Keys.run)).value.get,
     )
 
     interaction match {

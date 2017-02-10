@@ -59,7 +59,7 @@ private[spire] trait Fuser[C <: Context, A] {
         q"$tmp",
         abs(tmp),
         Right(0),
-        q"spire.algebra.Field[$A].fromDouble($tmp)"
+        q"spire.algebra.Field[$A].fromDouble($tmp)",
     ).fused(q"val $tmp = $exact.value" :: Nil)
   }
 
@@ -69,7 +69,7 @@ private[spire] trait Fuser[C <: Context, A] {
         q"$tmp",
         abs(tmp),
         Right(1),
-        q"$approx.exact"
+        q"$approx.exact",
     ).fused(
         q"val $tmp = spire.algebra.IsReal[$A].toDouble($approx.exact)" :: Nil)
   }

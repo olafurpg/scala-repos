@@ -21,8 +21,8 @@ final class NoteApi(
       .find(
           BSONDocument(
               "to" -> user.id,
-              "from" -> BSONDocument("$in" -> (myFriendIds + me.id))
-          ) ++ me.troll.fold(BSONDocument(), BSONDocument("troll" -> false))
+              "from" -> BSONDocument("$in" -> (myFriendIds + me.id)),
+          ) ++ me.troll.fold(BSONDocument(), BSONDocument("troll" -> false)),
       )
       .sort(BSONDocument("date" -> -1))
       .cursor[Note]()

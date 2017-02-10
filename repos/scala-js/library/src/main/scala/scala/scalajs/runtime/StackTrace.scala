@@ -253,7 +253,7 @@ object StackTrace {
           I = "scala_Int",
           J = "scala_Long",
           F = "scala_Float",
-          D = "scala_Double"
+          D = "scala_Double",
       )
       .asInstanceOf[js.Dictionary[String]]
 
@@ -278,7 +278,7 @@ object StackTrace {
         sr_ = "scala_runtime_",
         s_ = "scala_",
         jl_ = "java_lang_",
-        ju_ = "java_util_"
+        ju_ = "java_util_",
     )
     .asInstanceOf[js.Dictionary[String]]
 
@@ -558,7 +558,7 @@ object StackTrace {
             methodName = methodName,
             fileName = fileName,
             lineNumber = lineNumber,
-            columnNumber = columnNumber
+            columnNumber = columnNumber,
         )
         .asInstanceOf[JSStackTraceElem]
     }

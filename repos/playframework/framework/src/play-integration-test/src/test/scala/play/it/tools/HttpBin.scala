@@ -31,7 +31,7 @@ object HttpBinApplication {
         "origin" -> r.remoteAddress,
         "url" -> "",
         "args" -> r.queryString.mapValues(_.head),
-        "headers" -> r.headers.toSimpleMap
+        "headers" -> r.headers.toSimpleMap,
     )
   }
 
@@ -40,7 +40,7 @@ object HttpBinApplication {
       requestHeaderWriter.writes(r).as[JsObject] ++ Json.obj(
           "json" -> JsNull,
           "data" -> "",
-          "form" -> JsObject(Nil)
+          "form" -> JsObject(Nil),
       ) ++
       (r.body match {
             // Json Body
@@ -59,7 +59,7 @@ object HttpBinApplication {
                   "file" -> JsString(m.mdf
                         .file("upload")
                         .map(v => FileUtils.readFileToString(v.ref.file))
-                        .getOrElse(""))
+                        .getOrElse("")),
                 )
             case b =>
               Json.obj("data" -> JsString(b.toString))
@@ -376,7 +376,7 @@ object HttpBinApplication {
             .orElse(stream)
             .orElse(delay)
             .orElse(html)
-            .orElse(robots)
+            .orElse(robots),
         )
     }.application
   }

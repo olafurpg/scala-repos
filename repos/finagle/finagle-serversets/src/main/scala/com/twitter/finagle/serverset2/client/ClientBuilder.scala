@@ -32,7 +32,7 @@ private[client] case class ClientConfig(val hosts: String,
       "readOnlyOK" -> readOnlyOK,
       "sessionId" -> sessionId,
       "password" -> password,
-      "timer" -> timer
+      "timer" -> timer,
   )
 
   override def toString = {
@@ -73,7 +73,7 @@ private[serverset2] object ClientBuilder {
       readOnlyOK = false,
       sessionId = None,
       password = None,
-      timer = DefaultTimer.twitter
+      timer = DefaultTimer.twitter,
   )
 
   def apply() = new ClientBuilder(DefaultConfig)

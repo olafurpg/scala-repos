@@ -36,7 +36,7 @@ object ScaldingPoC extends App {
   // map, flatMap etc.
   val birds = List(
       "name" ->> "Swallow (European, unladen)" :: "speed" ->> 23 :: "weightLb" ->> 0.2 :: "heightFt" ->> 0.65 :: HNil,
-      "name" ->> "African (European, unladen)" :: "speed" ->> 24 :: "weightLb" ->> 0.21 :: "heightFt" ->> 0.6 :: HNil
+      "name" ->> "African (European, unladen)" :: "speed" ->> 24 :: "weightLb" ->> 0.21 :: "heightFt" ->> 0.6 :: HNil,
   )
 
   val fasterBirds = birds.map(b => b + ("doubleSpeed" ->> b("speed") * 2))
@@ -49,7 +49,7 @@ object ScaldingPoC extends App {
 
   val items = List(
       "author" ->> "Benjamin Pierce" :: "title" ->> "Types and Programming Languages" :: "price" ->> 49.35 :: HNil,
-      "author" ->> "Roger Hindley" :: "title" ->> "Basic Simple Type Theory" :: "price" ->> 23.14 :: HNil
+      "author" ->> "Roger Hindley" :: "title" ->> "Basic Simple Type Theory" :: "price" ->> 23.14 :: HNil,
   )
 
   val pricierItems = items.map(i => i + ("price" ->> i("price") * 1.1))
@@ -57,7 +57,7 @@ object ScaldingPoC extends App {
 
   val books = List(
       "text" ->> "Not everyone knows how I killed old Phillip Mathers" :: HNil,
-      "text" ->> "No, no, I can't tell you everything" :: HNil
+      "text" ->> "No, no, I can't tell you everything" :: HNil,
   )
 
   val lines = books.flatMap(book =>

@@ -191,7 +191,7 @@ object FilesystemIngestFailureLog {
               .fold(_ => "ingest", _ => "archive", _ => "storeFile")
               .serialize,
             "message" -> rec.message.serialize,
-            "lastKnownGood" -> rec.lastKnownGood.serialize
+            "lastKnownGood" -> rec.lastKnownGood.serialize,
         )
       }
 
@@ -463,7 +463,7 @@ abstract class KafkaShardIngestActor(
           topic,
           partition = 0,
           offset = lastCheckpoint.offset,
-          maxSize = fetchBufferSize
+          maxSize = fetchBufferSize,
       )
 
       // read a fetch buffer worth of messages from kafka, deserializing each one

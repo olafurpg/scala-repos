@@ -48,9 +48,9 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
   test("works for one range with four ports") {
     withRandomSeeds(
         input = Seq(
-              portRange("role", 10, 13)
+              portRange("role", 10, 13),
           ),
-        expectedOutput = (10 to 13).map(PortWithRole("role", _))
+        expectedOutput = (10 to 13).map(PortWithRole("role", _)),
     )
   }
 
@@ -59,11 +59,11 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
         input = Seq(
               portRange("role", 10, 13),
               portRange("marathon", 14, 20),
-              portRange("role", 21, 30)
+              portRange("role", 21, 30),
           ),
         expectedOutput = (10 to 13).map(PortWithRole("role", _)) ++ (14 to 20)
             .map(PortWithRole("marathon", _)) ++ (21 to 30).map(
-              PortWithRole("role", _))
+              PortWithRole("role", _)),
     )
   }
 
@@ -97,7 +97,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
     val allowTimeForTest = benchmarkDuration
     log.info(
         s"benchmarkDuration = ${benchmarkDuration.toMillis}ms, " +
-        s"allowing time for test = ${allowTimeForTest.toMillis}ms"
+        s"allowing time for test = ${allowTimeForTest.toMillis}ms",
     )
     log.info(s"duration = ${duration.toMillis}ms")
     assert(duration.toMillis < allowTimeForTest.toMillis)
@@ -115,7 +115,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
             val rangeSize: Long =
               Integer.MAX_VALUE.toLong / numberOfRanges.toLong
             portRange("role", i * rangeSize, (i + 1) * rangeSize - 1)
-          }
+          },
       )
 
       val takenPorts = ports.take(3).toSet
@@ -136,7 +136,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
     val allowTimeForTest = benchmarkDuration * 50
     log.info(
         s"benchmarkDuration = ${benchmarkDuration.toMillis}ms, " +
-        s"allowing time for test = ${allowTimeForTest.toMillis}ms"
+        s"allowing time for test = ${allowTimeForTest.toMillis}ms",
     )
     log.info(
         s"duration = ${duration.toMillis}ms for $iterations iterations and $numberOfRanges ranges")

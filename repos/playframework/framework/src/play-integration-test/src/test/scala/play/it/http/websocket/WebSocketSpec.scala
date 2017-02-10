@@ -105,7 +105,7 @@ trait WebSocketSpec
         sendFrames(
             TextMessage("a"),
             TextMessage("b"),
-            CloseMessage(1000)
+            CloseMessage(1000),
         ).via(flow).runWith(Sink.cancelled)
         consumed.future
       }
@@ -123,7 +123,7 @@ trait WebSocketSpec
           exactly(
               textFrame(be_==("a")),
               textFrame(be_==("b")),
-              closeFrame()
+              closeFrame(),
           ).inOrder)
     }
   }
@@ -150,7 +150,7 @@ trait WebSocketSpec
           .runWith(consumeFrames)
       }
       frames must contain(exactly(
-              closeFrame()
+              closeFrame(),
           ))
     }
   }
@@ -166,7 +166,7 @@ trait WebSocketSpec
                 "Connection" -> "upgrade",
                 "Sec-WebSocket-Version" -> "13",
                 "Sec-WebSocket-Key" -> "x3JJHMbDL1EzLkh9GBhXDw==",
-                "Origin" -> "http://example.com"
+                "Origin" -> "http://example.com",
             )
             .get()).status must_== FORBIDDEN
     }
@@ -216,7 +216,7 @@ trait WebSocketSpec
                 ContinuationMessage(ByteString("co"), false),
                 ContinuationMessage(ByteString("nd"), true),
                 TextMessage("third"),
-                CloseMessage(1000)
+                CloseMessage(1000),
             ).via(flow).runWith(Sink.ignore)
             consumed.future
           }
@@ -241,7 +241,7 @@ trait WebSocketSpec
                 ContinuationMessage(ByteString("co"), false),
                 ContinuationMessage(ByteString("nd"), true),
                 BinaryMessage(ByteString("third")),
-                CloseMessage(1000)
+                CloseMessage(1000),
             ).via(flow).runWith(Sink.ignore)
             consumed.future
           }
@@ -261,11 +261,11 @@ trait WebSocketSpec
                 ContinuationMessage(
                     ByteString(
                         new String(Array.range(1, 65530).map(_ => 'a'))),
-                    true)
+                    true),
             ).via(flow).runWith(consumeFrames)
           }
           frames must contain(exactly(
-                  closeFrame(1009)
+                  closeFrame(1009),
               ))
         }
       }
@@ -279,11 +279,11 @@ trait WebSocketSpec
           val frames = runWebSocket { flow =>
             sendFrames(
                 BinaryMessage(ByteString("first")),
-                TextMessage("foo")
+                TextMessage("foo"),
             ).via(flow).runWith(consumeFrames)
           }
           frames must contain(exactly(
-                  closeFrame(1003)
+                  closeFrame(1003),
               ))
         }
       }
@@ -297,12 +297,12 @@ trait WebSocketSpec
           val frames = runWebSocket { flow =>
             sendFrames(
                 PingMessage(ByteString("hello")),
-                CloseMessage(1000)
+                CloseMessage(1000),
             ).via(flow).runWith(consumeFrames)
           }
           frames must contain(exactly(
                   pongFrame(be_==("hello")),
-                  closeFrame()
+                  closeFrame(),
               ))
         }
       }
@@ -316,11 +316,11 @@ trait WebSocketSpec
           val frames = runWebSocket { flow =>
             sendFrames(
                 PongMessage(ByteString("hello")),
-                CloseMessage(1000)
+                CloseMessage(1000),
             ).via(flow).runWith(consumeFrames)
           }
           frames must contain(exactly(
-                  closeFrame()
+                  closeFrame(),
               ))
         }
       }
@@ -457,7 +457,7 @@ trait WebSocketSpec
                            Nil,
                            "GET",
                            "",
-                           "/stream")
+                           "/stream"),
         )
         invoker.call(javaHandler)
       }
@@ -501,7 +501,7 @@ trait WebSocketSpec
                            Nil,
                            "GET",
                            "",
-                           "/stream")
+                           "/stream"),
         )
         invoker.call(javaHandler)
       }

@@ -38,7 +38,7 @@ class LatencyHistogramTest extends FunSuite with Matchers {
       (130827L, 300),
       (130655L, 200),
       (127290L, 800),
-      (128163L, 123)
+      (128163L, 123),
   )
 
   Seq(0.0, 0.1, 0.01).foreach { err =>

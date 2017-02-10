@@ -71,7 +71,7 @@ class JsonFormatSpec extends FunSuite {
       description = Some("Build has completed successfully"),
       id = 1,
       context = "Default",
-      creator = apiUser
+      creator = apiUser,
   )(sha1, repo1Name)
   val apiCommitStatusJson = s"""{
     "created_at":"2011-04-14T16:00:49Z",
@@ -171,7 +171,7 @@ class JsonFormatSpec extends FunSuite {
       commit = ApiCommitListItem.Commit(
             message = "Fix all the bugs",
             author = apiPersonIdent,
-            committer = apiPersonIdent
+            committer = apiPersonIdent,
         )(sha1, repo1Name),
       author = Some(apiUser),
       committer = Some(apiUser),
@@ -279,7 +279,7 @@ class JsonFormatSpec extends FunSuite {
       mergeable = None,
       title = "new-feature",
       body = "Please pull these awesome changes",
-      user = apiUser
+      user = apiUser,
   )
   val apiPullRequestJson = s"""{
     "url": "${context.baseUrl}/api/v3/repos/octocat/Hello-World/pulls/1347",
@@ -338,7 +338,7 @@ class JsonFormatSpec extends FunSuite {
       user = apiUser,
       body = "Maybe you should use more emojji on this line.",
       created_at = date("2015-05-05T23:40:27Z"),
-      updated_at = date("2015-05-05T23:40:27Z")
+      updated_at = date("2015-05-05T23:40:27Z"),
   )(RepositoryName("baxterthehacker/public-repo"), 1)
   val apiPullRequestReviewCommentJson = s"""{
     "url": "http://gitbucket.exmple.com/api/v3/repos/baxterthehacker/public-repo/pulls/comments/29724692",

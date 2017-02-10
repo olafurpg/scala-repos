@@ -54,13 +54,13 @@ object OrderingExamples extends App {
   val hs = List(
       2 :: "b" :: HNil,
       2 :: "a" :: HNil,
-      1 :: "c" :: HNil
+      1 :: "c" :: HNil,
   ).sorted
   assert(
       hs == List(
           1 :: "c" :: HNil,
           2 :: "a" :: HNil,
-          2 :: "b" :: HNil
+          2 :: "b" :: HNil,
       ))
 
   case class Foo(i: Int, s: String)
@@ -69,12 +69,12 @@ object OrderingExamples extends App {
   val fs = List(
       Foo(2, "b"),
       Foo(2, "a"),
-      Foo(1, "c")
+      Foo(1, "c"),
   ).sorted
   assert(
       fs == List(
           Foo(1, "c"),
           Foo(2, "a"),
-          Foo(2, "b")
+          Foo(2, "b"),
       ))
 }

@@ -32,7 +32,7 @@ final class OptimizerOptions private (
     /** Perform expensive checks of the sanity of the Scala.js IR */
     val checkScalaJSIR: Boolean = false,
     /** Use Google Closure Backend */
-    val useClosureCompiler: Boolean = false
+    val useClosureCompiler: Boolean = false,
 ) {
 
   @deprecated(

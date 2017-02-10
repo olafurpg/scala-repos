@@ -41,6 +41,6 @@ private[finagle] class RichRequestHeader(val header: RequestHeader)
         else None,
         SpanId(header.getSpan_id),
         if (header.isSetSampled) Some(header.isSampled) else None,
-        if (header.isSetFlags) Flags(header.getFlags) else Flags()
+        if (header.isSetFlags) Flags(header.getFlags) else Flags(),
     )
 }

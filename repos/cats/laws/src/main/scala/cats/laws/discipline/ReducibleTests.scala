@@ -16,7 +16,7 @@ trait ReducibleTests[F[_]] extends FoldableTests[F] {
         "reduceLeftTo consistent with reduceMap" -> forAll(
             laws.reduceLeftToConsistentWithReduceMap[A, B] _),
         "reduceRightTo consistent with reduceMap" -> forAll(
-            laws.reduceRightToConsistentWithReduceMap[A, B] _)
+            laws.reduceRightToConsistentWithReduceMap[A, B] _),
     )
 }
 

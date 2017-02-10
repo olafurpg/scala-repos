@@ -41,21 +41,21 @@ object OperationOnCollectionInspectionBase {
       likeCollectionKey -> InspectionBundle.message(
           "operation.on.collection.like.collection.input.message"),
       likeOptionKey -> InspectionBundle.message(
-          "operation.on.collection.like.option.input.message")
+          "operation.on.collection.like.option.input.message"),
   )
 
   private val inputTitles = Map(
       likeCollectionKey -> InspectionBundle.message(
           "operation.on.collection.like.collection.input.title"),
       likeOptionKey -> InspectionBundle.message(
-          "operation.on.collection.like.option.input.title")
+          "operation.on.collection.like.option.input.title"),
   )
 
   private val panelTitles = Map(
       likeCollectionKey -> InspectionBundle.message(
           "operation.on.collection.like.collection.panel.title"),
       likeOptionKey -> InspectionBundle.message(
-          "operation.on.collection.like.option.panel.title")
+          "operation.on.collection.like.option.panel.title"),
   )
 }
 
@@ -102,13 +102,13 @@ abstract class OperationOnCollectionInspectionBase
 
   private val patternLists = Map(
       likeCollectionKey -> getLikeCollectionClasses _,
-      likeOptionKey -> getLikeOptionClasses _
+      likeOptionKey -> getLikeOptionClasses _,
   )
 
   private val setPatternLists = {
     Map(
         likeCollectionKey -> setLikeCollectionClasses _,
-        likeOptionKey -> setLikeOptionClasses _
+        likeOptionKey -> setLikeOptionClasses _,
     )
   }
 

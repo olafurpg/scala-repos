@@ -14,7 +14,7 @@ private[leadership] object AbdicateOnConnectionLossActor {
 
   private val connectionDropped = Set(
       Watcher.Event.KeeperState.Disconnected,
-      Watcher.Event.KeeperState.Expired
+      Watcher.Event.KeeperState.Expired,
   )
 }
 

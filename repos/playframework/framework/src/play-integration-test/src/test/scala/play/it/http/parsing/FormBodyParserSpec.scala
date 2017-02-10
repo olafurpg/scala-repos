@@ -24,7 +24,7 @@ class FormBodyParserSpec extends PlaySpecification {
       await(
           bodyParser(FakeRequest().withHeaders(
                   writeable.contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-            .run(Source.single(writeable.transform(body)))
+            .run(Source.single(writeable.transform(body))),
       )
     }
 

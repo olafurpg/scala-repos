@@ -42,7 +42,7 @@ object JSTreeExtractors {
       private[jse] final def genNamedLitExtract(
           exprs: List[Tree],
           acc: List[(StringLiteral, Tree)],
-          failIfNonLit: Boolean
+          failIfNonLit: Boolean,
       ): Option[List[(StringLiteral, Tree)]] = exprs match {
         case Tuple2(name: StringLiteral, value) :: xs =>
           genNamedLitExtract(xs, (name, value) :: acc, failIfNonLit)

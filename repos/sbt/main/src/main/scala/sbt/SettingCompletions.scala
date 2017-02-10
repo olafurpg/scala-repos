@@ -441,6 +441,6 @@ private[sbt] object SettingCompletions {
       classOf[Int],
       classOf[Double],
       classOf[Long],
-      classOf[String]
+      classOf[String],
   )
 }

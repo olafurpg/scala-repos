@@ -32,7 +32,7 @@ private[v1] class SecurityFilter
           Response
             .status(Response.Status.FORBIDDEN)
             .entity(raw"""user "$user"is not authorized""")
-            .build()
+            .build(),
         )
     }
   }

@@ -42,7 +42,7 @@ class SystemProperties
 
   def names: Iterator[String] =
     wrapAccess(
-        System.getProperties().stringPropertyNames().asScala.iterator
+        System.getProperties().stringPropertyNames().asScala.iterator,
     ) getOrElse Iterator.empty
 
   def get(key: String) =

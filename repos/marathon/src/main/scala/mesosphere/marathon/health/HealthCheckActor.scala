@@ -32,7 +32,7 @@ class HealthCheckActor(
         "Starting health check actor for app [{}] version [{}] and healthCheck [{}]",
         app.id,
         app.version,
-        healthCheck
+        healthCheck,
     )
     scheduleNextHealthCheck()
   }
@@ -42,7 +42,7 @@ class HealthCheckActor(
         "Restarting health check actor for app [{}] version [{}] and healthCheck [{}]",
         app.id,
         app.version,
-        healthCheck
+        healthCheck,
     )
 
   override def postStop(): Unit = {
@@ -51,7 +51,7 @@ class HealthCheckActor(
         "Stopped health check actor for app [{}] version [{}] and healthCheck [{}]",
         app.id,
         app.version,
-        healthCheck
+        healthCheck,
     )
   }
 
@@ -60,7 +60,7 @@ class HealthCheckActor(
         "Purging health status of done tasks for app [{}] version [{}] and healthCheck [{}]",
         app.id,
         app.version,
-        healthCheck
+        healthCheck,
     )
     val activeTaskIds =
       taskTracker.appTasksLaunchedSync(app.id).map(_.taskId).toSet
@@ -75,12 +75,12 @@ class HealthCheckActor(
           "Scheduling next health check for app [{}] version [{}] and healthCheck [{}]",
           app.id,
           app.version,
-          healthCheck
+          healthCheck,
       )
       nextScheduledCheck = Some(
           context.system.scheduler.scheduleOnce(healthCheck.interval) {
             self ! Tick
-          }
+          },
       )
     }
 
@@ -104,7 +104,7 @@ class HealthCheckActor(
     // ignore failures if maxFailures == 0
     if (consecutiveFailures >= maxFailures && maxFailures > 0) {
       log.info(
-          s"Detected unhealthy ${task.taskId} of app [${app.id}] version [${app.version}] on host ${task.agentInfo.host}"
+          s"Detected unhealthy ${task.taskId} of app [${app.id}] version [${app.version}] on host ${task.agentInfo.host}",
       )
 
       // kill the task
@@ -177,7 +177,7 @@ class HealthCheckActor(
             HealthStatusChanged(appId = app.id,
                                 taskId = taskId,
                                 version = result.version,
-                                alive = newHealth.alive)
+                                alive = newHealth.alive),
         )
       }
 

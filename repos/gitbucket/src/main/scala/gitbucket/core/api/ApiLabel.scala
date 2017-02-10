@@ -15,6 +15,6 @@ object ApiLabel {
   def apply(label: Label, repositoryName: RepositoryName): ApiLabel =
     ApiLabel(
         name = label.labelName,
-        color = label.color
+        color = label.color,
     )(repositoryName)
 }

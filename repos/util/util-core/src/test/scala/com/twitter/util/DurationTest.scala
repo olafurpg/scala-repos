@@ -56,7 +56,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
         assert(
             (c >= Long.MaxValue && d == Duration.Top) ||
             (c <= Long.MinValue && d == Duration.Bottom) ||
-            (d == c.toLong.nanoseconds)
+            (d == c.toLong.nanoseconds),
         )
       }
     }
@@ -157,7 +157,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
         assert(
             (c >= Long.MaxValue && d == Duration.Top) ||
             (c <= Long.MinValue && d == Duration.Bottom) ||
-            (d == c.toLong.nanoseconds)
+            (d == c.toLong.nanoseconds),
         )
       }
     }
@@ -227,7 +227,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
           9999999.seconds,
           Duration.Bottom,
           Duration.Top,
-          Duration.Undefined
+          Duration.Undefined,
       ) foreach { d =>
         assert(Duration.parse(d.toString) == d)
       }
@@ -255,7 +255,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
           "Duration.Bottom" -> Duration.Bottom,
           "Duration.Top" -> Duration.Top,
           "Duration.Undefined" -> Duration.Undefined,
-          "duration.TOP" -> Duration.Top
+          "duration.TOP" -> Duration.Top,
       ) foreach {
         case (s, d) =>
           assert(Duration.parse(s) == d)
@@ -274,7 +274,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
             "2.minutes 1.second",
             "98 milliseconds",
             "98 millisecons",
-            "99.minutes +"
+            "99.minutes +",
         ) foreach { s =>
           Duration.parse(s)
         }

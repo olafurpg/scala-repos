@@ -8,7 +8,7 @@ import java.util.{logging => javalog}
   */
 class TracingLogHandler(
     formatter: Formatter = BareFormatter,
-    level: Option[Level] = None
+    level: Option[Level] = None,
 )
     extends Handler(formatter, level) {
 

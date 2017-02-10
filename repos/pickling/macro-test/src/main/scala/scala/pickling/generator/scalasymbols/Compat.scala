@@ -90,7 +90,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.constructorParamTypes[T]})"""
+        q"""Seq[String](..${bundle.constructorParamTypes[T]})""",
     )
   }
   def varTypes[T]: Seq[String] = macro getVarTypes_impl[T]
@@ -99,7 +99,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.varTypes[T]})"""
+        q"""Seq[String](..${bundle.varTypes[T]})""",
     )
   }
 
@@ -110,7 +110,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.parentClasses[T]})"""
+        q"""Seq[String](..${bundle.parentClasses[T]})""",
     )
   }
 
@@ -122,7 +122,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.transientFields[T]})"""
+        q"""Seq[String](..${bundle.transientFields[T]})""",
     )
   }
   def getTransientVars[T]: Seq[String] = macro getTransientVars_Impl[T]
@@ -132,7 +132,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.transientVars[T]})"""
+        q"""Seq[String](..${bundle.transientVars[T]})""",
     )
   }
   def fieldNames[T]: Seq[String] = macro getFieldNames_Impl[T]
@@ -141,7 +141,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.fieldNames[T]})"""
+        q"""Seq[String](..${bundle.fieldNames[T]})""",
     )
   }
   def varNames[T]: Seq[String] = macro varNames_impl[T]
@@ -150,7 +150,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.varNames[T]})"""
+        q"""Seq[String](..${bundle.varNames[T]})""",
     )
   }
   def valNames[T]: Seq[String] = macro valNames_impl[T]
@@ -159,7 +159,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.valNames[T]})"""
+        q"""Seq[String](..${bundle.valNames[T]})""",
     )
   }
   def paramNames[T]: Seq[String] = macro paramNames_impl[T]
@@ -168,7 +168,7 @@ object Compat {
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.paramNames[T]})"""
+        q"""Seq[String](..${bundle.paramNames[T]})""",
     )
   }
 }

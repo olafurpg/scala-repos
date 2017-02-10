@@ -51,7 +51,7 @@ final class Env(config: Config,
                                      playban = playban,
                                      onStart = onStart,
                                      broomPeriod = BroomPeriod,
-                                     resyncIdsPeriod = ResyncIdsPeriod
+                                     resyncIdsPeriod = ResyncIdsPeriod,
                                  )),
                              name = ActorName)
 

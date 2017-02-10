@@ -36,7 +36,7 @@ object TfIdfExample {
       .createDataFrame(Seq(
               (0, "Hi I heard about Spark"),
               (0, "I wish Java could use case classes"),
-              (1, "Logistic regression models are neat")
+              (1, "Logistic regression models are neat"),
           ))
       .toDF("label", "sentence")
 

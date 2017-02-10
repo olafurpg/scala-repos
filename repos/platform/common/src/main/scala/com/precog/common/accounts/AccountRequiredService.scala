@@ -73,6 +73,6 @@ class AccountRequiredService[A, B](
   val metadata = AboutMetadata(
       ParameterMetadata('ownerAccountId, None),
       DescriptionMetadata(
-          "An explicit or implicit Precog account Id is required for the use of this service.")
+          "An explicit or implicit Precog account Id is required for the use of this service."),
   )
 }

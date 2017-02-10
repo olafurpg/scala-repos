@@ -63,8 +63,8 @@ class YarnShuffleIntegrationSuite extends BaseYarnClusterSuite {
                       registeredExecFile.getAbsolutePath),
         extraConf = Map(
               "spark.shuffle.service.enabled" -> "true",
-              "spark.shuffle.service.port" -> shuffleServicePort.toString
-          )
+              "spark.shuffle.service.port" -> shuffleServicePort.toString,
+          ),
     )
     checkResult(finalState, result)
     assert(YarnTestAccessor.getRegisteredExecutorFile(shuffleService).exists())

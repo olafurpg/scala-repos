@@ -68,7 +68,7 @@ object ContentDisplay
       Left,
       Center,
       GraphicOnly,
-      TextOnly
+      TextOnly,
   )
 }
 

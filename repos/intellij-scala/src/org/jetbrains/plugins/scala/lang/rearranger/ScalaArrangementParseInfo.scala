@@ -85,7 +85,7 @@ class ScalaArrangementParseInfo {
 
   private def buildMethodDependencyInfo(
       method: ScFunction,
-      cache: mutable.HashMap[ScFunction, ScalaArrangementDependency]
+      cache: mutable.HashMap[ScFunction, ScalaArrangementDependency],
   ): Option[ScalaArrangementDependency] = {
     val entry: ScalaArrangementEntry = methodToEntry(method)
     val result: ScalaArrangementDependency = new ScalaArrangementDependency(

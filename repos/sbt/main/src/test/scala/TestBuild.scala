@@ -131,7 +131,7 @@ object TestBuild {
         inheritProject,
         inheritConfig,
         inheritTask,
-        (ref, mp) => Nil
+        (ref, mp) => Nil,
     )
     lazy val allFullScopes: Seq[Scope] = for {
       (ref, p) <- (Global, root.root) +: allProjects.map {

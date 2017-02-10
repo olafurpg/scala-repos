@@ -21,7 +21,7 @@ class BitStringTest extends SpireTests {
           b.highestOneBit,
           b.lowestOneBit,
           b.numberOfLeadingZeros,
-          b.numberOfTrailingZeros
+          b.numberOfTrailingZeros,
       )
       found shouldBe expected
     }

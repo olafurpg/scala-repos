@@ -63,7 +63,7 @@ object MiscTests extends TestSuite {
         check(CharIn("abc", "d", Seq('1', '2', '3')), """CharIn("abcd123")""")
         check(
             StringIn("mango", "mandarin", "mangosteen"),
-            """StringIn("mango", "mandarin", "mangosteen")"""
+            """StringIn("mango", "mandarin", "mangosteen")""",
         )
         check(CharPred(_.isUpper), """CharPred(<function1>)""")
       }
@@ -111,7 +111,7 @@ object MiscTests extends TestSuite {
         val expected2 = F("A", Vector(C("B"), C(F("C", Vector(C("D"))))))
         assert(
             ("A" ~ "B" ~ "C" ~ "D") == expected1,
-            (("A" ~ "B") ~ ("C" ~ "D")) == expected2
+            (("A" ~ "B") ~ ("C" ~ "D")) == expected2,
         )
       }
     }
@@ -136,7 +136,7 @@ object MiscTests extends TestSuite {
       val charLiteral = wspStr("a")
       assert(
           literal.isInstanceOf[parsers.Terminals.Literal],
-          charLiteral.isInstanceOf[parsers.Terminals.CharLiteral]
+          charLiteral.isInstanceOf[parsers.Terminals.CharLiteral],
       )
     }
     'failureget {

@@ -24,7 +24,7 @@ class MarathonStartupIntegrationTest
              "--master",
              config.master),
         startupLine = "Failed to start all services.",
-        processName = "marathonFail"
+        processName = "marathonFail",
     )
 
     Then("the new process should fail and exit with an error code")

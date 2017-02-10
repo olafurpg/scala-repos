@@ -27,7 +27,7 @@ object Dependencies {
       scalaTestVersion :=
       (if (scalaVersion.value == "2.12.0-M2") "2.2.5-M2"
        else if (scalaVersion.value == "2.12.0-M3") "2.2.5-M3"
-       else "2.2.4")
+       else "2.2.4"),
   )
 
   object Compile {
@@ -261,11 +261,11 @@ object Dependencies {
   // special, since it also includes a compiler plugin
   lazy val parsing = Seq(
       DependencyHelpers.versionDependentDeps(
-          Dependencies.Compile.scalaReflect % "provided"
+          Dependencies.Compile.scalaReflect % "provided",
       ),
       addCompilerPlugin(
           "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion
-            .fullMapped(nominalScalaVersion))
+            .fullMapped(nominalScalaVersion)),
   )
 
   lazy val httpTestkit =

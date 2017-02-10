@@ -40,7 +40,7 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
               Row(4, "D"),
               Row(5, "E"),
               Row(6, "F"),
-              Row(null, "G")
+              Row(null, "G"),
           )),
       new StructType().add("N", IntegerType).add("L", StringType))
 
@@ -51,7 +51,7 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
               Row(2, "b"),
               Row(3, "c"),
               Row(4, "d"),
-              Row(null, "e")
+              Row(null, "e"),
           )),
       new StructType().add("n", IntegerType).add("l", StringType))
 
@@ -61,7 +61,7 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
       (2, 1),
       (2, 2),
       (3, 1),
-      (3, 2)
+      (3, 2),
   ).toDF("a", "b")
 
   private lazy val myTestData2 = Seq(
@@ -70,7 +70,7 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
       (2, 1),
       (2, 2),
       (3, 1),
-      (3, 2)
+      (3, 2),
   ).toDF("a", "b")
 
   // Note: the input dataframes and expression must be evaluated lazily because
@@ -268,8 +268,8 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
           (1, "A", 1, "a"),
           (2, "B", 2, "b"),
           (3, "C", 3, "c"),
-          (4, "D", 4, "d")
-      )
+          (4, "D", 4, "d"),
+      ),
   )
 
   {
@@ -284,8 +284,8 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
             (1, 1, 1, 1),
             (1, 1, 1, 2),
             (1, 2, 1, 1),
-            (1, 2, 1, 2)
-        )
+            (1, 2, 1, 2),
+        ),
     )
   }
 
@@ -297,7 +297,7 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
         left,
         right,
         () => (left.col("a") === right.col("a")).expr,
-        Seq.empty
+        Seq.empty,
     )
   }
 
@@ -311,8 +311,8 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
         () => (left.col("b") <=> right.col("b")).expr,
         Seq(
             (1, 0, 1, 0),
-            (2, null, 2, null)
-        )
+            (2, null, 2, null),
+        ),
     )
   }
 }

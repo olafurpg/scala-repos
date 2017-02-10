@@ -184,7 +184,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
           conf.zkHosts,
           conf.zkTimeoutDuration.toMillis,
           TimeUnit.MILLISECONDS,
-          conf.zooKeeperStatePath
+          conf.zooKeeperStatePath,
       )
       new MesosStateStore(state, conf.zkTimeoutDuration)
     }
@@ -242,8 +242,8 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
               schedulerActions,
               storage,
               healthCheckManager,
-              eventBus
-          )
+              eventBus,
+          ),
       )
     }
 
@@ -263,7 +263,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
               taskQueue,
               driverHolder,
               leaderInfo,
-              eventBus
+              eventBus,
           )
           .withRouter(RoundRobinPool(nrOfInstances = 1,
                                      supervisorStrategy = supervision)),
@@ -344,7 +344,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
         actorRefFactory,
         "serializeGroupUpdates",
         maxParallel = 1,
-        maxQueued = conf.internalMaxQueuedRootGroupUpdates()
+        maxQueued = conf.internalMaxQueuedRootGroupUpdates(),
     )
   }
 
@@ -365,7 +365,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
         appRepo,
         storage,
         conf,
-        eventBus
+        eventBus,
     )
 
     metrics.gauge("service.mesosphere.marathon.app.count", new Gauge[Int] {
@@ -492,7 +492,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
                   TaskFailure(
                       PathId.empty,
                       mesos.TaskID.newBuilder().setValue("").build,
-                      mesos.TaskState.TASK_STAGING
+                      mesos.TaskState.TASK_STAGING,
                 ))
   }
 
@@ -511,7 +511,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
                 MarathonTask
                   .newBuilder()
                   .setId(UUID.randomUUID().toString)
-                  .build())
+                  .build()),
       )
   }
 

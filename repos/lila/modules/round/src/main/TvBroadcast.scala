@@ -31,7 +31,7 @@ private final class TvBroadcast extends Actor {
       channel push makeMessage("fen",
                                Json.obj(
                                    "fen" -> move.fen,
-                                   "lm" -> move.move
+                                   "lm" -> move.move,
                                ))
   }
 }

@@ -413,7 +413,7 @@ private[spark] object Utils extends Logging {
           url,
           cachedFile,
           targetFile,
-          conf.getBoolean("spark.files.overwrite", false)
+          conf.getBoolean("spark.files.overwrite", false),
       )
     } else {
       doFetchFile(url, targetDir, fileName, conf, securityMgr, hadoopConf)
@@ -500,15 +500,15 @@ private[spark] object Utils extends Logging {
       if (!filesEqualRecursive(sourceFile, destFile)) {
         if (fileOverwrite) {
           logInfo(
-              s"File $destFile exists and does not match contents of $url, replacing it with $url"
+              s"File $destFile exists and does not match contents of $url, replacing it with $url",
           )
           if (!destFile.delete()) {
             throw new SparkException(
                 "Failed to delete %s while attempting to overwrite it with %s"
                   .format(
                     destFile.getAbsolutePath,
-                    sourceFile.getAbsolutePath
-                )
+                    sourceFile.getAbsolutePath,
+                ),
             )
           }
         } else {
@@ -521,8 +521,8 @@ private[spark] object Utils extends Logging {
         logInfo(
             "%s has been previously copied to %s".format(
                 sourceFile.getAbsolutePath,
-                destFile.getAbsolutePath
-            )
+                destFile.getAbsolutePath,
+            ),
         )
         return
       }
@@ -1012,7 +1012,7 @@ private[spark] object Utils extends Logging {
     filesAndDirs.exists(_.lastModified() > cutoffTimeInMillis) || filesAndDirs
       .filter(_.isDirectory)
       .exists(
-          subdir => doesDirectoryContainAnyNewFiles(subdir, cutoff)
+          subdir => doesDirectoryContainAnyNewFiles(subdir, cutoff),
       )
   }
 

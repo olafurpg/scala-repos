@@ -68,7 +68,7 @@ class DocumentationHandler(
                 Some(handle.size),
                 MimeTypes
                   .forFileName(handle.name)
-                  .orElse(Some(ContentTypes.BINARY))
+                  .orElse(Some(ContentTypes.BINARY)),
               ))
       }
     }
@@ -86,13 +86,13 @@ class DocumentationHandler(
       case apiDoc(page) =>
         Some(
             sendFileInline(apiRepo, "api/" + page).getOrElse(
-                NotFound(views.html.play20.manual(page, None, None, locator)))
+                NotFound(views.html.play20.manual(page, None, None, locator))),
         )
       case wikiResource(path) =>
         Some(
             sendFileInline(repo, path)
               .orElse(sendFileInline(apiRepo, path))
-              .getOrElse(NotFound("Resource not found [" + path + "]"))
+              .getOrElse(NotFound("Resource not found [" + path + "]")),
           )
       case wikiPage(page) =>
         Some(
@@ -105,7 +105,7 @@ class DocumentationHandler(
               case Some(RenderedPage(mainPage, Some(sidebar), _)) =>
                 Ok(views.html.play20
                       .manual(page, Some(mainPage), Some(sidebar), locator))
-            }
+            },
         )
       case _ => None
     }

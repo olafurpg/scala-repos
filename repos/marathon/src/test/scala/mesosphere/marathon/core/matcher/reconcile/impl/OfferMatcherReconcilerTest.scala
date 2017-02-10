@@ -55,8 +55,8 @@ class OfferMatcherReconcilerTest
             taskId,
             oldTask = None,
             maybeNewTask = None,
-            resources = offer.getResourcesList.asScala.to[Seq]
-        )
+            resources = offer.getResourcesList.asScala.to[Seq],
+        ),
     )
 
     // for the nicer error message with diff indication
@@ -91,8 +91,8 @@ class OfferMatcherReconcilerTest
             taskId,
             oldTask = None,
             maybeNewTask = None,
-            resources = offer.getResourcesList.asScala.to[Seq]
-        )
+            resources = offer.getResourcesList.asScala.to[Seq],
+        ),
     )
 
     // for the nicer error message with diff
@@ -127,8 +127,8 @@ class OfferMatcherReconcilerTest
             taskId,
             oldTask = Some(bogusTask),
             maybeNewTask = None,
-            resources = offer.getResourcesList.asScala.to[Seq]
-        )
+            resources = offer.getResourcesList.asScala.to[Seq],
+        ),
     )
 
     // for the nicer error message with diff
@@ -153,7 +153,7 @@ class OfferMatcherReconcilerTest
         Group.empty.copy(apps = Set(app)))
     And("a matching bogus task")
     f.taskTracker.tasksByApp()(any) returns Future.successful(
-        TasksByApp.forTasks(MarathonTestHelper.mininimalTask(taskId.idString))
+        TasksByApp.forTasks(MarathonTestHelper.mininimalTask(taskId.idString)),
     )
 
     When("reconciling")

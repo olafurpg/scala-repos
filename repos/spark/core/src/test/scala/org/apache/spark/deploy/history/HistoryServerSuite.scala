@@ -129,7 +129,7 @@ class HistoryServerSuite
       "stage task list from multi-attempt app json(1)" -> "applications/local-1426533911241/1/stages/0/0/taskList",
       "stage task list from multi-attempt app json(2)" -> "applications/local-1426533911241/2/stages/0/0/taskList",
       "rdd list storage json" -> "applications/local-1422981780767/storage/rdd",
-      "one rdd storage json" -> "applications/local-1422981780767/storage/rdd/0"
+      "one rdd storage json" -> "applications/local-1422981780767/storage/rdd/0",
   )
 
   // run a bunch of characterization tests -- just verify the behavior is the same as what is saved

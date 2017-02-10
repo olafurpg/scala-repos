@@ -20,7 +20,7 @@ trait MilestonesService {
         title = title,
         description = description,
         dueDate = dueDate,
-        closedDate = None
+        closedDate = None,
     )
 
   def updateMilestone(milestone: Milestone)(implicit s: Session): Unit =

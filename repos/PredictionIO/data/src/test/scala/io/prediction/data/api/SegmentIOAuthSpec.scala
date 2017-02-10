@@ -75,9 +75,9 @@ class SegmentIOAuthSpec extends Specification {
               eventClient,
               accessKeysClient,
               channelsClient,
-              EventServerConfig()
-          )
-      )
+              EventServerConfig(),
+          ),
+      ),
   )
 
   val base64Encoder = new BASE64Encoder
@@ -91,18 +91,18 @@ class SegmentIOAuthSpec extends Specification {
           eventServiceActor,
           Post("/webhooks/segmentio.json").withHeaders(
               List(
-                  RawHeader("Authorization", s"Basic $accessKey")
-              )
-          )
+                  RawHeader("Authorization", s"Basic $accessKey"),
+              ),
+          ),
       )
       probe.expectMsg(
           HttpResponse(
               401,
               HttpEntity(
                   contentType = ContentTypes.`application/json`,
-                  string = """{"message":"Invalid accessKey."}"""
-              )
-          )
+                  string = """{"message":"Invalid accessKey."}""",
+              ),
+          ),
       )
       success
     }
@@ -111,16 +111,16 @@ class SegmentIOAuthSpec extends Specification {
       val probe = TestProbe()(system)
       probe.send(
           eventServiceActor,
-          Post("/webhooks/segmentio.json")
+          Post("/webhooks/segmentio.json"),
       )
       probe.expectMsg(
           HttpResponse(
               401,
               HttpEntity(
                   contentType = ContentTypes.`application/json`,
-                  string = """{"message":"Missing accessKey."}"""
-              )
-          )
+                  string = """{"message":"Missing accessKey."}""",
+              ),
+          ),
       )
       success
     }
@@ -157,21 +157,21 @@ class SegmentIOAuthSpec extends Specification {
           eventServiceActor,
           Post(
               "/webhooks/segmentio.json",
-              HttpEntity(ContentTypes.`application/json`, jsonReq.getBytes)
+              HttpEntity(ContentTypes.`application/json`, jsonReq.getBytes),
           ).withHeaders(
               List(
-                  RawHeader("Authorization", s"Basic $accessKeyEncoded")
-              )
-          )
+                  RawHeader("Authorization", s"Basic $accessKeyEncoded"),
+              ),
+          ),
       )
       probe.expectMsg(
           HttpResponse(
               201,
               HttpEntity(
                   contentType = ContentTypes.`application/json`,
-                  string = """{"eventId":"event_id"}"""
-              )
-          )
+                  string = """{"eventId":"event_id"}""",
+              ),
+          ),
       )
       success
     }

@@ -21,7 +21,7 @@ class StatusTest
         List(() => Status.Busy,
              () => Status.Open,
              () => fail("element should not be evaluated")),
-        _.apply
+        _.apply,
     )
     assert(res == Status.Open)
   }
@@ -31,7 +31,7 @@ class StatusTest
         List(() => Status.Busy,
              () => Status.Closed,
              () => fail("element should not be evaluated")),
-        _.apply
+        _.apply,
     )
     assert(res == Status.Closed)
   }

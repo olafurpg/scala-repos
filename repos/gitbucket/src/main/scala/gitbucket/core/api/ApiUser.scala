@@ -28,6 +28,6 @@ object ApiUser {
       email = user.mailAddress,
       `type` = if (user.isGroupAccount) { "Organization" } else { "User" },
       site_admin = user.isAdmin,
-      created_at = user.registeredDate
+      created_at = user.registeredDate,
   )
 }

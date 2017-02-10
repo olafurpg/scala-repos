@@ -25,7 +25,7 @@ class CapabilityTest extends FunSuite {
           Capability.LongPassword,
           Capability.SSL,
           Capability.Transactions,
-          Capability.MultiResults
+          Capability.MultiResults,
       )
     }
   }
@@ -40,7 +40,7 @@ class CapabilityTest extends FunSuite {
     assertResult(true) {
       c2.hasAll(
           Capability.LocalFiles,
-          Capability.Compress
+          Capability.Compress,
       )
     }
   }

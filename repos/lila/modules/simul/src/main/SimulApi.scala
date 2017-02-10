@@ -125,7 +125,7 @@ private[simul] final class SimulApi(system: ActorSystem,
           _ ?? { simul =>
             val simul2 = simul.updatePairing(
                 game.id,
-                _.finish(game.status, game.winnerUserId, game.turns)
+                _.finish(game.status, game.winnerUserId, game.turns),
             )
             update(simul2) >> currentHostIdsCache.clear >>- {
               if (simul2.isFinished)
@@ -134,7 +134,7 @@ private[simul] final class SimulApi(system: ActorSystem,
                     lila.socket.Socket.makeMessage("simulEnd",
                                                    Json.obj(
                                                        "id" -> simul.id,
-                                                       "name" -> simul.name
+                                                       "name" -> simul.name,
                                                    )))
             }
           }

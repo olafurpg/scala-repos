@@ -33,6 +33,6 @@ object PlayLayoutPlugin extends AutoPlugin {
       sourceDirectory in TestAssets := (sourceDirectory in Test).value / "assets",
       resourceDirectory in Assets := baseDirectory.value / "public",
       // Native packager
-      sourceDirectory in Universal := baseDirectory.value / "dist"
+      sourceDirectory in Universal := baseDirectory.value / "dist",
   )
 }

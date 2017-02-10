@@ -159,7 +159,7 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
           "def canEqual(that: Any): Boolean = ???",
           "def equals(that: Any): Boolean = ???",
           "def productArity: Int = ???",
-          "def productElement(n: Int): Any = ???"
+          "def productElement(n: Int): Any = ???",
       )
 
       caseClassGeneratedFunctions.foreach { funText =>

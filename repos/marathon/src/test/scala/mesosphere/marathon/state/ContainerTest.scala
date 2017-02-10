@@ -17,13 +17,13 @@ class ContainerTest extends MarathonSpec with Matchers {
   class Fixture {
     lazy val volumes = Seq(
         DockerVolume("/etc/a", "/var/data/a", mesos.Volume.Mode.RO),
-        DockerVolume("/etc/b", "/var/data/b", mesos.Volume.Mode.RW)
+        DockerVolume("/etc/b", "/var/data/b", mesos.Volume.Mode.RW),
     )
 
     lazy val container = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,
         volumes = volumes,
-        docker = Some(Container.Docker(image = "group/image"))
+        docker = Some(Container.Docker(image = "group/image")),
     )
 
     lazy val container2 = Container(
@@ -47,10 +47,10 @@ class ContainerTest extends MarathonSpec with Matchers {
                                 containerPort = 8081,
                                 hostPort = 32002,
                                 servicePort = 9001,
-                                protocol = Container.Docker.PortMapping.UDP)
-                        ))
-              )
-          )
+                                protocol = Container.Docker.PortMapping.UDP),
+                        )),
+              ),
+          ),
     )
 
     lazy val container3 = Container(
@@ -63,10 +63,10 @@ class ContainerTest extends MarathonSpec with Matchers {
                   privileged = true,
                   parameters = Seq(
                         Parameter("abc", "123"),
-                        Parameter("def", "456")
-                    )
-              )
-          )
+                        Parameter("def", "456"),
+                    ),
+              ),
+          ),
     )
 
     lazy val container4 = Container(
@@ -80,11 +80,11 @@ class ContainerTest extends MarathonSpec with Matchers {
                   parameters = Seq(
                         Parameter("abc", "123"),
                         Parameter("def", "456"),
-                        Parameter("def", "789")
+                        Parameter("def", "789"),
                     ),
-                  forcePullImage = true
-              )
-          )
+                  forcePullImage = true,
+              ),
+          ),
     )
 
     lazy val mesosContainerWithPersistentVolume = Container(
@@ -93,10 +93,10 @@ class ContainerTest extends MarathonSpec with Matchers {
               PersistentVolume(
                   containerPath = "/local/container/",
                   persistent = PersistentVolumeInfo(1024),
-                  mode = mesos.Volume.Mode.RW
-              )
+                  mode = mesos.Volume.Mode.RW,
+              ),
           ),
-        docker = None
+        docker = None,
     )
 
     lazy val mesosContainerWithPersistentVolumeJsonStr =
@@ -153,7 +153,7 @@ class ContainerTest extends MarathonSpec with Matchers {
           .map(_.getKey))
     assert(
         f.container3.docker.get.parameters.map(_.value) == proto3.getDocker.getParametersList.asScala
-          .map(_.getValue)
+          .map(_.getValue),
     )
     assert(proto3.getDocker.hasForcePullImage)
     assert(
@@ -186,7 +186,7 @@ class ContainerTest extends MarathonSpec with Matchers {
           .setContainerPort(8081)
           .setHostPort(32002)
           .setProtocol("udp")
-          .build
+          .build,
       )
 
     assert(
@@ -207,7 +207,7 @@ class ContainerTest extends MarathonSpec with Matchers {
           .map(_.getKey))
     assert(
         f.container3.docker.get.parameters.map(_.value) == proto3.getDocker.getParametersList.asScala
-          .map(_.getValue)
+          .map(_.getValue),
     )
     assert(proto3.getDocker.hasForcePullImage)
     assert(

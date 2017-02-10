@@ -2170,8 +2170,8 @@ trait SHtml extends Loggable {
             case option =>
               optionToElem(option) % selected(deflt.contains(option.value))
           }}</select>)(_ % _),
-              <input type="hidden" value={hiddenId} name={funcName}/>
-          )
+              <input type="hidden" value={hiddenId} name={funcName}/>,
+          ),
       )
     }
   }
@@ -2574,7 +2574,7 @@ trait SHtml extends Loggable {
               if (possibleChoice._2 == 0)
                 <input type="hidden" name={name} value="-1"/>
               else Nil
-            }
+            },
         )
       })
     }

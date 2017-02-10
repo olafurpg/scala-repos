@@ -12,7 +12,7 @@ import com.twitter.io.{Buf, Charsets}
 class KeyValidationTest extends FunSuite {
 
   private class BasicKeyValidation(
-      override val keys: Seq[Buf]
+      override val keys: Seq[Buf],
   )
       extends KeyValidation
 
@@ -33,7 +33,7 @@ class KeyValidationTest extends FunSuite {
           "hi withwhitespace",
           "anda\rcarraigereturn",
           "yo\u0000ihaveacontrolchar",
-          "andheres\nanewline"
+          "andheres\nanewline",
       ) map { Buf.Utf8(_) }
 
     bads foreach { bad =>

@@ -192,19 +192,19 @@ object SexpExamples extends App {
   val foo = Foo(13)
   val fooSexp = SexpCons(
       SexpAtom("Foo"),
-      SexpProp("i", SexpAtom("13"))
+      SexpProp("i", SexpAtom("13")),
   )
   val bar = Bar("blah")
   val barSexp = SexpCons(
       SexpAtom("Bar"),
-      SexpProp("s", SexpAtom("blah"))
+      SexpProp("s", SexpAtom("blah")),
   )
   val baz = Baz(13, "blah")
   val bazSexp = SexpCons(SexpAtom("Baz"),
                          SexpCons(
                              // order is important --- how can we address this?
                              SexpProp("i", SexpAtom("13")),
-                             SexpProp("s", SexpAtom("blah"))
+                             SexpProp("s", SexpAtom("blah")),
                          ))
   val wibble = Wibble(Foo(13))
   val wibbleSexp = SexpCons(

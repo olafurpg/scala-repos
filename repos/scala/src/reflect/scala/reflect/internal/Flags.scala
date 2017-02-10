@@ -391,7 +391,7 @@ class Flags extends ModifierFlags {
       (INTERFACE, INTERFACE_PKL),
       (IMPLICIT, IMPLICIT_PKL),
       (SEALED, SEALED_PKL),
-      (ABSTRACT, ABSTRACT_PKL)
+      (ABSTRACT, ABSTRACT_PKL),
   )
 
   private val mappedRawFlags = rawPickledCorrespondence map (_._1)

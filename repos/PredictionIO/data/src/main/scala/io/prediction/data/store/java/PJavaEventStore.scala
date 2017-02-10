@@ -70,7 +70,7 @@ object PJavaEventStore {
         entityId,
         eventNamesSeq,
         targetEntityType,
-        targetEntityId
+        targetEntityId,
     )(sc)
   }
 
@@ -99,7 +99,7 @@ object PJavaEventStore {
         entityType,
         channelName,
         startTime,
-        untilTime
+        untilTime,
     )(sc)
   }
 }

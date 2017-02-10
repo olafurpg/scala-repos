@@ -95,7 +95,7 @@ class ScalaCodeFragment(project: Project, text: String) extends {
       .getInstance(project)
       .undoableActionPerformed(
           new ScalaCodeFragment.ImportClassUndoableAction(
-              path, document, imports)
+              path, document, imports),
       )
     val newRef = ref match {
       case st: ScStableCodeReferenceElement if st.resolve() == null =>

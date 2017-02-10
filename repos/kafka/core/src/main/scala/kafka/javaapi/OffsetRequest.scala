@@ -35,7 +35,7 @@ class OffsetRequest(
         requestInfo = scalaMap,
         versionId = versionId,
         clientId = clientId,
-        replicaId = Request.OrdinaryConsumerId
+        replicaId = Request.OrdinaryConsumerId,
     )
   }
 

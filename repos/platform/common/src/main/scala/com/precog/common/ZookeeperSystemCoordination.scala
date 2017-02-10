@@ -209,7 +209,7 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
             new DataUpdater[Array[Byte]] {
               def update(cur: Array[Byte]): Array[Byte] =
                 toNodeData(initialState.serialize)
-            }
+            },
         )
 
         logger.debug("%s: NEW".format(initialState))
@@ -249,7 +249,7 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
         new DataUpdater[Array[Byte]] {
           def update(cur: Array[Byte]): Array[Byte] =
             toNodeData(state.serialize)
-        }
+        },
     )
 
     logger.debug("%s: SAVE".format(state))
@@ -281,7 +281,7 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
                     Invalid("No checkpoint information found in Zookeeper!"))
               }
             }
-          }
+          },
       )
     } else {
       logger.debug("Checkpoints disabled, skipping load")
@@ -304,7 +304,7 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
           new DataUpdater[Array[Byte]] {
             def update(cur: Array[Byte]): Array[Byte] =
               toNodeData(checkpoint.serialize)
-          }
+          },
       )
 
       logger.debug("%s: SAVE".format(checkpoint))

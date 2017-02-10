@@ -727,7 +727,7 @@ object TestNodeProvider {
                   Option(PsiTreeUtil.getChildOfType(parent,
                                                     classOf[ScPatternList]))
                 case _ => None
-              }
+              },
           )
           .map((_, None))
     }

@@ -43,7 +43,7 @@ password  : last_0f-the/international:playboys
         Credentials(content) == Map(
             "username" -> "root",
             "password" -> "last_0f-the/international:playboys",
-            "moar" -> "ok"
+            "moar" -> "ok",
         ))
   }
 

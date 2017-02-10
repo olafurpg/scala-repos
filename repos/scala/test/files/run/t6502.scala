@@ -72,7 +72,7 @@ object Test extends StoreReporterDirectTest {
     val added = lines.next
     assert(
         added.contains("Added") && added.contains("test1.jar"),
-        s"[${added}] in [${output.lines.mkString("/")}]"
+        s"[${added}] in [${output.lines.mkString("/")}]",
     )
     lines = lines drop promptLength
     assert {

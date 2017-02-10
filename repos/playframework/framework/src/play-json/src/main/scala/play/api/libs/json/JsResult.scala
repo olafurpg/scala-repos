@@ -71,7 +71,7 @@ object JsError {
         (arr, err) =>
           arr :+ Json.obj(
               "msg" -> (if (flat) err.message else Json.toJson(err.messages)),
-              "args" -> Json.toJson(err.args)(argsWrite)
+              "args" -> Json.toJson(err.args)(argsWrite),
           )
       })
     }

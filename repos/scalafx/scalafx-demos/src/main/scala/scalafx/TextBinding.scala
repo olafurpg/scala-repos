@@ -48,9 +48,9 @@ object TextBinding extends JFXApp {
                 comboBox,
                 new Label {
                   text <== comboBox.editor().text
-                }
+                },
             )
-          }
+          },
       )
     }
   }

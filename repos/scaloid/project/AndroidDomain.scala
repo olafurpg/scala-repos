@@ -4,7 +4,7 @@ case class ScalaType(
     params: List[ScalaType],
     bounds: List[ScalaType],
     isVar: Boolean,
-    javaName: String
+    javaName: String,
 )
 
 object ScalaType {
@@ -22,7 +22,7 @@ object ScalaType {
 
 case class Argument(
     name: String,
-    tpe: ScalaType
+    tpe: ScalaType,
 )
 
 case class AndroidMethod(
@@ -32,7 +32,7 @@ case class AndroidMethod(
     paramedTypes: List[ScalaType],
     isAbstract: Boolean,
     isOverride: Boolean,
-    isDeprecated: Boolean
+    isDeprecated: Boolean,
 )
 
 case class AndroidCallbackMethod(
@@ -40,7 +40,7 @@ case class AndroidCallbackMethod(
     retType: ScalaType,
     argTypes: List[ScalaType],
     hasBody: Boolean,
-    isDeprecated: Boolean
+    isDeprecated: Boolean,
 )
 
 case class AndroidProperty(
@@ -49,7 +49,7 @@ case class AndroidProperty(
     getter: Option[AndroidMethod],
     setters: List[AndroidMethod],
     switch: Option[String],
-    nameClashes: Boolean
+    nameClashes: Boolean,
 )
 
 case class AndroidListener(
@@ -61,7 +61,7 @@ case class AndroidListener(
     setterArgTypes: List[ScalaType],
     callbackClassName: String,
     callbackMethods: List[AndroidCallbackMethod],
-    isDeprecated: Boolean
+    isDeprecated: Boolean,
 ) {
   def isSafe: Boolean =
     (!setter.startsWith("set")) || callbackMethods.length == 1 ||
@@ -73,7 +73,7 @@ case class AndroidIntentMethod(
     retType: ScalaType,
     argTypes: List[ScalaType],
     zeroArgs: Boolean,
-    isDeprecated: Boolean
+    isDeprecated: Boolean,
 )
 
 case class ScalaConstructor(
@@ -82,7 +82,7 @@ case class ScalaConstructor(
     explicitArgs: List[Argument],
     paramedTypes: List[ScalaType],
     isVarArgs: Boolean,
-    isDeprecated: Boolean
+    isDeprecated: Boolean,
 )
 
 case class AndroidClass(
@@ -98,5 +98,5 @@ case class AndroidClass(
     isAbstract: Boolean,
     isFinal: Boolean,
     hasBlankConstructor: Boolean,
-    isDeprecated: Boolean
+    isDeprecated: Boolean,
 )

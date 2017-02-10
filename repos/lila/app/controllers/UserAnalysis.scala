@@ -97,7 +97,7 @@ object UserAnalysis extends LilaController with TheftPrevention {
                           data =>
                             Ok(data)
                         }
-                    })
+                    }),
         )
       .map(_ as JSON)
   }
@@ -139,7 +139,7 @@ object UserAnalysis extends LilaController with TheftPrevention {
                       .after(wait.millis) {
                       Ok(Json.obj("reload" -> true))
                     }
-                }
+                },
             )
         }
       }

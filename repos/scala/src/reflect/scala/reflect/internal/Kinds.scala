@@ -18,7 +18,7 @@ trait Kinds { self: SymbolTable =>
   case class KindErrors(
       arity: List[SymPair] = Nil,
       variance: List[SymPair] = Nil,
-      strictness: List[SymPair] = Nil
+      strictness: List[SymPair] = Nil,
   ) {
     def isEmpty = arity.isEmpty && variance.isEmpty && strictness.isEmpty
 
@@ -29,7 +29,7 @@ trait Kinds { self: SymbolTable =>
     def ++(errs: KindErrors) = KindErrors(
         arity ++ errs.arity,
         variance ++ errs.variance,
-        strictness ++ errs.strictness
+        strictness ++ errs.strictness,
     )
     // @M TODO this method is duplicated all over the place (varianceString)
     private def varStr(s: Symbol): String =
@@ -125,7 +125,7 @@ trait Kinds { self: SymbolTable =>
       targs: List[Type],
       pre: Type,
       owner: Symbol,
-      explainErrors: Boolean
+      explainErrors: Boolean,
   ): List[(Type, Symbol, KindErrors)] = {
 
     // instantiate type params that come from outside the abstract type we're currently checking
@@ -139,7 +139,7 @@ trait Kinds { self: SymbolTable =>
         param: Symbol,
         paramowner: Symbol,
         underHKParams: List[Symbol],
-        withHKArgs: List[Symbol]
+        withHKArgs: List[Symbol],
     ): KindErrors = {
 
       var kindErrors: KindErrors = NoKindErrors
@@ -197,7 +197,7 @@ trait Kinds { self: SymbolTable =>
                 hkparam + " declared bounds: " + declaredBounds +
                 " after instantiating earlier hkparams: " +
                 declaredBoundsInst + "\n" + "checkKindBoundsHK base case: " +
-                hkarg + " has bounds: " + argumentBounds
+                hkarg + " has bounds: " + argumentBounds,
             )
           } else {
             hkarg.initialize // SI-7902 otherwise hkarg.typeParams yields List(NoSymbol)!
@@ -209,7 +209,7 @@ trait Kinds { self: SymbolTable =>
                 hkparam,
                 paramowner,
                 underHKParams ++ hkparam.typeParams,
-                withHKArgs ++ hkarg.typeParams
+                withHKArgs ++ hkarg.typeParams,
             )
           }
           if (!explainErrors && !kindErrors.isEmpty) return kindErrors
@@ -221,7 +221,7 @@ trait Kinds { self: SymbolTable =>
     if (settings.debug && (tparams.nonEmpty || targs.nonEmpty))
       log(
           "checkKindBounds0(" + tparams + ", " + targs + ", " + pre + ", " +
-          owner + ", " + explainErrors + ")"
+          owner + ", " + explainErrors + ")",
       )
 
     flatMap2(tparams, targs) { (tparam, targ) =>
@@ -240,7 +240,7 @@ trait Kinds { self: SymbolTable =>
               tparam,
               tparam.owner,
               tparam.typeParams,
-              tparamsHO
+              tparamsHO,
           )
           if (kindErrors.isEmpty) Nil
           else {

@@ -272,7 +272,7 @@ object Commands {
       // HyperLogLogs
       PFADD -> { PFAdd(_) },
       PFCOUNT -> { PFCount(_) },
-      PFMERGE -> { PFMerge(_) }
+      PFMERGE -> { PFMerge(_) },
   )
 
   def doMatch(cmd: String, args: List[Array[Byte]]) =

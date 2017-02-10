@@ -10,6 +10,6 @@ object B extends Build {
       settings = defaultSettings ++ Seq(
             libraryDependencies +=
               "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-            parallelExecution in test := false
+            parallelExecution in test := false,
         ))
 }

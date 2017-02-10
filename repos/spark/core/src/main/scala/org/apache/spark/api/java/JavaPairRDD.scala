@@ -250,7 +250,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
             mergeCombiners,
             partitioner,
             mapSideCombine,
-            serializer
+            serializer,
         ))
   }
 

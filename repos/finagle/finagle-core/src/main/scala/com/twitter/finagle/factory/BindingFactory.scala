@@ -25,7 +25,7 @@ private class DynNameFactory[Req, Rep](
   private sealed trait State
   private case class Pending(
       q: immutable.Queue[
-          (ClientConnection, Promise[Service[Req, Rep]], Stopwatch.Elapsed)]
+          (ClientConnection, Promise[Service[Req, Rep]], Stopwatch.Elapsed)],
   )
       extends State
   private case class Named(name: NameTree[Name.Bound]) extends State
@@ -154,7 +154,7 @@ private[finagle] object NameTreeFactory {
       path: Path,
       tree: NameTree[Key],
       factoryCache: ServiceFactoryCache[Key, Req, Rep],
-      rng: Rng = Rng.threadLocal
+      rng: Rng = Rng.threadLocal,
   ): ServiceFactory[Req, Rep] = {
 
     lazy val noBrokersAvailableFactory = Failed(
@@ -176,7 +176,7 @@ private[finagle] object NameTreeFactory {
 
     case class Weighted(
         drv: Drv,
-        factories: Seq[ServiceFactory[Req, Rep]]
+        factories: Seq[ServiceFactory[Req, Rep]],
     )
         extends ServiceFactory[Req, Rep] {
       def apply(conn: ClientConnection) = factories(drv(rng)).apply(conn)

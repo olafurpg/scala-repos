@@ -9,7 +9,7 @@ object Def {
 
     val s = show(a.tree)
     c.Expr(
-        Literal(Constant(s))
+        Literal(Constant(s)),
     )
   }
 }

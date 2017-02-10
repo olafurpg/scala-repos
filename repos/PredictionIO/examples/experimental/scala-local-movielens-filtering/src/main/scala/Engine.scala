@@ -12,7 +12,7 @@ object TempFilterEngine extends IEngineFactory {
         classOf[EventsDataSource],
         classOf[ItemRecPreparator],
         Map("ncMahoutItemBased" -> classOf[NCItemBasedAlgorithm]),
-        classOf[TempFilter]
+        classOf[TempFilter],
     )
   }
 }

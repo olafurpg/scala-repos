@@ -12,7 +12,7 @@ private[forum] final class DataForm(val captcher: akka.actor.ActorSelection)
       "text" -> text(minLength = 3),
       "author" -> optional(text),
       "gameId" -> nonEmptyText,
-      "move" -> nonEmptyText
+      "move" -> nonEmptyText,
   )(PostData.apply)(PostData.unapply)
     .verifying(captchaFailMessage, validateCaptcha _)
 
@@ -23,7 +23,7 @@ private[forum] final class DataForm(val captcher: akka.actor.ActorSelection)
   val topic = Form(
       mapping(
           "name" -> text(minLength = 3),
-          "post" -> postMapping
+          "post" -> postMapping,
       )(TopicData.apply)(TopicData.unapply))
 }
 

@@ -134,7 +134,7 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
          Seq(
              ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
              ZFile("Implementation.scala", implementationClass),
-             ZFile("Foo.scala", fooClass)
+             ZFile("Foo.scala", fooClass),
          ))
   }
 

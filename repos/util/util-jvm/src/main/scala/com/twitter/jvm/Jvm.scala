@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
 case class Heap(
     allocated: Long,
     tenuringThreshold: Long,
-    ageHisto: Seq[Long]
+    ageHisto: Seq[Long],
 )
 
 /**
@@ -46,7 +46,7 @@ case class PoolState(
       numCollections = this.numCollections - other.numCollections,
       capacity = other.capacity,
       used = this.used + other.capacity - other.used + other.capacity *
-        (this.numCollections - other.numCollections - 1)
+        (this.numCollections - other.numCollections - 1),
   )
 
   override def toString =
@@ -84,13 +84,13 @@ case class Gc(
     count: Long,
     name: String,
     timestamp: Time,
-    duration: Duration
+    duration: Duration,
 )
 
 case class Snapshot(
     timestamp: Time,
     heap: Heap,
-    lastGcs: Seq[Gc]
+    lastGcs: Seq[Gc],
 )
 
 /**

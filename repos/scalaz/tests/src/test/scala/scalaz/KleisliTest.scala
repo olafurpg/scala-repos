@@ -19,7 +19,7 @@ object KleisliTest extends SpecLite {
         Gen.frequency[Int => Option[Int]](
             (1, Gen.const((x: Int) => Some(x))),
             (1, Gen.const((x: Int) => Some(x + 1))),
-            (3, A.arbitrary.map(a => (_: Int) => a))
+            (3, A.arbitrary.map(a => (_: Int) => a)),
         ))
 
   implicit def KleisliEqual[M[_]](

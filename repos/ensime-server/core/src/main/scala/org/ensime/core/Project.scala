@@ -23,7 +23,7 @@ import org.ensime.util.FileUtils
   */
 class Project(
     broadcaster: ActorRef,
-    implicit val config: EnsimeConfig
+    implicit val config: EnsimeConfig,
 )
     extends Actor with ActorLogging with Stash {
   import context.{dispatcher, system}
@@ -129,7 +129,7 @@ class Project(
       rechecking = system.scheduler.scheduleOnce(
           5 seconds,
           scalac,
-          ReloadExistingFilesEvent
+          ReloadExistingFilesEvent,
       )
     // HACK: to expedite initial dev, Java requests use the Scala API
     case m @ TypecheckFileReq(sfi) if sfi.file.isJava => javac forward m

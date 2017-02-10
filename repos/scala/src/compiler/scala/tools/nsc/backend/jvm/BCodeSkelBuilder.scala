@@ -555,7 +555,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
             bytecodeName,
             mdesc,
             jgensig,
-            mkArray(thrownExceptions)
+            mkArray(thrownExceptions),
         )
         .asInstanceOf[asm.tree.MethodNode]
 
@@ -652,7 +652,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
                   null,
                   veryFirstProgramPoint,
                   onePastLastProgramPoint,
-                  0
+                  0,
               )
             }
             for (p <- params) {
@@ -731,7 +731,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
             "CREATOR",
             andrFieldDescr,
             null,
-            null
+            null,
         )
         // INVOKESTATIC CREATOR(): android.os.Parcelable$Creator; -- TODO where does this Android method come from?
         val callee =

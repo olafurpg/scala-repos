@@ -59,7 +59,7 @@ class EnsembleFlowPane extends EnsembleExample {
         children ++= Seq(
             new Label("Short label"),
             new Label("I am a slightly longer label."),
-            new ImageView(image)
+            new ImageView(image),
         )
       }
     }

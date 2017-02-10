@@ -95,7 +95,7 @@ private[lobby] final class Socket(val history: History[Messadata],
                    .obj(
                        "id" -> (game fullIdOf color),
                        "url" -> playerUrl(game fullIdOf color),
-                       "cookie" -> AnonCookie.json(game, color)
+                       "cookie" -> AnonCookie.json(game, color),
                    )
                    .noNull) _
 

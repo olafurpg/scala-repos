@@ -24,7 +24,7 @@ object Utility {
       "gt" -> '>',
       "amp" -> '&',
       "quot" -> '"',
-      "apos" -> '\''
+      "apos" -> '\'',
   )
 
   /**

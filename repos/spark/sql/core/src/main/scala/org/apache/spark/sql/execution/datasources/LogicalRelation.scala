@@ -71,7 +71,7 @@ case class LogicalRelation(
   override lazy val cleanArgs: Seq[Any] = Seq(relation)
 
   @transient override lazy val statistics: Statistics = Statistics(
-      sizeInBytes = BigInt(relation.sizeInBytes)
+      sizeInBytes = BigInt(relation.sizeInBytes),
   )
 
   /** Used to lookup original attribute capitalization */

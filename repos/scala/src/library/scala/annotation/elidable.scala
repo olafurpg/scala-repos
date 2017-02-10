@@ -116,6 +116,6 @@ object elidable {
       "ALL" -> ALL,
       "OFF" -> OFF,
       "MAXIMUM" -> MAXIMUM,
-      "MINIMUM" -> MINIMUM
+      "MINIMUM" -> MINIMUM,
   )
 }

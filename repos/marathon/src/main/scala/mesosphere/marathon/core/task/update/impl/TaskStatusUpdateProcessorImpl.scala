@@ -64,7 +64,7 @@ class TaskStatusUpdateProcessorImpl @Inject()(
               timestamp = now,
               appId = taskId.appId,
               task = task,
-              mesosStatus = status
+              mesosStatus = status,
           ).flatMap(_ => acknowledge(status))
         case _ =>
           killUnknownTaskTimer {
@@ -102,7 +102,7 @@ class TaskStatusUpdateProcessorImpl @Inject()(
           nextStep.processUpdate(timestamp, task, mesosStatus).map { _ =>
             log.debug(
                 "Done with executing {} for [{}]",
-                Array[Object](nextStep.name, mesosStatus.getTaskId.getValue): _*
+                Array[Object](nextStep.name, mesosStatus.getTaskId.getValue): _*,
             )
           }
         }

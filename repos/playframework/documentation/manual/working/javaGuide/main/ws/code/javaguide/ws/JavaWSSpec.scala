@@ -26,14 +26,14 @@ object JavaWSSpec extends Specification with Results with Status {
         Action {
           val obj: JsObject = Json.obj(
               "title" -> "foo",
-              "commentsUrl" -> "http://localhost:3333/comments"
+              "commentsUrl" -> "http://localhost:3333/comments",
           )
           Ok(obj)
         }
       case ("GET", "/comments") =>
         Action {
           val obj: JsObject = Json.obj(
-              "count" -> "10"
+              "count" -> "10",
           )
           Ok(obj)
         }

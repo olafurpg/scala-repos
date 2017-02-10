@@ -230,7 +230,7 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
             }
             return passAuth
           }
-        }
+        },
     )
   }
 

@@ -85,7 +85,7 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
             .format(dataSourceName)
             .schema(schema)
             .load(file.getCanonicalPath),
-          df
+          df,
       )
     }
   }
@@ -111,7 +111,7 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
             .format(dataSourceName)
             .schema(schema)
             .load(file.getCanonicalPath),
-          df
+          df,
       )
     }
   }

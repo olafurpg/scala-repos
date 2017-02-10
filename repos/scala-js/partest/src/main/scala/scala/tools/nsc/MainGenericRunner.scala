@@ -134,11 +134,11 @@ class MainGenericRunner {
                             List(ArrayValue(ArrayType("T", 1),
                                             args.map(StringLiteral(_)))))(
                           NoType),
-                      Undefined()
-                  )
+                      Undefined(),
+                  ),
               )(OptimizerHints.empty, None),
-              ModuleExportDef(exportName)
-          )
+              ModuleExportDef(exportName),
+          ),
       )(OptimizerHints.empty)
     }
 

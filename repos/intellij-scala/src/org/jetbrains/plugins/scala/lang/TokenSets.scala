@@ -152,10 +152,10 @@ object TokenSets {
                                  TokenSet.orSet(
                                      VARIABLES,
                                      TokenSet.create(
-                                         ScalaElementTypes.PRIMARY_CONSTRUCTOR)
-                                 )
-                             )
-                         )
+                                         ScalaElementTypes.PRIMARY_CONSTRUCTOR),
+                                 ),
+                             ),
+                         ),
                      )),
       MemberElementTypesExtension.getAllElementTypes)
 
@@ -176,6 +176,6 @@ object TokenSets {
       ANNOT_TYPE,
       WILDCARD_TYPE,
       TYPE_PROJECTION,
-      TYPE_VARIABLE
+      TYPE_VARIABLE,
   )
 }

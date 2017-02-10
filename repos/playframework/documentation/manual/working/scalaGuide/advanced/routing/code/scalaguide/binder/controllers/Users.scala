@@ -15,8 +15,8 @@ class Application extends Controller {
     Ok(
         JavaScriptReverseRouter("jsRoutes")(
             routes.javascript.Users.list,
-            routes.javascript.Users.get
-        )
+            routes.javascript.Users.get,
+        ),
     ).as("text/javascript")
   }
   //#javascript-router-resource
@@ -26,7 +26,7 @@ class Application extends Controller {
         //#javascript-router-resource-custom-method
         JavaScriptReverseRouter("jsRoutes", Some("myAjaxFunction"))(
             routes.javascript.Users.list,
-            routes.javascript.Users.get
+            routes.javascript.Users.get,
         )
         //#javascript-router-resource-custom-method
     ).as("text/javascript")

@@ -9,7 +9,7 @@ import com.twitter.finagle.{Service, SimpleFilter}
 trait ClientRequestTracingFilter[Req, Res] extends SimpleFilter[Req, Res] {
   def apply(
       request: Req,
-      service: Service[Req, Res]
+      service: Service[Req, Res],
   ) = {
     if (Trace.isActivelyTracing) {
       Trace.recordServiceName(serviceName)

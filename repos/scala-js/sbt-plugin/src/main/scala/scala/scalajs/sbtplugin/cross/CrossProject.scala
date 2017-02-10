@@ -208,7 +208,7 @@ import java.io.File
 final class CrossProject private (
     crossType: CrossType,
     val jvm: Project,
-    val js: Project
+    val js: Project,
 ) {
 
   import CrossProject._
@@ -310,7 +310,7 @@ object CrossProject extends CrossProjectExtra {
         makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "test"),
                          scalaBinaryVersion.value,
                          crossPaths.value)
-      }
+      },
   )
 
   // Inspired by sbt's Defaults.makeCrossSources

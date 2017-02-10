@@ -585,7 +585,7 @@ private[serializer] object KryoSerializer {
       classOf[Array[Short]],
       classOf[Array[Long]],
       classOf[BoundedPriorityQueue[_]],
-      classOf[SparkConf]
+      classOf[SparkConf],
   )
 
   private val toRegisterSerializer = Map[Class[_], KryoClassSerializer[_]](
@@ -601,7 +601,7 @@ private[serializer] object KryoSerializer {
           ret.deserialize(new KryoInputObjectInputBridge(kryo, input))
           ret
         }
-      }
+      },
   )
 }
 

@@ -57,7 +57,7 @@ object Comet extends DispatchSnippet with LazyLoggable {
         buildContainer(
             cometActor.buildSpan(response.inSpan) ++ response.outSpan,
             cometActor,
-            s"${cometActor.uniqueId}_outer"
+            s"${cometActor.uniqueId}_outer",
         )
 
       case Full(AnswerRender(response, _, _, _)) =>

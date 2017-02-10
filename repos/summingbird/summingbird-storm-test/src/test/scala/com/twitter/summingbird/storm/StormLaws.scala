@@ -80,7 +80,7 @@ object StormLaws {
 
     val job = mkJob(
         Memory.toSource(original),
-        sink
+        sink,
     )
     val topo = memory.plan(job)
     memory.run(topo)
@@ -100,7 +100,7 @@ object StormLaws {
         Storm.source(TraversableSpout(original)),
         Storm.sink[Int]({ (x: Int) =>
           append(x); Future.Unit
-        })
+        }),
     )
 
     StormTestRun(job)
@@ -137,7 +137,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.singleStepInScala(original)(testFn),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -152,7 +152,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.singleStepInScala(original)(fn),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -169,7 +169,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.twinStepOptionMapFlatMapScala(original)(fnA, fnB),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -187,7 +187,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.twinStepOptionMapFlatMapScala(original)(fnA, fnB),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -206,7 +206,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.singleStepInScala(original)(expansionFunc),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -256,7 +256,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.singleStepMapKeysInScala(original)(fnA, fnB),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -274,7 +274,7 @@ class StormLaws extends WordSpec {
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.leftJoinInScala(original)(serviceFn)(staticFunc)(
                 nextFn),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -294,7 +294,7 @@ class StormLaws extends WordSpec {
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.leftJoinWithFlatMapValuesInScala(original)(serviceFn)(
                 staticFunc)(nextFn1),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -312,7 +312,7 @@ class StormLaws extends WordSpec {
         Equiv[Map[Int, Int]].equiv(
             TestGraphs.repeatedTupleLeftJoinInScala(original)(serviceFn)(
                 staticFunc)(nextFn),
-            returnedState.toScala
+            returnedState.toScala,
         ) == true)
   }
 
@@ -333,7 +333,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             MapAlgebra.sumByKey(original.filter(_ % 2 == 0).map(_ -> 10)),
-            TestStore[Int, Int](id).get.toScala
+            TestStore[Int, Int](id).get.toScala,
         ) == true)
   }
 
@@ -344,7 +344,7 @@ class StormLaws extends WordSpec {
     }
 
     val stormOutputList = runWithOutSummer(original)(
-        TestGraphs.mapOnlyJob[Storm, Int, Int](_, _)(doubler)
+        TestGraphs.mapOnlyJob[Storm, Int, Int](_, _)(doubler),
     ).sorted
 
     val memoryOutputList = memoryPlanWithoutSummer(original)(
@@ -414,13 +414,13 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             scalaA,
-            store1Map
+            store1Map,
         ) == true)
 
     assert(
         Equiv[Map[Int, Int]].equiv(
             scalaB,
-            store2Map
+            store2Map,
         ) == true)
   }
 
@@ -479,7 +479,7 @@ class StormLaws extends WordSpec {
     assert(
         Equiv[Map[Int, Int]].equiv(
             scalaA,
-            store1Map
+            store1Map,
         ) == true)
   }
 }

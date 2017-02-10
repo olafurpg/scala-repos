@@ -388,37 +388,37 @@ object ScaloidCodeGenerator {
       "View" -> { cls =>
         val sClassName = "S" + cls.name
         s"LP <: ViewGroupLayoutParams[_, $sClassName]"
-      }
+      },
   )
 
   val genericArgs: PredefinedCodeMappings = List(
       "ArrayAdapter" -> { _ =>
         "[V <: android.view.View, T <: AnyRef]"
-      }
+      },
   )
 
   val simpleGenericArgs: PredefinedCodeMappings = List(
       "ArrayAdapter" -> { _ =>
         "[V, T]"
-      }
+      },
   )
 
   val ClassExplicitArgs: PredefinedCodeMappings = List(
       "ArrayAdapter" -> { _ =>
         "items: java.util.List[T], textViewResourceId: Int = android.R.layout.simple_spinner_item"
-      }
+      },
   )
 
   val BaseClassArgs: PredefinedCodeMappings = List(
       "ArrayAdapter" -> { _ =>
         "context, textViewResourceId, items"
-      }
+      },
   )
 
   val ClassImplicitArgs: PredefinedCodeMappings = List(
       "View" -> { _ =>
         "parentVGroup: TraitViewGroup[_] = null"
-      }
+      },
   )
 
   val CustomClassBodies: PredefinedCodeMappings = List(
@@ -462,19 +462,19 @@ object ScaloidCodeGenerator {
           |def this(imageResource: android.graphics.drawable.Drawable, onClickListener: ViewOnClickListener)(implicit context: Context) = this(imageResource, onClickListener, -1)
           |
           |""".stripMargin
-      }
+      },
   )
 
   val ConstImplicitArgs: PredefinedCodeMappings = List(
       "View" -> { cls =>
         s"defaultLayoutParam: S${cls.name} => LP"
-      }
+      },
   )
 
   val ConstImplicitBodies: PredefinedCodeMappings = List(
       "View" -> { _ =>
         "v.<<.parent.+=(v)"
-      }
+      },
   )
 
   val companionObjectExtends: PredefinedCodeMappings = List(
@@ -485,7 +485,7 @@ object ScaloidCodeGenerator {
       "ImageView" -> { cls =>
         val sClassName = "S" + cls.name
         s" extends ImageViewCompanion[$sClassName]"
-      }
+      },
   )
 
   val companionObjectBodies: PredefinedCodeMappings = List(
@@ -518,7 +518,7 @@ object ScaloidCodeGenerator {
           |
           |def apply[T <: AnyRef](textViewResourceId: Int, items: Array[T])(implicit context: Context): $sClassName[TextView, T] = new $sClassName[TextView, T](java.util.Arrays.asList(items:_*), textViewResourceId)
           |""".stripMargin
-      }
+      },
   )
 
   def license =

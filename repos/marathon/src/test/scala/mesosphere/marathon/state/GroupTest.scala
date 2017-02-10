@@ -23,7 +23,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                  "/test/group1/app1".toPath))),
                                    Group("/test/group2".toPath,
                                          Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
+                                                 "/test/group2/app2".toPath))),
                                ))))
 
       When("a group with a specific path is requested")
@@ -43,7 +43,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                  "/test/group1/app1".toPath))),
                                    Group("/test/group2".toPath,
                                          Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
+                                                 "/test/group2/app2".toPath))),
                                ))))
 
       When("a group with a specific path is requested")
@@ -75,8 +75,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                       Group(
                                           "/test/group2/b".toPath,
                                           Set(AppDefinition(
-                                                  "/test/group2/b/app1".toPath)))
-                                  ))
+                                                  "/test/group2/b/app1".toPath))),
+                                  )),
                           ))))
 
       When("a group with a specific path is requested")
@@ -107,7 +107,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                  "/test/group1/app1".toPath))),
                                    Group("/test/group2".toPath,
                                          Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
+                                                 "/test/group2/app2".toPath))),
                                ))))
 
       When("the group will be updated")
@@ -137,7 +137,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                  "/test/group1/app1".toPath))),
                                    Group("/test/group2".toPath,
                                          Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
+                                                 "/test/group2/app2".toPath))),
                                ))))
 
       When("the group will be updated")
@@ -180,7 +180,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                  "/test/group1/app1".toPath))),
                                    Group("/test/group2".toPath,
                                          Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
+                                                 "/test/group2/app2".toPath))),
                                ))))
 
       When("a non existing path is requested")
@@ -291,14 +291,14 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                       AppDefinition(
                                           "/test/group1/app1".toPath,
                                           args = Some(Seq("a", "b", "c")),
-                                          versionInfo = fullVersion)
+                                          versionInfo = fullVersion),
                                   )),
                             Group("/test/group2".toPath,
                                   Set(
                                       AppDefinition("/test/group2/app2".toPath,
                                                     args = Some(Seq("a", "b")),
-                                                    versionInfo = fullVersion)
-                                  ))
+                                                    versionInfo = fullVersion),
+                                  )),
                         ))))
 
       When("the group is marshalled and unmarshalled again")
@@ -331,7 +331,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                           Set(AppDefinition(
                                                   "/test/database/mongo/m1".toPath)),
                                           dependencies = Set(
-                                                "/test/database/redis".toPath))
+                                                "/test/database/redis".toPath)),
                                   )),
                           Group(
                               "/test/service".toPath,
@@ -347,7 +347,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                 "/test/service/service2/s2".toPath)),
                                         dependencies = Set(
                                               "/test/database".toPath,
-                                              "/test/service/service1".toPath))
+                                              "/test/service/service1".toPath)),
                                 )),
                           Group(
                               "/test/frontend".toPath,
@@ -365,7 +365,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                         dependencies = Set(
                                               "/test/service".toPath,
                                               "/test/database/mongo".toPath,
-                                              "/test/frontend/app1".toPath))
+                                              "/test/frontend/app1".toPath)),
                                 )),
                           Group(
                               "/test/cache".toPath,
@@ -373,7 +373,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                     Group("/test/cache/c1".toPath,
                                           Set(AppDefinition(
                                                   "/test/cache/c1/c1".toPath))) //has no dependencies
-                                ))
+                                )),
                       ))))
       current.hasNonCyclicDependencies should equal(true)
 
@@ -392,7 +392,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
           "/test/service/service2/s2".toPath,
           "/test/frontend/app1/a1".toPath,
           "/test/frontend/app2/a2".toPath,
-          "/test/cache/c1/c1".toPath
+          "/test/cache/c1/c1".toPath,
       )
       ids should equal(expectedIds)
 
@@ -416,7 +416,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                      "/test/database/redis".toPath)),
                                            AppDefinition(
                                                "/test/database/mongo".toPath,
-                                               dependencies = Set("/test/database/redis".toPath))
+                                               dependencies = Set("/test/database/redis".toPath)),
                                        )),
                                    Group(
                                        "/test/service".toPath,
@@ -427,7 +427,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                "/test/service/srv2".toPath,
                                                dependencies = Set(
                                                      "/test/database/mongo".toPath,
-                                                     "/test/service/srv1".toPath))
+                                                     "/test/service/srv1".toPath)),
                                        )),
                                    Group("/test/frontend".toPath,
                                          Set(
@@ -440,13 +440,13 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                  dependencies = Set(
                                                        "/test/service/srv2".toPath,
                                                        "/test/database/mongo".toPath,
-                                                       "/test/frontend/app1".toPath))
+                                                       "/test/frontend/app1".toPath)),
                                          )),
                                    Group("/test/cache".toPath,
                                          Set(
                                              AppDefinition(
                                                  "/test/cache/cache1".toPath) //has no dependencies
-                                         ))))
+                                         )))),
             ))
       current.hasNonCyclicDependencies should equal(true)
 
@@ -465,7 +465,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
           "/test/service/srv2".toPath,
           "/test/frontend/app1".toPath,
           "/test/frontend/app2".toPath,
-          "/test/cache/cache1".toPath
+          "/test/cache/cache1".toPath,
       )
       ids should be(expected)
 
@@ -490,7 +490,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                   "/test/database/memcache/m1".toPath))),
                                     Group("/test/database/mongo".toPath,
                                           Set(AppDefinition(
-                                                  "/test/database/mongo/m1".toPath)))
+                                                  "/test/database/mongo/m1".toPath))),
                                 )),
                           Group(
                               "/test/service".toPath,
@@ -502,7 +502,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                                 "/test/service/service1/srv1".toPath))),
                                     Group(
                                         "/test/service/service2".toPath,
-                                        Set(AppDefinition("/test/service/service2/srv2".toPath)))
+                                        Set(AppDefinition("/test/service/service2/srv2".toPath))),
                                 )),
                           Group("/test/frontend".toPath,
                                 groups = Set(
@@ -511,7 +511,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                           Set(AppDefinition("/test/frontend/app1/a1".toPath))),
                                       Group("/test/frontend/app2".toPath,
                                             Set(AppDefinition(
-                                                    "/test/frontend/app2/a2".toPath)))
+                                                    "/test/frontend/app2/a2".toPath))),
                                   )),
                           Group(
                               "/test/cache".toPath,
@@ -519,8 +519,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                     Group(
                                         "/test/cache/c1".toPath,
                                         Set(AppDefinition(
-                                                "/test/cache/c1/cache1".toPath)))
-                                ))
+                                                "/test/cache/c1/cache1".toPath))),
+                                )),
                       ))))
       current.hasNonCyclicDependencies should equal(true)
 
@@ -543,7 +543,7 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                       AppDefinition(
                                           "/test/database/mongo/m1".toPath,
                                           dependencies = Set(
-                                                "/test/service".toPath))))
+                                                "/test/service".toPath)))),
                         )),
                 Group(
                     "/test/service".toPath,
@@ -551,8 +551,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                           Group(
                               "/test/service/service1".toPath,
                               Set(
-                                  AppDefinition("/test/service/service1/srv1".toPath, dependencies = Set("/test/database".toPath))))
-        ))
+                                  AppDefinition("/test/service/service1/srv1".toPath, dependencies = Set("/test/database".toPath)))),
+        )),
       ))
 
       Then("the cycle is detected")
@@ -571,9 +571,9 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                 groups = Set(
                                       Group("/test/service/test".toPath,
                                             Set(
-                                                AppDefinition("/test/service/test/app".toPath, cmd = Some("Foobar"))))
-          ))
-        ))
+                                                AppDefinition("/test/service/test/app".toPath, cmd = Some("Foobar")))),
+          )),
+        )),
       ))
 
       When("App is updated")
@@ -602,8 +602,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                                   Set(AppDefinition("app2".toPath,
                                                     cmd = Some("bar"),
                                                     dependencies = Set(
-                                                          "../app1".toPath))))
-                        ))
+                                                          "../app1".toPath)))),
+                        )),
             ))
 
       When("group is validated")

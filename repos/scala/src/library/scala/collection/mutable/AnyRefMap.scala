@@ -75,7 +75,7 @@ final class AnyRefMap[K <: AnyRef, V] private[collection](
       vc: Int,
       hz: Array[Int],
       kz: Array[AnyRef],
-      vz: Array[AnyRef]
+      vz: Array[AnyRef],
   ) {
     mask = m; _size = sz; _vacant = vc; _hashes = hz; _keys = kz; _values = vz
   }

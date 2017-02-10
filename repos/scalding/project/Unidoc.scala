@@ -26,7 +26,7 @@ object Unidoc {
       unidocClasspath <<= unidocAllClasspaths map {
         _.flatten.map(_.data).distinct
       },
-      unidoc <<= unidocTask
+      unidoc <<= unidocTask,
   )
 
   def allSources(projectRef: ProjectRef,

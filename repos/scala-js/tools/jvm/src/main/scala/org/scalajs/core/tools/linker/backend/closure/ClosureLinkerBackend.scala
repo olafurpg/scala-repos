@@ -30,7 +30,7 @@ import org.scalajs.core.tools.linker.backend.emitter.{Emitter, CoreJSLibs}
 final class ClosureLinkerBackend(
     semantics: Semantics,
     withSourceMap: Boolean,
-    config: LinkerBackend.Config
+    config: LinkerBackend.Config,
 )
     extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
 

@@ -61,7 +61,7 @@ class DocFindingSpec
           "    List(1, 2).flat@30@Map(Some(_))",
           "    List(1, 2).coll@31@ect { case 1 => 5 }",
           "  }",
-          "}"
+          "}",
       ) { (p, label, cc) =>
         val sig = cc.askDocSignatureAtPoint(p).get
 

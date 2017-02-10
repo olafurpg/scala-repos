@@ -28,8 +28,8 @@ object Release {
           releaseStepCommand("sonatypeRelease"),
           setNextVersion,
           commitNextVersion,
-          pushChanges
-      )
+          pushChanges,
+      ),
   )
 
   /**

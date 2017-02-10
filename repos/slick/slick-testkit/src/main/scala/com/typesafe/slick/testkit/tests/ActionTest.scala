@@ -111,7 +111,7 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
           a2.map(_ shouldBe (1 to 20).toSeq),
           a3.map(_ shouldBe (1 to 20).toSeq),
           a4.map(_ shouldBe (())),
-          a5.map(_ shouldBe "a5")
+          a5.map(_ shouldBe "a5"),
       )
     } else DBIO.successful(())
 

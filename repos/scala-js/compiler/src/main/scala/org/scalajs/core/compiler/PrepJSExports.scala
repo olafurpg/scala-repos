@@ -26,7 +26,7 @@ trait PrepJSExports {
       jsName: String,
       pos: Position,
       isNamed: Boolean,
-      ignoreInvalid: Boolean
+      ignoreInvalid: Boolean,
   )
       extends jsInterop.ExportInfo
 

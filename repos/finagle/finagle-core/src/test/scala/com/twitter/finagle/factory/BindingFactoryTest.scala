@@ -54,7 +54,7 @@ class BindingFactoryTest
   trait Ctx {
     def withExpectedTrace(
         f: => Unit,
-        expected: Seq[Annotation]
+        expected: Seq[Annotation],
     ) {
       val tracer: Tracer = spy(new NullTracer)
       val captor: ArgumentCaptor[Record] =
@@ -132,7 +132,7 @@ class BindingFactoryTest
             assert(factory.status == status)
           }
         }
-      }
+      },
   )
 
   test("stats")(Time.withCurrentTimeFrozen { tc =>
@@ -153,7 +153,7 @@ class BindingFactoryTest
       Await.result(Await.result(f).close())
 
       val expected = Map(
-          Seq("bind_latency_us") -> Seq(5678.0)
+          Seq("bind_latency_us") -> Seq(5678.0),
       )
 
       assert(imsr.stats == expected)
@@ -241,7 +241,7 @@ class BindingFactoryTest
                                     "/test1010=>/$/inet/0/1010"),
         Annotation.Message("namer.success"),
         Annotation.BinaryAnnotation("namer.tree", "/$/inet/0/1010"),
-        Annotation.BinaryAnnotation("namer.name", "/$/inet/0/1010")
+        Annotation.BinaryAnnotation("namer.name", "/$/inet/0/1010"),
     ))
   })
 
@@ -260,7 +260,7 @@ class BindingFactoryTest
         Annotation.BinaryAnnotation("namer.dtab.base",
                                     "/test1010=>/$/inet/0/1010"),
         Annotation.BinaryAnnotation("namer.failure",
-                                    "java.lang.RuntimeException")
+                                    "java.lang.RuntimeException"),
     ))
   })
 
@@ -274,7 +274,7 @@ class BindingFactoryTest
         Annotation.BinaryAnnotation("namer.dtab.base",
                                     "/test1010=>/$/inet/0/1010"),
         Annotation.Message("namer.success"),
-        Annotation.BinaryAnnotation("namer.tree", "~")
+        Annotation.BinaryAnnotation("namer.tree", "~"),
     ))
   })
 
@@ -304,7 +304,7 @@ class BindingFactoryTest
                                     "/test1010=>/$/inet/0/1010"),
         Annotation.Message("namer.success"),
         Annotation.BinaryAnnotation("namer.tree", "/$/inet/0/1010"),
-        Annotation.BinaryAnnotation("namer.name", "/$/inet/0/1010")
+        Annotation.BinaryAnnotation("namer.name", "/$/inet/0/1010"),
     ))
   })
 
@@ -471,7 +471,7 @@ class DynNameFactoryTest extends FunSuite with MockitoSugar {
           namew.notify(Return(NameTree.Leaf(Name.empty)))
           assert(dyn.status == status)
         }
-      }
+      },
   )
 
   test("queue requests until name is nonpending (ok)")(new Ctx {
@@ -597,7 +597,7 @@ class NameTreeFactoryTest extends FunSuite {
                 Future.value(null)
               def close(deadline: Time) = Future.Done
               override def status = key
-          })
+          }),
       ).isAvailable
 
     assert(

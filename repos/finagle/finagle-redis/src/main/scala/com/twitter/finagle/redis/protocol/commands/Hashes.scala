@@ -148,7 +148,7 @@ case class HScan(
     key: ChannelBuffer,
     cursor: Long,
     count: Option[JLong] = None,
-    pattern: Option[ChannelBuffer] = None
+    pattern: Option[ChannelBuffer] = None,
 )
     extends Command {
   def command = Commands.HSCAN

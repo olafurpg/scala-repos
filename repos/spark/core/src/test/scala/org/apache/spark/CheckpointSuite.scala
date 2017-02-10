@@ -110,7 +110,7 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
     assert(
         rddSizeAfterCheckpoint < rddSizeBeforeCheckpoint,
         "Size of " + rddType + " did not reduce after checkpointing " + " [" +
-        rddSizeBeforeCheckpoint + " --> " + rddSizeAfterCheckpoint + "]"
+        rddSizeBeforeCheckpoint + " --> " + rddSizeAfterCheckpoint + "]",
     )
   }
 
@@ -173,7 +173,7 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
         "Size of " + rddType +
         " partitions did not reduce after checkpointing parent RDDs" +
         " [" + partitionSizeBeforeCheckpoint + " --> " +
-        partitionSizeAfterCheckpoint + "]"
+        partitionSizeAfterCheckpoint + "]",
     )
   }
 
@@ -198,7 +198,7 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
         rddSize > rddCpDataSize,
         "RDD's checkpoint data (" + rddCpDataSize +
         ") is equal or larger than the " + "whole RDD with checkpoint data (" +
-        rddSize + ")"
+        rddSize + ")",
     )
     (rddSize - rddCpDataSize, rddPartitionSize)
   }
@@ -233,7 +233,7 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
   /** Run a test twice, once for local checkpointing and once for reliable checkpointing. */
   protected def runTest(
       name: String,
-      skipLocalCheckpoint: Boolean = false
+      skipLocalCheckpoint: Boolean = false,
   )(body: Boolean => Unit): Unit = {
     test(name + " [reliable checkpoint]")(body(true))
     if (!skipLocalCheckpoint) {
@@ -298,7 +298,7 @@ class CheckpointSuite
     _: Boolean =>
       def testPartitionerCheckpointing(
           partitioner: Partitioner,
-          corruptPartitionerFile: Boolean = false
+          corruptPartitionerFile: Boolean = false,
       ): Unit = {
         val rddWithPartitioner =
           sc.makeRDD(1 to 4).map { _ -> 1 }.partitionBy(partitioner)
@@ -431,7 +431,7 @@ class CheckpointSuite
     assert(
         (splitAfterCheckpoint.s1.getClass != splitBeforeCheckpoint.s1.getClass) &&
         (splitAfterCheckpoint.s2.getClass != splitBeforeCheckpoint.s2.getClass),
-        "CartesianRDD.s1 and CartesianRDD.s2 not updated after parent RDD is checkpointed"
+        "CartesianRDD.s1 and CartesianRDD.s2 not updated after parent RDD is checkpointed",
     )
   }
 
@@ -453,7 +453,7 @@ class CheckpointSuite
         coalesced.partitions.head.asInstanceOf[CoalescedRDDPartition])
     assert(
         splitAfterCheckpoint.parents.head.getClass != splitBeforeCheckpoint.parents.head.getClass,
-        "CoalescedRDDPartition.parents not updated after parent RDD is checkpointed"
+        "CoalescedRDDPartition.parents not updated after parent RDD is checkpointed",
     )
   }
 
@@ -508,7 +508,7 @@ class CheckpointSuite
         partitionAfterCheckpoint.partitions(1).getClass != partitionBeforeCheckpoint
           .partitions(1)
           .getClass,
-        "ZippedPartitionsRDD partition 0 (or 1) not updated after parent RDDs are checkpointed"
+        "ZippedPartitionsRDD partition 0 (or 1) not updated after parent RDDs are checkpointed",
     )
   }
 
@@ -520,7 +520,7 @@ class CheckpointSuite
                 sc,
                 Array(
                     generateFatPairRDD(),
-                    rdd.map(x => (x % 2, 1)).reduceByKey(partitioner, _ + _)
+                    rdd.map(x => (x % 2, 1)).reduceByKey(partitioner, _ + _),
                 ))
         },
         reliableCheckpoint)
@@ -532,7 +532,7 @@ class CheckpointSuite
                 sc,
                 Array(
                     generateFatPairRDD(),
-                    rdd.map(x => (x % 2, 1)).reduceByKey(partitioner, _ + _)
+                    rdd.map(x => (x % 2, 1)).reduceByKey(partitioner, _ + _),
                 ))
         },
         reliableCheckpoint)
@@ -553,7 +553,7 @@ class CheckpointSuite
           .asInstanceOf[PartitionerAwareUnionRDDPartition])
     assert(
         partitionBeforeCheckpoint.parents.head.getClass != partitionAfterCheckpoint.parents.head.getClass,
-        "PartitionerAwareUnionRDDPartition.parents not updated after parent RDD is checkpointed"
+        "PartitionerAwareUnionRDDPartition.parents not updated after parent RDD is checkpointed",
     )
   }
 
@@ -644,7 +644,7 @@ object CheckpointSuite {
       part: Partitioner): RDD[(K, Array[Iterable[V]])] = {
     new CoGroupedRDD[K](
         Seq(first.asInstanceOf[RDD[(K, _)]], second.asInstanceOf[RDD[(K, _)]]),
-        part
+        part,
     ).asInstanceOf[RDD[(K, Array[Iterable[V]])]]
   }
 }

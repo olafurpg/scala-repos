@@ -76,7 +76,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       "Int.scala",
       "Float.scala",
       "Long.scala",
-      "Double.scala"
+      "Double.scala",
   )
 
   /**
@@ -376,7 +376,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           if (!classSym.hasJavaEnumFlag && classSym.hasAbstractFlag)
             ACC_ABSTRACT else 0,
           if (classSym.isArtifact) ACC_SYNTHETIC else 0,
-          if (classSym.hasJavaEnumFlag) enumFlags else 0
+          if (classSym.hasJavaEnumFlag) enumFlags else 0,
       )
     }
 
@@ -401,7 +401,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           // A ClassBType for a primitive class (scala.Boolean et al) is only created when compiling these classes.
           ((superClassSym != NoSymbol) && !superClassSym.isInterface) ||
           (isCompilingPrimitive && primitiveTypeToBType.contains(classSym)),
-        s"Bad superClass for $classSym: $superClassSym"
+        s"Bad superClass for $classSym: $superClassSym",
     )
     val superClass =
       if (superClassSym == NoSymbol) None
@@ -795,7 +795,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         if (sym.hasJavaEnumFlag) ACC_ENUM else 0,
         if (sym.isVarargsMethod) ACC_VARARGS else 0,
         if (sym.hasFlag(symtab.Flags.SYNCHRONIZED)) ACC_SYNCHRONIZED else 0,
-        if (sym.isDeprecated) asm.Opcodes.ACC_DEPRECATED else 0
+        if (sym.isDeprecated) asm.Opcodes.ACC_DEPRECATED else 0,
     )
   }
 
@@ -803,7 +803,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     javaFlags(sym) | GenBCode.mkFlags(
         if (sym hasAnnotation TransientAttr) asm.Opcodes.ACC_TRANSIENT else 0,
         if (sym hasAnnotation VolatileAttr) asm.Opcodes.ACC_VOLATILE else 0,
-        if (sym.isMutable) 0 else asm.Opcodes.ACC_FINAL
+        if (sym.isMutable) 0 else asm.Opcodes.ACC_FINAL,
     )
   }
 }

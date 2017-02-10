@@ -38,7 +38,7 @@ case class DataMapException(msg: String, cause: Exception)
   * @group Event Data
   */
 class DataMap(
-    val fields: Map[String, JValue]
+    val fields: Map[String, JValue],
 )
     extends Serializable {
   @transient lazy implicit private val formats =

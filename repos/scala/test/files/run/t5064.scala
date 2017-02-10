@@ -10,7 +10,7 @@ object Test extends CompilerTest {
        |  List
        |  Seq
        |  Nil
-       |}""".stripMargin
+       |}""".stripMargin,
   )
   def check(source: String, unit: CompilationUnit) {
     for (ClassDef(_, _, _, Template(_, _, stats)) <- unit.body; stat <- stats;

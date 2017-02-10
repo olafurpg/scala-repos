@@ -221,7 +221,7 @@ object Buf {
   class ByteArray(
       private[Buf] val bytes: Array[Byte],
       private[Buf] val begin: Int,
-      private[Buf] val end: Int
+      private[Buf] val end: Int,
   )
       extends Buf {
 

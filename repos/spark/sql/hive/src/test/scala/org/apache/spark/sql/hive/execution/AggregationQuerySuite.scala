@@ -862,7 +862,7 @@ abstract class AggregationQuerySuite
         checkAnswer(
             df.groupBy().agg(udaf(allColumns: _*)),
             // udaf returns a Row as the output value.
-            Row(expectedAnswer)
+            Row(expectedAnswer),
         )
     }
   }

@@ -103,7 +103,7 @@ trait WebJobManager
                 started: Option[DateTime]): Response[Job] = {
     val content: JValue = JObject(
         jfield("name", name) :: jfield("type", jobType) ::
-        (data map (jfield("data", _) :: Nil) getOrElse Nil)
+        (data map (jfield("data", _) :: Nil) getOrElse Nil),
     )
 
     withJsonClient { client =>
@@ -167,7 +167,7 @@ trait WebJobManager
         JObject(
             JField("message", JString(msg)) :: JField(
                 "progress", JNum(progress)) :: JField("unit", JString(unit)) ::
-            (info map (JField("info", _) :: Nil) getOrElse Nil)
+            (info map (JField("info", _) :: Nil) getOrElse Nil),
         )
 
       val client =

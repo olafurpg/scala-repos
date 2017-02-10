@@ -19,7 +19,7 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
     }
     Json.obj(
         "filter" -> filterName,
-        "paginator" -> lila.common.paginator.PaginatorJson(pag)
+        "paginator" -> lila.common.paginator.PaginatorJson(pag),
     )
   }
 
@@ -47,7 +47,7 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
                   "name" -> p.name,
                   "aiLevel" -> p.aiLevel,
                   "rating" -> p.rating,
-                  "ratingDiff" -> p.ratingDiff
+                  "ratingDiff" -> p.ratingDiff,
               )
               .noNull
           }),
@@ -56,7 +56,7 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
           "opening" -> g.opening,
           "winner" -> g.winnerColor.map(_.name),
           "bookmarks" -> g.bookmarks,
-          "bookmarked" -> bookmarked.option(true)
+          "bookmarked" -> bookmarked.option(true),
       )
       .noNull
 }

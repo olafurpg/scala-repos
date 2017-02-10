@@ -246,7 +246,7 @@ object GzipFilterConfig {
         chunkedThreshold = config
             .get[ConfigMemorySize]("chunkedThreshold")
             .toBytes
-            .toInt
+            .toInt,
       )
   }
 }
@@ -266,7 +266,7 @@ class GzipFilterConfigProvider @Inject()(config: Configuration)
 class GzipFilterModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = Seq(
       bind[GzipFilterConfig].toProvider[GzipFilterConfigProvider],
-      bind[GzipFilter].toSelf
+      bind[GzipFilter].toSelf,
   )
 }
 

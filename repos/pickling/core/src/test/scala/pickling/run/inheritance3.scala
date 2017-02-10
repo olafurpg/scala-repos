@@ -22,7 +22,7 @@ class Inheritance3Test extends FunSuite {
         name = "Joey",
         age = 32,
         salary = 30000,
-        since = 1999
+        since = 1999,
     )
 
     val pickleF = (f: Firefighter).pickle

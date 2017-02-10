@@ -98,7 +98,7 @@ object Term {
       '-' -> '\u207B',
       '1' -> '\u00B9',
       '2' -> '\u00B2',
-      '3' -> '\u00B3'
+      '3' -> '\u00B3',
   )
 
   // call Regex constructor directly to get rid of compiler warning

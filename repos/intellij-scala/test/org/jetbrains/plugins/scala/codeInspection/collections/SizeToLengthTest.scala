@@ -32,7 +32,7 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
         |  val s = ""
         |  s.length
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 
@@ -63,7 +63,7 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
         |  val arr = Array(1, 2)
         |  arr.length
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 }

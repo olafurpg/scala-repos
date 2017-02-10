@@ -565,7 +565,7 @@ trait JdbcBackend extends RelationalBackend {
               else { s =>
                 curr.statementInit(s); p.statementInit(s)
               },
-              p.fetchSize
+              p.fetchSize,
           )
         } else p
       statementParameters = p2 ::

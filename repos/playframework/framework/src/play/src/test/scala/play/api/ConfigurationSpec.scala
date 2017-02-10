@@ -25,10 +25,10 @@ object ConfigurationSpec extends Specification {
           "blah.4" -> List("one", "two", "three"),
           "blah2" -> Map(
               "blah3" -> Map(
-                  "blah4" -> "value6"
-              )
-          )
-      )
+                  "blah4" -> "value6",
+              ),
+          ),
+      ),
   )
 
   "Configuration" should {
@@ -100,7 +100,7 @@ object ConfigurationSpec extends Specification {
         copy
       }
       val conf = Configuration.from(
-          Map("item" -> "uhoh, it's gonna blow")
+          Map("item" -> "uhoh, it's gonna blow"),
       );
       {
         try {
@@ -151,7 +151,7 @@ object PlayConfigSpec extends Specification {
     "support getting prototyped seqs" in {
       val seq = config(
           "bars" -> Seq(Map("a" -> "different a")),
-          "prototype.bars" -> Map("a" -> "some a", "b" -> "some b")
+          "prototype.bars" -> Map("a" -> "some a", "b" -> "some b"),
       ).getPrototypedSeq("bars")
       seq must haveSize(1)
       seq.head.get[String]("a") must_== "different a"
@@ -160,7 +160,7 @@ object PlayConfigSpec extends Specification {
     "support getting prototyped maps" in {
       val map = config(
           "bars" -> Map("foo" -> Map("a" -> "different a")),
-          "prototype.bars" -> Map("a" -> "some a", "b" -> "some b")
+          "prototype.bars" -> Map("a" -> "some a", "b" -> "some b"),
       ).getPrototypedMap("bars")
       map must haveSize(1)
       val foo = map("foo")

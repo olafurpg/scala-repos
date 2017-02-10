@@ -456,7 +456,7 @@ class KMeans private (private var k: Int,
                 r += 1
               }
               s0
-          }
+          },
       )
 
       bcNewCenters.unpersist(blocking = false)

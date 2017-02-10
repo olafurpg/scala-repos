@@ -118,7 +118,7 @@ class MutableSettings(val errorFn: String => Unit)
     def tryToSetIfExists(
         cmd: String,
         args: List[String],
-        setter: (Setting) => (List[String] => Option[List[String]])
+        setter: (Setting) => (List[String] => Option[List[String]]),
     ): Option[List[String]] =
       lookupSetting(cmd) match {
         //case None       => errorFn("Parameter '" + cmd + "' is not recognised by Scalac.") ; None
@@ -608,7 +608,7 @@ class MutableSettings(val errorFn: String => Unit)
     override def value = join(
         prependPath.value,
         super.value,
-        appendPath.value
+        appendPath.value,
     )
   }
 
@@ -676,7 +676,7 @@ class MutableSettings(val errorFn: String => Unit)
       helpArg: String,
       descr: String,
       val domain: E,
-      val default: Option[List[String]]
+      val default: Option[List[String]],
   )
       extends Setting(name, s"$descr: `_' for all, `$name:help' to list")
       with Clearable {
@@ -918,7 +918,7 @@ class MutableSettings(val errorFn: String => Unit)
   class PhasesSetting private[nsc](
       name: String,
       descr: String,
-      default: String
+      default: String,
   )
       extends Setting(name, mkPhasesHelp(descr, default)) with Clearable {
     private[nsc] def this(name: String, descr: String) = this(name, descr, "")
@@ -983,7 +983,7 @@ class MutableSettings(val errorFn: String => Unit)
 
     withHelpSyntax(
         if (default == "") name + ":<phases>"
-        else name + "[:phases]"
+        else name + "[:phases]",
     )
   }
 

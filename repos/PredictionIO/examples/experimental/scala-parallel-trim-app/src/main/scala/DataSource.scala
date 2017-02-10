@@ -18,7 +18,7 @@ case class DataSourceParams(
     srcAppId: Int,
     dstAppId: Int,
     startTime: Option[DateTime],
-    untilTime: Option[DateTime]
+    untilTime: Option[DateTime],
 )
     extends Params
 
@@ -36,7 +36,7 @@ class DataSource(val dsp: DataSourceParams)
     val srcEvents: RDD[Event] = eventsDb.find(
         appId = dsp.srcAppId,
         startTime = dsp.startTime,
-        untilTime = dsp.untilTime
+        untilTime = dsp.untilTime,
     )(sc)
 
     val dstEvents: Array[Event] =

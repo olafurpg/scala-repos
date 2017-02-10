@@ -9,7 +9,7 @@ import scala.collection.mutable.Buffer
 
 private[lease] class Coordinator(
     val counter: ByteCounter,
-    verbose: Boolean = false
+    verbose: Boolean = false,
 ) {
 
   /**
@@ -64,7 +64,7 @@ private[lease] class Coordinator(
       space: MemorySpace,
       maxWait: Duration,
       npending: () => Int,
-      log: Logger
+      log: Logger,
   ) {
     val elapsed = Stopwatch.start()
     // TODO: if grabbing memory info is slow, rewrite this to only check memory info occasionally
@@ -108,7 +108,7 @@ private[lease] object Coordinator {
     */
   def parallelGc(
       ms: Buffer[MemoryPoolMXBean],
-      cs: Buffer[GarbageCollectorMXBean]
+      cs: Buffer[GarbageCollectorMXBean],
   ): Option[(MemoryPoolMXBean, GarbageCollectorMXBean)] =
     for {
       parEden <- ms find (_.getName == "PS Eden Space")
@@ -121,7 +121,7 @@ private[lease] object Coordinator {
     */
   def parNewCMS(
       ms: Buffer[MemoryPoolMXBean],
-      cs: Buffer[GarbageCollectorMXBean]
+      cs: Buffer[GarbageCollectorMXBean],
   ): Option[(MemoryPoolMXBean, GarbageCollectorMXBean)] =
     for {
       parEden <- ms find (_.getName == "Par Eden Space")

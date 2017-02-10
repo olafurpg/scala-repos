@@ -346,7 +346,7 @@ object Act {
 
   private[this] def actionParser: Parser[ActAction] =
     token(
-        ((ShowCommand ^^^ ShowAction) | (MultiTaskCommand ^^^ MultiAction)) <~ Space
+        ((ShowCommand ^^^ ShowAction) | (MultiTaskCommand ^^^ MultiAction)) <~ Space,
     ) ?? SingleAction
 
   @deprecated("No longer used.", "0.13.2")

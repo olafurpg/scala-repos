@@ -114,7 +114,7 @@ object TextFormatterWithChangeFilterDemo extends JFXApp {
             new BorderPane {
               top = textField
               center = outputTextArea
-            }
+            },
         )
       }
     }

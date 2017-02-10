@@ -241,7 +241,7 @@ object CreateServer extends Logging {
         engineParams,
         engineInstance.id,
         modelsFromEngineInstance,
-        params = WorkflowParams()
+        params = WorkflowParams(),
     )
 
     val algorithms = engineParams.algorithmParamsList.map {
@@ -502,7 +502,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                     args.eventServerPort,
                     requestCount,
                     avgServingSec,
-                    lastServingSec
+                    lastServingSec,
                 )
                 .toString
             }
@@ -523,7 +523,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                   queryString,
                   algorithms.head.queryClass,
                   algorithms.head.querySerializer,
-                  algorithms.head.gsonTypeAdapterFactories
+                  algorithms.head.gsonTypeAdapterFactories,
               )
               val queryJValue = JsonExtractor.toJValue(
                   jsonExtractorOption,
@@ -711,7 +711,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                         "description" -> p.pluginDescription,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
-                }
+                },
                 ))
           }
         }

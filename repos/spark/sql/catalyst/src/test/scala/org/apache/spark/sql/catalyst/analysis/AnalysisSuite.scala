@@ -301,7 +301,7 @@ class AnalysisSuite extends AnalysisTest {
     def checkUDF(udf: Expression, transformed: Expression): Unit = {
       checkAnalysis(
           Project(Alias(udf, "")() :: Nil, testRelation2),
-          Project(Alias(transformed, "")() :: Nil, testRelation2)
+          Project(Alias(transformed, "")() :: Nil, testRelation2),
       )
     }
 

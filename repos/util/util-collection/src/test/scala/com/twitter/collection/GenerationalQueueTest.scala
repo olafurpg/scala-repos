@@ -13,7 +13,7 @@ class GenerationalQueueTest extends FunSuite {
   def genericGenerationalQueueTest[A](
       name: String,
       newQueue: () => GenerationalQueue[String],
-      timeout: Duration
+      timeout: Duration,
   ) {
 
     test("%s: Don't collect fresh data".format(name)) {

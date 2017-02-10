@@ -19,7 +19,7 @@ class KetamaDistributorTest extends WordSpec {
         KetamaNode("10.0.1.5", 1000, 5),
         KetamaNode("10.0.1.6", 800, 6),
         KetamaNode("10.0.1.7", 950, 7),
-        KetamaNode("10.0.1.8", 100, 8)
+        KetamaNode("10.0.1.8", 100, 8),
     )
 
     // 160 is the hard coded value for libmemcached, which was this input data is from
@@ -69,7 +69,7 @@ class KetamaDistributorTest extends WordSpec {
           8796093022208L -> 3,
           4312515125124L -> 2,
           -8192481414141L -> 1,
-          -9515121512312L -> 5
+          -9515121512312L -> 5,
       )
 
       knownGoodValues foreach {

@@ -92,7 +92,7 @@ object SimpleColorfulCircles extends JFXApp {
       at(40 s) {
         Set(
             circle.centerX -> random * 800,
-            circle.centerY -> random * 600
+            circle.centerY -> random * 600,
         )
       }
   }.play()

@@ -102,7 +102,7 @@ class HttpEventStreamActorTest
       Props(new HttpEventStreamHandleActor(handle, stream, 1))
     streamActor = TestActorRef(
         Props(
-            new HttpEventStreamActor(leaderInfo, metrics, handleStreamProps)
+            new HttpEventStreamActor(leaderInfo, metrics, handleStreamProps),
         ))
   }
 }

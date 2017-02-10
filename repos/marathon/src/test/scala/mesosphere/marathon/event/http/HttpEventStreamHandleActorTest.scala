@@ -71,7 +71,7 @@ class HttpEventStreamHandleActorTest
     }
     handleActor = TestActorRef(
         Props(
-            new HttpEventStreamHandleActor(handle, stream, 50)
+            new HttpEventStreamHandleActor(handle, stream, 50),
         ))
     val attached = EventStreamAttached("remote")
     val detached = EventStreamDetached("remote")
@@ -104,7 +104,7 @@ class HttpEventStreamHandleActorTest
     stream = mock[EventStream]
     handleActor = TestActorRef(
         Props(
-            new HttpEventStreamHandleActor(handle, stream, 1)
+            new HttpEventStreamHandleActor(handle, stream, 1),
         ))
   }
 }

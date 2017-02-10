@@ -118,8 +118,8 @@ abstract class TreeBuilder {
             If(
                 Apply(Select(catchFn, nme.isDefinedAt), List(Ident(binder))),
                 Apply(Select(catchFn, nme.apply), List(Ident(binder))),
-                Throw(Ident(binder))
-            )
+                Throw(Ident(binder)),
+            ),
         ))
     makeCaseDef(pat, EmptyTree, body)
   }

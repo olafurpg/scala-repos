@@ -62,7 +62,7 @@ private[stat] sealed trait StreamingTestMethod extends Serializable {
         summaryStats.count,
         summaryStats.max,
         summaryStats.min,
-        summaryStats.mean * summaryStats.count
+        summaryStats.mean * summaryStats.count,
     )
   }
 }
@@ -104,7 +104,7 @@ private[stat] object WelchTTest extends StreamingTestMethod with Logging {
         welchDF(statsA, statsB),
         tTester.get.t(statsA, statsB),
         methodName,
-        nullHypothesis
+        nullHypothesis,
     )
   }
 }
@@ -137,7 +137,7 @@ private[stat] object StudentTTest extends StreamingTestMethod with Logging {
         studentDF(statsA, statsB),
         tTester.get.homoscedasticT(statsA, statsB),
         methodName,
-        nullHypothesis
+        nullHypothesis,
     )
   }
 }

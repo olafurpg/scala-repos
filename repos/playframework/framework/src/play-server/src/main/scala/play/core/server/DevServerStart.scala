@@ -220,7 +220,7 @@ object DevServerStart {
               .asInstanceOf[Option[Result]]
               .orElse(
                   currentWebCommands.flatMap(
-                      _.handleWebCommand(request, buildLink, path))
+                      _.handleWebCommand(request, buildLink, path)),
               )
           }
         }
@@ -237,7 +237,7 @@ object DevServerStart {
                   classLoader,
                   System.getProperties,
                   dirAndDevSettings,
-                  allowMissingApplicationConf = true)
+                  allowMissingApplicationConf = true),
         )
 
         // We *must* use a different Akka configuration in dev mode, since loading two actor systems from the same

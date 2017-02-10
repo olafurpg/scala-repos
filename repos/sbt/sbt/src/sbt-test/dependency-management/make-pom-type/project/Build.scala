@@ -7,7 +7,7 @@ object build extends Build {
       organization := "org.example",
       version := "1.0",
       scalaVersion := "2.9.2",
-      autoScalaLibrary := false
+      autoScalaLibrary := false,
   )
 
   lazy val p1 =

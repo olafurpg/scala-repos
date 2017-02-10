@@ -53,7 +53,7 @@ object ServerConfig {
         configuration = Configuration.load(classLoader,
                                            properties,
                                            rootDirConfig(rootDir),
-                                           mode == Mode.Test)
+                                           mode == Mode.Test),
     )
   }
 

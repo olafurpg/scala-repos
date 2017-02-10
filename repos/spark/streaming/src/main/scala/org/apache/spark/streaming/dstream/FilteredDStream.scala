@@ -24,7 +24,7 @@ import org.apache.spark.streaming.{Duration, Time}
 
 private[streaming] class FilteredDStream[T : ClassTag](
     parent: DStream[T],
-    filterFunc: T => Boolean
+    filterFunc: T => Boolean,
 )
     extends DStream[T](parent.ssc) {
 

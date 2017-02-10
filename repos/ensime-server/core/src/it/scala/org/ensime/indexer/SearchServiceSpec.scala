@@ -68,7 +68,7 @@ class SearchServiceSpec
           "String",
           "string",
           "j.l.str",
-          "j l str"
+          "j l str",
       )
   }
 
@@ -79,7 +79,7 @@ class SearchServiceSpec
           "FunSuite",
           "funsuite",
           "funsu",
-          "o s Fun"
+          "o s Fun",
       )
   }
 
@@ -87,12 +87,12 @@ class SearchServiceSpec
     implicit service =>
       searchesClasses(
           "org.example.Bloo",
-          "o e bloo"
+          "o e bloo",
       )
 
       searchesClasses(
           "org.example.Blue$",
-          "o e blue"
+          "o e blue",
       )
 
       searchesClasses(
@@ -109,12 +109,12 @@ class SearchServiceSpec
     implicit service =>
       searchClasses(
           "org.example.Blip$",
-          "Blip"
+          "Blip",
       )
 
       searchClasses(
           "org.example.Blop",
-          "Blop"
+          "Blop",
       )
   }
 
@@ -125,7 +125,7 @@ class SearchServiceSpec
           "String",
           "string",
           "j.l.str",
-          "j l str"
+          "j l str",
       )
     }
   }
@@ -135,14 +135,14 @@ class SearchServiceSpec
       searchesEmpty(
           "CASE_INSENSITIVE",
           "case_insensitive",
-          "case_"
+          "case_",
       )
   }
 
   it should "not return results from instance fields" in withSearchService {
     implicit service =>
       searchesEmpty(
-          "java.awt.Point.x"
+          "java.awt.Point.x",
       )
   }
 
@@ -150,7 +150,7 @@ class SearchServiceSpec
     implicit service =>
       searchesClassesAndMethods(
           "java.lang.Runtime.addShutdownHook",
-          "addShutdownHook"
+          "addShutdownHook",
       )
   }
 
@@ -159,7 +159,7 @@ class SearchServiceSpec
       searchesClassesAndMethods(
           "java.lang.Runtime.availableProcessors",
           "availableProcessors",
-          "availableP"
+          "availableP",
       )
   }
 
@@ -173,7 +173,7 @@ class SearchServiceSpec
               "org.example2.Baz$Wibble$baz$",
               "org.example2.Baz$Wibble$",
               "org.example2.Baz$",
-              "org.example2.Baz$Wibble"
+              "org.example2.Baz$Wibble",
           ))
       hits.head shouldBe "org.example2.Baz"
   }

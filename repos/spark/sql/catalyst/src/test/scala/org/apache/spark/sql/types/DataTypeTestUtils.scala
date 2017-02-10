@@ -29,7 +29,7 @@ object DataTypeTestUtils {
       ByteType,
       ShortType,
       IntegerType,
-      LongType
+      LongType,
   )
 
   /**
@@ -41,7 +41,7 @@ object DataTypeTestUtils {
       DecimalType(20, 5),
       DecimalType.SYSTEM_DEFAULT,
       DoubleType,
-      FloatType
+      FloatType,
   )
 
   /**
@@ -80,7 +80,7 @@ object DataTypeTestUtils {
         BooleanType,
         DateType,
         StringType,
-        TimestampType
+        TimestampType,
     )
 
   /**

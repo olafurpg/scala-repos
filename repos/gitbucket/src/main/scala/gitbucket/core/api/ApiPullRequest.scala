@@ -49,7 +49,7 @@ object ApiPullRequest {
       mergeable = None, // TODO: need check mergeable.
       title = issue.title,
       body = issue.content.getOrElse(""),
-      user = user
+      user = user,
   )
 
   case class Commit(sha: String, ref: String, repo: ApiRepository)(

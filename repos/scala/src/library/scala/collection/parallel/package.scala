@@ -154,7 +154,7 @@ package parallel {
           throwables
             .map(t =>
                   t + "\n" + t.getStackTrace.take(10).++("...").mkString("\n"))
-            .mkString("\n\n")
+            .mkString("\n\n"),
         )
 
   /** A helper iterator for iterating very small array buffers.
@@ -180,7 +180,7 @@ package parallel {
         val divsz = (until - index) / 2
         Seq(
             new BufferSplitter(buffer, index, index + divsz, signalDelegate),
-            new BufferSplitter(buffer, index + divsz, until, signalDelegate)
+            new BufferSplitter(buffer, index + divsz, until, signalDelegate),
         )
       } else Seq(this)
     private[parallel] override def debugInformation = {

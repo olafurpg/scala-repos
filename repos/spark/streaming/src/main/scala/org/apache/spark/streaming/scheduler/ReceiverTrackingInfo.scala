@@ -53,6 +53,6 @@ private[streaming] case class ReceiverTrackingInfo(
       executorId = runningExecutor.map(_.executorId).getOrElse(""),
       lastErrorMessage = errorInfo.map(_.lastErrorMessage).getOrElse(""),
       lastError = errorInfo.map(_.lastError).getOrElse(""),
-      lastErrorTime = errorInfo.map(_.lastErrorTime).getOrElse(-1L)
+      lastErrorTime = errorInfo.map(_.lastErrorTime).getOrElse(-1L),
   )
 }

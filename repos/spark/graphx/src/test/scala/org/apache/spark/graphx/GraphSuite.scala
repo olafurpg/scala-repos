@@ -202,12 +202,12 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val vertices = sc.parallelize(Array[(Long, Option[java.lang.Integer])](
               (1L, Some(1)),
               (2L, Some(2)),
-              (3L, Some(3))
+              (3L, Some(3)),
           ))
       val edges = sc.parallelize(Array(
               Edge(1L, 2L, 0),
               Edge(2L, 3L, 0),
-              Edge(3L, 1L, 0)
+              Edge(3L, 1L, 0),
           ))
       val graph0 = Graph(vertices, edges)
       // Trigger initial vertex replication
@@ -302,7 +302,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val subgraph = graph
         .subgraph(
             e => e.dstId != 4L,
-            (vid, vdata) => vid != 3L
+            (vid, vdata) => vid != 3L,
         )
         .mapVertices((vid, vdata) => -1)
         .mapEdges(e => -1)

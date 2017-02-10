@@ -16,7 +16,7 @@ import org.ensime.core._
 class ConnectionHandler(
     project: ActorRef,
     broadcaster: ActorRef,
-    target: ActorRef
+    target: ActorRef,
 )
     extends Actor with ActorLogging {
 
@@ -51,6 +51,6 @@ object ConnectionHandler {
   def apply(
       project: ActorRef,
       broadcaster: ActorRef,
-      target: ActorRef
+      target: ActorRef,
   ): Props = Props(classOf[ConnectionHandler], project, broadcaster, target)
 }

@@ -56,7 +56,7 @@ class MarathonSchedulerTest
         config,
         new SchedulerCallbacks {
           override def disconnected(): Unit = {}
-        }
+        },
     ) {
       override protected def suicide(removeFrameworkId: Boolean): Unit = {
         suicideFn(removeFrameworkId)

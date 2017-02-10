@@ -18,7 +18,7 @@ trait Bifoldable[F[_, _]] extends Any with Serializable { self =>
       f: A => C, g: B => C)(implicit C: Monoid[C]): C =
     bifoldLeft(fab, C.empty)(
         (c: C, a: A) => C.combine(c, f(a)),
-        (c: C, b: B) => C.combine(c, g(b))
+        (c: C, b: B) => C.combine(c, g(b)),
     )
 
   def compose[G[_, _]](implicit ev: Bifoldable[G])
@@ -42,13 +42,13 @@ trait CompositeBifoldable[F[_, _], G[_, _]]
       fab: F[G[A, B], G[A, B]], c: C)(f: (C, A) => C, g: (C, B) => C): C =
     F.bifoldLeft(fab, c)(
         (c: C, gab: G[A, B]) => G.bifoldLeft(gab, c)(f, g),
-        (c: C, gab: G[A, B]) => G.bifoldLeft(gab, c)(f, g)
+        (c: C, gab: G[A, B]) => G.bifoldLeft(gab, c)(f, g),
     )
 
   def bifoldRight[A, B, C](fab: F[G[A, B], G[A, B]], c: Eval[C])(
       f: (A, Eval[C]) => Eval[C], g: (B, Eval[C]) => Eval[C]): Eval[C] =
     F.bifoldRight(fab, c)(
         (gab: G[A, B], c: Eval[C]) => G.bifoldRight(gab, c)(f, g),
-        (gab: G[A, B], c: Eval[C]) => G.bifoldRight(gab, c)(f, g)
+        (gab: G[A, B], c: Eval[C]) => G.bifoldRight(gab, c)(f, g),
     )
 }

@@ -30,7 +30,7 @@ trait NamedCometActorTrait extends BaseCometActor with Loggable {
     NamedCometListener
       .getOrAddDispatchersFor(name)
       .foreach(
-          dispatcher => dispatcher ! registerCometActor(this, name)
+          dispatcher => dispatcher ! registerCometActor(this, name),
       )
     super.localSetup()
   }
@@ -42,7 +42,7 @@ trait NamedCometActorTrait extends BaseCometActor with Loggable {
     NamedCometListener
       .getOrAddDispatchersFor(name)
       .foreach(
-          dispatcher => dispatcher ! unregisterCometActor(this)
+          dispatcher => dispatcher ! unregisterCometActor(this),
       )
     super.localShutdown()
   }

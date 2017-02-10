@@ -226,7 +226,7 @@ class KafkaController(val config: KafkaConfig,
       "ActiveControllerCount",
       new Gauge[Int] {
         def value() = if (isActive) 1 else 0
-      }
+      },
   )
 
   newGauge(
@@ -241,7 +241,7 @@ class KafkaController(val config: KafkaConfig,
                         p._2.leaderAndIsr.leader))
           }
         }
-      }
+      },
   )
 
   newGauge(
@@ -260,7 +260,7 @@ class KafkaController(val config: KafkaConfig,
               }
           }
         }
-      }
+      },
   )
 
   def epoch = controllerContext.epoch

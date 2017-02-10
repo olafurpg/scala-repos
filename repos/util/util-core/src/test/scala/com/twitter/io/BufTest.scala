@@ -20,7 +20,7 @@ class BufTest
       Charsets.Utf8,
       Charsets.Utf16,
       Charsets.Utf16BE,
-      Charsets.Utf16LE
+      Charsets.Utf16LE,
   )
 
   test("Buf.ByteArray.slice") {

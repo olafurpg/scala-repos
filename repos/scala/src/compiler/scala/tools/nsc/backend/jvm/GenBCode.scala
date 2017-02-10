@@ -100,7 +100,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
      */
     case class SubItem3(
         jclassName: String,
-        jclassBytes: Array[Byte]
+        jclassBytes: Array[Byte],
     )
 
     case class Item3(arrivalPos: Int,
@@ -164,7 +164,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
             reporter.warning(
                 claszSymbol.pos,
                 s"Class ${claszSymbol.javaClassName} differs only in case from ${dupClassSym.javaClassName}. " +
-                "Such classes will overwrite one another on case-insensitive filesystems."
+                "Such classes will overwrite one another on case-insensitive filesystems.",
             )
         }
 
@@ -199,7 +199,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
                 claszSymbol,
                 cunit,
                 fieldSymbols(claszSymbol),
-                methodSymbols(cd)
+                methodSymbols(cd),
             )
           } else null
 

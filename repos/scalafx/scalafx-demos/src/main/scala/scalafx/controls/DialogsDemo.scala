@@ -60,7 +60,7 @@ object DialogsDemo extends JFXApp {
             button("Confirmation Dialog with Custom Actions",
                    confirmationWithCustomActions),
             button("Text Input", textInputDialog),
-            button("Choice", choiceDialog)
+            button("Choice", choiceDialog),
         )
         spacing = 6
         padding = Insets(10)

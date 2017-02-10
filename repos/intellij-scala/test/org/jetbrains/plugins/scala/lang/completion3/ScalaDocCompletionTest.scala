@@ -48,7 +48,7 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       |  */
       | def f(i: Int) { }
       """,
-        "param"
+        "param",
     )
   }
 
@@ -66,7 +66,7 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       |  */
       | def f(param: String) {}
       """,
-        "param"
+        "param",
     )
   }
 
@@ -85,7 +85,7 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       |  */
       """,
         (al: LookupElement) =>
-          al.getObject.asInstanceOf[PsiClass].qualifiedName == "java.util.HashMap"
+          al.getObject.asInstanceOf[PsiClass].qualifiedName == "java.util.HashMap",
     )
   }
 
@@ -105,7 +105,7 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       | */
       | def f(iii: Int, ikk: Int) {}
       """,
-        "ikk"
+        "ikk",
     )
   }
 }

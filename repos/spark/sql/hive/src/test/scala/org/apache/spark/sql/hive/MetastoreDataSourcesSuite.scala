@@ -711,7 +711,7 @@ class MetastoreDataSourcesSuite
                 outputFormat = None,
                 serde = None,
                 serdeProperties = Map("path" -> sessionState.catalog
-                        .hiveDefaultTableFilePath(TableIdentifier(tableName)))
+                        .hiveDefaultTableFilePath(TableIdentifier(tableName))),
             ),
           properties = Map("spark.sql.sources.provider" -> "json",
                            "spark.sql.sources.schema" -> schema.json,

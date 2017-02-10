@@ -44,7 +44,7 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
 
       val server = NettyServer.fromRouter(ServerConfig(
               port = Some(19000),
-              address = "127.0.0.1"
+              address = "127.0.0.1",
           )) {
         case GET(p"/hello/$to") =>
           Action {

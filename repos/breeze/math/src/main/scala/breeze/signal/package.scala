@@ -67,14 +67,14 @@ package object signal {
             DenseVector.tabulate(0 to windowLength / 2 - 1)(
                 (i: Int) => i.toDouble * realFs / windowLength.toDouble),
             DenseVector.tabulate(-windowLength / 2 to -1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble)
+                (i: Int) => i.toDouble * realFs / windowLength.toDouble),
         )
       } else {
         DenseVector.vertcat(
             DenseVector.tabulate(0 to (windowLength - 1) / 2)(
                 (i: Int) => i.toDouble * realFs / windowLength.toDouble),
             DenseVector.tabulate(-(windowLength - 1) / 2 to -1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble)
+                (i: Int) => i.toDouble * realFs / windowLength.toDouble),
         )
       }
     if (shifted) fourierShift(shiftedFreq) else shiftedFreq
@@ -97,7 +97,7 @@ package object signal {
       range: OptRange = OptRange.All,
       overhang: OptOverhang = OptOverhang.None,
       padding: OptPadding = OptPadding.Zero,
-      method: OptMethod = OptMethod.Automatic
+      method: OptMethod = OptMethod.Automatic,
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
     canConvolve(
         data, kernel, range, correlate = false, overhang, padding, method)
@@ -113,7 +113,7 @@ package object signal {
       range: OptRange = OptRange.All,
       overhang: OptOverhang = OptOverhang.None,
       padding: OptPadding = OptPadding.Zero,
-      method: OptMethod = OptMethod.Automatic
+      method: OptMethod = OptMethod.Automatic,
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
     canConvolve(
         data, kernel, range, correlate = true, overhang, padding, method)

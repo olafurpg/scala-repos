@@ -50,7 +50,7 @@ private[streaming] class PIDRateEstimator(
     proportional: Double,
     integral: Double,
     derivative: Double,
-    minRate: Double
+    minRate: Double,
 )
     extends RateEstimator with Logging {
 

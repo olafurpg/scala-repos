@@ -60,7 +60,7 @@ object QaQuestion extends QaController {
           data =>
             api.question.create(data, me) map { q =>
               Redirect(routes.QaQuestion.show(q.id, q.slug))
-          }
+          },
       )
     } else renderN00b
   }
@@ -80,7 +80,7 @@ object QaQuestion extends QaController {
             api.question.edit(data, q.id) map {
               case None => NotFound
               case Some(q2) => Redirect(routes.QaQuestion.show(q2.id, q2.slug))
-          }
+          },
       )
     }
   }
@@ -101,7 +101,7 @@ object QaQuestion extends QaController {
             case Some(vote) =>
               Ok(html.qa.vote(routes.QaQuestion.vote(id).url, vote))
             case None => NotFound
-        }
+        },
     )
   }
 

@@ -16,7 +16,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
                                     Map("" -> classOf[PPreparator1]),
                                     Map(
                                         "PAlgo2" -> classOf[PAlgo2],
-                                        "PAlgo3" -> classOf[PAlgo3]
+                                        "PAlgo3" -> classOf[PAlgo3],
                                     ),
                                     Map("" -> classOf[LServing1]))
 
@@ -29,7 +29,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
         algorithmParamsList = Seq(
               ("PAlgo2", PAlgo2.Params(20)),
               ("PAlgo2", PAlgo2.Params(21)),
-              ("PAlgo3", PAlgo3.Params(22))
+              ("PAlgo3", PAlgo3.Params(22)),
           ),
         servingParams = LServing1.Params(3))
 
@@ -70,7 +70,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
                     pPs shouldBe Seq(
                         Prediction(id = 20, q = q, models = Some(model0)),
                         Prediction(id = 21, q = q, models = Some(model1)),
-                        Prediction(id = 22, q = q, models = Some(model2))
+                        Prediction(id = 22, q = q, models = Some(model2)),
                     )
                   }
               }

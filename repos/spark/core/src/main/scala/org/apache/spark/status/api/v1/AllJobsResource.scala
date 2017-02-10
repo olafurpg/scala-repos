@@ -57,7 +57,7 @@ private[v1] object AllJobsResource {
       Seq(
           JobExecutionStatus.RUNNING -> ui.jobProgressListener.activeJobs.values.toSeq,
           JobExecutionStatus.SUCCEEDED -> ui.jobProgressListener.completedJobs.toSeq,
-          JobExecutionStatus.FAILED -> ui.jobProgressListener.failedJobs.reverse.toSeq
+          JobExecutionStatus.FAILED -> ui.jobProgressListener.failedJobs.reverse.toSeq,
       )
     }
     statusToJobs
@@ -91,7 +91,7 @@ private[v1] object AllJobsResource {
           numActiveStages = job.numActiveStages,
           numCompletedStages = job.completedStageIndices.size,
           numSkippedStages = job.numSkippedStages,
-          numFailedStages = job.numFailedStages
+          numFailedStages = job.numFailedStages,
       )
     }
   }

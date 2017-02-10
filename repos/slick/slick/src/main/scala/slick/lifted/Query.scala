@@ -436,8 +436,8 @@ object TableQueryMacroImpl {
                         EmptyTree)),
             Apply(
                 Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
-                List(Ident(TermName("tag")))
-            )
+                List(Ident(TermName("tag"))),
+            ),
         ))
     reify { TableQuery.apply[E](cons.splice) }
   }

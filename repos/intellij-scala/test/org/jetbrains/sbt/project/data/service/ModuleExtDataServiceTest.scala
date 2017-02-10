@@ -76,7 +76,7 @@ class ModuleExtDataServiceTest
         "-no-specialization",
         "-unchecked",
         "-nowarn",
-        "-XmyCoolAdditionalOption"
+        "-XmyCoolAdditionalOption",
     )
 
     importProjectData(generateScalaProject("2.11.5", Some("2.11.5"), options))
@@ -158,7 +158,7 @@ class ModuleExtDataServiceTest
         "-deprecation",
         "-target",
         "1.8",
-        "-Werror"
+        "-Werror",
     )
     importProjectData(generateJavaProject(None, options))
 

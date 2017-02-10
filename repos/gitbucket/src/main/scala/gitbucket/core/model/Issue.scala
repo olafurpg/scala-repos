@@ -65,5 +65,5 @@ case class Issue(
     closed: Boolean,
     registeredDate: java.util.Date,
     updatedDate: java.util.Date,
-    isPullRequest: Boolean
+    isPullRequest: Boolean,
 )

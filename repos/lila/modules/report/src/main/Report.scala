@@ -56,6 +56,6 @@ object Report {
 
   private[report] lazy val tube = JsTube(
       (__.json update readDate('createdAt)) andThen Json.reads[Report],
-      Json.writes[Report] andThen (__.json update writeDate('createdAt))
+      Json.writes[Report] andThen (__.json update writeDate('createdAt)),
   )
 }

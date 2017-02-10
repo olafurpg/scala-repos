@@ -20,7 +20,7 @@ import java.util.{logging => javalog}
 
 class LazyLogRecord(
     level: javalog.Level,
-    messageGenerator: => AnyRef
+    messageGenerator: => AnyRef,
 )
     extends LogRecord(level, "") {
 

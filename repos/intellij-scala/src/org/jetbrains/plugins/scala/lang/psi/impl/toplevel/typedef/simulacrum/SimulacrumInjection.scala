@@ -119,7 +119,7 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                                     ScalaPsiElementFactory
                                       .createTypeParameterFromText(
                                         tpAdditional.get, source.getManager),
-                                    ScSubstitutor.empty
+                                    ScSubstitutor.empty,
                                 ))
                             Some(subst)
                           case _ => None

@@ -13,7 +13,7 @@ object SonatypeSupport {
   def sonatype(
       ghUser: String,
       ghRepo: String,
-      license: (String, URL)
+      license: (String, URL),
   ) = Seq(
       publishMavenStyle := true,
       publishArtifact in Test := false,
@@ -46,6 +46,6 @@ object SonatypeSupport {
         <developer>
           <id>$ghUser</id>
         </developer>
-      </developers>)
+      </developers>),
   )
 }

@@ -56,7 +56,7 @@ object Enumeratee2TTest extends SpecLite {
           middle3((8, 8)),
           middle3((8, 8)),
           middle3((8, 8)),
-          middle3((8, 8))
+          middle3((8, 8)),
       )
     }
   }
@@ -87,7 +87,7 @@ object Enumeratee2TTest extends SpecLite {
             (3, 4),
             (5, 2),
             (5, 3),
-            (5, 4)
+            (5, 4),
         ))
   }
 
@@ -116,7 +116,7 @@ object Enumeratee2TTest extends SpecLite {
     (List(
             (1, 1),
             (1, 1),
-            (1, 1)
+            (1, 1),
         ))
   }
 }

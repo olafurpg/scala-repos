@@ -128,7 +128,7 @@ class AkkaHttpServer(config: ServerConfig,
         request,
         taggedRequestHeader,
         requestBodySource,
-        handler
+        handler,
     )
     responseFuture
   }
@@ -142,7 +142,7 @@ class AkkaHttpServer(config: ServerConfig,
             EssentialAction(_ => Accumulator.done(futureResult)),
             Failure(
                 new Exception(
-                    "getHandler returned Result, but not Application"))
+                    "getHandler returned Result, but not Application")),
         )
       case Right((newRequestHeader, handler, newApp)) =>
         (

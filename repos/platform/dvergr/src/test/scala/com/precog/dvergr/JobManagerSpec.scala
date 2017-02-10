@@ -154,7 +154,7 @@ trait JobManagerSpec[M[+ _]] extends Specification {
       val data: JValue = JObject(
           List(
               JField("a", JArray(JString("a"), JNum(2))),
-              JField("b", JNum(1.675))
+              JField("b", JNum(1.675)),
           ))
 
       val job = jobs
@@ -307,7 +307,7 @@ trait JobManagerSpec[M[+ _]] extends Specification {
         JObject(
             List(
                 JField("name", JString(name)),
-                JField("message", JString(message))
+                JField("message", JString(message)),
             ))
 
       val m1 = jobs.addMessage(job.id, "chat", say("Tom", "Hello")).copoint

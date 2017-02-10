@@ -215,7 +215,7 @@ with AbstractTestConfigurationProducer {
         TestNodeProvider
           .getUTestLeftHandTestDefinition(element)
           .flatMap(getTestSuiteName)
-          .orNull
+          .orNull,
       )
     (containingObject, testName)
   }

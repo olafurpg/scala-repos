@@ -121,7 +121,7 @@ sealed trait Spool[+A] {
             .map {
               case (thisTail, thatTail) =>
                 thisTail.zip(thatTail)
-            }
+            },
         )
 
   /**

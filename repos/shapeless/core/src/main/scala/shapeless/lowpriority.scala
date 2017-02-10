@@ -73,7 +73,7 @@ class LowPriorityMacros(val c: whitebox.Context)
       case Some(tpe) =>
         c.inferImplicitValue(
             appliedType(strictTpe, appliedType(lowPriorityForTpe, tpe)),
-            silent = false
+            silent = false,
         )
 
         q"null: _root_.shapeless.LowPriority"
@@ -89,7 +89,7 @@ class LowPriorityMacros(val c: whitebox.Context)
             appliedType(
                 strictTpe,
                 appliedType(lowPriorityForIgnoringTpe, weakTypeOf[T], tpe)),
-            silent = false
+            silent = false,
         )
 
         q"null: _root_.shapeless.LowPriority.Ignoring[${weakTypeOf[T]}]"

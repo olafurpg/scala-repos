@@ -98,7 +98,7 @@ object Configuration {
           directConfig,
           applicationConfig,
           playOverridesConfig,
-          referenceConfig
+          referenceConfig,
       ).reduceLeft(_ withFallback _)
 
       // Resolve settings. Among other things, the `play.server.dir` setting defined in directConfig will

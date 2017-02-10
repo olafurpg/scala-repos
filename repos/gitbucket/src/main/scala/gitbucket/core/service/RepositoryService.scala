@@ -151,7 +151,7 @@ trait RepositoryService { self: AccountService =>
                         .title)
                   .get
                   .milestoneId
-              }
+              },
           )
         }: _*)
 
@@ -197,7 +197,7 @@ trait RepositoryService { self: AccountService =>
                   x.copy(
                       labelId = newLabelMap(oldLabelMap(x.labelId)),
                       userName = newUserName,
-                      repositoryName = newRepositoryName
+                      repositoryName = newRepositoryName,
                 )): _*)
 
         if (account.isGroupAccount) {
@@ -234,7 +234,7 @@ trait RepositoryService { self: AccountService =>
                     .replace(s"[issue:${oldUserName}/${oldRepositoryName}#",
                              s"[issue:${newUserName}/${newRepositoryName}#")
                     .replace(s"[commit:${oldUserName}/${oldRepositoryName}@",
-                             s"[commit:${newUserName}/${newRepositoryName}@")
+                             s"[commit:${newUserName}/${newRepositoryName}@"),
                 )
         }
       }
@@ -323,7 +323,7 @@ trait RepositoryService { self: AccountService =>
           getForkedCount(
               repository.originUserName.getOrElse(repository.userName),
               repository.originRepositoryName
-                .getOrElse(repository.repositoryName)
+                .getOrElse(repository.repositoryName),
           ),
           getRepositoryManagers(repository.userName))
     }
@@ -373,7 +373,7 @@ trait RepositoryService { self: AccountService =>
           getForkedCount(
               repository.originUserName.getOrElse(repository.userName),
               repository.originRepositoryName.getOrElse(
-                  repository.repositoryName)
+                  repository.repositoryName),
           ),
           getRepositoryManagers(repository.userName))
     }
@@ -424,7 +424,7 @@ trait RepositoryService { self: AccountService =>
           getForkedCount(
               repository.originUserName.getOrElse(repository.userName),
               repository.originRepositoryName.getOrElse(
-                  repository.repositoryName)
+                  repository.repositoryName),
           ),
           getRepositoryManagers(repository.userName))
     }

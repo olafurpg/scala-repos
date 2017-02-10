@@ -32,7 +32,7 @@ object inv extends UFunc {
             ipiv,
             work /* workspace */,
             lwork /* workspace size */,
-            info
+            info,
         )
         assert(info.`val` >= 0,
                "Malformed argument %d (LAPACK)".format(-info.`val`))
@@ -62,7 +62,7 @@ object inv extends UFunc {
             ipiv,
             work /* workspace */,
             lwork /* workspace size */,
-            info
+            info,
         )
         assert(info.`val` >= 0,
                "Malformed argument %d (LAPACK)".format(-info.`val`))

@@ -138,7 +138,7 @@ class BytecodeTest extends ClearAfterClass {
                "scala/Predef$",
                "println",
                "(Ljava/lang/Object;)V",
-               false)
+               false),
     )
 
     val mainIns =

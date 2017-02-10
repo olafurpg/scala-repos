@@ -64,7 +64,7 @@ class MarathonSchedulerActorTest
     when(repo.allPathIds()).thenReturn(Future.successful(Seq(app.id)))
     when(taskTracker.tasksByApp()(any[ExecutionContext])).thenReturn(
         Future.successful(TaskTracker.TasksByApp.of(
-                TaskTracker.AppTasks("nope".toPath, tasks)))
+                TaskTracker.AppTasks("nope".toPath, tasks))),
     )
     when(repo.currentVersion(app.id)).thenReturn(Future.successful(Some(app)))
 
@@ -156,7 +156,7 @@ class MarathonSchedulerActorTest
         host = "",
         ipAddresses = Nil,
         ports = Nil,
-        version = app.version.toString
+        version = app.version.toString,
     )
 
     when(driver.killTask(taskA.taskId.mesosTaskId)).thenAnswer(
@@ -216,7 +216,7 @@ class MarathonSchedulerActorTest
         ipAddresses = Nil,
         ports = Nil,
         version = "",
-        timestamp = app.version.toString
+        timestamp = app.version.toString,
     )
 
     when(driver.killTask(taskA.taskId.mesosTaskId)).thenAnswer(
@@ -247,13 +247,13 @@ class MarathonSchedulerActorTest
         cmd = Some("cmd"),
         instances = 2,
         upgradeStrategy = UpgradeStrategy(0.5),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0))
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0)),
     )
     val origGroup = Group(PathId("/foo/bar"), Set(app))
 
     val appNew = app.copy(
         cmd = Some("cmd new"),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(1000))
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(1000)),
     )
 
     val targetGroup = Group(PathId("/foo/bar"), Set(appNew))
@@ -286,7 +286,7 @@ class MarathonSchedulerActorTest
         cmd = Some("cmd"),
         instances = 2,
         upgradeStrategy = UpgradeStrategy(0.5),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0))
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0)),
     )
     val taskA = MarathonTestHelper.runningTaskForApp(app.id)
     val origGroup = Group(PathId("/foo/bar"), Set(app))
@@ -315,8 +315,8 @@ class MarathonSchedulerActorTest
                 host = "",
                 ipAddresses = Nil,
                 ports = Nil,
-                version = app.version.toString
-            )
+                version = app.version.toString,
+            ),
         )
         Status.DRIVER_RUNNING
       }
@@ -346,7 +346,7 @@ class MarathonSchedulerActorTest
         cmd = Some("cmd"),
         instances = 2,
         upgradeStrategy = UpgradeStrategy(0.5),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0))
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0)),
     )
     val group = Group(PathId("/foo/bar"), Set(app))
 
@@ -383,7 +383,7 @@ class MarathonSchedulerActorTest
         cmd = Some("cmd"),
         instances = 2,
         upgradeStrategy = UpgradeStrategy(0.5),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0))
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(0)),
     )
     val group = Group(PathId("/foo/bar"), Set(app))
 
@@ -408,7 +408,7 @@ class MarathonSchedulerActorTest
             queue,
             holder,
             leaderInfo,
-            system.eventStream
+            system.eventStream,
         ))
 
     try {
@@ -483,8 +483,8 @@ class MarathonSchedulerActorTest
             holder,
             leaderInfo,
             system.eventStream,
-            cancellationTimeout = 0.seconds
-        )
+            cancellationTimeout = 0.seconds,
+        ),
     )
     try {
       schedulerActor ! LocalLeadershipEvent.ElectedAsLeader
@@ -591,7 +591,7 @@ class MarathonSchedulerActorTest
               schedulerActions,
               storage,
               hcManager,
-              system.eventStream
+              system.eventStream,
           ))
     historyActorProps = Props(
         new HistoryActor(system.eventStream, taskFailureEventRepository))
@@ -633,8 +633,8 @@ class MarathonSchedulerActorTest
             queue,
             holder,
             leaderInfo,
-            system.eventStream
-        )
+            system.eventStream,
+        ),
     )
   }
 

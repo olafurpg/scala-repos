@@ -486,7 +486,7 @@ object ScSimpleTypeElementImpl {
         }
       case superRef: ScSuperReference =>
         val template = superRef.drvTemplate.getOrElse(
-            return Failure("Cannot find enclosing container", Some(superRef))
+            return Failure("Cannot find enclosing container", Some(superRef)),
         )
         Success(ScThisType(template), Some(path))
     }

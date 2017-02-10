@@ -16,7 +16,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Array(1) $START==$END Array(1)",
         "Array(1) == Array(1)",
-        "Array(1) sameElements Array(1)"
+        "Array(1) sameElements Array(1)",
     )
   }
 
@@ -24,7 +24,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Array(1).${START}equals$END(Array(1))",
         "Array(1).equals(Array(1))",
-        "Array(1).sameElements(Array(1))"
+        "Array(1).sameElements(Array(1))",
     )
   }
 
@@ -32,7 +32,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Array(1).${START}equals$END(Seq(1))",
         "Array(1).equals(Seq(1))",
-        "Array(1).sameElements(Seq(1))"
+        "Array(1).sameElements(Seq(1))",
     )
   }
 
@@ -40,7 +40,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1) $START==$END Array(1)",
         "Seq(1) == Array(1)",
-        "Seq(1) sameElements Array(1)"
+        "Seq(1) sameElements Array(1)",
     )
   }
 
@@ -52,7 +52,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Array(1) $START!=$END Array(1)",
         "Array(1) != Array(1)",
-        "!(Array(1) sameElements Array(1))"
+        "!(Array(1) sameElements Array(1))",
     )
   }
 
@@ -60,7 +60,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Iterator(1) $START==$END Iterator(1)",
         "Iterator(1) == Iterator(1)",
-        "Iterator(1) sameElements Iterator(1)"
+        "Iterator(1) sameElements Iterator(1)",
     )
   }
 
@@ -68,7 +68,7 @@ class EqualityToSameElementsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Iterator(1) $START!=$END Iterator(1)",
         "Iterator(1) != Iterator(1)",
-        "!(Iterator(1) sameElements Iterator(1))"
+        "!(Iterator(1) sameElements Iterator(1))",
     )
   }
 }

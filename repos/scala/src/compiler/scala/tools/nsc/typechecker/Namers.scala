@@ -897,7 +897,7 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
           if (shouldWiden) tpe.widen
           else if (sym.isFinal)
             tpe // "final val" allowed to retain constant type
-          else tpe.deconst
+          else tpe.deconst,
       )
     }
 
@@ -1102,7 +1102,7 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
             tparamSyms, // deSkolemized symbols  -- TODO: check that their infos don't refer to method args?
             if (vparamSymss.isEmpty) NullaryMethodType(restpe)
             // vparamss refer (if they do) to skolemized tparams
-            else (vparamSymss :\ restpe)(makeMethodType)
+            else (vparamSymss :\ restpe)(makeMethodType),
         )
         res.substSym(tparamSkolems, tparamSyms)
       }
@@ -1299,7 +1299,7 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       }
       assert(
           !overrides || vparamss.length == baseParamss.length,
-          "" + meth.fullName + ", " + overridden.fullName
+          "" + meth.fullName + ", " + overridden.fullName,
       )
 
       // cache the namer used for entering the default getter symbols
@@ -1633,7 +1633,7 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
     }
     private val logDefinition = new LogTransitions[Symbol](
         sym => "[define] >> " + sym.flagString + " " + sym.fullLocationString,
-        sym => "[define] << " + sym
+        sym => "[define] << " + sym,
     )
     private def logAndValidate(sym: Symbol)(body: => Unit) {
       logDefinition(sym)(body)

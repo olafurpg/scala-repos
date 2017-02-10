@@ -57,7 +57,7 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
           createArray('id).as("arr"),
           array(array('id), createArray('id)).as("arr2"),
           lit("""{"f1": "1", "f2": "2", "f3": 3}""").as("json"),
-          'id
+          'id,
       )
       .write
       .saveAsTable("parquet_t3")
@@ -481,7 +481,7 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
       """.stripMargin,
         "a",
         "b",
-        "we`ird"
+        "we`ird",
     )
 
     checkColumnNames(
@@ -493,14 +493,14 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         "a",
         "a",
         "b",
-        "b"
+        "b",
     )
 
     // String literal
     checkColumnNames(
         "SELECT 'foo', '\"bar\\''",
         "foo",
-        "\"bar\'"
+        "\"bar\'",
     )
 
     // Numeric literals (should have CAST or suffixes in column names)
@@ -511,13 +511,13 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         "3",
         "4",
         "5.1",
-        "6.1"
+        "6.1",
     )
 
     // Aliases
     checkColumnNames(
         "SELECT 1 AS a",
-        "a"
+        "a",
     )
 
     // Complex type extractors
@@ -536,7 +536,7 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         "b[0].f1",
         "f1",
         "c[foo]",
-        "d[0]"
+        "d[0]",
     )
   }
 

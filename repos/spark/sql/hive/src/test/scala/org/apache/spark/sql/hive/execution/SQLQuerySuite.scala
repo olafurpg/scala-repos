@@ -384,7 +384,7 @@ class SQLQuerySuite
       "SPARK-4512 Fix attribute reference resolution error when using SORT BY") {
     checkAnswer(
         sql("SELECT * FROM (SELECT key + key AS a FROM src SORT BY value) t ORDER BY t.a"),
-        sql("SELECT key + key as a FROM src ORDER BY a").collect().toSeq
+        sql("SELECT key + key as a FROM src ORDER BY a").collect().toSeq,
     )
   }
 
@@ -742,7 +742,7 @@ class SQLQuerySuite
 
     checkAnswer(
         sql("SELECT * FROM nullValuesInInnerComplexTypes"),
-        Row(Row(null, null, null))
+        Row(Row(null, null, null)),
     )
 
     sql("DROP TABLE nullValuesInInnerComplexTypes")
@@ -824,7 +824,7 @@ class SQLQuerySuite
       sql(s"INSERT OVERWRITE TABLE explodeTest SELECT explode(a) AS val FROM data")
       checkAnswer(
           sql("SELECT key from explodeTest"),
-          (1 to 5).flatMap(i => Row(i) :: Row(i + 1) :: Nil)
+          (1 to 5).flatMap(i => Row(i) :: Row(i + 1) :: Nil),
       )
 
       sql("DROP TABLE explodeTest")
@@ -895,7 +895,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 10)
+        WindowData(6, "c", 10),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -910,7 +910,7 @@ class SQLQuerySuite
             ("b", 7, 15),
             ("b", 8, 15),
             ("c", 9, 19),
-            ("c", 10, 19)
+            ("c", 10, 19),
         ).map(i => Row(i._1, i._2, i._3)))
 
     checkAnswer(
@@ -924,7 +924,7 @@ class SQLQuerySuite
             ("b", 6, 15),
             ("b", 7, 15),
             ("c", 8, 19),
-            ("c", 9, 19)
+            ("c", 9, 19),
         ).map(i => Row(i._1, i._2, i._3)))
 
     checkAnswer(
@@ -938,7 +938,7 @@ class SQLQuerySuite
             ("b", 7, 7d / 15),
             ("b", 8, 8d / 15),
             ("c", 10, 10d / 19),
-            ("c", 9, 9d / 19)
+            ("c", 9, 9d / 19),
         ).map(i => Row(i._1, i._2, i._3)))
 
     checkAnswer(
@@ -952,7 +952,7 @@ class SQLQuerySuite
             ("b", 7, 7d / 13),
             ("b", 8, 8d / 13),
             ("c", 10, 10d / 17),
-            ("c", 9, 9d / 17)
+            ("c", 9, 9d / 17),
         ).map(i => Row(i._1, i._2, i._3)))
   }
 
@@ -963,7 +963,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 10)
+        WindowData(6, "c", 10),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -978,7 +978,7 @@ class SQLQuerySuite
             ("b", 2),
             ("b", 3),
             ("c", 2),
-            ("c", 3)
+            ("c", 3),
         ).map(i => Row(i._1, i._2)))
   }
 
@@ -989,7 +989,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 10)
+        WindowData(6, "c", 10),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -1004,7 +1004,7 @@ class SQLQuerySuite
             (3, "b", 7, 51),
             (4, "b", 8, 51),
             (5, "c", 9, 51),
-            (6, "c", 10, 51)
+            (6, "c", 10, 51),
         ).map(i => Row(i._1, i._2, i._3, i._4)))
 
     checkAnswer(sql("""
@@ -1018,7 +1018,7 @@ class SQLQuerySuite
                     (3, "b", 7, 16),
                     (4, "b", 8, 18),
                     (5, "c", 9, 9),
-                    (6, "c", 10, 10)
+                    (6, "c", 10, 10),
                 ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 
@@ -1029,7 +1029,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 10)
+        WindowData(6, "c", 10),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -1050,7 +1050,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 10)
+        WindowData(6, "c", 10),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -1066,7 +1066,7 @@ class SQLQuerySuite
             (3, "b", 1, 7),
             (4, "b", 0, 8),
             (5, "c", 1, 5),
-            (6, "c", 0, 6)
+            (6, "c", 0, 6),
         ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 
@@ -1105,7 +1105,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 11)
+        WindowData(6, "c", 11),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -1117,7 +1117,7 @@ class SQLQuerySuite
             (4, 8, 57),
             (5, 9, 57),
             (6, 11, 57),
-            (1, 10, 57)
+            (1, 10, 57),
         ).map(i => Row(i._1, i._2, i._3)))
 
     checkAnswer(
@@ -1131,7 +1131,7 @@ class SQLQuerySuite
             ("b", 3),
             ("c", 2),
             ("d", 2),
-            ("c", 3)
+            ("c", 3),
         ).map(i => Row(i._1, i._2)))
 
     checkAnswer(
@@ -1145,7 +1145,7 @@ class SQLQuerySuite
             ("b", 2),
             ("c", 1),
             ("d", 1),
-            ("c", 2)
+            ("c", 2),
         ).map(i => Row(i._1, i._2)))
 
     checkAnswer(
@@ -1159,7 +1159,7 @@ class SQLQuerySuite
             ("b", 0.4666666666666667),
             ("b", 0.5333333333333333),
             ("c", 0.45),
-            ("c", 0.55)
+            ("c", 0.55),
         ).map(i => Row(i._1, i._2)))
   }
 
@@ -1171,7 +1171,7 @@ class SQLQuerySuite
         WindowData(3, "b", 7),
         WindowData(4, "b", 8),
         WindowData(5, "c", 9),
-        WindowData(6, "c", 11)
+        WindowData(6, "c", 11),
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
@@ -1186,7 +1186,7 @@ class SQLQuerySuite
                     ("b", 51),
                     ("c", 51),
                     ("c", 51),
-                    ("d", 51)
+                    ("d", 51),
                 ).map(i => Row(i._1, i._2)))
   }
 
@@ -1377,7 +1377,7 @@ class SQLQuerySuite
           |select id, concat(year(datef))
           |from test_SPARK8588 where concat(year(datef), ' year') in ('2015 year', '2014 year')
         """.stripMargin),
-        Row(1, "2014") :: Row(2, "2015") :: Nil
+        Row(1, "2014") :: Row(2, "2015") :: Nil,
     )
     dropTempTable("test_SPARK8588")
   }
@@ -1458,7 +1458,7 @@ class SQLQuerySuite
       |from (select '{"layer1": {"layer2": "text inside layer 2"}}' json) test
       |lateral view json_tuple(json, 'layer1') insideLayer1 as json
       |lateral view json_tuple(insideLayer1.json, 'layer2') insideLayer2 as json
-    """.stripMargin
+    """.stripMargin,
     )
 
     checkAnswer(df, Row("text inside layer 2") :: Nil)
@@ -1744,7 +1744,7 @@ class SQLQuerySuite
             (500, null, 1),
             (84, 1, 0),
             (105, 2, 0),
-            (107, 4, 0)
+            (107, 4, 0),
         ).map(i => Row(i._1, i._2, i._3)))
   }
 
@@ -1765,7 +1765,7 @@ class SQLQuerySuite
             (1, 0, 100, 0),
             (1, 0, 140, 0),
             (1, 0, 145, 0),
-            (1, 0, 150, 0)
+            (1, 0, 150, 0),
         ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 
@@ -1786,7 +1786,7 @@ class SQLQuerySuite
             (1, 0, 100, 0),
             (1, 0, 140, 0),
             (1, 0, 145, 0),
-            (1, 0, 150, 0)
+            (1, 0, 150, 0),
         ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 
@@ -1799,7 +1799,7 @@ class SQLQuerySuite
             (500, null, 1),
             (84, 1, 0),
             (105, 2, 0),
-            (107, 4, 0)
+            (107, 4, 0),
         ).map(i => Row(i._1, i._2, i._3)))
   }
 
@@ -1820,7 +1820,7 @@ class SQLQuerySuite
             (1, null, 12, 2),
             (1, null, 14, 2),
             (1, null, 15, 2),
-            (1, null, 22, 2)
+            (1, null, 22, 2),
         ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 
@@ -1841,7 +1841,7 @@ class SQLQuerySuite
             (1, null, 12, 2),
             (1, null, 14, 2),
             (1, null, 15, 2),
-            (1, null, 22, 2)
+            (1, null, 22, 2),
         ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 

@@ -636,7 +636,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def htmlProperties: HtmlProperties = {
     session.map(_.requestHtmlProperties.is) openOr LiftRules.htmlProperties
       .vend(
-        S.request openOr Req.nil
+        S.request openOr Req.nil,
     )
   }
 
@@ -850,7 +850,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def addComet(cometActor: LiftCometActor): Unit = {
     requestCometVersions.set(
         requestCometVersions.is + CVP(cometActor.uniqueId,
-                                      cometActor.lastRenderTime)
+                                      cometActor.lastRenderTime),
     )
   }
 
@@ -870,7 +870,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       cometName: Box[String] = Empty,
       cometHtml: NodeSeq = NodeSeq.Empty,
       cometAttributes: Map[String, String] = Map.empty,
-      receiveUpdatesOnPage: Boolean = false
+      receiveUpdatesOnPage: Boolean = false,
   ): Box[LiftCometActor] = {
     for {
       session <- session ?~ "Comet lookup and creation requires a session."
@@ -898,7 +898,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       cometName: Box[String],
       cometHtml: NodeSeq,
       cometAttributes: Map[String, String],
-      receiveUpdatesOnPage: Boolean
+      receiveUpdatesOnPage: Boolean,
   )(implicit cometManifest: Manifest[T]): Box[T] = {
     for {
       session <- session ?~ "Comet lookup and creation requires a session."
@@ -963,13 +963,13 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                     cometVersions.toList.map {
                       case CometVersionPair(guid, version) =>
                         (guid, js.JE.Num(version))
-                    }: _*
+                    }: _*,
                 ),
                 // Don't kick off a new comet request client-side if we're responding
                 // to a comet request right now.
-                !currentCometActor.isDefined
+                !currentCometActor.isDefined,
             )
-            .cmd
+            .cmd,
         )
     } else {
       Nil
@@ -1130,7 +1130,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                         NamedPF
                           .applyBox((name, loc),
                                     LiftRules.resourceBundleFactories.toList)
-                          .map(List(_)) openOr Nil
+                          .map(List(_)) openOr Nil,
                   )))
           _resBundle.value
         }
@@ -1653,7 +1653,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     Box
       .legacyNullTest(_responseHeaders.value)
       .foreach(
-          rh => rh.headers = rh.headers + (name -> value)
+          rh => rh.headers = rh.headers + (name -> value),
       )
   }
 
@@ -1682,7 +1682,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
           rh =>
             rh.headers.iterator.toList ::: in.filter {
               case (n, v) => !rh.headers.contains(n)
-          }
+          },
       )
       .openOr(Nil)
   }
@@ -1702,7 +1702,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     Box
       .legacyNullTest(_responseHeaders.value)
       .map(
-          rh => Box(rh.headers.get(name))
+          rh => Box(rh.headers.get(name)),
       )
       .openOr(Empty)
   }
@@ -1736,7 +1736,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     Box
       .legacyNullTest(_responseHeaders.value)
       .foreach(
-          rh => rh.docType = what
+          rh => rh.docType = what,
       )
   }
 
@@ -1751,7 +1751,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     Box
       .legacyNullTest(_responseHeaders.value)
       .map(
-          rh => (rh.overrodeDocType, rh.docType)
+          rh => (rh.overrodeDocType, rh.docType),
       )
       .openOr((false, Empty))
 

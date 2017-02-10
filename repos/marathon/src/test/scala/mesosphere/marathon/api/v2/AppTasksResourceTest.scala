@@ -64,7 +64,7 @@ class AppTasksResourceTest
         task1.taskId.idString,
         scale = false,
         force = false,
-        auth.request
+        auth.request,
     )
     response.getStatus shouldEqual 200
     JsonTestHelper
@@ -95,7 +95,7 @@ class AppTasksResourceTest
           appId = appId,
           task = task,
           healthCheckResults = Seq(),
-          servicePorts = Seq()
+          servicePorts = Seq(),
       )
     }
     JsonTestHelper
@@ -334,7 +334,7 @@ class AppTasksResourceTest
         config,
         groupManager,
         auth.auth,
-        auth.auth
+        auth.auth,
     )
 
     config.zkTimeoutDuration returns 1.second
@@ -351,7 +351,7 @@ class AppTasksResourceTest
         config,
         groupManager,
         auth.auth,
-        auth.auth
+        auth.auth,
     )
   }
 }

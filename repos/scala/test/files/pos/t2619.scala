@@ -34,7 +34,7 @@ object ModuleAL extends ModuleType1 {
   def as = Nil
   def ms = List(
       ModuleAG,
-      ModuleAI
+      ModuleAI,
   )
 }
 object ModuleAM extends ModuleType1 {
@@ -42,7 +42,7 @@ object ModuleAM extends ModuleType1 {
   def ms =
     List(
         ModuleAL,
-        ModuleAE
+        ModuleAE,
     ) ::: List(ModuleAK)
 }
 object ModuleBE extends ModuleType1 {
@@ -69,7 +69,7 @@ object ModuleBL extends ModuleType1 {
   def as = Nil
   def ms = List(
       ModuleBG,
-      ModuleBI
+      ModuleBI,
   )
 }
 object ModuleBM extends ModuleType1 {
@@ -77,6 +77,6 @@ object ModuleBM extends ModuleType1 {
   def ms =
     List(
         ModuleBL,
-        ModuleBE
+        ModuleBE,
     ) ::: List(ModuleBK)
 }

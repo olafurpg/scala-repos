@@ -144,7 +144,7 @@ object WorksheetDiffSplitters {
                   (to + 1) * lineHeight1,
                   (offset + spaces - firstVisible2 + 1) * lineHeight2,
                   if (flag) COLOR1 else COLOR2,
-                  false
+                  false,
               )
           }
 

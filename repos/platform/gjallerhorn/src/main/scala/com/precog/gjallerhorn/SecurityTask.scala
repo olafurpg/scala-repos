@@ -113,7 +113,7 @@ class SecurityTask(settings: Settings)
                JString("read")),
               //(JString("/"),JArray(List(JString(accountId))),JString("reduce")),
               (JString(rootPath), JArray(Nil), JString("write")),
-              (JString(rootPath), JArray(Nil), JString("delete"))
+              (JString(rootPath), JArray(Nil), JString("delete")),
           )
       }
     }

@@ -32,7 +32,7 @@ class PhantomJSEnv(
     addArgs: Seq[String] = Seq.empty,
     addEnv: Map[String, String] = Map.empty,
     val autoExit: Boolean = true,
-    jettyClassLoader: ClassLoader = null
+    jettyClassLoader: ClassLoader = null,
 )
     extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
 
@@ -384,7 +384,7 @@ class PhantomJSEnv(
             |  }
             |
             |})();
-            |""".stripMargin
+            |""".stripMargin,
         ),
         new MemVirtualJSFile("scalaJSEnvInfo.js").withContent(
             """
@@ -396,7 +396,7 @@ class PhantomJSEnv(
             |    });
             |  }
             |};
-            """.stripMargin
+            """.stripMargin,
         )
         // scalastyle:on line.size.limit
     )

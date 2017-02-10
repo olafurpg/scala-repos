@@ -36,7 +36,7 @@ trait NullZooKeeperWriter extends ZooKeeperWriter with NullZooKeeperClient {
       path: String,
       data: Option[Buf],
       acl: Seq[Data.ACL],
-      createMode: CreateMode
+      createMode: CreateMode,
   ): Future[String] = Future.never
 
   def delete(path: String, version: Option[Int]): Future[Unit] = Future.never

@@ -66,7 +66,7 @@ object SerializersSpec extends Specification with PicklingTestUtils {
           notifyKey = "abcdefg",
           reloadKey = "hijklmnop",
           compileTimeout = 1000,
-          mainClass = "play.Server"
+          mainClass = "play.Server",
       )
       roundTrip(forkConfig)
     }

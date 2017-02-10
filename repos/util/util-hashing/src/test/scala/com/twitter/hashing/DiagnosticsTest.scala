@@ -23,7 +23,7 @@ class DiagnosticsTest extends WordSpec {
           "FNV1A_64" -> KeyHasher.FNV1A_64,
           "CRC32-ITU" -> KeyHasher.CRC32_ITU,
           "HSIEH" -> KeyHasher.HSIEH,
-          "JENKINS" -> KeyHasher.JENKINS
+          "JENKINS" -> KeyHasher.JENKINS,
       )
 
       val keys = (1 until 1000000).map(_.toString).toList

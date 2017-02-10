@@ -113,7 +113,7 @@ object Expressions {
           .rep(1)
           .map(_.mkString)
           .map(Ast.expr.Str) | NAME.map(
-            Ast.expr.Name(_, Ast.expr_context.Load)) | NUMBER
+            Ast.expr.Name(_, Ast.expr_context.Load)) | NUMBER,
     )
   }
   val list_contents = P(test.rep(1, ",") ~ ",".?)
@@ -152,7 +152,7 @@ object Expressions {
             lower,
             upper,
             step.map(_.getOrElse(Ast.expr.Name(Ast.identifier("None"),
-                                               Ast.expr_context.Load)))
+                                               Ast.expr_context.Load))),
         )
     }
     P(ellipses | multi | single)
@@ -167,10 +167,10 @@ object Expressions {
         (dict_item.rep(1, ",") ~ ",".?).map { x =>
           val (keys, values) = x.unzip
           Ast.expr.Dict(keys, values)
-        }
+        },
     )
     val dict_comp = P(
-        (dict_item ~ comp_for.rep(1)).map(Ast.expr.DictComp.tupled)
+        (dict_item ~ comp_for.rep(1)).map(Ast.expr.DictComp.tupled),
     )
     val set: P[Ast.expr.Set] = P(test.rep(1, ",") ~ ",".?).map(Ast.expr.Set)
     val set_comp = P(test ~ comp_for.rep(1)).map(Ast.expr.SetComp.tupled)

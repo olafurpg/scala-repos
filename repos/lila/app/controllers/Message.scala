@@ -61,7 +61,7 @@ object Message extends LilaController {
           },
           text =>
             api.makePost(thread, text, me) inject Redirect(
-                routes.Message.thread(thread.id) + "#bottom")
+                routes.Message.thread(thread.id) + "#bottom"),
       )
     }
   }

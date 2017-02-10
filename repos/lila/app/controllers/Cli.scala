@@ -10,7 +10,7 @@ object Cli extends LilaController {
   private lazy val form = Form(
       tuple(
           "command" -> nonEmptyText,
-          "password" -> nonEmptyText
+          "password" -> nonEmptyText,
       ))
 
   def command = OpenBody { implicit ctx =>

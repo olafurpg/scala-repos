@@ -107,7 +107,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(
         unionDF.agg(avg('key), max('key), min('key), sum('key)),
-        Row(50.5, 100, 1, 25250) :: Nil
+        Row(50.5, 100, 1, 25250) :: Nil,
     )
   }
 
@@ -128,7 +128,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
         df1.unionAll(df2).orderBy("label"),
         Seq(Row(1, new ExamplePoint(1.0, 2.0)),
-            Row(2, new ExamplePoint(3.0, 4.0)))
+            Row(2, new ExamplePoint(3.0, 4.0))),
     )
   }
 
@@ -158,7 +158,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
             word.split(" ").toSeq
           }
           .select('word),
-        Row("a") :: Row("b") :: Row("c") :: Row("d") :: Row("e") :: Nil
+        Row("a") :: Row("b") :: Row("c") :: Row("d") :: Row("e") :: Nil,
     )
   }
 
@@ -173,7 +173,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
           .select('_1 as 'letter, 'number)
           .groupBy('letter)
           .agg(countDistinct('number)),
-        Row("a", 3) :: Row("b", 2) :: Row("c", 1) :: Nil
+        Row("a", 3) :: Row("b", 2) :: Row("c", 1) :: Nil,
     )
   }
 
@@ -351,7 +351,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
     // SPARK-12340: overstep the bounds of Int in SparkPlan.executeTake
     checkAnswer(
         sqlContext.range(2).toDF().limit(2147483638),
-        Row(0) :: Row(1) :: Nil
+        Row(0) :: Row(1) :: Nil,
     )
   }
 
@@ -410,7 +410,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
         // SELECT *, foo(key, value) FROM testData
         testData.select($"*", foo('key, 'value)).limit(3),
-        Row(1, "1", "11") :: Row(2, "2", "22") :: Row(3, "3", "33") :: Nil
+        Row(1, "1", "11") :: Row(2, "2", "22") :: Row(3, "3", "33") :: Nil,
     )
   }
 
@@ -651,7 +651,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
   test("showString: array") {
     val df = Seq(
         (Array(1, 2, 3), Array(1, 2, 3)),
-        (Array(2, 3, 4), Array(2, 3, 4))
+        (Array(2, 3, 4), Array(2, 3, 4)),
     ).toDF()
     val expectedAnswer = """+---------+---------+
                            ||       _1|       _2|
@@ -668,7 +668,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
         ("12".getBytes(StandardCharsets.UTF_8),
          "ABC.".getBytes(StandardCharsets.UTF_8)),
         ("34".getBytes(StandardCharsets.UTF_8),
-         "12346".getBytes(StandardCharsets.UTF_8))
+         "12346".getBytes(StandardCharsets.UTF_8)),
     ).toDF()
     val expectedAnswer = """+-------+----------------+
                            ||     _1|              _2|
@@ -683,7 +683,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
   test("showString: minimum column width") {
     val df = Seq(
         (1, 1),
-        (2, 2)
+        (2, 2),
     ).toDF()
     val expectedAnswer = """+---+---+
                            || _1| _2|
@@ -746,14 +746,14 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
         sparkContext.makeRDD("""{"a.b": {"c": {"d..e": {"f": 1}}}}""" :: Nil))
     checkAnswer(
         df.select(df("`a.b`.c.`d..e`.`f`")),
-        Row(1)
+        Row(1),
     )
 
     val df2 = sqlContext.read.json(
         sparkContext.makeRDD("""{"a  b": {"c": {"d  e": {"f": 1}}}}""" :: Nil))
     checkAnswer(
         df2.select(df2("`a  b`.c.d  e.f")),
-        Row(1)
+        Row(1),
     )
 
     def checkError(testFun: => Unit): Unit = {
@@ -1109,7 +1109,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
     val union = df1.unionAll(df2)
     checkAnswer(
         union.filter('i < rand(7) * 10),
-        expected(union)
+        expected(union),
     )
     checkAnswer(
         union.select(rand(7)),
@@ -1121,19 +1121,19 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
               val rng =
                 new org.apache.spark.util.random.XORShiftRandom(7 + index)
               data.map(_ => rng.nextDouble()).map(i => Row(i))
-          }
+          },
       )
 
     val intersect = df1.intersect(df2)
     checkAnswer(
         intersect.filter('i < rand(7) * 10),
-        expected(intersect)
+        expected(intersect),
     )
 
     val except = df1.except(df2)
     checkAnswer(
         except.filter('i < rand(7) * 10),
-        expected(except)
+        expected(except),
     )
   }
 

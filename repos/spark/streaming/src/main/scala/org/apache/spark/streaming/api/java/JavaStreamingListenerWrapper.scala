@@ -38,7 +38,7 @@ private[streaming] class JavaStreamingListenerWrapper(
         receiverInfo.executorId,
         receiverInfo.lastErrorMessage,
         receiverInfo.lastError,
-        receiverInfo.lastErrorTime
+        receiverInfo.lastErrorTime,
     )
   }
 
@@ -48,7 +48,7 @@ private[streaming] class JavaStreamingListenerWrapper(
         streamInputInfo.inputStreamId,
         streamInputInfo.numRecords: Long,
         streamInputInfo.metadata.asJava,
-        streamInputInfo.metadataDescription.orNull
+        streamInputInfo.metadataDescription.orNull,
     )
   }
 
@@ -61,7 +61,7 @@ private[streaming] class JavaStreamingListenerWrapper(
         outputOperationInfo.description: String,
         outputOperationInfo.startTime.getOrElse(-1),
         outputOperationInfo.endTime.getOrElse(-1),
-        outputOperationInfo.failureReason.orNull
+        outputOperationInfo.failureReason.orNull,
     )
   }
 
@@ -80,7 +80,7 @@ private[streaming] class JavaStreamingListenerWrapper(
         batchInfo.numRecords,
         batchInfo.outputOperationInfos
           .mapValues(toJavaOutputOperationInfo(_))
-          .asJava
+          .asJava,
       )
   }
 

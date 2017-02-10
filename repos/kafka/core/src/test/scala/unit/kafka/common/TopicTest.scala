@@ -80,7 +80,7 @@ class TopicTest {
         "_start",
         "end_",
         "mid_dle",
-        "_ma_ny."
+        "_ma_ny.",
     )
 
     falseTopics.foreach(t => assertFalse(Topic.hasCollisionChars(t)))

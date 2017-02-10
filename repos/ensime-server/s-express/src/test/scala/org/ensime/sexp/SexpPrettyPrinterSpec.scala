@@ -27,7 +27,7 @@ class SexpPrettyPrinterSpec extends EnsimeSpec {
         SexpList(foo, SexpNumber(13), foosym),
         """("foo"
           |  13
-          |  foo)""".stripMargin
+          |  foo)""".stripMargin,
     )
   }
 
@@ -35,7 +35,7 @@ class SexpPrettyPrinterSpec extends EnsimeSpec {
     assertPrinter(
         SexpList(SexpList(foo), SexpList(foo)),
         """(("foo")
-          |  ("foo"))""".stripMargin
+          |  ("foo"))""".stripMargin,
     )
   }
 
@@ -45,13 +45,13 @@ class SexpPrettyPrinterSpec extends EnsimeSpec {
         """(
   :foo foo
   :bar foo
-)"""
+)""",
     )
 
     val datum = SexpData(fookey -> foo, barkey -> foo)
     assertPrinter(SexpData(
                       fookey -> datum,
-                      barkey -> datum
+                      barkey -> datum,
                   ),
                   """(
   :foo (

@@ -57,27 +57,27 @@ object JsonPerformanceTest extends App {
               "string",
               "string",
               "string",
-              "string"
+              "string",
           ),
           "f6" -> Json.obj(
               "f1" -> 10,
               "f2" -> 20,
               "f3" -> 30,
-              "f4" -> "string"
-          )
+              "f4" -> "string",
+          ),
       ),
       "f2" -> "string",
       "f3" -> "string",
       "f4" -> 10,
       "f5" -> true,
       "f6" -> false,
-      "f7" -> Json.arr(1, 2, 3, 4, 5, 6)
+      "f7" -> Json.arr(1, 2, 3, 4, 5, 6),
   )
 
   lazy val json = Json.stringify(jsvalue)
 
   lazy val largeArrayJsValue = Json.obj(
-      "f1" -> Json.toJson((1 to 65536))
+      "f1" -> Json.toJson((1 to 65536)),
   )
 
   lazy val largeArrayJson = Json.stringify(largeArrayJsValue)

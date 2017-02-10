@@ -48,7 +48,7 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
               _ => LiteralColumn[Option[Int]](None) === (None: Option[Int]))
           .map(_.id)
           .result
-          .map(_ shouldBe Nil)
+          .map(_ shouldBe Nil),
       )
   }
 
@@ -75,7 +75,7 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
         as.schema.create,
         as.map(_.a) ++= Seq(1, 2, 3),
         as.to[Set].result.map(_ shouldBe Set((1, 1), (2, 2), (3, 3))),
-        as.schema.drop
+        as.schema.drop,
     )
   }
 }

@@ -216,7 +216,7 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
         logWarning(
             "Time taken to find new files exceeds the batch size. " +
             "Consider increasing the batch size or reducing the number of " +
-            "files in the monitored directory."
+            "files in the monitored directory.",
         )
       }
       newFiles

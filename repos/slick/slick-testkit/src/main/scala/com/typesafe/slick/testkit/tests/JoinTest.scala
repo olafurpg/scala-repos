@@ -29,7 +29,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           (1, "Scala"),
           (2, "ScalaQuery"),
           (3, "Windows"),
-          (4, "Software")
+          (4, "Software"),
       )
       _ <- posts.map(p => (p.title, p.category)) ++= Seq(
           ("Test Post", -1),
@@ -37,7 +37,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           ("Efficient Parameterized Queries in ScalaQuery", 2),
           ("Removing Libraries and HomeGroup icons from the Windows 7 desktop",
            3),
-          ("A ScalaQuery Update", 2)
+          ("A ScalaQuery Update", 2),
       )
       // Implicit join
       q1 = (for {
@@ -139,7 +139,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           (((3, "b"), Some((3, "b"))), Some((2, "b"))),
           (((3, "b"), Some((3, "b"))), Some((3, "b"))),
           (((4, "c"), None), None),
-          (((5, "c"), None), None)
+          (((5, "c"), None), None),
       )
       // Right outer, lift primitive value
       q6 = (ys.map(_.b) joinRight xs.map(_.b) on (_ === _)).to[Set]
@@ -167,7 +167,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           (Some((2, "b")), (3, "b")),
           (Some((3, "b")), (3, "b")),
           (None, (4, "c")),
-          (None, (5, "c"))
+          (None, (5, "c")),
       )
       // Right outer, lift non-primitive value, then map to primitive
       q9 = (ys joinRight xs on (_.b === _.b)).map {
@@ -201,7 +201,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           (Some((Some((3, "b")), (3, "b"))), (2, "b")),
           (Some((Some((3, "b")), (3, "b"))), (3, "b")),
           (None, (4, "c")),
-          (None, (5, "c"))
+          (None, (5, "c")),
       )
       // Full outer, lift primitive values
       q11 = (xs.map(_.b) joinFull ys.map(_.b) on (_ === _)).to[Set]
@@ -224,7 +224,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           (Some((4, "c")), None),
           (Some((5, "c")), None),
           (None, Some((4, "d"))),
-          (None, Some((5, "d")))
+          (None, Some((5, "d"))),
       )
     } yield ()
   }
@@ -266,7 +266,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           (1, "Scala"),
           (3, "Windows"),
           (2, "ScalaQuery"),
-          (4, "Software")
+          (4, "Software"),
       )
       _ <- posts.map(p => (p.title, p.category)) ++= Seq(
           ("Test Post", -1),
@@ -274,7 +274,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           ("Efficient Parameterized Queries in ScalaQuery", 2),
           ("Removing Libraries and HomeGroup icons from the Windows 7 desktop",
            3),
-          ("A ScalaQuery Update", 2)
+          ("A ScalaQuery Update", 2),
       )
       q1 = for {
         (c, i) <- categories.sortBy(_.id).zipWithIndex
@@ -377,7 +377,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
           .named("q1")
           .map(_.toSet shouldBe Set((1, Some(1)), (2, Some(2)), (3, None))),
         q2.result.named("q2").map(_.toSet shouldBe Set((1, 1), (2, 2))),
-        q3.result.named("q3").map(_.toSet shouldBe Set((1, 1), (2, 2)))
+        q3.result.named("q3").map(_.toSet shouldBe Set((1, 1), (2, 2))),
     )
   }
 
@@ -405,7 +405,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
         as ++= Seq(1, 2, 3),
         bs ++= Seq(1, 2, 4, 5).map(Some.apply _),
         q1.result.map(_.toSet shouldBe Set(3)),
-        q2.result.map(_.toSet shouldBe Set(Some(4), Some(5)))
+        q2.result.map(_.toSet shouldBe Set(Some(4), Some(5))),
     )
   }
 }

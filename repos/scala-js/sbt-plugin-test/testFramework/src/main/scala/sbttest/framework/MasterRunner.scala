@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 final class MasterRunner(
     args: Array[String],
     remoteArgs: Array[String],
-    testClassLoader: ClassLoader
+    testClassLoader: ClassLoader,
 )
     extends BaseRunner(args, remoteArgs, testClassLoader) {
 

@@ -43,7 +43,7 @@ case class ZCount(key: ChannelBuffer, min: ZInterval, max: ZInterval)
             CommandBytes.ZCOUNT,
             key,
             StringToChannelBuffer(min.toString),
-            StringToChannelBuffer(max.toString)
+            StringToChannelBuffer(max.toString),
         ))
 }
 object ZCount {
@@ -396,7 +396,7 @@ sealed trait StrictZMembersCommand extends ZMembersCommand {
     members.map { member =>
       Seq(
           StringToBytes(member.score.toString),
-          member.member.array
+          member.member.array,
       )
     }.flatten
   }
@@ -404,7 +404,7 @@ sealed trait StrictZMembersCommand extends ZMembersCommand {
     members.map { member =>
       Seq(
           StringToChannelBuffer(member.score.toString),
-          member.member
+          member.member,
       )
     }.flatten
   }

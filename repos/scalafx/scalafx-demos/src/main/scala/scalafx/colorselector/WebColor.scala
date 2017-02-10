@@ -179,7 +179,7 @@ object WebColor {
       WebColor("WHITE", White),
       WebColor("WHITESMOKE", WhiteSmoke),
       WebColor("YELLOW", Yellow),
-      WebColor("YELLOWGREEN", YellowGreen)
+      WebColor("YELLOWGREEN", YellowGreen),
   )
 }
 

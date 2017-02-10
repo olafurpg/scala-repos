@@ -66,7 +66,7 @@ class MockLiftActorSpec extends Specification {
       mockActor.messages must_== List(
           MockSpecActorMessage3,
           MockSpecActorMessage2,
-          MockSpecActorMessage1
+          MockSpecActorMessage1,
       )
     }
   }
@@ -110,7 +110,7 @@ class MockLiftActorSpec extends Specification {
       mockActor.messages must_== List(
           MockSpecActorMessage3,
           MockSpecActorMessage2,
-          MockSpecActorMessage1
+          MockSpecActorMessage1,
       )
     }
   }

@@ -72,7 +72,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
             "playerInfo" -> playerInfoJson,
             "quote" -> tour.isCreated.option(lila.quote.Quote.one(tour.id)),
             "spotlight" -> tour.spotlight,
-            "socketVersion" -> socketVersion
+            "socketVersion" -> socketVersion,
         )
         .noNull
 
@@ -108,7 +108,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
                     "ratingDiff" -> player.ratingDiff,
                     "fire" -> player.fire,
                     "nb" -> sheetNbs(user.id, sheet, pairings),
-                    "performance" -> tpr
+                    "performance" -> tpr,
                 )
                 .noNull,
               "pairings" -> povs.map { pov =>
@@ -120,10 +120,10 @@ final class JsonView(getLightUser: String => Option[LightUser],
                                            pov.opponent.rating),
                       "win" -> pov.win,
                       "status" -> pov.game.status.id,
-                      "berserk" -> pov.player.berserk.option(true)
+                      "berserk" -> pov.player.berserk.option(true),
                   )
                   .noNull
-              }
+              },
           )
       }
 
@@ -173,7 +173,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
     } yield
       Json.obj(
           "page" -> page,
-          "players" -> rankedPlayers.map(playerJson(sheets, tour))
+          "players" -> rankedPlayers.map(playerJson(sheets, tour)),
       )
 
   private val firstPageCache = lila.memo.AsyncCache[String, JsObject](
@@ -207,7 +207,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
             "title" -> light.flatMap(_.title),
             "rating" -> rp.player.rating,
             "ratingDiff" -> rp.player.ratingDiff,
-            "berserk" -> p.berserk.option(true)
+            "berserk" -> p.berserk.option(true),
         )
         .noNull
     }
@@ -235,7 +235,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
       .obj(
           "name" -> light.map(_.name),
           "title" -> light.flatMap(_.title),
-          "rating" -> rating
+          "rating" -> rating,
       )
       .noNull
   }
@@ -268,7 +268,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
           "withdraw" -> p.withdraw.option(true),
           "score" -> p.score,
           "ratingDiff" -> p.ratingDiff,
-          "sheet" -> sheet.map(sheetJson)
+          "sheet" -> sheet.map(sheetJson),
       )
       .noNull
   }
@@ -329,7 +329,7 @@ object JsonView {
       Json
         .obj(
             "iconImg" -> s.iconImg,
-            "iconFont" -> s.iconFont
+            "iconFont" -> s.iconFont,
         )
         .noNull
     }

@@ -62,7 +62,7 @@ class MesosSchedulerUtilsSuite
   test("parse a non-empty constraint string correctly") {
     val expectedMap = Map(
         "tachyon" -> Set("true"),
-        "zone" -> Set("us-east-1a", "us-east-1b")
+        "zone" -> Set("us-east-1a", "us-east-1b"),
     )
     utils.parseConstraintString("tachyon:true;zone:us-east-1a,us-east-1b") should be(
         expectedMap)

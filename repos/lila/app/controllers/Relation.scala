@@ -31,15 +31,15 @@ object Relation extends LilaController {
                           html.relation.actions(userId,
                                                 relation = relation,
                                                 blocked = blocked,
-                                                followable = followable)
+                                                followable = followable),
                       ))),
             api = _ =>
                 fuccess(
                     Ok(Json.obj(
                             "followable" -> followable,
                             "following" -> relation.contains(true),
-                            "blocking" -> relation.contains(false)
-                        )))
+                            "blocking" -> relation.contains(false),
+                        ))),
         )
     }
 

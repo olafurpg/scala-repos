@@ -20,7 +20,7 @@ object ApplicationBuild extends Build {
         resolvers += Resolver.sonatypeRepo("releases"), // TODO: Delete this eventually, just needed for lag between deploying to sonatype and getting on maven central
         version := PlayVersion.current,
         libraryDependencies ++= Seq(
-            "org.mockito" % "mockito-core" % "1.9.5" % "test"
+            "org.mockito" % "mockito-core" % "1.9.5" % "test",
         ),
         PlayDocsKeys.docsJarFile :=
           Some((packageBin in (playDocs, Compile)).value),
@@ -29,7 +29,7 @@ object ApplicationBuild extends Build {
                   "ScalaAnorm",
                   "PlaySlickMigrationGuide",
                   "ScalaTestingWithScalaTest",
-                  "ScalaFunctionalTestingWithScalaTest"
+                  "ScalaFunctionalTestingWithScalaTest",
               )),
         PlayDocsKeys.javaManualSourceDirectories :=
         (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
@@ -47,7 +47,7 @@ object ApplicationBuild extends Build {
         crossScalaVersions := Seq("2.11.7"),
         scalaVersion := PlayVersion.scalaVersion,
         fork in Test := true,
-        javaOptions in Test ++= Seq("-Xmx512m", "-Xms128m")
+        javaOptions in Test ++= Seq("-Xmx512m", "-Xms128m"),
     )
     .dependsOn(
         playDocs,
@@ -61,7 +61,7 @@ object ApplicationBuild extends Build {
         playProject("Play-JDBC-Evolutions") % "test",
         playProject("Play-JDBC") % "test",
         playProject("Play-Logback") % "test",
-        playProject("Play-Java-JDBC") % "test"
+        playProject("Play-Java-JDBC") % "test",
     )
 
   lazy val playDocs = playProject("Play-Docs")

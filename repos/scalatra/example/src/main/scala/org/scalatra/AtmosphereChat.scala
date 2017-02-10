@@ -21,7 +21,7 @@ class AtmosphereChat
         content = bodyHtml,
         url = url(_, includeServletPath = false),
         scripts = "/jquery/jquery.atmosphere.js" :: "/jquery/application.js" :: Nil,
-        defaultScripts = "/assets/js/jquery.min.js" :: "/assets/js/bootstrap.min.js" :: Nil
+        defaultScripts = "/assets/js/jquery.min.js" :: "/assets/js/bootstrap.min.js" :: Nil,
     )
   }
 

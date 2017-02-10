@@ -30,7 +30,7 @@ object Timeline extends LilaController {
               entries map { es =>
                 Ok(Json.obj("entries" -> es))
               }
-          }
+          },
       )
   }
 

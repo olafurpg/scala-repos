@@ -30,6 +30,6 @@ object ForkParallelTest extends Build {
                 sys.error("Forked tests were not executed in parallel!")
               }
             }
-          }
+          },
         ))
 }

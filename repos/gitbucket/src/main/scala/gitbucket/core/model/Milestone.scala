@@ -38,5 +38,5 @@ case class Milestone(
     title: String,
     description: Option[String],
     dueDate: Option[java.util.Date],
-    closedDate: Option[java.util.Date]
+    closedDate: Option[java.util.Date],
 )

@@ -70,7 +70,7 @@ final class FishnetApi(hub: lila.hub.Env,
     sequencer {
       analysisColl
         .find(BSONDocument(
-                "acquired" -> BSONDocument("$exists" -> false)
+                "acquired" -> BSONDocument("$exists" -> false),
             ))
         .sort(BSONDocument(
                 "sender.system" -> 1, // user requests first, then lichess auto analysis
@@ -154,7 +154,7 @@ final class FishnetApi(hub: lila.hub.Env,
     analysisColl
       .count(BSONDocument(
               "game.id" -> gameId,
-              "sender.system" -> false
+              "sender.system" -> false,
           ).some)
       .map(0 !=)
 

@@ -20,7 +20,7 @@ object DevErrorPageSpec extends PlaySpecification {
     }
 
     "link the error line if play.editor is configured" in new WithApplication(
-        _.configure("play.editor" -> "someEditorLinkWith %s:%s")
+        _.configure("play.editor" -> "someEditorLinkWith %s:%s"),
     ) {
       val result =
         app.errorHandler.onServerError(FakeRequest(), testExceptionSource)

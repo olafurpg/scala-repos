@@ -129,7 +129,7 @@ object ResourceMatcher {
             Resource.CPUS, app.cpus, ScalarMatchResult.Scope.NoneDisk),
         scalarResourceMatch(
             Resource.MEM, app.mem, ScalarMatchResult.Scope.NoneDisk),
-        diskMatch
+        diskMatch,
     ).filter(_.requiredValue != 0)
 
     logUnsatisfiedResources(offer, selector, scalarMatchResults)
@@ -146,7 +146,7 @@ object ResourceMatcher {
       if (badConstraints.nonEmpty && log.isInfoEnabled) {
         log.info(
             s"Offer [${offer.getId.getValue}]. Constraints for app [${app.id}] not satisfied.\n" +
-            s"The conflicting constraints are: [${badConstraints.mkString(", ")}]"
+            s"The conflicting constraints are: [${badConstraints.mkString(", ")}]",
         )
       }
 

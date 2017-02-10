@@ -22,8 +22,8 @@ object Api extends LilaController {
                                      "unsupportedAt" -> old.unsupportedAt)
                           }),
             "app" -> Json.obj(
-                "current" -> app.currentVersion
-            )
+                "current" -> app.currentVersion,
+            ),
         )) as JSON
   }
 
@@ -37,7 +37,7 @@ object Api extends LilaController {
         .list(
             teamId = teamId,
             engine = getBoolOpt("engine"),
-            nb = getInt("nb")
+            nb = getInt("nb"),
         )
         .map(_.some)
     }
@@ -56,7 +56,7 @@ object Api extends LilaController {
             withMoveTimes = getBool("with_movetimes"),
             token = get("token"),
             nb = getInt("nb"),
-            page = getInt("page")
+            page = getInt("page"),
         ) map (_.some)
       }
     }

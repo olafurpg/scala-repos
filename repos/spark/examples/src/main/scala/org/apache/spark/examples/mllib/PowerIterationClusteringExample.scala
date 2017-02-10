@@ -58,7 +58,7 @@ object PowerIterationClusteringExample {
   case class Params(
       k: Int = 2,
       numPoints: Int = 10,
-      maxIterations: Int = 15
+      maxIterations: Int = 15,
   )
       extends AbstractParams[Params]
 

@@ -132,7 +132,7 @@ trait EvaluatorModule[M[+ _]]
                            List(
                                inlineStatics(_, ctx),
                                optimizeJoins(_, ctx),
-                               rewriteConditionals(_)
+                               rewriteConditionals(_),
                            ))
     }
 
@@ -146,7 +146,7 @@ trait EvaluatorModule[M[+ _]]
               inferTypes(JType.JUniverseT), { g =>
                 megaReduce(g, findReductions(g, ctx))
               },
-              memoize
+              memoize,
           ))
     }
 
@@ -851,7 +851,7 @@ trait EvaluatorModule[M[+ _]]
                   state.copy(
                       assume = state.assume +
                         (m -> (wrapped, IdentityOrder.empty)),
-                      reductions = state.reductions + (m -> rvalue)
+                      reductions = state.reductions + (m -> rvalue),
                   )
                 }
               } yield {
@@ -1472,7 +1472,7 @@ trait EvaluatorModule[M[+ _]]
     private case class EvaluatorState(
         assume: Map[DepGraph, (Table, TableOrder)] = Map.empty,
         reductions: Map[DepGraph, Option[RValue]] = Map.empty,
-        extraCount: Int = 0
+        extraCount: Int = 0,
     )
 
     private sealed trait TableOrder {

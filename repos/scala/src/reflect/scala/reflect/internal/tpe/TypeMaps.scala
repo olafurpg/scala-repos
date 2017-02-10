@@ -1170,7 +1170,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
           debuglog(
               "ADAPT2 pre = " + pre + ", bcs.head = " + bcs.head +
               ", sym = " + sym.fullLocationString + ", rebind = " +
-              rebind0.fullLocationString
+              rebind0.fullLocationString,
           )
         }
         rebind0.suchThat(sym => sym.isType || sym.isStable) orElse {

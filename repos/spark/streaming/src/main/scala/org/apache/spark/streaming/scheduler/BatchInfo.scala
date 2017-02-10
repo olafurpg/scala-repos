@@ -38,7 +38,7 @@ case class BatchInfo(
     submissionTime: Long,
     processingStartTime: Option[Long],
     processingEndTime: Option[Long],
-    outputOperationInfos: Map[Int, OutputOperationInfo]
+    outputOperationInfos: Map[Int, OutputOperationInfo],
 ) {
 
   /**

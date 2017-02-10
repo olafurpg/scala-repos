@@ -106,7 +106,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           ("SELECT * FROM testData right JOIN testData2 ON (key * a != key + a)",
            classOf[BroadcastNestedLoopJoin]),
           ("SELECT * FROM testData full JOIN testData2 ON (key * a != key + a)",
-           classOf[BroadcastNestedLoopJoin])
+           classOf[BroadcastNestedLoopJoin]),
       ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
     }
   }
@@ -126,7 +126,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         ("SELECT * FROM testData join testData2 ON key = a and key = 2",
          classOf[BroadcastHashJoin]),
         ("SELECT * FROM testData join testData2 ON key = a where key = 2",
-         classOf[BroadcastHashJoin])
+         classOf[BroadcastHashJoin]),
     ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
     sql("UNCACHE TABLE testData")
   }
@@ -141,7 +141,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         ("SELECT * FROM testData RIGHT JOIN testData2 ON key = a where key = 2",
          classOf[BroadcastHashJoin]),
         ("SELECT * FROM testData right join testData2 ON key = a and key = 2",
-         classOf[BroadcastHashJoin])
+         classOf[BroadcastHashJoin]),
     ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
     sql("UNCACHE TABLE testData")
   }
@@ -163,7 +163,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
                     Row(1, "A", 1, "a"),
                     Row(2, "B", 2, "b"),
                     Row(3, "C", 3, "c"),
-                    Row(4, "D", 4, "d")
+                    Row(4, "D", 4, "d"),
                 ))
   }
 
@@ -173,7 +173,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
                     Row(1, "A", 1, "a"),
                     Row(2, "B", 2, "b"),
                     Row(3, "C", 3, "c"),
-                    Row(4, "D", 4, "d")
+                    Row(4, "D", 4, "d"),
                 ))
   }
 
@@ -185,7 +185,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         Row(1, 1, 1, 1) :: Row(1, 1, 1, 2) :: Row(1, 2, 1, 1) :: Row(1,
                                                                      2,
                                                                      1,
-                                                                     2) :: Nil
+                                                                     2) :: Nil,
     )
   }
 
@@ -375,7 +375,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "1000000000") {
       Seq(
           ("SELECT * FROM testData LEFT SEMI JOIN testData2 ON key = a",
-           classOf[BroadcastHashJoin])
+           classOf[BroadcastHashJoin]),
       ).foreach {
         case (query, joinClass) => assertJoin(query, joinClass)
       }
@@ -384,7 +384,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "-1") {
       Seq(
           ("SELECT * FROM testData LEFT SEMI JOIN testData2 ON key = a",
-           classOf[ShuffledHashJoin])
+           classOf[ShuffledHashJoin]),
       ).foreach {
         case (query, joinClass) => assertJoin(query, joinClass)
       }
@@ -439,7 +439,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           ("SELECT * FROM testData right JOIN testData2 WHERE (key * a != key + a)",
            classOf[BroadcastNestedLoopJoin]),
           ("SELECT * FROM testData full JOIN testData2 WHERE (key * a != key + a)",
-           classOf[BroadcastNestedLoopJoin])
+           classOf[BroadcastNestedLoopJoin]),
       ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
 
       checkAnswer(sql("""

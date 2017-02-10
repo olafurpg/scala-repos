@@ -59,7 +59,7 @@ class ThriftClientFramedCodec(
     protocolFactory: TProtocolFactory,
     config: ClientCodecConfig,
     clientId: Option[ClientId] = None,
-    useCallerSeqIds: Boolean = false
+    useCallerSeqIds: Boolean = false,
 )
     extends Codec[ThriftClientRequest, Array[Byte]] {
 
@@ -71,7 +71,7 @@ class ThriftClientFramedCodec(
 
   override def prepareConnFactory(
       underlying: ServiceFactory[ThriftClientRequest, Array[Byte]],
-      params: Stack.Params
+      params: Stack.Params,
   ) = preparer.prepare(underlying, params)
 
   override val protocolLibraryName: String = "thrift"
@@ -124,12 +124,12 @@ private[finagle] case class ThriftClientPreparer(
     useCallerSeqIds: Boolean = false) {
 
   def prepareService(params: Stack.Params)(
-      service: Service[ThriftClientRequest, Array[Byte]]
+      service: Service[ThriftClientRequest, Array[Byte]],
   ): Future[Service[ThriftClientRequest, Array[Byte]]] = {
     val payloadSize = new PayloadSizeFilter[ThriftClientRequest, Array[Byte]](
         params[param.Stats].statsReceiver,
         _.message.length,
-        _.length
+        _.length,
     )
     val Thrift.param.AttemptTTwitterUpgrade(attemptUpgrade) =
       params[Thrift.param.AttemptTTwitterUpgrade]
@@ -148,7 +148,7 @@ private[finagle] case class ThriftClientPreparer(
 
   def prepare(
       underlying: ServiceFactory[ThriftClientRequest, Array[Byte]],
-      params: Stack.Params
+      params: Stack.Params,
   ): ServiceFactory[ThriftClientRequest, Array[Byte]] = {
     val param.Stats(stats) = params[param.Stats]
     val Thrift.param.AttemptTTwitterUpgrade(attemptUpgrade) =
@@ -171,7 +171,7 @@ private[finagle] case class ThriftClientPreparer(
   }
 
   private def upgrade(
-      service: Service[ThriftClientRequest, Array[Byte]]
+      service: Service[ThriftClientRequest, Array[Byte]],
   ): Future[Service[ThriftClientRequest, Array[Byte]]] = {
     // Attempt to upgrade the protocol the first time around by
     // sending a magic method invocation.

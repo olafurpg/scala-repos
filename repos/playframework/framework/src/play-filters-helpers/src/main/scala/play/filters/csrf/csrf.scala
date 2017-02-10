@@ -169,7 +169,7 @@ object CSRFConfig {
         headerName = config.get[String]("header.name"),
         shouldProtect = shouldProtect,
         bypassCorsTrustedOrigins = config.get[Boolean](
-              "bypassCorsTrustedOrigins")
+              "bypassCorsTrustedOrigins"),
     )
   }
 }
@@ -325,7 +325,7 @@ class CSRFModule extends Module {
     Seq(
         bind[CSRFConfig].toProvider[CSRFConfigProvider],
         bind[CSRF.TokenProvider].toProvider[CSRF.TokenProviderProvider],
-        bind[CSRFFilter].toSelf
+        bind[CSRFFilter].toSelf,
     ) ++ ErrorHandler.bindingsFromConfiguration(environment, configuration)
   }
 }

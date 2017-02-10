@@ -116,12 +116,12 @@ class FailureTest
             new Exception,
             Failure.Interrupted | Failure.Restartable | Failure.Naming | Failure.Wrapped),
         Failure("abc"),
-        new Exception
+        new Exception,
     )
     val categories = Seq(
         Set("interrupted", "restartable", "wrapped", "naming"),
         Set(),
-        Set()
+        Set(),
     )
     for ((f, c) <- failures.zip(categories)) {
       assert(Failure.flagsOf(f) == c)

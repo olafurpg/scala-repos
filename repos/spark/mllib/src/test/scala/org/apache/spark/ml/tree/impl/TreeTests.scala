@@ -168,7 +168,7 @@ private[ml] object TreeTests extends SparkFunSuite {
             new LabeledPoint(1, Vectors.dense(1, 1, 0, 1, 0)),
             new LabeledPoint(1, Vectors.dense(1, 1, 0, 0, 0)),
             new LabeledPoint(0, Vectors.dense(1, 0, 0, 0, 0)),
-            new LabeledPoint(1, Vectors.dense(1, 1, 0, 0, 0))
+            new LabeledPoint(1, Vectors.dense(1, 1, 0, 0, 0)),
         ))
 
   /**
@@ -186,7 +186,7 @@ private[ml] object TreeTests extends SparkFunSuite {
       "minInstancesPerNode" -> 2,
       "minInfoGain" -> 1e-14,
       "maxMemoryInMB" -> 257,
-      "cacheNodeIds" -> true
+      "cacheNodeIds" -> true,
   )
 
   /** Data for tree read/write tests which produces a non-trivial tree. */

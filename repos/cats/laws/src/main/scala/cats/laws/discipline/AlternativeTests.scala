@@ -30,7 +30,7 @@ trait AlternativeTests[F[_]] extends ApplicativeTests[F] with MonoidKTests[F] {
               laws.alternativeLeftDistributivity[A, B] _),
           "right distributivity" -> forAll(
               laws.alternativeRightDistributivity[A, B] _),
-          "right absorption" -> forAll(laws.alternativeRightAbsorption[A, B] _)
+          "right absorption" -> forAll(laws.alternativeRightAbsorption[A, B] _),
       )
     }
   }

@@ -154,13 +154,13 @@ trait MongoDocumentMeta[BaseDocument]
               findOpts
                 .find(_.isInstanceOf[Limit])
                 .map(x => x.value)
-                .getOrElse(0)
+                .getOrElse(0),
             )
           .skip(
               findOpts
                 .find(_.isInstanceOf[Skip])
                 .map(x => x.value)
-                .getOrElse(0)
+                .getOrElse(0),
             )
         sort.foreach(s => cur.sort(s))
 

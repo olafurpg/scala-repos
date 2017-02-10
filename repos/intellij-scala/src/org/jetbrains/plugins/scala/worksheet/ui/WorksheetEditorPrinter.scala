@@ -286,7 +286,7 @@ class WorksheetEditorPrinter(
                               offset,
                               linesCount,
                               group,
-                              limit
+                              limit,
                           )
                       } foreach {
                         case region =>
@@ -431,7 +431,7 @@ object WorksheetEditorPrinter {
                 new VisualPosition(
                     Math.min(originalImpl.getCaretModel.getVisualPosition.line,
                              viewerImpl.getDocument.getLineCount),
-                    0)
+                    0),
             )
 
             val syncSupport = new SyncScrollSupport

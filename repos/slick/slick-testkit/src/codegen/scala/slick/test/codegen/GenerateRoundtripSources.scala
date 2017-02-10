@@ -227,7 +227,7 @@ class Tables(val profile: JdbcProfile) {
             Option_java_sql_Timestamp,
             Option_java_util_UUID,
             Option_java_sql_Blob //,Option_java_sql_Clob
-        )
+        ),
     )
     def pk = primaryKey("PK", (Int, Long))
   }
@@ -283,7 +283,7 @@ class Tables(val profile: JdbcProfile) {
           (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6),
           (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6),
           (p5i1, p5i2, p5i3, p5i4, p5i5, p5i6),
-          (p6i1, p6i2, p6i3, p6i4, p6i5, p6i6)
+          (p6i1, p6i2, p6i3, p6i4, p6i5, p6i6),
       ).shaped <>
       ({
         case (id, p1, p2, p3, p4, p5, p6) =>

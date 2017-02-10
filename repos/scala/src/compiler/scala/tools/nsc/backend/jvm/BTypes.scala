@@ -939,11 +939,11 @@ abstract class BTypes {
           else
             !isJLO(this) &&
             ifInit(info.get.superClass.get)(!_.isInterface.get),
-          s"Invalid superClass in $this: ${info.get.superClass}"
+          s"Invalid superClass in $this: ${info.get.superClass}",
       )
       assert(
           info.get.interfaces.forall(c => ifInit(c)(_.isInterface.get)),
-          s"Invalid interfaces in $this: ${info.get.interfaces}"
+          s"Invalid interfaces in $this: ${info.get.interfaces}",
       )
 
       assert(
@@ -1010,8 +1010,8 @@ abstract class BTypes {
                     // the static flag in the InnerClass table has a special meaning, see InnerClass comment
                     i.flags & ~Opcodes.ACC_STATIC,
                     if (isStaticNestedClass) Opcodes.ACC_STATIC
-                    else 0
-                ) & BCodeHelpers.INNER_CLASSES_FLAGS
+                    else 0,
+                ) & BCodeHelpers.INNER_CLASSES_FLAGS,
             )
       })
 
@@ -1123,12 +1123,12 @@ abstract class BTypes {
         "scala/Int",
         "scala/Float",
         "scala/Long",
-        "scala/Double"
+        "scala/Double",
     )
 
     private val isInternalPhantomType = Set(
         "scala/Null",
-        "scala/Nothing"
+        "scala/Nothing",
     )
   }
 

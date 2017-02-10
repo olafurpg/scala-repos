@@ -714,7 +714,7 @@ object util {
               def isDefinedAt(row: Int) = c.isDefinedAt(row)
             }
           case CUndefined => UndefinedColumn(c)
-        }
+        },
     )
   }
 

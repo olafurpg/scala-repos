@@ -48,7 +48,7 @@ case class CommitStatus(
     description: Option[String],
     creator: String,
     registeredDate: java.util.Date,
-    updatedDate: java.util.Date
+    updatedDate: java.util.Date,
 )
 object CommitStatus {
   def pending(owner: String, repository: String, context: String) =

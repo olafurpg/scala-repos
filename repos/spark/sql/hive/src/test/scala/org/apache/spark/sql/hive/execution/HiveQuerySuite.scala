@@ -883,7 +883,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
               Row("dt", "string", null),
               Row("# Partition Information", "", ""),
               Row("# col_name", "data_type", "comment"),
-              Row("dt", "string", null))
+              Row("dt", "string", null)),
     ) {
       sql("DESCRIBE test_describe_commands1")
         .select('col_name, 'data_type, 'comment)
@@ -897,7 +897,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
               Row("dt", "string", null),
               Row("# Partition Information", "", ""),
               Row("# col_name", "data_type", "comment"),
-              Row("dt", "string", null))
+              Row("dt", "string", null)),
     ) {
       sql("DESCRIBE default.test_describe_commands1")
         .select('col_name, 'data_type, 'comment)
@@ -929,7 +929,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
               Array("# Partition Information"),
               Array("# col_name", "data_type", "comment"),
               Array(""),
-              Array("dt", "string"))
+              Array("dt", "string")),
     ) {
       sql("DESCRIBE test_describe_commands1 PARTITION (dt='2008-06-08')")
         .select('result)
@@ -944,7 +944,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     testData.toDF().registerTempTable("test_describe_commands2")
 
     assertResult(
-        Array(Row("a", "int", ""), Row("b", "string", ""))
+        Array(Row("a", "int", ""), Row("b", "string", "")),
     ) {
       sql("DESCRIBE test_describe_commands2")
         .select('col_name, 'data_type, 'comment)

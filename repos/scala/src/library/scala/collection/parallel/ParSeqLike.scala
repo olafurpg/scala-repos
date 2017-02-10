@@ -182,7 +182,7 @@ trait ParSeqLike[
       tasksupport.executeAndWaitResult(
           new ReverseMap[S, That](f, () => bf(repr).asCombiner, splitter) mapResult {
             _.resultWithTaskSupport
-          }
+          },
       )
     } else setTaskSupport(seq.reverseMap(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
@@ -208,7 +208,7 @@ trait ParSeqLike[
         tasksupport.executeAndWaitResult(
             new SameElements(splitter.psplitWithSignalling(
                                  offset, pthat.length)(1) assign ctx,
-                             pthat.splitter)
+                             pthat.splitter),
         )
       }
     } otherwise seq.startsWith(that, offset)
@@ -288,7 +288,7 @@ trait ParSeqLike[
                       combinerFactory(() => bf(repr).asCombiner),
                       splitter) mapResult {
             _.resultWithTaskSupport
-          }
+          },
       )
     } else setTaskSupport(seq.updated(index, elem)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
@@ -321,7 +321,7 @@ trait ParSeqLike[
                   splitter,
                   thatseq.splitter) mapResult {
             _.resultWithTaskSupport
-          }
+          },
       )
     } else super.zip(that)(bf)
 
@@ -561,7 +561,7 @@ trait ParSeqLike[
       val opits = otherpit.psplitWithSignalling(fp, sp)
       Seq(
           new Zip(fp, cf, pits(0), opits(0)),
-          new Zip(sp, cf, pits(1), opits(1))
+          new Zip(sp, cf, pits(1), opits(1)),
       )
     }
     override def merge(that: Zip[U, S, That]) =

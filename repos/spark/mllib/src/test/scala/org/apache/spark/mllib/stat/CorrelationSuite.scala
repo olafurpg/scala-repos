@@ -36,7 +36,7 @@ class CorrelationSuite
       Vectors.dense(1.0, 0.0, 0.0, -2.0),
       Vectors.dense(4.0, 5.0, 0.0, 3.0),
       Vectors.dense(6.0, 7.0, 0.0, 8.0),
-      Vectors.dense(9.0, 0.0, 0.0, 1.0)
+      Vectors.dense(9.0, 0.0, 0.0, 1.0),
   )
 
   test("corr(x, y) pearson, 1 value in data") {

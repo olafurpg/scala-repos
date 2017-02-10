@@ -75,7 +75,7 @@ trait PredicatePullupSpecs[M[+ _]]
                                       Cross(None),
                                       load,
                                       Const(CString("time"))(loc))(loc),
-                                 Const(CLong(1329643873628L))(loc))(loc)
+                                 Const(CLong(1329643873628L))(loc))(loc),
                         ),
                         Extra(
                             Join(instructions.GtEq,
@@ -84,14 +84,14 @@ trait PredicatePullupSpecs[M[+ _]]
                                       Cross(None),
                                       load,
                                       Const(CString("time"))(loc))(loc),
-                                 Const(CLong(1328779873610L))(loc))(loc)
-                        )
+                                 Const(CLong(1328779873610L))(loc))(loc),
+                        ),
                     ),
                     UnfixedSolution(1,
                                     Join(instructions.DerefObject,
                                          Cross(None),
                                          load,
-                                         Const(CString("userId"))(loc))(loc))
+                                         Const(CString("userId"))(loc))(loc)),
                 )),
           Join(instructions.JoinObject,
                Cross(None),
@@ -106,7 +106,7 @@ trait PredicatePullupSpecs[M[+ _]]
                          Cross(None),
                          SplitGroup(0, load.identities, id)(loc),
                          Const(CString("time"))(loc))(loc))(loc))(loc),
-          id
+          id,
       )(loc)
 
       val filteredLoad =
@@ -150,7 +150,7 @@ trait PredicatePullupSpecs[M[+ _]]
                          Cross(None),
                          SplitGroup(0, load.identities, id)(loc),
                          Const(CString("time"))(loc))(loc))(loc))(loc),
-          id
+          id,
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
@@ -190,7 +190,7 @@ trait PredicatePullupSpecs[M[+ _]]
                                         Cross(None),
                                         load,
                                         Const(CString("time"))(loc))(loc),
-                                   Const(CLong(1329643873628L))(loc))(loc)
+                                   Const(CLong(1329643873628L))(loc))(loc),
                           ),
                           Extra(
                               Join(instructions.GtEq,
@@ -199,20 +199,20 @@ trait PredicatePullupSpecs[M[+ _]]
                                         Cross(None),
                                         load,
                                         Const(CString("time"))(loc))(loc),
-                                   Const(CLong(1328779873610L))(loc))(loc)
-                          )
+                                   Const(CLong(1328779873610L))(loc))(loc),
+                          ),
                       ),
                       UnfixedSolution(1,
                                       Join(instructions.DerefObject,
                                            Cross(None),
                                            load,
-                                           Const(CString("userId"))(loc))(loc))
+                                           Const(CString("userId"))(loc))(loc)),
                   ),
                   UnfixedSolution(2,
                                   Join(instructions.DerefObject,
                                        Cross(None),
                                        load,
-                                       Const(CString("pageId"))(loc))(loc))
+                                       Const(CString("pageId"))(loc))(loc)),
               )),
           Join(instructions.JoinObject,
                Cross(None),
@@ -227,7 +227,7 @@ trait PredicatePullupSpecs[M[+ _]]
                          Cross(None),
                          SplitGroup(0, load.identities, id)(loc),
                          Const(CString("time"))(loc))(loc))(loc))(loc),
-          id
+          id,
       )(loc)
 
       val filteredLoad =
@@ -263,7 +263,7 @@ trait PredicatePullupSpecs[M[+ _]]
                                     Join(instructions.DerefObject,
                                          Cross(None),
                                          filteredLoad,
-                                         Const(CString("pageId"))(loc))(loc))
+                                         Const(CString("pageId"))(loc))(loc)),
                 )),
           Join(instructions.JoinObject,
                Cross(None),
@@ -278,7 +278,7 @@ trait PredicatePullupSpecs[M[+ _]]
                          Cross(None),
                          SplitGroup(0, load.identities, id)(loc),
                          Const(CString("time"))(loc))(loc))(loc))(loc),
-          id
+          id,
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
@@ -320,11 +320,11 @@ trait PredicatePullupSpecs[M[+ _]]
                                   Cross(None),
                                   load,
                                   Const(CString("Edition"))(loc))(loc),
-                             Const(CLong(2000))(loc))(loc)
-                    )
+                             Const(CLong(2000))(loc))(loc),
+                    ),
                 )),
           innerSplit,
-          id1
+          id1,
       )(loc)
 
       lazy val innerSplit = Split(
@@ -336,7 +336,7 @@ trait PredicatePullupSpecs[M[+ _]]
                                      SplitGroup(0, load.identities, id1)(loc),
                                      Const(CString("Weight"))(loc))(loc))),
           SplitGroup(2, load.identities, id2)(loc),
-          id2
+          id2,
       )(loc)
 
       val filteredLoad = Filter(IdentitySort,
@@ -358,7 +358,7 @@ trait PredicatePullupSpecs[M[+ _]]
                                      filteredLoad,
                                      Const(CString("Gender"))(loc))(loc))),
           expectedInner,
-          id1
+          id1,
       )(loc)
 
       lazy val expectedInner = Split(
@@ -370,7 +370,7 @@ trait PredicatePullupSpecs[M[+ _]]
                                      SplitGroup(0, load.identities, id1)(loc),
                                      Const(CString("Weight"))(loc))(loc))),
           SplitGroup(2, load.identities, id2)(loc),
-          id2
+          id2,
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
@@ -409,8 +409,8 @@ trait PredicatePullupSpecs[M[+ _]]
                                   Cross(None),
                                   load,
                                   Const(CString("Edition"))(loc))(loc),
-                             Const(CLong(2000))(loc))(loc)
-                    )
+                             Const(CLong(2000))(loc))(loc),
+                    ),
                 )),
           Join(instructions.JoinObject,
                Cross(None),
@@ -435,7 +435,7 @@ trait PredicatePullupSpecs[M[+ _]]
                               SplitGroup(0, load.identities, id)(loc),
                               Const(CString("Gender"))(loc))(loc))(loc))(loc))(
               loc),
-          id
+          id,
       )(loc)
 
       val filteredLoad = Filter(IdentitySort,
@@ -479,7 +479,7 @@ trait PredicatePullupSpecs[M[+ _]]
                               SplitGroup(0, load.identities, id)(loc),
                               Const(CString("Gender"))(loc))(loc))(loc))(loc))(
               loc),
-          id
+          id,
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected

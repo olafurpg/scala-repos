@@ -52,13 +52,13 @@ class ClusterClientTest
     // connect to zookeeper server
     zookeeperClient = boundedWait(
         zookeeperServer.createClient(
-            ZooKeeperClient.digestCredentials("user", "pass"))
+            ZooKeeperClient.digestCredentials("user", "pass")),
     )
 
     // create serverset
     val serverSet = boundedWait(
         ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+            zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath),
     )
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
@@ -72,7 +72,7 @@ class ClusterClientTest
                          case None =>
                            fail("could not start TestMemcachedServer")
                        }
-                     }
+                     },
                  ),
                  TimeOut)
 
@@ -356,7 +356,7 @@ class ClusterClientTest
       Await.result(Future.collect(
                        (0 until count) map { n =>
                          client.set("foo" + n, Buf.Utf8("bar" + n))
-                       }
+                       },
                    ),
                    TimeOut)
 
@@ -576,7 +576,7 @@ class ClusterClientTest
   def initializePool(
       expectedSize: Int,
       backupPool: Option[scala.collection.immutable.Set[CacheNode]] = None,
-      ignoreConfigData: Boolean = false
+      ignoreConfigData: Boolean = false,
   ): Cluster[CacheNode] = {
     val myCachePool =
       if (!ignoreConfigData)
@@ -606,7 +606,7 @@ class ClusterClientTest
       currentSize: Int,
       expectedPoolSize: Int,
       expectedAdd: Int,
-      expectedRem: Int
+      expectedRem: Int,
   )(ops: => Unit): Future[Unit] = {
     var addSeen = 0
     var remSeen = 0

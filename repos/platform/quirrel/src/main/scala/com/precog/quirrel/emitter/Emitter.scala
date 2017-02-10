@@ -256,7 +256,7 @@ trait Emitter
                      op: BinaryOperation): EmitterState = {
       emitCrossOrMatchState(left, leftProv, right, rightProv)(
           ifCross = Map2Cross(op),
-          ifMatch = Map2Match(op)
+          ifMatch = Map2Match(op),
       )
     }
 
@@ -283,7 +283,7 @@ trait Emitter
                         rightProv: Provenance): EmitterState = {
       emitCrossOrMatchState(left, leftProv, right, rightProv)(
           ifCross = FilterCross,
-          ifMatch = FilterMatch
+          ifMatch = FilterMatch,
       )
     }
 

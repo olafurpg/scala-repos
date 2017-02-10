@@ -52,7 +52,7 @@ object ReplicationClient {
       pools: Seq[Cluster[CacheNode]],
       clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] = None,
       hashName: Option[String] = None,
-      failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
+      failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds),
   ) = {
     val underlyingClients =
       pools map { pool =>
@@ -72,7 +72,7 @@ object ReplicationClient {
       pools: Seq[Cluster[CacheNode]],
       clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] = None,
       hashName: Option[String] = None,
-      failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
+      failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds),
   ) = {
     new SimpleReplicationClient(newBaseReplicationClient(
             pools, clientBuilder, hashName, failureAccrualParams))
@@ -211,7 +211,7 @@ class BaseReplicationClient(
   private[this] def attachCas(
       valueStatus: ReplicationStatus[Option[Buf]],
       underlyingResults: Seq[GetsResult],
-      key: String
+      key: String,
   ): ReplicationStatus[Option[(Buf, ReplicaCasUnique)]] =
     valueStatus match {
       case ConsistentReplication(Some(v)) =>

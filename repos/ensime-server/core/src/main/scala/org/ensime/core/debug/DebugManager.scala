@@ -18,15 +18,15 @@ case class DMClassPrepareEvent(
 
 object DebugManager {
   def apply(
-      broadcaster: ActorRef
+      broadcaster: ActorRef,
   )(
-      implicit config: EnsimeConfig
+      implicit config: EnsimeConfig,
   ): Props = Props(new DebugManager(broadcaster, config))
 }
 
 class DebugManager(
     broadcaster: ActorRef,
-    config: EnsimeConfig
+    config: EnsimeConfig,
 )
     extends Actor with ActorLogging {
 
@@ -114,7 +114,7 @@ class DebugManager(
   def vmOptions(): List[String] =
     List(
         "-classpath",
-        config.runtimeClasspath.mkString("\"", File.pathSeparator, "\"")
+        config.runtimeClasspath.mkString("\"", File.pathSeparator, "\""),
     ) ++ config.debugVMArgs
 
   def withVM[T](action: (VM => T)): Option[T] = {
@@ -229,7 +229,7 @@ class DebugManager(
           DebugThreadId(e.thread().uniqueID()),
           e.thread().name,
           pos.map(_.file),
-          pos.map(_.line)
+          pos.map(_.line),
       )
     case e: ThreadDeathEvent =>
       broadcaster ! DebugThreadDeathEvent(DebugThreadId(e.thread().uniqueID()))
@@ -336,7 +336,7 @@ class DebugManager(
         vm.newStepRequest(
             thread,
             StepRequest.STEP_LINE,
-            StepRequest.STEP_OVER
+            StepRequest.STEP_OVER,
         )
         TrueResponse
       }
@@ -346,7 +346,7 @@ class DebugManager(
         vm.newStepRequest(
             thread,
             StepRequest.STEP_LINE,
-            StepRequest.STEP_INTO
+            StepRequest.STEP_INTO,
         )
         TrueResponse
       }
@@ -356,7 +356,7 @@ class DebugManager(
         vm.newStepRequest(
             thread,
             StepRequest.STEP_LINE,
-            StepRequest.STEP_OUT
+            StepRequest.STEP_OUT,
         )
         TrueResponse
       }

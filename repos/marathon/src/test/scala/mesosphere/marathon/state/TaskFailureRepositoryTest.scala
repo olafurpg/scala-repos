@@ -71,7 +71,7 @@ class TaskFailureRepositoryTest
         inMemoryStore,
         metrics,
         () => TaskFailure.empty,
-        prefix = "taskFailure:"
+        prefix = "taskFailure:",
     )
     lazy val metricRegistry = new MetricRegistry
     lazy val metrics = new Metrics(metricRegistry)

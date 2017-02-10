@@ -52,7 +52,7 @@ private[streaming] class FileBasedWriteAheadLog(
     hadoopConf: Configuration,
     rollingIntervalSecs: Int,
     maxFailures: Int,
-    closeFileAfterWrite: Boolean
+    closeFileAfterWrite: Boolean,
 )
     extends WriteAheadLog with Logging {
 

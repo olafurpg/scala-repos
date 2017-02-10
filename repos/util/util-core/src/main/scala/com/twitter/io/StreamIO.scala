@@ -14,7 +14,7 @@ object StreamIO {
   final def copy(
       inputStream: InputStream,
       outputStream: OutputStream,
-      bufferSize: Int = 1024
+      bufferSize: Int = 1024,
   ) {
     val buf = new Array[Byte](bufferSize)
     inputStream.read(buf, 0, buf.length) match {

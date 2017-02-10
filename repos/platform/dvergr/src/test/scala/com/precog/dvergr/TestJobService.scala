@@ -80,21 +80,21 @@ class JobServiceSpec extends TestJobService {
   val simpleJob: JValue = JObject(
       List(
           JField("name", JString("abc")),
-          JField("type", JString("cba"))
+          JField("type", JString("cba")),
       ))
 
   val jobWithData: JValue = JObject(
       List(
           JField("name", JString("xyz")),
           JField("type", JString("zyx")),
-          JField("data", JObject(JField("x", JNum(1))))
+          JField("data", JObject(JField("x", JNum(1)))),
       ))
 
   def startJob(ts: Option[DateTime] = None): JValue = JObject(
       JField("state", JString("started")) ::
       (ts map { dt =>
             JField("timestamp", dt.serialize) :: Nil
-          } getOrElse Nil)
+          } getOrElse Nil),
   )
 
   def postJob(job: JValue, apiKey: String = validAPIKey) =
@@ -154,7 +154,7 @@ class JobServiceSpec extends TestJobService {
         JObject(
             JField("message", JString(message)) :: JField(
                 "progress", JNum(progress)) :: JField("unit", JString(unit)) ::
-            (info map (JField("info", _) :: Nil) getOrElse Nil)
+            (info map (JField("info", _) :: Nil) getOrElse Nil),
         ))
   }
 

@@ -26,7 +26,7 @@ trait BinaryVectorizerFixture {
           HashMap("food" -> "orange", "music" -> "rock", "hobby" -> "scala"),
           HashMap("food" -> "orange", "music" -> "pop", "hobby" -> "running"),
           HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar"),
-          HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar")
+          HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar"),
       )
 
       val properties = HashSet("food", "hobby")
@@ -50,7 +50,7 @@ trait BinaryVectorizerFixture {
   def vecSum(vec1: Vector, vec2: Vector): Array[Double] = {
     (0 until vec1.size)
       .map(
-          k => vec1(k) + vec2(k)
+          k => vec1(k) + vec2(k),
       )
       .toArray
   }

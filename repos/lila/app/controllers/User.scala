@@ -68,7 +68,7 @@ object User extends LilaController {
             Ok(Json.toJson(list
                       .take(getInt("nb").fold(10)(_ min max))
                       .map(env.jsonView(_))))
-        }
+        },
     )
   }
 
@@ -145,7 +145,7 @@ object User extends LilaController {
           info = none,
           filter = GameFilterMenu.currentOf(GameFilterMenu.all, filterName),
           me = ctx.me,
-          page = page
+          page = page,
       )(ctx.body) map { filterName -> _ }
     }
   }
@@ -230,7 +230,7 @@ object User extends LilaController {
           err => filter(username, none, 1, Results.BadRequest),
           text =>
             env.noteApi.write(user, text, me) inject Redirect(
-                routes.User.show(username).url + "?note")
+                routes.User.show(username).url + "?note"),
       )
     }
   }
@@ -240,7 +240,7 @@ object User extends LilaController {
       lila.game.BestOpponents(user.id, 50) flatMap { ops =>
         ctx.isAuth.fold(
             Env.pref.api.followables(ops map (_._1.id)),
-            fuccess(List.fill(50)(true))
+            fuccess(List.fill(50)(true)),
         ) flatMap { followables =>
           (ops zip followables).map {
             case ((u, nb), followable) =>

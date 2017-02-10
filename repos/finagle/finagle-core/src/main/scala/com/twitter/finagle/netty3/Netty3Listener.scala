@@ -130,7 +130,7 @@ object Netty3Listener {
 
     pipeline.addFirst(
         "sslConnect",
-        new SslListenerConnectionHandler(handler, onShutdown)
+        new SslListenerConnectionHandler(handler, onShutdown),
     )
   }
 
@@ -162,7 +162,7 @@ object Netty3Listener {
     */
   def apply[In, Out](
       pipeline: ChannelPipelineFactory,
-      params: Stack.Params
+      params: Stack.Params,
   ): Listener[In, Out] = {
     val Label(label) = params[Label]
     val Logger(logger) = params[Logger]
@@ -214,7 +214,7 @@ object Netty3Listener {
         nettyTimer = nettyTimer,
         statsReceiver = stats,
         monitor = monitor,
-        logger = logger
+        logger = logger,
     )
   }
 }
@@ -258,7 +258,7 @@ case class Netty3Listener[In, Out](
     bootstrapOptions: Map[String, Object] = Map(
           "soLinger" -> (0: java.lang.Integer),
           "reuseAddress" -> java.lang.Boolean.TRUE,
-          "child.tcpNoDelay" -> java.lang.Boolean.TRUE
+          "child.tcpNoDelay" -> java.lang.Boolean.TRUE,
       ),
     channelReadTimeout: Duration = Duration.Top,
     channelWriteCompletionTimeout: Duration = Duration.Top,
@@ -267,7 +267,7 @@ case class Netty3Listener[In, Out](
     nettyTimer: org.jboss.netty.util.Timer = DefaultTimer.netty,
     statsReceiver: StatsReceiver = ServerStatsReceiver,
     monitor: com.twitter.util.Monitor = NullMonitor,
-    logger: java.util.logging.Logger = DefaultLogger
+    logger: java.util.logging.Logger = DefaultLogger,
 )
     extends Listener[In, Out] {
   import Netty3Listener._
@@ -342,7 +342,7 @@ case class Netty3Listener[In, Out](
             serveTransport,
             logger,
             scopedStatsReceiver,
-            closer.activeChannels
+            closer.activeChannels,
       )
       val bootstrap = new ServerBootstrap(channelFactory)
       bootstrap.setOptions(bootstrapOptions.asJava)
@@ -373,7 +373,7 @@ private[netty3] class ServerBridge[In, Out](
     serveTransport: Transport[In, Out] => Unit,
     log: java.util.logging.Logger,
     statsReceiver: StatsReceiver,
-    channels: ChannelGroup
+    channels: ChannelGroup,
 )
     extends SimpleChannelHandler {
   import ServerBridge.FinestIOExceptionMessages

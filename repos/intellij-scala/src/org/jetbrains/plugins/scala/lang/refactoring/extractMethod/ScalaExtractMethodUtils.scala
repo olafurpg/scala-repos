@@ -129,13 +129,13 @@ object ScalaExtractMethodUtils {
               byOutputsSize(
                   "true",
                   "None",
-                  "None"
+                  "None",
               )
             case Some(_) =>
               byOutputsSize(
                   s"Some($retExprText)",
                   s"Left($retExprText)",
-                  s"Left($retExprText)"
+                  s"Left($retExprText)",
               )
             case None => "" //should not occur
           }
@@ -293,19 +293,19 @@ object ScalaExtractMethodUtils {
         byOutputsSize(
             (false, "Boolean"),
             (false, s"Option[$outputType]"),
-            (false, s"Option[$outputType]")
+            (false, s"Option[$outputType]"),
         )
       case Some(tp) =>
         byOutputsSize(
             (false, s"Option[${tp.presentableText}]"),
             (false, s"Either[${tp.presentableText}, $outputType]"),
-            (false, s"Either[${tp.presentableText}, $outputType]")
+            (false, s"Either[${tp.presentableText}, $outputType]"),
         )
       case None =>
         byOutputsSize(
             (true, "Unit"),
             prepareResult(outputs(0).returnType),
-            (false, outputType)
+            (false, outputType),
         )
     }
   }

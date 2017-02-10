@@ -108,7 +108,7 @@ trait ComTests extends AsyncTests {
 
     val ops = List[ComJSRunner => Unit](
         _.send("ping"),
-        com => assertEquals("pong", com.receive())
+        com => assertEquals("pong", com.receive()),
     )
 
     for {

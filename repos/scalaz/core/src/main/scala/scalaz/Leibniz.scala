@@ -87,13 +87,13 @@ object Leibniz extends LeibnizInstances {
   /** Equality is transitive */
   def trans[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](
       f: Leibniz[L, H, B, C],
-      g: Leibniz[L, H, A, B]
+      g: Leibniz[L, H, A, B],
   ): Leibniz[L, H, A, C] =
     f.subst[λ[`X >: L <: H` => Leibniz[L, H, A, X]]](g) // note kind-projector 0.5.2 cannot do super/subtype bounds
 
   /** Equality is symmetric */
   def symm[L, H >: L, A >: L <: H, B >: L <: H](
-      f: Leibniz[L, H, A, B]
+      f: Leibniz[L, H, A, B],
   ): Leibniz[L, H, B, A] =
     f.subst[λ[`X>:L<:H` => Leibniz[L, H, X, A]]](refl)
 
@@ -105,9 +105,9 @@ object Leibniz extends LeibnizInstances {
       HT >: LT,
       T[_ >: LA <: HA] >: LT <: HT,
       A >: LA <: HA,
-      A2 >: LA <: HA
+      A2 >: LA <: HA,
   ](
-      a: Leibniz[LA, HA, A, A2]
+      a: Leibniz[LA, HA, A, A2],
   ): Leibniz[LT, HT, T[A], T[A2]] =
     a.subst[λ[`X >: LA <: HA` => Leibniz[LT, HT, T[A], T[X]]]](refl)
 
@@ -123,10 +123,10 @@ object Leibniz extends LeibnizInstances {
       A >: LA <: HA,
       A2 >: LA <: HA,
       B >: LB <: HB,
-      B2 >: LB <: HB
+      B2 >: LB <: HB,
   ](
       a: Leibniz[LA, HA, A, A2],
-      b: Leibniz[LB, HB, B, B2]
+      b: Leibniz[LB, HB, B, B2],
   ): Leibniz[LT, HT, T[A, B], T[A2, B2]] =
     b.subst[λ[`X >: LB <: HB` => Leibniz[LT, HT, T[A, B], T[A2, X]]]](
         a.subst[λ[`X >: LA <: HA` => Leibniz[LT, HT, T[A, B], T[X, B]]]](refl))
@@ -147,11 +147,11 @@ object Leibniz extends LeibnizInstances {
       B >: LB <: HB,
       B2 >: LB <: HB,
       C >: LC <: HC,
-      C2 >: LC <: HC
+      C2 >: LC <: HC,
   ](
       a: Leibniz[LA, HA, A, A2],
       b: Leibniz[LB, HB, B, B2],
-      c: Leibniz[LC, HC, C, C2]
+      c: Leibniz[LC, HC, C, C2],
   ): Leibniz[LT, HT, T[A, B, C], T[A2, B2, C2]] =
     c.subst[λ[`X >: LC <: HC` => Leibniz[LT, HT, T[A, B, C], T[A2, B2, X]]]](
         b.subst[
@@ -184,9 +184,9 @@ object Leibniz extends LeibnizInstances {
       HA >: LA,
       T[_ >: LA <: HA] /*: Injective*/,
       A >: LA <: HA,
-      A2 >: LA <: HA
+      A2 >: LA <: HA,
   ](
-      t: T[A] === T[A2]
+      t: T[A] === T[A2],
   ): Leibniz[LA, HA, A, A2] = force[LA, HA, A, A2]
 
   def lower2[
@@ -198,9 +198,9 @@ object Leibniz extends LeibnizInstances {
       A >: LA <: HA,
       A2 >: LA <: HA,
       B >: LB <: HB,
-      B2 >: LB <: HB
+      B2 >: LB <: HB,
   ](
-      t: T[A, B] === T[A2, B2]
+      t: T[A, B] === T[A2, B2],
   ): (Leibniz[LA, HA, A, A2], Leibniz[LB, HB, B, B2]) =
     (force[LA, HA, A, A2], force[LB, HB, B, B2])
 }

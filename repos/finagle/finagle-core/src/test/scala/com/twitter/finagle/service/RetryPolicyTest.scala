@@ -12,7 +12,7 @@ import org.scalatest.junit.JUnitRunner
 class RetryPolicyTest extends FunSpec {
   def getBackoffs(
       policy: RetryPolicy[Try[Nothing]],
-      exceptions: Stream[Exception]
+      exceptions: Stream[Exception],
   ): Stream[Duration] =
     exceptions match {
       case Stream.Empty => Stream.empty
@@ -148,7 +148,7 @@ class RetryPolicyTest extends FunSpec {
         RetryPolicy.backoff(Backoff.const(Duration.Zero).take(2))(
             RetryPolicy.WriteExceptionsOnly),
         RetryPolicy.backoff(Stream.fill(3)(channelClosedBackoff))(
-            RetryPolicy.ChannelClosedExceptionsOnly)
+            RetryPolicy.ChannelClosedExceptionsOnly),
     )
 
     it("return None for unmatched exception") {
@@ -175,7 +175,7 @@ class RetryPolicyTest extends FunSpec {
           WriteException(new Exception),
           WriteException(new Exception),
           new ChannelClosedException(),
-          WriteException(new Exception)
+          WriteException(new Exception),
       )
 
       val backoffs = getBackoffs(combinedPolicy, exceptions)
@@ -183,7 +183,7 @@ class RetryPolicyTest extends FunSpec {
           channelClosedBackoff,
           writeExceptionBackoff,
           writeExceptionBackoff,
-          channelClosedBackoff
+          channelClosedBackoff,
       )
       assert(backoffs == expectedBackoffs)
     }

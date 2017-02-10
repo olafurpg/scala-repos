@@ -34,7 +34,7 @@ class TransactionTest extends FunSuite with MockitoSugar with MustMatchers {
             "START TRANSACTION",
             sqlQuery,
             sqlQuery,
-            "COMMIT"
+            "COMMIT",
         ).map(QueryRequest(_)))
 
     verify(factory, times(1)).apply()
@@ -67,7 +67,7 @@ class TransactionTest extends FunSuite with MockitoSugar with MustMatchers {
         List(
             "START TRANSACTION",
             sqlQuery,
-            "ROLLBACK"
+            "ROLLBACK",
         ).map(QueryRequest(_)))
 
     verify(factory, times(1)).apply()

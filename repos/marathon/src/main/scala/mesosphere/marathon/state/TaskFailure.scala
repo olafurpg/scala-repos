@@ -48,7 +48,7 @@ object TaskFailure {
     TaskFailure(
         PathId.empty,
         mesos.TaskID.newBuilder().setValue("").build,
-        mesos.TaskState.TASK_STAGING
+        mesos.TaskState.TASK_STAGING,
     )
   }
 
@@ -61,7 +61,7 @@ object TaskFailure {
         host = proto.getHost,
         version = Timestamp(proto.getVersion),
         timestamp = Timestamp(proto.getTimestamp),
-        slaveId = if (proto.hasSlaveId) Some(proto.getSlaveId) else None
+        slaveId = if (proto.hasSlaveId) Some(proto.getSlaveId) else None,
     )
 
   object FromMesosStatusUpdateEvent {
@@ -80,7 +80,7 @@ object TaskFailure {
       _,
       version,
       _,
-      ts
+      ts,
       ) = statusUpdate
 
       val state = taskState(taskStateStr)
@@ -95,7 +95,7 @@ object TaskFailure {
                 host,
                 Timestamp(version),
                 Timestamp(ts),
-                Option(slaveIDToProto(SlaveID(slaveId)))
+                Option(slaveIDToProto(SlaveID(slaveId))),
             ))
       else None
     }

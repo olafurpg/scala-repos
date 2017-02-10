@@ -50,7 +50,7 @@ private[streaming] class KafkaInputDStream[K : ClassTag,
     kafkaParams: Map[String, String],
     topics: Map[String, Int],
     useReliableReceiver: Boolean,
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
 )
     extends ReceiverInputDStream[(K, V)](_ssc) with Logging {
 
@@ -69,7 +69,7 @@ private[streaming] class KafkaReceiver[K : ClassTag,
                                        T <: Decoder[_]: ClassTag](
     kafkaParams: Map[String, String],
     topics: Map[String, Int],
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
 )
     extends Receiver[(K, V)](storageLevel) with Logging {
 

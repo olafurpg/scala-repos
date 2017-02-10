@@ -130,7 +130,7 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     kc.setConsumerOffsets(kafkaParams("group.id"), rangesMap)
       .fold(
           err => throw new Exception(err.mkString("\n")),
-          _ => ()
+          _ => (),
       )
 
     // this is the "0 messages" case
@@ -166,7 +166,7 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
               .toOption
               .map { offs =>
                 offs.map(kv => kv._1 -> kv._2.offset)
-              }
+              },
           )
     }
     kc.getPartitions(topics).right.toOption.flatMap { topicPartitions =>

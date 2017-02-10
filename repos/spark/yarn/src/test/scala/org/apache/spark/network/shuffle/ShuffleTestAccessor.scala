@@ -39,7 +39,7 @@ object ShuffleTestAccessor {
   def getExecutorInfo(
       appId: ApplicationId,
       execId: String,
-      resolver: ExternalShuffleBlockResolver
+      resolver: ExternalShuffleBlockResolver,
   ): Option[ExecutorShuffleInfo] = {
     val id = new AppExecId(appId.toString, execId)
     Option(resolver.executors.get(id))

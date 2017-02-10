@@ -213,7 +213,7 @@ class AggregateFlatClassPathTest {
         sourceFileEntry(dir1, pkg1, "G"),
         classFileEntry(dir2, pkg1, "C"),
         classFileEntry(dir2, pkg1, "B"),
-        classFileEntry(dir3, pkg1, "D")
+        classFileEntry(dir3, pkg1, "D"),
     )
     assertEquals(classesAndSourcesInPkg1, cp.list(pkg1).classesAndSources)
 
@@ -227,7 +227,7 @@ class AggregateFlatClassPathTest {
     assertEquals(
         Some(ClassAndSourceFilesEntry(classFile(dir2, pkg1, "A"),
                                       sourceFile(dir1, pkg1, "A"))),
-        cp.findClass(s"$pkg1.A")
+        cp.findClass(s"$pkg1.A"),
     )
     assertEquals(
         Some(classFileEntry(dir3, pkg1, "D")), cp.findClass(s"$pkg1.D"))

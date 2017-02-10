@@ -30,7 +30,7 @@ class ScalariformFormatSpec extends EnsimeSpec {
             SexpSymbol(":doubleIndentClassDeclaration"),
             SexpSymbol("t"),
             SexpSymbol(":indentSpaces"),
-            SexpNumber(13)
+            SexpNumber(13),
         ))
   }
 }

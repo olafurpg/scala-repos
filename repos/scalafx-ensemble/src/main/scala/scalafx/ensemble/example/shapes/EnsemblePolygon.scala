@@ -51,7 +51,7 @@ class EnsemblePolygon extends EnsembleExample {
           polyObj(Polygon(45, 10, 10, 80, 80, 80), Color.DarkCyan),
           polyObj(
               Polygon(135, 15, 160, 30, 160, 60, 135, 75, 110, 60, 110, 30),
-              Color.Orange)
+              Color.Orange),
       )
     }
   }

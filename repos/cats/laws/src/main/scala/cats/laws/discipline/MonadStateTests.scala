@@ -33,7 +33,7 @@ trait MonadStateTests[F[_], S] extends MonadTests[F] {
           "monadState get idempotent" -> laws.monadStateGetIdempotent,
           "monadState set twice" -> forAll(laws.monadStateSetTwice _),
           "monadState set get" -> forAll(laws.monadStateSetGet _),
-          "monadState get set" -> laws.monadStateGetSet
+          "monadState get set" -> laws.monadStateGetSet,
       )
     }
   }

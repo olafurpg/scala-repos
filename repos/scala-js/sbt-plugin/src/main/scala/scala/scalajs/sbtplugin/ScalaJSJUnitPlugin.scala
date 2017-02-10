@@ -36,6 +36,6 @@ object ScalaJSJUnitPlugin extends AutoPlugin {
         } yield {
           s"-Xplugin:$jarPath"
         }
-      }
+      },
   )
 }

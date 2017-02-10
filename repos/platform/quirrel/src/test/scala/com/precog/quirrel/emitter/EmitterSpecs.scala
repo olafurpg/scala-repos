@@ -252,7 +252,7 @@ object EmitterSpecs
 
     "emit negation of literal numeric load with value provenance" in {
       testEmit("neg 5")(
-          Vector(PushNum("5"), Map1(Neg))
+          Vector(PushNum("5"), Map1(Neg)),
       )
     }
 
@@ -302,7 +302,7 @@ object EmitterSpecs
       testEmit(input)(Vector(
               PushTrue,
               Map1(Comp),
-              Map1(Comp)
+              Map1(Comp),
           ))
     }
 
@@ -748,7 +748,7 @@ object EmitterSpecs
 
     "emit load of literal load" in {
       testEmit("""load("foo")""")(
-          Vector(PushString("foo"), AbsoluteLoad)
+          Vector(PushString("foo"), AbsoluteLoad),
       )
     }
 

@@ -45,7 +45,7 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
     */
   protected def newNode(
       factory: ServiceFactory[Req, Rep],
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   ): Node
 
   /**

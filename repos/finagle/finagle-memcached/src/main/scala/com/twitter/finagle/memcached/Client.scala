@@ -84,7 +84,7 @@ object Client {
 case class GetResult private[memcached](
     hits: Map[String, Value] = Map.empty,
     misses: immutable.Set[String] = immutable.Set.empty,
-    failures: Map[String, Throwable] = Map.empty
+    failures: Map[String, Throwable] = Map.empty,
 ) {
   lazy val values: Map[String, Buf] = hits.mapValues { _.value }
 
@@ -202,7 +202,7 @@ trait BaseClient[T] {
       flags: Int,
       expiry: Time,
       value: T,
-      casUnique: Buf
+      casUnique: Buf,
   ): Future[JBoolean] =
     checkAndSet(key, flags, expiry, value, casUnique).flatMap(
         CasFromCheckAndSet)
@@ -237,7 +237,7 @@ trait BaseClient[T] {
       flags: Int,
       expiry: Time,
       value: T,
-      casUnique: Buf
+      casUnique: Buf,
   ): Future[CasResult]
 
   /**
@@ -406,7 +406,7 @@ trait Client extends BaseClient[Buf] {
       new Bijection[Buf, String] {
         def apply(a: Buf): String = a match { case Buf.Utf8(s) => s }
         def invert(b: String): Buf = Buf.Utf8(b)
-      }
+      },
   )
 
   /** Adaptor to use Array[Byte] as values */
@@ -414,7 +414,7 @@ trait Client extends BaseClient[Buf] {
       new Bijection[Buf, Array[Byte]] {
         def apply(a: Buf): Array[Byte] = a.toArray
         def invert(b: Array[Byte]): Buf = Buf.ByteArray.Owned(b)
-      }
+      },
   )
 }
 
@@ -499,7 +499,7 @@ protected class ConnectedClient(
       case other =>
         throw new IllegalStateException(
             "Invalid response type from get: %s".format(
-                other.getClass.getSimpleName)
+                other.getClass.getSimpleName),
         )
     } handle {
       case t: RequestException =>
@@ -704,7 +704,7 @@ trait PartitionedClient extends Client {
   private[this] def withKeysGroupedByClient[A](keys: Iterable[String])(
       f: (Client, Iterable[String]) => Future[A]): Future[Seq[A]] = {
     Future.collect(
-        keys.groupBy(clientOf).map(Function.tupled(f)).toSeq
+        keys.groupBy(clientOf).map(Function.tupled(f)).toSeq,
     )
   }
 
@@ -807,7 +807,7 @@ private[finagle] object KetamaFailureAccrualFactory {
     */
   def module[Req, Rep](
       key: KetamaClientKey,
-      healthBroker: Broker[NodeHealth]
+      healthBroker: Broker[NodeHealth],
   ): Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module5[FailureAccrualFactory.Param,
                       Memcached.param.EjectFailedHost,
@@ -825,7 +825,7 @@ private[finagle] object KetamaFailureAccrualFactory {
           _label: finagle.param.Label,
           _timer: finagle.param.Timer,
           _stats: finagle.param.Stats,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ) = failureAccrual match {
         case Param.Configured(policy) =>
           val Memcached.param.EjectFailedHost(ejectFailedHost) =
@@ -877,7 +877,7 @@ private[finagle] class KetamaFailureAccrualFactory[Req, Rep](
       key: KetamaClientKey,
       healthBroker: Broker[NodeHealth],
       ejectFailedHost: Boolean,
-      label: String
+      label: String,
   ) =
     this(underlying,
          FailureAccrualPolicy.consecutiveFailures(
@@ -1139,7 +1139,7 @@ case class KetamaClientBuilder private[memcached](
     _failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds),
     _ejectFailedHost: Boolean = true,
     oldLibMemcachedVersionComplianceMode: Boolean = false,
-    numReps: Int = KetamaPartitionedClient.DefaultNumReps
+    numReps: Int = KetamaPartitionedClient.DefaultNumReps,
 ) {
   import Memcached.Client.mkDestination
 
@@ -1153,7 +1153,7 @@ case class KetamaClientBuilder private[memcached](
 
   def dest(
       name: Name,
-      useOnlyResolvedAddress: Boolean = false
+      useOnlyResolvedAddress: Boolean = false,
   ): KetamaClientBuilder = {
     val Name.Bound(va) =
       if (LocalMemcached.enabled) {

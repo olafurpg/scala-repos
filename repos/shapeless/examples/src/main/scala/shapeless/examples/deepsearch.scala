@@ -33,7 +33,7 @@ object DeepSearchExamples extends App {
   trait LowPrioritySearchable {
     implicit def hlistishSearchable[A, L <: HList, Q](
         implicit gen: Generic.Aux[A, L],
-        s: Searchable[L, Q]
+        s: Searchable[L, Q],
     ): Searchable[A, Q] = new Searchable[A, Q] {
       def find(p: Q => Boolean)(a: A) = s.find(p)(gen to a)
     }
@@ -57,7 +57,7 @@ object DeepSearchExamples extends App {
 
     implicit def hlistSearchable[H, T <: HList, Q](
         implicit hs: Searchable[H, Q] = null,
-        ts: Searchable[T, Q]
+        ts: Searchable[T, Q],
     ): Searchable[H :: T, Q] = new Searchable[H :: T, Q] {
       def find(p: Q => Boolean)(a: H :: T) =
         Option(hs).flatMap(_.find(p)(a.head)) orElse ts.find(p)(a.tail)

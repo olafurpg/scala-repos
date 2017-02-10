@@ -16,7 +16,7 @@ object Util {
         (scalaBinaryVersion.value match {
               case "2.11" => true
               case _ => false
-            })
+            }),
     )
 
   lazy val javaOnlySettings =
@@ -39,7 +39,7 @@ object Util {
       scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
         case Some((2, 10)) => Seq("-deprecation", "-Xlint")
         case _ => Seq()
-      }
+      },
   )
 
   def projectComponent = projectID <<= (projectID, componentID) { (pid, cid) =>
@@ -108,7 +108,7 @@ object Util {
 
   def publishPomSettings: Seq[Setting[_]] = Seq(
       publishArtifact in makePom := false,
-      pomPostProcess := cleanPom _
+      pomPostProcess := cleanPom _,
   )
 
   def cleanPom(pomNode: scala.xml.Node) = {
@@ -173,7 +173,7 @@ object %s {
             scalaKeywords := getScalaKeywords,
             generateKeywords <<=
               (sourceManaged, scalaKeywords) map writeScalaKeywords,
-            sourceGenerators <+= generateKeywords map (x => Seq(x))
+            sourceGenerators <+= generateKeywords map (x => Seq(x)),
         ))
 }
 
@@ -200,7 +200,7 @@ object Licensed {
         _ +: _
       },
       extractLicenses <<=
-        (baseDirectory in ThisBuild, notice, streams) map extractLicenses0
+        (baseDirectory in ThisBuild, notice, streams) map extractLicenses0,
   )
   def extractLicenses0(base: File, note: File, s: TaskStreams): Seq[File] =
     if (!note.exists) Nil

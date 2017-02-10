@@ -35,7 +35,7 @@ sealed trait Parsed[+T] {
 case class ParseError(failure: Parsed.Failure)
     extends Exception(
         ParseError.msg0(
-            failure.extra.input, failure.extra.traced.expected, failure.index)
+            failure.extra.input, failure.extra.traced.expected, failure.index),
     )
 
 object ParseError {
@@ -95,7 +95,7 @@ object Parsed {
         Nil,
         extra.input,
         index,
-        Failure.formatParser(lastParser, extra.input, index)
+        Failure.formatParser(lastParser, extra.input, index),
     )
 
     override def toString = s"Failure($msg)"
@@ -224,7 +224,7 @@ object Parsed {
                          originalParser,
                          originalIndex,
                          (_, _, _) => ()),
-            originalIndex
+            originalIndex,
         )
         .asInstanceOf[Mutable.Failure]
 
@@ -232,7 +232,7 @@ object Parsed {
           input,
           index,
           mutFailure.fullStack.toVector.reverse,
-          mutFailure.traceParsers + lastParser
+          mutFailure.traceParsers + lastParser,
       )
     }
   }
@@ -350,7 +350,7 @@ class ParseCtx(val input: String,
       originalIndex,
       traceIndex,
       Set.empty,
-      false
+      false,
   )
   val success = Mutable.Success(null, 0, Set.empty, false)
 }

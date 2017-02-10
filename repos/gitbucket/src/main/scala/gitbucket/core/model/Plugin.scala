@@ -15,5 +15,5 @@ trait PluginComponent extends TemplateComponent { self: Profile =>
 
 case class Plugin(
     pluginId: String,
-    version: String
+    version: String,
 )

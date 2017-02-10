@@ -3,7 +3,7 @@ package scala.tools.partest.scalajs
 class ScalaJSPartestOptions private (
     val testFilter: ScalaJSPartestOptions.TestFilter,
     val optMode: ScalaJSPartestOptions.OptMode,
-    val showDiff: Boolean
+    val showDiff: Boolean,
 )
 
 object ScalaJSPartestOptions {

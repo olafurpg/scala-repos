@@ -263,7 +263,7 @@ object scalac extends Command {
                   SeqPara("Configure XML parsing.",
                           Mono("\"coalescing\"") & " convert PCData to Text and coalesce sibling nodes (default in 2.11).")),
               Definition(CmdOption("Y"),
-                         "Print a synopsis of private options.")
+                         "Print a synopsis of private options."),
           )),
       Section("Compilation Phases",
               DefinitionList(
@@ -381,7 +381,7 @@ object scalac extends Command {
                              "java") & " command defined by " & MBold(
                              "JAVACMD") & ".",
                          "With Java 1.5 (or newer) one may for example configure the " & "memory usage of the JVM as follows: " & Mono(
-                             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\"")
+                             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\""),
                      ))))
 
   val examples = Section(

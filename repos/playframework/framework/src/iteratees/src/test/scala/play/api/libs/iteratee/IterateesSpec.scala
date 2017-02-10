@@ -457,10 +457,10 @@ object IterateesSpec
                             delayed(
                                 cont(input3 =>
                                       delayed(
-                                          done(input1 + input2 + input3)
-                                    ))
-                          ))
-                ))
+                                          done(input1 + input2 + input3),
+                                    )),
+                          )),
+                )),
         ).recover { case t: Throwable => unexpected }
         val actual = await(Enumerator(expected, expected, expected) |>>> it)
         actual must equalTo(expected * 3)
@@ -477,10 +477,10 @@ object IterateesSpec
                             delayed(
                                 cont(input3 =>
                                       delayed(
-                                          error(input1 + input2 + input3)
-                                    ))
-                          ))
-                ))
+                                          error(input1 + input2 + input3),
+                                    )),
+                          )),
+                )),
         ).recover { case t: Throwable => expected }
         val actual =
           await(Enumerator(unexpected, unexpected, unexpected) |>>> it)

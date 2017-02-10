@@ -90,7 +90,7 @@ case class Prediction(val data: HashMap[String, Double]) extends Serializable {}
 object SaddleWrapper {
   def ToFrame[A](
       timeIndex: Array[DateTime],
-      tickerPriceSeq: Array[(String, Array[A])]
+      tickerPriceSeq: Array[(String, Array[A])],
   )(implicit st: ST[A]): Frame[DateTime, String, A] = {
     val index = IndexTime(timeIndex: _*)
     val seriesList = tickerPriceSeq.map {

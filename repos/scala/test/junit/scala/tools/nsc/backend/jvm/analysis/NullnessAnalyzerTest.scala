@@ -140,7 +140,7 @@ class NullnessAnalyzerTest extends ClearAfterClass {
     for ((insn, index, nullness) <- List(
         ("+ACONST_NULL", 2, NullValue),
         ("+ASTORE 1", 1, NullValue),
-        ("+ALOAD 1", 2, NullValue)
+        ("+ALOAD 1", 2, NullValue),
     )) testNullness(a, m, insn, index, nullness)
   }
 

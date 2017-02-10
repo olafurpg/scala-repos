@@ -173,7 +173,7 @@ private[orc] class OrcOutputWriter(path: String,
           new Path(path, filename).getFileSystem(conf),
           conf.asInstanceOf[JobConf],
           new Path(path, filename).toString,
-          Reporter.NULL
+          Reporter.NULL,
       )
       .asInstanceOf[RecordWriter[NullWritable, Writable]]
   }
@@ -303,7 +303,7 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
           conf.asInstanceOf[JobConf],
           inputFormatClass,
           classOf[NullWritable],
-          classOf[Writable]
+          classOf[Writable],
       )
       .asInstanceOf[HadoopRDD[NullWritable, Writable]]
 
@@ -339,6 +339,6 @@ private[orc] object OrcRelation {
       CompressionKind.NONE.name -> "",
       CompressionKind.SNAPPY.name -> ".snappy",
       CompressionKind.ZLIB.name -> ".zlib",
-      CompressionKind.LZO.name -> ".lzo"
+      CompressionKind.LZO.name -> ".lzo",
   )
 }

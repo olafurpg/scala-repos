@@ -8,24 +8,24 @@ import scala.collection.immutable.HashMap
 // all data need to be serializable
 class MyTrainingData(
     // list of (day, temperature) tuples
-    val temperatures: List[(String, Double)]
+    val temperatures: List[(String, Double)],
 )
     extends Serializable
 
 class MyQuery(
-    val day: String
+    val day: String,
 )
     extends Serializable
 
 class MyModel(
-    val temperatures: HashMap[String, Double]
+    val temperatures: HashMap[String, Double],
 )
     extends Serializable {
   override def toString = temperatures.toString
 }
 
 class MyPredictedResult(
-    val temperature: Double
+    val temperature: Double,
 )
     extends Serializable
 
@@ -82,7 +82,7 @@ object MyEngineFactory extends IEngineFactory {
     /* SimpleEngine only requires one DataSouce and one Algorithm */
     new SimpleEngine(
         classOf[MyDataSource],
-        classOf[MyAlgorithm]
+        classOf[MyAlgorithm],
     )
   }
 }

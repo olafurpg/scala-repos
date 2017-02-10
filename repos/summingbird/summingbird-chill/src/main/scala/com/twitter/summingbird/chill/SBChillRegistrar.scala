@@ -59,7 +59,7 @@ object SBChillRegistrar {
         classOf[ScalaKryoInstantiator],
         new ScalaKryoInstantiator()
           .withRegistrar(new IterableRegistrar(iterableRegistrars ++ defaults))
-          .setReferences(false)
+          .setReferences(false),
       )
     kryoConfig.unwrap
   }

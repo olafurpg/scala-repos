@@ -56,17 +56,17 @@ object RecoverJson {
     def increment(balanced: Balanced) = BalancedStackState(
         bufferIndex,
         offset + 1,
-        stack push balanced
+        stack push balanced,
     )
     def decrement = BalancedStackState(
         bufferIndex,
         offset + 1,
-        stack pop
+        stack pop,
     )
     def skip = BalancedStackState(
         bufferIndex,
         offset + 1,
-        stack
+        stack,
     )
   }
 
@@ -79,7 +79,7 @@ object RecoverJson {
             BalancedStackState(
                 accum.bufferIndex + 1,
                 accum.offset % buffers(accum.bufferIndex).limit,
-                accum.stack
+                accum.stack,
             ))
       else {
         val buffer = buffers(accum.bufferIndex)
@@ -119,7 +119,7 @@ object RecoverJson {
                 BalancedStackState(
                     bufferIndex,
                     offset + 1,
-                    next.stack
+                    next.stack,
                 )
             } getOrElse {
               // String didn't end
@@ -130,7 +130,7 @@ object RecoverJson {
                   buffers.length,
                   0,
                   if (lastCharacter == '\\') quoted push EscapeChar
-                  else quoted
+                  else quoted,
               )
             })
 

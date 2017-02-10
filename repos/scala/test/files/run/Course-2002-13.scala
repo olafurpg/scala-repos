@@ -267,7 +267,7 @@ object Test {
         "adjectif(belle).\n" + "nom(table).\n" + "nom(cheval).\n" +
         "complement(A,D,N) :- article(A), adjectif(D), nom(N).\n" +
         "phrase(S,V,A,D,N) :- sujet(S), verbe(V), complement(A,D,N).\n" +
-        "?phrase(S,V,A,D,N).\n" + "?more.\n"
+        "?phrase(S,V,A,D,N).\n" + "?more.\n",
     );
     Console.println;
 
@@ -278,7 +278,7 @@ object Test {
         "adjectif(belle,f).\n" + "nom(table,f).\n" + "nom(cheval,m).\n" +
         "complement(A,D,N) :- article(A,G), adjectif(D,G), nom(N,G).\n" +
         "phrase(S,V,A,D,N) :- sujet(S), verbe(V), complement(A,D,N).\n" +
-        "?phrase(S,V,A,D,N).\n" + "?more.\n"
+        "?phrase(S,V,A,D,N).\n" + "?more.\n",
     );
     Console.println;
 
@@ -294,7 +294,7 @@ object Test {
         "?phrase(S,V,A,D,N).\n" + "?more.\n" + "?more.\n" + "?more.\n" +
         "?phrase(jean,mange,le,nil,cheval).\n" +
         "?phrase(jean,mange,le,cons(grand,nil),cheval).\n" +
-        "?phrase(jean,mange,le,cons(grand,nil),table).\n"
+        "?phrase(jean,mange,le,cons(grand,nil),table).\n",
     );
     Console.println;
 

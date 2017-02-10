@@ -320,8 +320,8 @@ object ScalaPsiUtil {
             .getCachedClass(
                 "scala.Function1",
                 e.getResolveScope,
-                ScalaPsiManager.ClassCategory.TYPE
-            )
+                ScalaPsiManager.ClassCategory.TYPE,
+            ),
         ) collect {
         case cl: ScTrait =>
           ScParameterizedType(
@@ -375,7 +375,7 @@ object ScalaPsiUtil {
               _.map(
                   _.getTypeAfterImplicitConversion(checkImplicits = false,
                                                    isShape = m.isShapeResolve,
-                                                   None)._1.getOrAny
+                                                   None)._1.getOrAny,
               ))
         case _ => Seq.empty
       }

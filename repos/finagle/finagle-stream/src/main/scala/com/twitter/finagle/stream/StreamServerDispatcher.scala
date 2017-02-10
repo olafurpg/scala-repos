@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.http._
   */
 private[twitter] class StreamServerDispatcher[Req : RequestType](
     trans: Transport[Any, Any],
-    service: Service[Req, StreamResponse]
+    service: Service[Req, StreamResponse],
 )
     extends GenSerialServerDispatcher[Req, StreamResponse, Any, Any](trans) {
   import Bijections._

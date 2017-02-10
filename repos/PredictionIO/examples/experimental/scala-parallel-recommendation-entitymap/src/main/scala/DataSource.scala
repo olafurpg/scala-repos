@@ -28,24 +28,24 @@ class DataSource(val dsp: DataSourceParams)
     val users: EntityMap[User] = eventsDb.extractEntityMap[User](
         appId = dsp.appId,
         entityType = "user",
-        required = Some(Seq("attr0", "attr1", "attr2"))
+        required = Some(Seq("attr0", "attr1", "attr2")),
     )(sc) { dm =>
       User(
           attr0 = dm.get[Double]("attr0"),
           attr1 = dm.get[Int]("attr1"),
-          attr2 = dm.get[Int]("attr2")
+          attr2 = dm.get[Int]("attr2"),
       )
     }
 
     val items: EntityMap[Item] = eventsDb.extractEntityMap[Item](
         appId = dsp.appId,
         entityType = "item",
-        required = Some(Seq("attrA", "attrB", "attrC"))
+        required = Some(Seq("attrA", "attrB", "attrC")),
     )(sc) { dm =>
       Item(
           attrA = dm.get[String]("attrA"),
           attrB = dm.get[Int]("attrB"),
-          attrC = dm.get[Boolean]("attrC")
+          attrC = dm.get[Boolean]("attrC"),
       )
     }
 
@@ -81,25 +81,25 @@ class DataSource(val dsp: DataSourceParams)
 case class User(
     attr0: Double,
     attr1: Int,
-    attr2: Int
+    attr2: Int,
 )
 
 case class Item(
     attrA: String,
     attrB: Int,
-    attrC: Boolean
+    attrC: Boolean,
 )
 
 case class Rating(
     user: String,
     item: String,
-    rating: Double
+    rating: Double,
 )
 
 class TrainingData(
     val users: EntityMap[User],
     val items: EntityMap[Item],
-    val ratings: RDD[Rating]
+    val ratings: RDD[Rating],
 )
     extends Serializable {
   override def toString = {

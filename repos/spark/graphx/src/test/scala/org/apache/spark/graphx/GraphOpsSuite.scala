@@ -85,7 +85,7 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
                   deg.getOrElse(0)
                 }
             },
-            vpred = (vid: VertexId, deg: Int) => deg > 0
+            vpred = (vid: VertexId, deg: Int) => deg > 0,
         )
         .cache()
 

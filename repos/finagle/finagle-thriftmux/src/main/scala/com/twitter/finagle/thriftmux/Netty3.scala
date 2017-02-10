@@ -51,7 +51,7 @@ private[finagle] class PipelineFactory(
       val request_ = InputBuffer.peelMessage(
           ThriftMuxUtil.bufferToArray(req),
           header,
-          protocolFactory
+          protocolFactory,
       )
       val richHeader = new RichRequestHeader(header)
 

@@ -252,14 +252,14 @@ trait PostgresProfile extends JdbcProfile {
             "create trigger " + lobTrigger(tname) +
             " before update or delete on " + quoteIdentifier(tname) +
             " for each row execute procedure lo_manage(" +
-            quoteIdentifier(column.name) + ")"
+            quoteIdentifier(column.name) + ")",
         ) else None
 
     def dropLobTrigger(tname: String): Option[String] =
       if (sqlType == "lo")
         Some(
             "drop trigger " + lobTrigger(tname) + " on " + quoteIdentifier(
-                tname)
+                tname),
         ) else None
   }
 

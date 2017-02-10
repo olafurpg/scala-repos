@@ -407,7 +407,7 @@ object CachesUtil {
             if (!queue.exists(_._1 == fun)) {
               queue.enqueue((fun, project)); needToCheckFuns = true
             }
-        }
+        },
     )
   }
 }

@@ -76,7 +76,7 @@ object SerializerPropertiesSuite extends Assertions {
             val x =
               MyCaseClass(rand.nextInt(), rand.nextString(rand.nextInt(10)))
             (x, x)
-        }
+        },
     )
     randomFunctions(rand.nextInt(randomFunctions.size)).apply()
   }

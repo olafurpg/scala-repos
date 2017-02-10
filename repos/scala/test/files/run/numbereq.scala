@@ -7,7 +7,7 @@ object Test {
         new java.lang.Double(x.toDouble),
         new java.lang.Float(x.toFloat),
         new java.lang.Long(x.toLong),
-        new java.lang.Integer(x)
+        new java.lang.Integer(x),
     )
     val extras = List(
         if (x >= Short.MinValue && x <= Short.MaxValue)
@@ -15,7 +15,7 @@ object Test {
         if (x >= Byte.MinValue && x <= Byte.MaxValue)
           List(new java.lang.Byte(x.toByte)) else Nil,
         if (x >= Char.MinValue && x <= Char.MaxValue)
-          List(new java.lang.Character(x.toChar)) else Nil
+          List(new java.lang.Character(x.toChar)) else Nil,
     ).flatten
 
     base ::: extras
@@ -31,7 +31,7 @@ object Test {
         if (x.isValidInt) List(new java.lang.Integer(x.toInt)) else Nil,
         if (x.isValidShort) List(new java.lang.Short(x.toShort)) else Nil,
         if (x.isValidByte) List(new java.lang.Byte(x.toByte)) else Nil,
-        if (x.isValidChar) List(new java.lang.Character(x.toChar)) else Nil
+        if (x.isValidChar) List(new java.lang.Character(x.toChar)) else Nil,
     ).flatten
   }
 

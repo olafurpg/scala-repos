@@ -22,7 +22,7 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
           tbl.schema.create,
           tbl ++= data,
           q.result.map(_ shouldBe data),
-          tbl.schema.drop
+          tbl.schema.drop,
       )
     }
 
@@ -41,7 +41,7 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
                                 BigDecimal("1"),
                                 BigDecimal(Long.MinValue),
                                 BigDecimal(Long.MaxValue))
-        }
+        },
     )
   }
 
@@ -64,7 +64,7 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
         t1.filter(_.data =!= v.bind).map(_.id).result.map(_ shouldBe Nil),
         t1 += (2, v, None),
         t1.filter(_.dataOpt.isDefined).map(_.id).result.map(_ shouldBe Seq(1)),
-        t1.filter(_.dataOpt.isEmpty).map(_.id).result.map(_ shouldBe Seq(2))
+        t1.filter(_.dataOpt.isEmpty).map(_.id).result.map(_ shouldBe Seq(2)),
     )
   }
 
@@ -84,7 +84,7 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
         ts += 42,
         ts.map(_ => ()).result.map(_ shouldBe Seq(())),
         ts.map(a => ((), a)).result.map(_ shouldBe Seq(((), 42))),
-        ts.map(a => (a, ())).result.map(_ shouldBe Seq((42, ())))
+        ts.map(a => (a, ())).result.map(_ shouldBe Seq((42, ()))),
     )
   }
 }

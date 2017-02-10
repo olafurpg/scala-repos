@@ -20,9 +20,9 @@ private class HashedWheelTimer(underlying: netty.Timer) extends Timer {
 
   protected def schedulePeriodically(
       when: Time,
-      period: Duration
+      period: Duration,
   )(
-      f: => Unit
+      f: => Unit,
   ): TimerTask = new TimerTask {
     var isCancelled = false
     var ref: TimerTask = schedule(when) { loop() }

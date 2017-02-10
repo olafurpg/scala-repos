@@ -16,19 +16,19 @@ import Iteratee._
 sealed abstract class StepT[E, F[_], A] {
   def fold[Z](
       cont: (Input[E] => IterateeT[E, F, A]) => Z,
-      done: (=> A, => Input[E]) => Z
+      done: (=> A, => Input[E]) => Z,
   ): Z
 
   /** An alias for `fold` */
   def apply[Z](
       cont: (Input[E] => IterateeT[E, F, A]) => Z,
-      done: (=> A, => Input[E]) => Z
+      done: (=> A, => Input[E]) => Z,
   ): Z = fold(cont, done)
 
   def cont: Option[Input[E] => IterateeT[E, F, A]] =
     fold(
         Some(_),
-        (_, _) => None
+        (_, _) => None,
     )
 
   def contOr(
@@ -38,7 +38,7 @@ sealed abstract class StepT[E, F[_], A] {
   def mapContOr[Z](k: (Input[E] => IterateeT[E, F, A]) => Z, z: => Z): Z =
     fold(
         k(_),
-        (_, _) => z
+        (_, _) => z,
     )
 
   def mapCont(k: (Input[E] => IterateeT[E, F, A]) => IterateeT[E, F, A])(
@@ -48,7 +48,7 @@ sealed abstract class StepT[E, F[_], A] {
   def doneValue: LazyOption[A] =
     fold(
         _ => LazyOption.lazyNone,
-        (a, _) => LazyOption.lazySome(a)
+        (a, _) => LazyOption.lazySome(a),
     )
 
   def doneValueOr(a: => A): A =
@@ -57,13 +57,13 @@ sealed abstract class StepT[E, F[_], A] {
   def mapDoneValueOr[Z](k: (=> A) => Z, z: => Z) =
     fold(
         _ => z,
-        (a, _) => k(a)
+        (a, _) => k(a),
     )
 
   def doneInput: LazyOption[Input[E]] =
     fold(
         _ => LazyOption.lazyNone,
-        (_, i) => LazyOption.lazySome(i)
+        (_, i) => LazyOption.lazySome(i),
     )
 
   def doneInputOr(a: => Input[E]): Input[E] =
@@ -72,7 +72,7 @@ sealed abstract class StepT[E, F[_], A] {
   def mapDoneInputOr[Z](k: (=> Input[E]) => Z, z: => Z) =
     fold(
         _ => z,
-        (_, i) => k(i)
+        (_, i) => k(i),
     )
 
   def >-[Z](cont: => Z, done: => Z): Z =
@@ -92,7 +92,7 @@ object StepT extends StepTFunctions with EnumeratorTInstances {
       new StepT[E, F, A] {
         def fold[Z](
             cont: (Input[E] => IterateeT[E, F, A]) => Z,
-            done: (=> A, => Input[E]) => Z
+            done: (=> A, => Input[E]) => Z,
         ) = cont(c)
       }
 
@@ -105,7 +105,7 @@ object StepT extends StepTFunctions with EnumeratorTInstances {
     def apply[E, F[_], A](d: => A, r: => Input[E]) = new StepT[E, F, A] {
       def fold[Z](
           cont: (Input[E] => IterateeT[E, F, A]) => Z,
-          done: (=> A, => Input[E]) => Z
+          done: (=> A, => Input[E]) => Z,
       ) = done(d, r)
     }
 

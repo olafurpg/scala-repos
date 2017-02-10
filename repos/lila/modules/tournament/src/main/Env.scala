@@ -112,12 +112,12 @@ final class Env(config: Config,
   system.actorOf(
       Props(new CreatedOrganizer(
               api = api,
-              isOnline = isOnline
+              isOnline = isOnline,
           )))
 
   private val reminder = system.actorOf(
       Props(new Reminder(
-              renderer = hub.actor.renderer
+              renderer = hub.actor.renderer,
           )))
 
   system.actorOf(
@@ -125,7 +125,7 @@ final class Env(config: Config,
               api = api,
               reminder = reminder,
               isOnline = isOnline,
-              socketHub = socketHub
+              socketHub = socketHub,
           )))
 
   system.actorOf(Props(new Scheduler(api)))

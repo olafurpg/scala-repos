@@ -42,7 +42,7 @@ private[video] final class Youtube(
       .withQueryString(
           "id" -> scala.util.Random.shuffle(ids).take(max).mkString(","),
           "part" -> "id,statistics,snippet,contentDetails",
-          "key" -> apiKey
+          "key" -> apiKey,
       )
       .get() flatMap {
       case res if res.status == 200 =>

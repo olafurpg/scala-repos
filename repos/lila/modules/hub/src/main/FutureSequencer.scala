@@ -74,7 +74,7 @@ object FutureSequencer {
             .fold(run()) { timeout =>
               run().withTimeout(
                   duration = timeout,
-                  error = Timeout(timeout)
+                  error = Timeout(timeout),
               )(context.system)
             }
             .andThenAnyway {

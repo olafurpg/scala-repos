@@ -35,7 +35,7 @@ class Timer(taskExecutor: ExecutorService,
       wheelSize = wheelSize,
       startMs = startMs,
       taskCounter = taskCounter,
-      delayQueue
+      delayQueue,
   )
 
   // Locks used to protect data structures while ticking

@@ -90,7 +90,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     private[scala] def missingHook(owner: Symbol, name: Name): Symbol =
       logResult(s"missingHook($owner, $name)")(
           mirrorMissingHook(owner, name) orElse universeMissingHook(owner,
-                                                                    name)
+                                                                    name),
       )
 
     // todo: get rid of most the methods here and keep just staticClass/Module/Package

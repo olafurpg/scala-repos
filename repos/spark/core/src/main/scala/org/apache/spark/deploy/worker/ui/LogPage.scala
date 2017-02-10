@@ -140,7 +140,7 @@ private[ui] class LogPage(parent: WorkerWebUI)
       logDirectory: String,
       logType: String,
       offsetOption: Option[Long],
-      byteLength: Int
+      byteLength: Int,
   ): (String, Long, Long, Long) = {
 
     if (!supportedLogTypes.contains(logType)) {

@@ -42,8 +42,8 @@ class OfferMatcherReconciliationModule(
             reviveOffersConfig,
             clock,
             marathonEventStream,
-            offersWantedObserver
+            offersWantedObserver,
         ),
-        "offersWantedForReconciliation"
+        "offersWantedForReconciliation",
     )
 }

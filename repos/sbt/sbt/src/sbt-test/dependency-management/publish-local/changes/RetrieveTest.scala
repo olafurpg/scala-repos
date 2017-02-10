@@ -12,7 +12,7 @@ object MultiPublishTest extends Build {
         externalResolvers <<= baseDirectory map { base =>
           Resolver.file("local", base / "ivy" / "local" asFile)(
               Resolver.ivyStylePatterns) :: Nil
-        }
+        },
     )
 
   lazy val root =

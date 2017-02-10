@@ -8,7 +8,7 @@ object Test {
 
   def bippies = List(
       Bippy(5, List(new C), new B),
-      Bippy2(5, List(new B), new C)
+      Bippy2(5, List(new B), new C),
   )
 
   def bmethod(x: B) = ()

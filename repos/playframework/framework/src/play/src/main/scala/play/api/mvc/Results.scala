@@ -397,7 +397,7 @@ trait Results {
     def apply[C](content: C)(implicit writeable: Writeable[C]): Result = {
       Result(
           header,
-          writeable.toEntity(content)
+          writeable.toEntity(content),
       )
     }
 
@@ -412,15 +412,15 @@ trait Results {
                                val dispositionType =
                                  if (inline) "inline" else "attachment"
                                dispositionType + "; filename=\"" + name + "\""
-                             }
+                             },
                          )),
           HttpEntity.Streamed(
               file,
               Some(length),
               play.api.libs.MimeTypes
                 .forFileName(name)
-                .orElse(Some(play.api.http.ContentTypes.BINARY))
-            )
+                .orElse(Some(play.api.http.ContentTypes.BINARY)),
+            ),
         )
     }
 
@@ -496,7 +496,7 @@ trait Results {
           header = header,
           body = HttpEntity.Chunked(
                 content.map(c => HttpChunk.Chunk(writeable.transform(c))),
-                writeable.contentType)
+                writeable.contentType),
       )
     }
 
@@ -532,7 +532,7 @@ trait Results {
                   .fromPublisher(Streams.enumeratorToPublisher(content))
                   .map(writeable.transform),
                 None,
-                writeable.contentType)
+                writeable.contentType),
       )
     }
 
@@ -542,7 +542,7 @@ trait Results {
     def sendEntity(entity: HttpEntity): Result = {
       Result(
           header = header,
-          body = entity
+          body = entity,
       )
     }
   }

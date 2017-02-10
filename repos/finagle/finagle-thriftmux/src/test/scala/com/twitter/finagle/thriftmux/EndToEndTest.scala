@@ -200,13 +200,13 @@ class EndToEndTest
           ("ThriftMux proto deprecated",
            protoOld,
            port(protoOld.boundAddress)),
-          ("ThriftMux proto", protoOld, port(protoNew.boundAddress))
+          ("ThriftMux proto", protoOld, port(protoNew.boundAddress)),
       )
     }
 
     def clients(
         pf: TProtocolFactory,
-        port: Int
+        port: Int,
     ): Seq[(String, TestService$FinagleClient, Closable)] = {
       val dest = s"localhost:$port"
       val builder = ClientBuilder()
@@ -247,7 +247,7 @@ class EndToEndTest
           ("Thrift via ClientBuilder", toIface(thriftBuilder), thriftBuilder),
           ("Thrift via proto", toIface(thriftProto), thriftProto),
           ("ThriftMux proto deprecated", toIface(oldProto), oldProto),
-          ("ThriftMux proto", toIface(newProto), newProto)
+          ("ThriftMux proto", toIface(newProto), newProto),
       )
     }
 
@@ -570,7 +570,7 @@ class EndToEndTest
 
   private def testFailureClassification(
       sr: InMemoryStatsReceiver,
-      client: TestService.FutureIface
+      client: TestService.FutureIface,
   ): Unit = {
     val ex = intercept[InvalidQueryException] {
       Await.result(client.query("hi"), 5.seconds)
@@ -637,7 +637,7 @@ class EndToEndTest
         clientBuilder,
         serviceName = "client",
         stats = sr,
-        responseClassifier = classifier
+        responseClassifier = classifier,
     )
 
     testFailureClassification(sr, client)
@@ -1046,7 +1046,7 @@ class EndToEndTest
             def apply(conn: ClientConnection) =
               Future.exception(new Exception("unhappy"))
             def close(deadline: Time) = Future.Done
-          }
+          },
       )
   }
 

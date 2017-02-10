@@ -36,7 +36,7 @@ final class Env(config: Config,
                                                    classOf[lila.hub.Sequencer],
                                                    None,
                                                    None,
-                                                   logger
+                                                   logger,
                                                )))
 
   private lazy val userCacheApi = new UserCacheApi(

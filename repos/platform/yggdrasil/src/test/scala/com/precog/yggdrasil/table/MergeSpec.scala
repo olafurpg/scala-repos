@@ -146,7 +146,7 @@ trait MergeSpec[M[+ _]]
                       twoField,
                       DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                           valueField),
-                                        bField)))
+                                        bField))),
           ),
           GroupingSource(
               foo,
@@ -166,7 +166,7 @@ trait MergeSpec[M[+ _]]
                       twoField,
                       DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                           valueField),
-                                        bField)))
+                                        bField))),
           ),
           GroupingSpec.Intersection)
 
@@ -309,7 +309,7 @@ trait MergeSpec[M[+ _]]
                       oneField,
                       DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                           valueField),
-                                        editionField)))
+                                        editionField))),
           ),
           GroupingSource(
               medals,
@@ -342,7 +342,7 @@ trait MergeSpec[M[+ _]]
                       oneField,
                       DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                           valueField),
-                                        editionField)))
+                                        editionField))),
           ),
           GroupingSpec.Intersection)
 

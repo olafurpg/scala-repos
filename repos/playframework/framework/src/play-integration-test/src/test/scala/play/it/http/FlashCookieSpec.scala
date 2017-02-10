@@ -27,7 +27,7 @@ trait FlashCookieSpec
       case ("GET", "/flash") =>
         Action {
           Redirect("/landing").flashing(
-              "success" -> "found"
+              "success" -> "found",
           )
         }
       case ("GET", "/set-cookie") =>

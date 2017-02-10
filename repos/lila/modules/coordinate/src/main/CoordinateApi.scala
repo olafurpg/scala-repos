@@ -22,7 +22,7 @@ final class CoordinateApi(scoreColl: Coll) {
                                           "$slice" -> -20),
                   "black" -> BSONDocument("$each" ->
                                           (!white ?? List(BSONInteger(hits))),
-                                          "$slice" -> -20)
+                                          "$slice" -> -20),
               )),
           upsert = true)
       .void

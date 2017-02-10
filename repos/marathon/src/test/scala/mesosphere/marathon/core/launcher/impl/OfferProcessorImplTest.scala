@@ -123,7 +123,7 @@ class OfferProcessorImplTest
       val launch = f.launchWithOldTask(
           task,
           MarathonTestHelper.makeTaskFromTaskInfo(task),
-          Some(dummyTask)
+          Some(dummyTask),
       )
       TaskOpWithSource(dummySource, launch)
     }
@@ -309,7 +309,7 @@ class OfferProcessorImplTest
         new Metrics(new MetricRegistry),
         offerMatcher,
         taskLauncher,
-        taskCreationHandler
+        taskCreationHandler,
     )
   }
 

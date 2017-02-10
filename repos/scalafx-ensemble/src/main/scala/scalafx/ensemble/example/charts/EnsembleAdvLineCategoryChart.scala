@@ -54,7 +54,7 @@ class EnsembleAdvLineCategoryChart extends EnsembleExample {
           XYChart.Data[String, Number]("RC1", 90d),
           XYChart.Data[String, Number]("RC2", 30d),
           XYChart.Data[String, Number]("1.0", 120d),
-          XYChart.Data[String, Number]("1.1", 20d)
+          XYChart.Data[String, Number]("1.1", 20d),
       )
     }
 

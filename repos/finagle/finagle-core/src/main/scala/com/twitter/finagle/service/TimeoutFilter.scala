@@ -41,7 +41,7 @@ object TimeoutFilter {
           _param: Param,
           _timer: param.Timer,
           _compensation: LatencyCompensation.Compensation,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ): ServiceFactory[Req, Rep] = {
         val timeout = _param.timeout + _compensation.howlong
 
@@ -69,7 +69,7 @@ object TimeoutFilter {
       def make(
           _param: Param,
           _timer: param.Timer,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ): ServiceFactory[Req, Rep] = {
         val Param(timeout) = _param
         val param.Timer(timer) = _timer
@@ -85,7 +85,7 @@ object TimeoutFilter {
   def typeAgnostic(
       timeout: Duration,
       exception: RequestTimeoutException,
-      timer: Timer
+      timer: Timer,
   ): TypeAgnostic = new TypeAgnostic {
     override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
       new TimeoutFilter[Req, Rep](timeout, exception, timer)

@@ -293,7 +293,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
   def foreach(f: A => Unit) {
     fold(
       (_, a1, a2) => { f(a1); f(a2) },
-      (_, a1, a2, a3) => { f(a1); f(a2); f(a3) }
+      (_, a1, a2, a3) => { f(a1); f(a2); f(a3) },
     )}
 
   def iterator = fold(
@@ -443,8 +443,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
         rightz.fold(
           v => this,
           (v, x) => this :+ x,
-          (v2, pr2, m2, sf2) => deep(measurer.append(v1, v2), pr1, addDigits0(m1, sf1, pr2, m2), sf2)
-        )
+          (v2, pr2, m2, sf2) => deep(measurer.append(v1, v2), pr1, addDigits0(m1, sf1, pr2, m2), sf2),
+        ),
     )
   }
 
@@ -464,8 +464,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           v => this :+ n,
           (v, x) => this :+ n :+ x,
           (v2, pr2, m2, sf2) =>
-            deep(measurer.append((measurer.snoc(v1, n)), v2), pr1, addDigits1(m1, sf1, n, pr2, m2), sf2)
-        )
+            deep(measurer.append((measurer.snoc(v1, n)), v2), pr1, addDigits1(m1, sf1, n, pr2, m2), sf2),
+        ),
     )
   }
 
@@ -482,8 +482,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           (v, x) => this :+ n1 :+ n2 :+ x,
           (v2, pr2, m2, sf2) =>
             deep(measurer.append(measurer.snoc(measurer.snoc(v1, n1), n2), v2),
-              pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
-        )
+              pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2),
+        ),
     )
   }
 
@@ -501,8 +501,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
            (v, x) => this :+ n1 :+ n2 :+ n3 :+ x,
            (v2, pr2, m2, sf2) =>
              deep(measurer.append(measurer.snoc(measurer.snoc(measurer.snoc(v1, n1), n2), n3), v2),
-               pr1, addDigits3(m1, sf1, n1, n2, n3, pr2, m2), sf2)
-        )
+               pr1, addDigits3(m1, sf1, n1, n2, n3, pr2, m2), sf2),
+        ),
     )
   }
 
@@ -521,8 +521,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           (v, x) => this :+ n1 :+ n2 :+ n3 :+ n4 :+ x,
           (v2, pr2, m2, sf2) =>
             deep(measurer.append(measurer.snoc(measurer.snoc(measurer.snoc(measurer.snoc(v1, n1), n2), n3), n4), v2),
-              pr1, addDigits4(m1, sf1, n1, n2, n3, n4, pr2, m2), sf2)
-        )
+              pr1, addDigits4(m1, sf1, n1, n2, n3, n4, pr2, m2), sf2),
+        ),
     )
   }
 
@@ -724,7 +724,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           (deepR(pr, m, l), x, cata(r)(_.toTree, empty))
         }
       }
-    }
+    },
   )
 
   def isEmpty: Boolean = fold(v => true, (v, x) => false, (v, pr, m, sf) => false)
@@ -827,7 +827,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     fold(
       _ => {},
       (_, x) => { f(x) },
-      (_, pr, m, sf) => { pr.foreach(f); m.foreach(_.foreach(f)); sf.foreach(f) }
+      (_, pr, m, sf) => { pr.foreach(f); m.foreach(_.foreach(f)); sf.foreach(f) },
     )}
 
   /** An iterator that visits each element in the tree. */
@@ -923,7 +923,7 @@ sealed abstract class FingerTreeInstances {
       override def show(t: FingerTree[V,A]) = t.fold(
         empty = v => Cord(V.show(v), " []"),
         single = (v, x) => Cord(V.show(v), " [", A.show(x), "]"),
-        deep = (v, pf, m, sf) => Cord(V.show(v), " [", AS.show(pf.toList), ", ?, ", AS.show(sf.toList), "]")
+        deep = (v, pf, m, sf) => Cord(V.show(v), " [", AS.show(pf.toList), ", ?, ", AS.show(sf.toList), "]"),
       )
     }
 

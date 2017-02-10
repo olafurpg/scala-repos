@@ -67,7 +67,7 @@ object Cross {
             val settings = Seq(
                 scalaVersion in GlobalScope :== version,
                 scalaHome in GlobalScope :== Some(home),
-                scalaInstance in GlobalScope :== instance
+                scalaInstance in GlobalScope :== instance,
             )
             (settings,
              excludeKeys(
@@ -78,7 +78,7 @@ object Cross {
             state.log.info("Setting version to " + arg)
             val settings = Seq(
                 scalaVersion in GlobalScope :== arg,
-                scalaHome in GlobalScope :== None
+                scalaHome in GlobalScope :== None,
             )
             (settings, excludeKeys(Set(scalaVersion.key, scalaHome.key)))
           }

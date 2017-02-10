@@ -28,7 +28,7 @@ final class JsonView {
                   List(
                       Json toJson D.Perf,
                       Json toJson D.Color,
-                      Json toJson D.OpponentStrength
+                      Json toJson D.OpponentStrength,
                   )),
             //game
             Categ("Game",
@@ -36,7 +36,7 @@ final class JsonView {
                       openingJson,
                       Json toJson D.MyCastling,
                       Json toJson D.OpCastling,
-                      Json toJson D.QueenTrade
+                      Json toJson D.QueenTrade,
                   )),
             // move
             Categ("Move",
@@ -44,40 +44,40 @@ final class JsonView {
                       Json toJson D.PieceRole,
                       Json toJson D.MovetimeRange,
                       Json toJson D.MaterialRange,
-                      Json toJson D.Phase
+                      Json toJson D.Phase,
                   )),
             // result
             Categ("Result",
-                  List(Json toJson D.Termination, Json toJson D.Result))
+                  List(Json toJson D.Termination, Json toJson D.Result)),
         ),
         "metricCategs" -> metricCategs,
-        "presets" -> Preset.all
+        "presets" -> Preset.all,
     )
   }
 
   private val metricCategs = List(
       Categ("Setup",
             List(
-                Json toJson M.OpponentRating
+                Json toJson M.OpponentRating,
             )),
       Categ("Move",
             List(
                 Json toJson M.Movetime,
                 Json toJson M.PieceRole,
                 Json toJson M.Material,
-                Json toJson M.NbMoves
+                Json toJson M.NbMoves,
             )),
       Categ("Evaluation",
             List(
                 Json toJson M.MeanCpl,
                 Json toJson M.Opportunism,
-                Json toJson M.Luck
+                Json toJson M.Luck,
             )),
       // result
       Categ("Result",
             List(Json toJson M.Termination,
                  Json toJson M.Result,
-                 Json toJson M.RatingDiff))
+                 Json toJson M.RatingDiff)),
   )
 
   private implicit def presetWriter[X]: OWrites[Preset] = OWrites { p =>
@@ -91,7 +91,7 @@ final class JsonView {
             dimension.key -> JsArray(selected
                   .map(Dimension.valueKey(dimension))
                   .map(JsString.apply))
-        })
+        }),
     )
   }
 
@@ -135,6 +135,6 @@ final class JsonView {
               case Array(key, values) =>
                 key -> JsArray(values.split(',').map(JsString.apply))
             }
-            .toMap: Map[String, JsArray])
+            .toMap: Map[String, JsArray]),
   )
 }

@@ -4,12 +4,12 @@ import io.prediction.controller.IEngineFactory
 import io.prediction.controller.Engine
 
 class Query(
-    val features: Array[Double]
+    val features: Array[Double],
 )
     extends Serializable
 
 class PredictedResult(
-    val label: Double
+    val label: Double,
 )
     extends Serializable
 

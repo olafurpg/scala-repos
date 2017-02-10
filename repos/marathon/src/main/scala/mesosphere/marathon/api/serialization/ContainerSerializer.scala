@@ -27,7 +27,7 @@ object ContainerSerializer {
     Container(
         `type` = proto.getType,
         volumes = proto.getVolumesList.asScala.map(Volume(_)).to[Seq],
-        docker = maybeDocker
+        docker = maybeDocker,
     )
   }
 
@@ -113,7 +113,7 @@ object DockerSerializer {
         privileged = proto.getPrivileged,
         parameters = proto.getParametersList.asScala.map(Parameter(_)).to[Seq],
         forcePullImage = if (proto.hasForcePullImage) proto.getForcePullImage
-          else false
+          else false,
     )
 
   def toMesos(
@@ -168,7 +168,7 @@ object PortMappingSerializer {
         if (proto.hasName) Some(proto.getName) else None,
         proto.getLabelsList.asScala.map { p =>
           p.getKey -> p.getValue
-        }.toMap
+        }.toMap,
     )
 
   def toMesos(mapping: Container.Docker.PortMapping)

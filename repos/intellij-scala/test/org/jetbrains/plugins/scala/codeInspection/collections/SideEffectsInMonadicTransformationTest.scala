@@ -52,7 +52,7 @@ class SideEffectsInMonadicTransformationTest
         |  if (it.hasNext) x + ${START}it.next$END
         |  else x
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 
@@ -66,7 +66,7 @@ class SideEffectsInMonadicTransformationTest
          |  ${START}buf += x$END
          |  x
          |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     check(
@@ -78,7 +78,7 @@ class SideEffectsInMonadicTransformationTest
          |  ${START}buf.+=:(x)$END
          |  x
          |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     check(
@@ -90,7 +90,7 @@ class SideEffectsInMonadicTransformationTest
          |  ${START}buf.append(x)$END
          |  x
          |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     check(
@@ -102,7 +102,7 @@ class SideEffectsInMonadicTransformationTest
          |  ${START}buf.clear$END
          |  x
          |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     check(
@@ -114,7 +114,7 @@ class SideEffectsInMonadicTransformationTest
          |  ${START}st.push(x)$END
          |  x
          |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 
@@ -140,7 +140,7 @@ class SideEffectsInMonadicTransformationTest
          |    x
          |  case _ => 1
          |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 
@@ -175,7 +175,7 @@ class SideEffectsInMonadicTransformationTest
         |}
         |val a = new A()
         |Seq(1).map(x => ${START}a.z_=(x)$END)
-      """.stripMargin
+      """.stripMargin,
     )
     check(
         s"""
@@ -184,7 +184,7 @@ class SideEffectsInMonadicTransformationTest
        |}
        |val a = new A()
        |Seq(1).map(x => ${START}a.z = x$END)
-      """.stripMargin
+      """.stripMargin,
     )
   }
 
@@ -197,7 +197,7 @@ class SideEffectsInMonadicTransformationTest
        |}
        |val a = new A()
        |Seq(1).map(x => ${START}a.setZ(x)$END)
-      """.stripMargin
+      """.stripMargin,
     )
 
     checkTextHasNoErrors(
@@ -214,7 +214,7 @@ class SideEffectsInMonadicTransformationTest
          |  val a = new A()
          |  a.setZ(x)
          |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 

@@ -61,7 +61,7 @@ final class GameSearchApi(client: ESClient)
           Fields.analysed -> analysed,
           Fields.whiteUser -> game.whitePlayer.userId,
           Fields.blackUser -> game.blackPlayer.userId,
-          Fields.source -> game.source.map(_.id)
+          Fields.source -> game.source.map(_.id),
       )
       .noNull
 
@@ -115,7 +115,7 @@ final class GameSearchApi(client: ESClient)
 
     lila.game.tube.gameTube.coll
       .find(BSONDocument(
-              "ca" -> BSONDocument("$gt" -> since)
+              "ca" -> BSONDocument("$gt" -> since),
           ))
       .sort(BSONDocument("ca" -> 1))
       .cursor[Game](ReadPreference.secondaryPreferred)

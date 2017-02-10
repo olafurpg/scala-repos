@@ -126,7 +126,7 @@ trait Server[Req, Rep] {
   def serveAndAnnounce(
       name: String,
       addr: SocketAddress,
-      service: ServiceFactory[Req, Rep]
+      service: ServiceFactory[Req, Rep],
   ): ListeningServer = {
     val server = serve(addr, service)
     server.announce(name)
@@ -137,7 +137,7 @@ trait Server[Req, Rep] {
   def serveAndAnnounce(
       name: String,
       addr: SocketAddress,
-      service: Service[Req, Rep]
+      service: Service[Req, Rep],
   ): ListeningServer =
     serveAndAnnounce(name, addr, ServiceFactory.const(service))
 
@@ -145,7 +145,7 @@ trait Server[Req, Rep] {
   def serveAndAnnounce(
       name: String,
       addr: String,
-      service: ServiceFactory[Req, Rep]
+      service: ServiceFactory[Req, Rep],
   ): ListeningServer = {
     val server = serve(addr, service)
     server.announce(name)

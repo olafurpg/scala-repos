@@ -199,8 +199,8 @@ object AdSamples {
               "platform" -> JString(plat),
               "campaign" -> JString(camp),
               "cpm" -> JNum(cpm),
-              "ageRange" -> ageRange
-          )
+              "ageRange" -> ageRange,
+          ),
       )
     }
 
@@ -216,8 +216,8 @@ object AdSamples {
               "employees" -> JString(emps),
               "revenue" -> JString(rev),
               "category" -> JString(cat),
-              "campaign" -> JString(camp)
-          )
+              "campaign" -> JString(camp),
+          ),
       )
     }
 
@@ -235,8 +235,8 @@ object AdSamples {
               "timeZone" -> JString(tz),
               "timeString" -> JString(toISO8601(time, tz)),
               "pageId" -> JString(pid),
-              "userId" -> JString(uid)
-          )
+              "userId" -> JString(uid),
+          ),
       )
     }
 
@@ -252,8 +252,8 @@ object AdSamples {
               "time" -> JNum(time),
               "timeZone" -> JString(tz),
               "pageId" -> JString(pid),
-              "userId" -> JString(uid)
-          )
+              "userId" -> JString(uid),
+          ),
       )
     }
 
@@ -267,8 +267,8 @@ object AdSamples {
           Map(
               "time" -> JString(time),
               "platform" -> JString(platform),
-              "eventName" -> JString(eventName)
-          )
+              "eventName" -> JString(eventName),
+          ),
       )
     }
 
@@ -282,8 +282,8 @@ object AdSamples {
           Map(
               "age" -> JNum(age),
               "income" -> JNum(income),
-              "location" -> JObject(Map("state" -> JString(state)))
-          )
+              "location" -> JObject(Map("state" -> JString(state))),
+          ),
       )
     }
 
@@ -303,8 +303,8 @@ object AdSamples {
               "taxRate" -> JNum(taxRate),
               "subTotal" -> JNum(subTotal),
               "shipping" -> JNum(shipping),
-              "handling" -> JNum(handling)
-          )
+              "handling" -> JNum(handling),
+          ),
       )
     }
 

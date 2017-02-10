@@ -61,9 +61,9 @@ class FileProcessLogger(file: File)
   private val writer = (new PrintWriter(
       new BufferedWriter(
           new OutputStreamWriter(
-              new FileOutputStream(file, true)
-          )
-      )
+              new FileOutputStream(file, true),
+          ),
+      ),
   ))
   def out(s: => String): Unit = writer println s
   def err(s: => String): Unit = writer println s

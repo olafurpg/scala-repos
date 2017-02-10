@@ -94,7 +94,7 @@ object EventJson4sSupport {
               properties = DataMap(properties),
               eventTime = eventTime,
               prId = prId,
-              creationTime = creationTime
+              creationTime = creationTime,
           )
           EventValidation.validate(newEvent)
           newEvent

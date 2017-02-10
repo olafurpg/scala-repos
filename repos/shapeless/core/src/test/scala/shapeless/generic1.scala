@@ -153,7 +153,7 @@ package Generic1TestsAux {
 
     implicit def isCPointedSingleSingleton[C](
         implicit w: Witness.Aux[C],
-        pf: Lazy[Pointed[Const[C]#λ]]
+        pf: Lazy[Pointed[Const[C]#λ]],
     ): Pointed[({ type λ[A] = Const[C]#λ[A] :+: Const[CNil]#λ[A] })#λ] =
       new Pointed[({ type λ[A] = Const[C]#λ[A] :+: Const[CNil]#λ[A] })#λ] {
         def point[A](a: A): Const[C]#λ[A] :+: Const[CNil]#λ[A] =
@@ -161,7 +161,7 @@ package Generic1TestsAux {
       }
 
     implicit def isCPointedSingle[F[_]](
-        implicit pf: Lazy[Pointed[F]]
+        implicit pf: Lazy[Pointed[F]],
     ): Pointed[({ type λ[A] = F[A] :+: Const[CNil]#λ[A] })#λ] =
       new Pointed[({ type λ[A] = F[A] :+: Const[CNil]#λ[A] })#λ] {
         def point[A](a: A): F[A] :+: Const[CNil]#λ[A] = Inl(pf.value.point(a))
@@ -408,8 +408,8 @@ class Generic1Tests {
         Leaf("quux"),
         Node(
             Leaf("foo"),
-            Leaf("wibble")
-        )
+            Leaf("wibble"),
+        ),
     )
 
     val t0 = transform(tree)(_.length)
@@ -419,8 +419,8 @@ class Generic1Tests {
         Leaf(4),
         Node(
             Leaf(3),
-            Leaf(6)
-        )
+            Leaf(6),
+        ),
     )
     assertEquals(expectedTree, t0)
     assertEquals(expectedTree, t1)

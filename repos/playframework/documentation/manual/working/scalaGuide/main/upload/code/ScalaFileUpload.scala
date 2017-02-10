@@ -51,7 +51,7 @@ package scalaguide.upload.fileupload {
                                            "formuploaded",
                                            None,
                                            TemporaryFile(tmpFile))),
-                              Nil)
+                              Nil),
         )
         testAction(upload, request)
 

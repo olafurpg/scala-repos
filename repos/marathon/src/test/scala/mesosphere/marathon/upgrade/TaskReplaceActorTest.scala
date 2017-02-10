@@ -222,7 +222,7 @@ class TaskReplaceActorTest
         id = "myApp".toPath,
         instances = 3,
         healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(0.5)
+        upgradeStrategy = UpgradeStrategy(0.5),
     )
 
     val driver = mock[SchedulerDriver]
@@ -305,7 +305,7 @@ class TaskReplaceActorTest
         id = "myApp".toPath,
         instances = 3,
         healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(0.5, 0.0)
+        upgradeStrategy = UpgradeStrategy(0.5, 0.0),
     )
 
     val driver = mock[SchedulerDriver]
@@ -473,7 +473,7 @@ class TaskReplaceActorTest
         id = "myApp".toPath,
         instances = 3,
         healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(1.0, 0.7)
+        upgradeStrategy = UpgradeStrategy(1.0, 0.7),
     )
 
     val driver = mock[SchedulerDriver]

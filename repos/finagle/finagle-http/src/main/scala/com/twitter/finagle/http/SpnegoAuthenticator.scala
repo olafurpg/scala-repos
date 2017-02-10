@@ -138,7 +138,7 @@ object SpnegoAuthenticator {
     class JAASClientSource(
         val loginContext: String,
         _serverPrincipal: String,
-        _serverPrincipalType: Oid = JAAS.Krb5PrincipalType
+        _serverPrincipalType: Oid = JAAS.Krb5PrincipalType,
     )
         extends ClientSource with JAAS {
       val serverPrincipal =
@@ -163,9 +163,9 @@ object SpnegoAuthenticator {
                 selfPrincipal.orNull,
                 lifetime,
                 mechanism,
-                GSSCredential.INITIATE_ONLY
+                GSSCredential.INITIATE_ONLY,
             ),
-            lifetime
+            lifetime,
         )
     }
 
@@ -185,14 +185,14 @@ object SpnegoAuthenticator {
             selfPrincipal.orNull,
             lifetime,
             JAAS.SpnegoMechanism,
-            GSSCredential.ACCEPT_ONLY
+            GSSCredential.ACCEPT_ONLY,
         )
         cred.add(
             selfPrincipal.orNull,
             lifetime,
             lifetime,
             JAAS.Krb5Mechanism,
-            GSSCredential.ACCEPT_ONLY
+            GSSCredential.ACCEPT_ONLY,
         )
         manager.createContext(cred)
       }
@@ -275,7 +275,7 @@ object SpnegoAuthenticator {
     private def challengeResponseLoop(
         req: Req,
         backend: Service[Req, Rsp],
-        credentialOption: Option[Future[GSSContext]]
+        credentialOption: Option[Future[GSSContext]],
     ): Future[Rsp] =
       backend(req).transform {
         case Return(rsp) if rsps.status(rsp) == Status.Unauthorized =>

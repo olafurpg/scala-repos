@@ -40,7 +40,7 @@ object DisplayHelpers {
         header,
         header.map { str =>
           "-" * str.length
-        }
+        },
     )
   }
 }

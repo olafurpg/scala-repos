@@ -20,7 +20,7 @@ import com.twitter.finagle.{Service, Status, NotShardableException, ShardNotAvai
   */
 class ShardingService[Req, Rep](
     distributor: Distributor[Service[Req, Rep]],
-    hash: Req => Option[Long]
+    hash: Req => Option[Long],
 )
     extends Service[Req, Rep] {
 
@@ -47,7 +47,7 @@ private[service] object ShardingService {
 case class KetamaShardingServiceBuilder[Req, Rep](
     _nodes: Option[Seq[KetamaNode[Service[Req, Rep]]]] = None,
     _hash: Option[Req => Option[Long]] = None,
-    _numReps: Int = 160
+    _numReps: Int = 160,
 ) {
 
   def nodesAndWeights(nodes: Seq[(String, Int, Service[Req, Rep])]) = {

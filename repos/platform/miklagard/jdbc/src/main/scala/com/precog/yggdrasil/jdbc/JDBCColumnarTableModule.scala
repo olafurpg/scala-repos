@@ -428,7 +428,7 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
               case InitialLoad(Nil) =>
                 M.point(None)
             },
-            UnknownSize
+            UnknownSize,
         ).transform(idSpec) //.printer("JDBC Table")
       }
     }

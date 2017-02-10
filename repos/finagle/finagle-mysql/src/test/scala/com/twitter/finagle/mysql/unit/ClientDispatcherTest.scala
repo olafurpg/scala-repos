@@ -62,7 +62,7 @@ class ClientDispatcherTest extends FunSuite {
       80,
       103,
       54,
-      0
+      0,
   )
   val initPacket = Packet(0, Buffer(rawInit))
   val init = HandshakeInit.decode(initPacket)
@@ -160,7 +160,7 @@ class ClientDispatcherTest extends FunSuite {
             maxLen,
             Type.VarChar,
             0,
-            0
+            0,
         )
         f :: aux(len - 1)
     }

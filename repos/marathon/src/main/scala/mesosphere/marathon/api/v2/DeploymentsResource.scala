@@ -62,7 +62,7 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
                 result(groupManager.update(
                         plan.original.id,
                         plan.revert,
-                        force = true
+                        force = true,
                     )))
         }
       }
@@ -81,13 +81,13 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
         "steps" -> steps,
         "currentActions" -> currentStepInfo.step.actions.map(actionToMap),
         "currentStep" -> currentStepInfo.nr,
-        "totalSteps" -> deployment.steps.size
+        "totalSteps" -> deployment.steps.size,
     )
   }
 
   def actionToMap(action: DeploymentAction): Map[String, String] =
     Map(
         "action" -> action.getClass.getSimpleName,
-        "app" -> action.app.id.toString
+        "app" -> action.app.id.toString,
     )
 }

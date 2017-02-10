@@ -61,7 +61,7 @@ private[timeline] final class Push(lobbySocket: ActorSelection,
     Entry
       .make(users, data)
       .fold(
-          fufail[Entry]("[timeline] invalid entry data " + data)
+          fufail[Entry]("[timeline] invalid entry data " + data),
       ) { entry =>
         entryRepo.findRecent(entry.typ, DateTime.now minusMinutes 50) flatMap {
           entries =>

@@ -27,7 +27,7 @@ final class LightUserApi(coll: Coll) {
         coll
           .find(
               BSONDocument(F.id -> id),
-              BSONDocument(F.username -> true, F.title -> true)
+              BSONDocument(F.username -> true, F.title -> true),
           )
           .one[LightUser],
       timeToLive = 20 minutes,

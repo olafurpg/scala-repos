@@ -105,14 +105,14 @@ object Multipart {
               Buf.ByteArray.Owned(fu.get()),
               fu.getContentType,
               fu.getFilename,
-              fu.getContentTransferEncoding
+              fu.getContentTransferEncoding,
           )
         } else {
           buf += OnDiskFileUpload(
               fu.getFile,
               fu.getContentType,
               fu.getFilename,
-              fu.getContentTransferEncoding
+              fu.getContentTransferEncoding,
           )
         }
 

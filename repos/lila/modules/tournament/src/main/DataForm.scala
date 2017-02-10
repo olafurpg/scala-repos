@@ -59,7 +59,7 @@ final class DataForm {
             "position" -> nonEmptyText.verifying(positions contains _),
             "mode" -> optional(
                 number.verifying(Mode.all map (_.id) contains _)),
-            "private" -> optional(text.verifying("on" == _))
+            "private" -> optional(text.verifying("on" == _)),
         )(TournamentSetup.apply)(TournamentSetup.unapply)
           .verifying("Invalid clock", _.validClock)
           .verifying("Increase tournament duration, or decrease game clock",

@@ -664,7 +664,7 @@ private[clustering] object LDASuite {
         Vectors.dense(2, 3, 12, 3, 1),
         Vectors.dense(0, 0, 0, 0, 0), // empty doc
         Vectors.dense(0, 3, 1, 9, 8),
-        Vectors.dense(1, 1, 4, 2, 6)
+        Vectors.dense(1, 1, 4, 2, 6),
     ).zipWithIndex.map {
       case (wordCounts, docId) => (docId.toLong, wordCounts)
     }
@@ -682,7 +682,7 @@ private[clustering] object LDASuite {
         Vectors.sparse(6, Array(0, 2), Array(1, 1)),
         Vectors.sparse(6, Array(3, 4), Array(1, 1)),
         Vectors.sparse(6, Array(3, 5), Array(1, 1)),
-        Vectors.sparse(6, Array(4, 5), Array(1, 1))
+        Vectors.sparse(6, Array(4, 5), Array(1, 1)),
     ).zipWithIndex.map {
       case (wordCounts, docId) => (docId.toLong, wordCounts)
     }

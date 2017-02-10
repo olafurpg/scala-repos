@@ -260,10 +260,10 @@ class MongoRecordSpec extends Specification with MongoTestKit {
               (("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~
                   ("mapField" -> ("x" -> "1"))),
               (("intField" -> 2) ~ ("stringField" -> "jsonobj2") ~
-                  ("mapField" -> ("x" -> "2")))
+                  ("mapField" -> ("x" -> "2"))),
           )) ~
       ("mongoCaseClassListField" -> List(
-              ("intField" -> 1) ~ ("stringField" -> "str") ~ ("enum" -> 1)
+              ("intField" -> 1) ~ ("stringField" -> "str") ~ ("enum" -> 1),
           )) ~ ("mandatoryMongoRefListField" -> JArray(Nil))
 
     val mtr = MapTestRecord.createRecord
@@ -298,7 +298,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
       ("name" -> "SubRecord1") ~ ("subsub" -> ("name" -> "SubSubRecord1")) ~
       ("subsublist" -> List(
               ("name" -> "SubSubRecord1"),
-              ("name" -> "SubSubRecord2")
+              ("name" -> "SubSubRecord2"),
           )) ~
       ("when" -> ("$dt" -> srtr.meta.formats.dateFormat.format(sr1.when.value))) ~
       ("slist" -> List("s1", "s2")) ~
@@ -569,7 +569,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
       val btr = BoxTestRecord.createRecord
       btr.jsonobjlist.set(
           BoxTestJsonObj("1", Empty, Full("Full String1"), Failure("Failure1")) :: BoxTestJsonObj(
-              "2", Empty, Full("Full String2"), Failure("Failure2")) :: Nil
+              "2", Empty, Full("Full String2"), Failure("Failure2")) :: Nil,
       )
 
       btr.save()

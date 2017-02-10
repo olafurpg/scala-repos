@@ -46,7 +46,7 @@ private[streaming] class ReceiverSupervisorImpl(
     receiver: Receiver[_],
     env: SparkEnv,
     hadoopConf: Configuration,
-    checkpointDirOption: Option[String]
+    checkpointDirOption: Option[String],
 )
     extends ReceiverSupervisor(receiver, env.conf) with Logging {
 
@@ -134,7 +134,7 @@ private[streaming] class ReceiverSupervisorImpl(
   def pushArrayBuffer(
       arrayBuffer: ArrayBuffer[_],
       metadataOption: Option[Any],
-      blockIdOption: Option[StreamBlockId]
+      blockIdOption: Option[StreamBlockId],
   ) {
     pushAndReportBlock(
         ArrayBufferBlock(arrayBuffer), metadataOption, blockIdOption)
@@ -144,7 +144,7 @@ private[streaming] class ReceiverSupervisorImpl(
   def pushIterator(
       iterator: Iterator[_],
       metadataOption: Option[Any],
-      blockIdOption: Option[StreamBlockId]
+      blockIdOption: Option[StreamBlockId],
   ) {
     pushAndReportBlock(IteratorBlock(iterator), metadataOption, blockIdOption)
   }
@@ -153,7 +153,7 @@ private[streaming] class ReceiverSupervisorImpl(
   def pushBytes(
       bytes: ByteBuffer,
       metadataOption: Option[Any],
-      blockIdOption: Option[StreamBlockId]
+      blockIdOption: Option[StreamBlockId],
   ) {
     pushAndReportBlock(ByteBufferBlock(bytes), metadataOption, blockIdOption)
   }
@@ -162,7 +162,7 @@ private[streaming] class ReceiverSupervisorImpl(
   def pushAndReportBlock(
       receivedBlock: ReceivedBlock,
       metadataOption: Option[Any],
-      blockIdOption: Option[StreamBlockId]
+      blockIdOption: Option[StreamBlockId],
   ) {
     val blockId = blockIdOption.getOrElse(nextBlockId)
     val time = System.currentTimeMillis

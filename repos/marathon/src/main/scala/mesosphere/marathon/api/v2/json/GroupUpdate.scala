@@ -66,7 +66,7 @@ case class GroupUpdate(id: Option[PathId],
         .getOrElse(Set.empty)
         .map(sub => sub.toGroup(sub.groupId.canonicalPath(gid), version)),
       dependencies.fold(Set.empty[PathId])(_.map(_.canonicalPath(gid))),
-      version
+      version,
   )
 }
 

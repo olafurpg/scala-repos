@@ -33,7 +33,7 @@ object AnnotationTestsDefinitions {
   @Other case class CC(
       @First i: Int,
       s: String,
-      @Second(2, "b") ob: Option[Boolean]
+      @Second(2, "b") ob: Option[Boolean],
   )
 
   @Last(true)

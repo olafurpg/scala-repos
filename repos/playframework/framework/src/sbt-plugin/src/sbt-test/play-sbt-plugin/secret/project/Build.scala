@@ -25,6 +25,6 @@ object ApplicationBuild extends Build {
             case Secret(_) =>
             case _ => throw new RuntimeException("secret not found!!\n" + file)
           }
-        }
+        },
     )
 }

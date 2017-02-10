@@ -41,7 +41,7 @@ object FieldSerializerExamples extends Specification {
   "Fields can be ignored and renamed" in {
     val dogSerializer = FieldSerializer[WildDog](
         renameTo("name", "animalname") orElse ignore("owner"),
-        renameFrom("animalname", "name")
+        renameFrom("animalname", "name"),
     )
 
     implicit val formats = DefaultFormats + dogSerializer

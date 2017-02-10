@@ -12,7 +12,7 @@ object Test extends InteractiveTest {
       "@since 2.10",
       "@todo this is unsafe!",
       "@note Don't inherit!",
-      "@see something else"
+      "@see something else",
   )
 
   val names = Seq("Class",

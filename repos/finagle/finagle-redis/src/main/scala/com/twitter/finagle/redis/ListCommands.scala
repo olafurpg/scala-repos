@@ -47,7 +47,7 @@ trait Lists { self: BaseClient =>
   def lInsertAfter(
       key: ChannelBuffer,
       pivot: ChannelBuffer,
-      value: ChannelBuffer
+      value: ChannelBuffer,
   ): Future[Option[JLong]] =
     doRequest(LInsert(key, "AFTER", pivot, value)) {
       case IntegerReply(n) => Future.value(if (n == -1) None else Some(n))
@@ -66,7 +66,7 @@ trait Lists { self: BaseClient =>
   def lInsertBefore(
       key: ChannelBuffer,
       pivot: ChannelBuffer,
-      value: ChannelBuffer
+      value: ChannelBuffer,
   ): Future[Option[JLong]] =
     doRequest(LInsert(key, "BEFORE", pivot, value)) {
       case IntegerReply(n) => Future.value(if (n == -1) None else Some(n))

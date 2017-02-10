@@ -60,7 +60,7 @@ class EnsembleGaussianBlur extends EnsembleExample {
           effect = new GaussianBlur() {
             radius = 5d
           }
-        }
+        },
     )
   }
 }

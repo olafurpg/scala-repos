@@ -696,7 +696,7 @@ trait ParIterableLike[+T,
         new Partition(pred, combinerFactory, combinerFactory, splitter) mapResult {
           p =>
             (p._1.resultWithTaskSupport, p._2.resultWithTaskSupport)
-        }
+        },
     )
   }
 
@@ -776,7 +776,7 @@ trait ParIterableLike[+T,
         new SplitAt(n, combinerFactory, combinerFactory, splitter) mapResult {
           p =>
             (p._1.resultWithTaskSupport, p._2.resultWithTaskSupport)
-        }
+        },
     )
   }
 
@@ -908,7 +908,7 @@ trait ParIterableLike[+T,
                  combinerFactory,
                  splitter assign cntx) mapResult {
           _._2.resultWithTaskSupport
-        }
+        },
     )
   }
 
@@ -949,7 +949,7 @@ trait ParIterableLike[+T,
                      splitter,
                      thatseq.splitter) mapResult {
             _.resultWithTaskSupport
-          }
+          },
       )
     } else
       setTaskSupport(
@@ -1380,7 +1380,7 @@ trait ParIterableLike[+T,
   protected[this] class GroupBy[K, U >: T](
       f: U => K,
       mcf: () => HashMapCombiner[K, U],
-      protected[this] val pit: IterableSplitter[T]
+      protected[this] val pit: IterableSplitter[T],
   )
       extends Transformer[HashMapCombiner[K, U], GroupBy[K, U]] {
     @volatile var result: Result = null
@@ -1625,7 +1625,7 @@ trait ParIterableLike[+T,
                          .repetition(thiselem, diff)
                          .splitter
                          .asInstanceOf[IterableSplitter[T]],
-                       opits(1))
+                       opits(1)),
         )
       }
     override def merge(that: ZipAll[U, S, That]) =
@@ -1758,7 +1758,7 @@ trait ParIterableLike[+T,
       case ScanNode(left, right) =>
         Seq(
             new FromScanTree(left, z, op, cbf),
-            new FromScanTree(right, z, op, cbf)
+            new FromScanTree(right, z, op, cbf),
         )
       case _ =>
         throw new UnsupportedOperationException("Cannot be split further")

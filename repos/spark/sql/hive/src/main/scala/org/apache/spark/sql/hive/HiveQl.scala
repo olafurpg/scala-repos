@@ -128,7 +128,7 @@ private[hive] class HiveQl(conf: ParserConf)
       "TOK_SHOWINDEXES",
       "TOK_SHOWLOCKS",
       "TOK_SHOWPARTITIONS",
-      "TOK_UNLOCKTABLE"
+      "TOK_UNLOCKTABLE",
   )
 
   // Commands that we do not need to explain.
@@ -137,7 +137,7 @@ private[hive] class HiveQl(conf: ParserConf)
         "TOK_DESCTABLE",
         "TOK_SHOWTABLES",
         "TOK_TRUNCATETABLE", // truncate table" is a NativeCommand, does not need to explain.
-        "TOK_ALTERTABLE"
+        "TOK_ALTERTABLE",
     ) ++ nativeCommands
 
   /**
@@ -184,7 +184,7 @@ private[hive] class HiveQl(conf: ParserConf)
               inputFormat = None,
               outputFormat = None,
               serde = None,
-              serdeProperties = Map.empty[String, String]
+              serdeProperties = Map.empty[String, String],
           ),
         properties = properties,
         viewOriginalText = Some(originalText),
@@ -284,7 +284,7 @@ private[hive] class HiveQl(conf: ParserConf)
         allowExisting,
         maybeProperties,
         maybeColumns,
-        maybePartCols
+        maybePartCols,
         ) = getClauses(Seq("TOK_TABNAME",
                            "TOK_QUERY",
                            "TOK_TABLECOMMENT",
@@ -368,7 +368,7 @@ private[hive] class HiveQl(conf: ParserConf)
                   inputFormat = None,
                   outputFormat = None,
                   serde = None,
-                  serdeProperties = Map.empty[String, String]
+                  serdeProperties = Map.empty[String, String],
               ),
             schema = Seq.empty[CatalogColumn])
 

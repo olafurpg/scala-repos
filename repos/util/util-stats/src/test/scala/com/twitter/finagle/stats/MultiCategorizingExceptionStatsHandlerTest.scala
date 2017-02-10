@@ -66,7 +66,7 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "clienterrors/restartable/java.lang.RuntimeException/java.lang.Exception",
             "sourcedfailures/service",
             "sourcedfailures/service/java.lang.RuntimeException",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 
@@ -110,7 +110,7 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "clienterrors/java.lang.RuntimeException/java.lang.Exception",
             "sourcedfailures/service",
             "sourcedfailures/service/java.lang.RuntimeException",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 
@@ -130,7 +130,7 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
         keys == Seq(
             "failures",
             "failures/java.lang.RuntimeException",
-            "failures/java.lang.RuntimeException/java.lang.Exception"
+            "failures/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 
@@ -179,7 +179,7 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "clienterrors/restartable",
             "clienterrors/restartable/java.lang.RuntimeException/java.lang.Exception",
             "sourcedfailures/service",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception",
         ))
   }
 }

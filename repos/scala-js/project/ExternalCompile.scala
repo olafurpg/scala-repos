@@ -11,7 +11,7 @@ object ExternalCompile {
 
   val scalaJSExternalCompileConfigSettings: Seq[Setting[_]] =
     inTask(compile)(
-        Defaults.runnerTask
+        Defaults.runnerTask,
     ) ++ Seq(
         fork in compile := true,
         trapExit in compile := true,
@@ -103,7 +103,7 @@ object ExternalCompile {
         },
         // Make sure jsDependencyManifest runs after compile, otherwise compile
         // might remove the entire directory afterwards.
-        jsDependencyManifest <<= jsDependencyManifest.dependsOn(compile)
+        jsDependencyManifest <<= jsDependencyManifest.dependsOn(compile),
     )
 
   val scalaJSExternalCompileSettings =

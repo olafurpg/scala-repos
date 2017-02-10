@@ -86,12 +86,12 @@ case class AppUpdate(id: Option[PathId] = None,
       // For all other updates, the GroupVersioningUtil will determine a new version if the AppDefinition
       // has really changed.
       versionInfo = app.versionInfo,
-      residency = residency.orElse(app.residency)
+      residency = residency.orElse(app.residency),
   )
 
   def withCanonizedIds(base: PathId = PathId.empty): AppUpdate = copy(
       id = id.map(_.canonicalPath(base)),
-      dependencies = dependencies.map(_.map(_.canonicalPath(base)))
+      dependencies = dependencies.map(_.map(_.canonicalPath(base))),
   )
 }
 

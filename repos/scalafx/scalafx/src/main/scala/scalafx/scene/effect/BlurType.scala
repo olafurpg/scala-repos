@@ -61,7 +61,7 @@ object BlurType extends SFXEnumDelegateCompanion[jfxse.BlurType, BlurType] {
       OnePassBox,
       TwoPassBox,
       ThreePassBox,
-      Gaussian
+      Gaussian,
   )
 }
 

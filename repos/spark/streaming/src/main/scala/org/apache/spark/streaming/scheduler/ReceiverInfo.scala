@@ -32,5 +32,5 @@ case class ReceiverInfo(
     executorId: String,
     lastErrorMessage: String = "",
     lastError: String = "",
-    lastErrorTime: Long = -1L
+    lastErrorTime: Long = -1L,
 ) {}

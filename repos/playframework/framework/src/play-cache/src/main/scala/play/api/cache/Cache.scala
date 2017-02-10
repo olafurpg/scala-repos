@@ -198,7 +198,7 @@ class EhCacheModule extends Module {
             .to(new NamedJavaCacheApiProvider(cacheApiKey)),
           bind[Cached]
             .qualifiedWith(namedCache)
-            .to(new NamedCachedProvider(cacheApiKey))
+            .to(new NamedCachedProvider(cacheApiKey)),
         )
     }
 
@@ -207,7 +207,7 @@ class EhCacheModule extends Module {
         // alias the default cache to the unqualified implementation
         bind[CacheApi].to(
             bind[CacheApi].qualifiedWith(named(defaultCacheName))),
-        bind[JavaCacheApi].to[DefaultJavaCacheApi]
+        bind[JavaCacheApi].to[DefaultJavaCacheApi],
     ) ++ bindCache(defaultCacheName) ++ bindCaches.flatMap(bindCache)
   }
 }

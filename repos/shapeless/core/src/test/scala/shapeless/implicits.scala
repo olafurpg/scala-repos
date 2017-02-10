@@ -108,7 +108,7 @@ class CachedTest {
   @Test
   def testDivergent {
     illTyped(
-        "cachedImplicit[math.Ordering[Ordered[Int]]]"
+        "cachedImplicit[math.Ordering[Ordered[Int]]]",
     )
   }
 
@@ -116,7 +116,7 @@ class CachedTest {
   def testNotFound1 {
     trait T[X]
     illTyped(
-        "cachedImplicit[T[String]]"
+        "cachedImplicit[T[String]]",
     )
   }
 
@@ -126,7 +126,7 @@ class CachedTest {
     trait U[X]
     illTyped(
         "cachedImplicit[U[String]]",
-        "No U\\[String]"
+        "No U\\[String]",
     )
   }
 

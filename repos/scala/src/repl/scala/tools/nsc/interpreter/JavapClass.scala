@@ -28,7 +28,7 @@ import Javap.{JpResult, JpError, Showable, helper, toolArgs, DefaultOptions}
 class JavapClass(
     val loader: ScalaClassLoader,
     val printWriter: PrintWriter,
-    intp: IMain
+    intp: IMain,
 )
     extends Javap {
   import JavapClass._
@@ -219,7 +219,7 @@ class JavapClass(
           classOf[JavaFileManager],
           classOf[DiagnosticListener[_]],
           classOf[JIterable[String]],
-          classOf[JIterable[String]]
+          classOf[JIterable[String]],
       ) orFailed null
 
     class JavaReporter
@@ -383,7 +383,7 @@ object JavapClass {
   def apply(
       loader: ScalaClassLoader = ScalaClassLoader.appLoader,
       printWriter: PrintWriter = new PrintWriter(System.out, true),
-      intp: IMain
+      intp: IMain,
   ) = new JavapClass(loader, printWriter, intp)
 
   /** Match foo#bar, both groups are optional (may be null). */
@@ -487,7 +487,7 @@ object Javap {
       "-s" -> "Internal type signatures",
       "-sysinfo" -> "System info of class",
       "-constants" -> "Static final constants",
-      "-filter" -> "Filter REPL machinery from output"
+      "-filter" -> "Filter REPL machinery from output",
   )
 
   // match prefixes and unpack opts, or -help on failure

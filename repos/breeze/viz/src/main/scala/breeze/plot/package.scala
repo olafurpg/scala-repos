@@ -49,7 +49,7 @@ package object plot {
           x = (k: K) => vv(xv(x, k)),
           y = (k: K) => vv(yv(y, k)),
           label = (k: K) => if (labels != null) labels(k) else null,
-          tip = (k: K) => if (tips != null) tips(k) else null
+          tip = (k: K) => if (tips != null) tips(k) else null,
       )
 
       // initialize the series renderer
@@ -158,7 +158,7 @@ package object plot {
           y = (k: K) => vv(yv(y, k)),
           z = (k: K) => size(k),
           label = (k: K) => if (labels != null) labels(k) else null,
-          tip = (k: K) => if (tips != null) tips(k) else null
+          tip = (k: K) => if (tips != null) tips(k) else null,
       )
 
       // initialize the series renderer
@@ -232,7 +232,7 @@ package object plot {
                 },
                 y = (i: Int) => counts(i),
                 label = (i: Int) => null,
-                tip = (i: Int) => null
+                tip = (i: Int) => null,
             ),
             width)
 
@@ -295,7 +295,7 @@ package object plot {
                 if (labels != null && labels.isDefinedAt(k)) labels(k)
                 else null,
             tip = (k: (Int, Int)) =>
-                if (tips != null && tips.isDefinedAt(k)) tips(k) else null
+                if (tips != null && tips.isDefinedAt(k)) tips(k) else null,
         )
 
         // initialize renderer

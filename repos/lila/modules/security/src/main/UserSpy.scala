@@ -72,7 +72,7 @@ object UserSpy {
     storeColl
       .find(
           BSONDocument("user" -> user.id),
-          BSONDocument(field -> true)
+          BSONDocument(field -> true),
       )
       .cursor[BSONDocument]()
       .collect[List]() map {
@@ -85,7 +85,7 @@ object UserSpy {
       storeColl.distinct("user",
                          BSONDocument(
                              field -> BSONDocument("$in" -> values),
-                             "user" -> BSONDocument("$ne" -> user.id)
+                             "user" -> BSONDocument("$ne" -> user.id),
                          ).some) map lila.db.BSON.asStrings flatMap {
         userIds =>
           userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)

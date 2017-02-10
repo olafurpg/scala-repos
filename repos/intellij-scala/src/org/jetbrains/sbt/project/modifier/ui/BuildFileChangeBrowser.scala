@@ -58,7 +58,7 @@ class BuildFileChangeBrowser(val project: Project,
               }
               .getOrElse(myChange)
           }
-        }
+        },
     )
 
     setChangesToDisplay(updatedChanges)

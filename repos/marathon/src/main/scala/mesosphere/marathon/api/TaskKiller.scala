@@ -62,7 +62,7 @@ class TaskKiller @Inject()(taskTracker: TaskTracker,
         updateGroup,
         Timestamp.now(),
         force = force,
-        toKill = appTasks
+        toKill = appTasks,
     )
 
     appTasks.keys

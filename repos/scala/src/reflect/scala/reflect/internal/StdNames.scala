@@ -66,7 +66,7 @@ trait StdNames { self: SymbolTable =>
         settings.maxClassfileName.value - maxSuffixLength,
         2 *
         (settings.maxClassfileName.value - maxSuffixLength -
-            2 * marker.length - 32)
+            2 * marker.length - 32),
     )
     def toMD5(s: String, edge: Int): String = {
       val prefix = s take edge
@@ -1215,7 +1215,7 @@ trait StdNames { self: SymbolTable =>
         tpnme.Int -> BoxedInteger,
         tpnme.Long -> BoxedLong,
         tpnme.Float -> BoxedFloat,
-        tpnme.Double -> BoxedDouble
+        tpnme.Double -> BoxedDouble,
     )
   }
 

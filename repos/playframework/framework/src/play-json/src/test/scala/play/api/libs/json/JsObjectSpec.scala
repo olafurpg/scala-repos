@@ -17,7 +17,7 @@ object JsObjectSpec extends Specification {
       val populatedObj = Json.obj(
           "field1" -> 123,
           "field2" -> "abc",
-          "field3" -> JsNull
+          "field3" -> JsNull,
       )
       populatedObj.deepMerge(Json.obj()) must beEqualTo(populatedObj)
     }
@@ -26,7 +26,7 @@ object JsObjectSpec extends Specification {
       val populatedObj = Json.obj(
           "field1" -> 123,
           "field2" -> "abc",
-          "field3" -> JsNull
+          "field3" -> JsNull,
       )
       Json.obj().deepMerge(populatedObj) must beEqualTo(populatedObj)
     }
@@ -42,12 +42,12 @@ object JsObjectSpec extends Specification {
             "field3" -> JsNull,
             "field4" -> 456,
             "field5" -> "abc",
-            "field6" -> "def"
+            "field6" -> "def",
         )
         .deepMerge(Json.obj(
                 "field4" -> 789,
                 "field5" -> "xyz",
-                "field6" -> JsNull
+                "field6" -> JsNull,
             )) must beEqualTo(
           Json.obj(
               "field1" -> 123,
@@ -55,8 +55,8 @@ object JsObjectSpec extends Specification {
               "field3" -> JsNull,
               "field4" -> 789,
               "field5" -> "xyz",
-              "field6" -> JsNull
-          )
+              "field6" -> JsNull,
+          ),
       )
     }
 
@@ -68,26 +68,26 @@ object JsObjectSpec extends Specification {
             "field3" -> Json.arr(
                 "abc",
                 "def",
-                "ghi"
+                "ghi",
             ),
             "field4" -> Json.obj(
                 "field1a" -> 888,
                 "field2b" -> "xxx",
-                "field3c" -> JsNull
-            )
+                "field3c" -> JsNull,
+            ),
         )
         .deepMerge(
             Json.obj(
                 "field3" -> Json.arr(
                     "jkl",
                     "mno",
-                    "pqr"
+                    "pqr",
                 ),
                 "field4" -> Json.obj(
                     "field1a" -> 999,
                     "field2b" -> "yyy",
-                    "field3c" -> "zzz"
-                )
+                    "field3c" -> "zzz",
+                ),
             )) must beEqualTo(
           Json.obj(
               "field1" -> 123,
@@ -95,14 +95,14 @@ object JsObjectSpec extends Specification {
               "field3" -> Json.arr(
                   "jkl",
                   "mno",
-                  "pqr"
+                  "pqr",
               ),
               "field4" -> Json.obj(
                   "field1a" -> 999,
                   "field2b" -> "yyy",
-                  "field3c" -> "zzz"
-              )
-          )
+                  "field3c" -> "zzz",
+              ),
+          ),
       )
     }
 
@@ -116,17 +116,17 @@ object JsObjectSpec extends Specification {
                             "field5a" -> "abc",
                             "field5b" -> Json.arr("111", "222"),
                             "field5d" -> Json.arr(Json.obj("a" -> 1),
-                                                  Json.obj("b" -> 2))
-                        )
+                                                  Json.obj("b" -> 2)),
+                        ),
                     ),
                     "field2b" -> Json.arr("aaa", "bbb"),
                     "field2c" -> Json.obj(
-                        "hello" -> "world"
-                    )
+                        "hello" -> "world",
+                    ),
                 ),
                 "field2b" -> "xxx",
-                "field2c" -> JsNull
-            )
+                "field2c" -> JsNull,
+            ),
         )
         .deepMerge(Json.obj(
                 "field1a" -> Json.obj(
@@ -136,17 +136,17 @@ object JsObjectSpec extends Specification {
                                 "field5b" -> Json.arr("333", "444"),
                                 "field5c" -> "deep",
                                 "field5d" -> Json.arr(Json.obj("c" -> 3),
-                                                      Json.obj("d" -> 4))
-                            )
+                                                      Json.obj("d" -> 4)),
+                            ),
                         ),
                         "field2b" -> Json.arr("ccc", "ddd"),
                         "field2c" -> Json.obj(
-                            "hello" -> "new world"
-                        )
+                            "hello" -> "new world",
+                        ),
                     ),
                     "field2b" -> "yyy",
-                    "field2d" -> "zzz"
-                )
+                    "field2d" -> "zzz",
+                ),
             )) must beEqualTo(
           Json.obj(
               "field1a" -> Json.obj(
@@ -157,19 +157,19 @@ object JsObjectSpec extends Specification {
                               "field5b" -> Json.arr("333", "444"),
                               "field5c" -> "deep",
                               "field5d" -> Json.arr(Json.obj("c" -> 3),
-                                                    Json.obj("d" -> 4))
-                          )
+                                                    Json.obj("d" -> 4)),
+                          ),
                       ),
                       "field2b" -> Json.arr("ccc", "ddd"),
                       "field2c" -> Json.obj(
-                          "hello" -> "new world"
-                      )
+                          "hello" -> "new world",
+                      ),
                   ),
                   "field2b" -> "yyy",
                   "field2c" -> JsNull,
-                  "field2d" -> "zzz"
-              )
-          )
+                  "field2d" -> "zzz",
+              ),
+          ),
       )
     }
   }

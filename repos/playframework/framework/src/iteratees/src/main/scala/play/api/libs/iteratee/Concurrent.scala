@@ -260,14 +260,14 @@ object Concurrent {
                 Future
                   .firstCompletedOf(
                       it.unflatten.map(Left(_))(dec) :: timeoutFuture(
-                          Right(()), timeout, unit) :: Nil
+                          Right(()), timeout, unit) :: Nil,
                   )(dec)
                   .map {
                     case Left(Step.Cont(k)) => Cont(step(k(other)))
                     case Left(done) => Done(done.it, other)
                     case Right(_) =>
                       Error("iteratee is taking too long", other)
-                  }(dec)
+                  }(dec),
               )
         }
         Cont(step(inner))
@@ -437,8 +437,8 @@ object Concurrent {
                               Done(Error(msg, e), Input.Empty)
                           }(dec)
                           .map(i => { busy.single() = false; Left(i) })(dec),
-                        timeoutFuture(Right(()), duration, unit)
-                    )
+                        timeoutFuture(Right(()), duration, unit),
+                    ),
                 )(dec)
 
               Iteratee.flatten(

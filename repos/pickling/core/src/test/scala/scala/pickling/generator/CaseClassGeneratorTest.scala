@@ -108,7 +108,7 @@ class CaseClassGeneratorTest extends FunSuite {
               .asInstanceOf[Pickler[OpenCaseClassSub]],
             currentRuntime.picklers
               .genUnpickler(currentRuntime.currentMirror, key.key)
-              .asInstanceOf[Unpickler[OpenCaseClassSub]]
+              .asInstanceOf[Unpickler[OpenCaseClassSub]],
           )
       }
       PicklingMacros.genPicklerUnpickler[OpenCaseClass]

@@ -75,7 +75,7 @@ final class LongMap[V] private[collection](
       sz: Int,
       vc: Int,
       kz: Array[Long],
-      vz: Array[AnyRef]
+      vz: Array[AnyRef],
   ) {
     mask = m; extraKeys = ek; zeroValue = zv; minValue = mv; _size = sz;
     _vacant = vc; _keys = kz; _values = vz

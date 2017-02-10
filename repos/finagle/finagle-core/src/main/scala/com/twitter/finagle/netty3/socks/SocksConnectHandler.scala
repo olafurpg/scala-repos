@@ -37,7 +37,7 @@ object SocksConnectHandler {
       proxyAddr: SocketAddress,
       addr: InetSocketAddress,
       authenticationSettings: Seq[AuthenticationSetting],
-      pipeline: ChannelPipeline
+      pipeline: ChannelPipeline,
   ): SocksConnectHandler = {
     val handler = new SocksConnectHandler(
         proxyAddr, addr, authenticationSettings)

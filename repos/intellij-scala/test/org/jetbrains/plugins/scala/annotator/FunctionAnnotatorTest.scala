@@ -108,7 +108,7 @@ class FunctionAnnotatorTest extends SimpleTestCase {
         |    case e: Exception => throw e
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
         )) {
       case Error("}", TypeMismatch()) :: Nil =>
     }

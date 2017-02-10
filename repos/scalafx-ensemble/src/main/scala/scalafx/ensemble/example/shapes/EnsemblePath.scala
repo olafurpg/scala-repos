@@ -54,10 +54,10 @@ class EnsemblePath extends EnsembleExample {
               MoveTo(100, 55),
               CubicCurveTo(120, 20, 130, 80, 140, 45),
               QuadCurveTo(150, 0, 160, 45),
-              ArcTo(20, 40, 0, 180, 45, true, true)
+              ArcTo(20, 40, 0, 180, 45, true, true),
           )
           fill = Color.Azure
-        }
+        },
     )
   }
 }

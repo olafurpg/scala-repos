@@ -229,7 +229,7 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
     }
 
     val matchedBroadcastRows = matchedBuildRows.fold(
-        new BitSet(relation.value.length)
+        new BitSet(relation.value.length),
     )(_ | _)
 
     if (joinType == LeftSemi) {
@@ -289,7 +289,7 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
 
     sparkContext.union(
         matchedStreamRows,
-        sparkContext.makeRDD(notMatchedBroadcastRows)
+        sparkContext.makeRDD(notMatchedBroadcastRows),
     )
   }
 

@@ -391,7 +391,7 @@ class BasicWorkflow
                                 List(
                                 TextEdit(`fooFile`, 214, 217, "bar"),
                                 TextEdit(`fooFile`, 252, 255, "bar"),
-                                TextEdit(`fooFile`, 269, 272, "bar")
+                                TextEdit(`fooFile`, 269, 272, "bar"),
                                 ),
                                 _) =>
           }

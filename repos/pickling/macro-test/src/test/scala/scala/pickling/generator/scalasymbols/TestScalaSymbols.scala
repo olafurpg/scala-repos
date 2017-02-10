@@ -53,19 +53,19 @@ class TestScalaSymbols extends FunSuite {
     assert(
         Compat.varTypes[ParentTag.Foo[String, Int]].toSet == Set(
             "scala.Tuple2[java.lang.String,scala.Int]",
-            "scala.Int"
+            "scala.Int",
         ))
     assert(
         Compat.varTypes[ParentTag.Baz[String]].toSet == Set(
             "scala.Tuple2[java.lang.String,scala.Float]",
             "scala.Tuple2[java.lang.String,scala.Int]",
-            "scala.Int"
+            "scala.Int",
         ))
     assert(
         Compat.varTypes[ParentTag.Biz].toSet == Set(
             "scala.Tuple2[java.lang.String,scala.Float]",
             "scala.Tuple2[java.lang.String,scala.Int]",
-            "scala.Int"
+            "scala.Int",
         ))
   }
 

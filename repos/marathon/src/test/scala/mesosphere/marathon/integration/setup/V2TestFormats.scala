@@ -18,7 +18,7 @@ object V2TestFormats {
         DeploymentPlan(original = (js \ "original").as[Group],
                        target = (js \ "target").as[Group],
                        version = (js \ "version").as[Timestamp])
-          .copy(id = (js \ "id").as[String])
+          .copy(id = (js \ "id").as[String]),
     )
   }
 
@@ -91,7 +91,7 @@ object V2TestFormats {
         "labels" -> update.labels,
         "version" -> update.version,
         "acceptedResourceRoles" -> update.acceptedResourceRoles,
-        "ipAddress" -> update.ipAddress
+        "ipAddress" -> update.ipAddress,
     )
   }
 }

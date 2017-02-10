@@ -571,7 +571,7 @@ object SparkSubmit {
                        CLUSTER,
                        sysProp = "spark.driver.supervise"),
         OptionAssigner(
-            args.ivyRepoPath, STANDALONE, CLUSTER, sysProp = "spark.jars.ivy")
+            args.ivyRepoPath, STANDALONE, CLUSTER, sysProp = "spark.jars.ivy"),
     )
 
     // In client mode, launch the application main class directly

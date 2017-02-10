@@ -68,7 +68,7 @@ object JObjectParser extends SimpleInjector {
         JObject(
             x.keySet.toList.map { f =>
               JField(f.toString, serialize(x.get(f.toString), formats))
-            }
+            },
         )
       case x => {
           JNothing

@@ -907,7 +907,7 @@ package play.api.mvc {
         fromMap(
             decodeSetCookieHeader(headerValue)
               .groupBy(_.name)
-              .mapValues(_.head)
+              .mapValues(_.head),
           )
       case None => fromMap(Map.empty)
     }
@@ -915,7 +915,7 @@ package play.api.mvc {
     def fromCookieHeader(header: Option[String]): Cookies = header match {
       case Some(headerValue) =>
         fromMap(
-            decodeCookieHeader(headerValue).groupBy(_.name).mapValues(_.head)
+            decodeCookieHeader(headerValue).groupBy(_.name).mapValues(_.head),
         )
       case None => fromMap(Map.empty)
     }
@@ -984,7 +984,7 @@ package play.api.mvc {
                       Option(cookie.path).getOrElse("/"),
                       Option(cookie.domain),
                       cookie.isSecure,
-                      cookie.isHttpOnly
+                      cookie.isHttpOnly,
                 ))
         }
       }.getOrElse {
@@ -1008,7 +1008,7 @@ package play.api.mvc {
           .map { cookie =>
             Cookie(
                 cookie.name,
-                cookie.value
+                cookie.value,
             )
           }
           .toSeq

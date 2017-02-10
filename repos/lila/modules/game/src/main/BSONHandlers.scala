@@ -41,7 +41,7 @@ object BSONHandlers {
             o.pockets.white.roles.map(_.forsythUpper).mkString +
             o.pockets.black.roles.map(_.forsyth).mkString
           },
-          "t" -> o.promoted.map(_.piotr).mkString
+          "t" -> o.promoted.map(_.piotr).mkString,
       )
     }
 
@@ -108,7 +108,7 @@ object BSONHandlers {
                               tournamentId = r strO tournamentId,
                               simulId = r strO simulId,
                               tvAt = r dateO tvAt,
-                              analysed = r boolD analysed)
+                              analysed = r boolD analysed),
       )
     }
 
@@ -152,7 +152,7 @@ object BSONHandlers {
         tournamentId -> o.metadata.tournamentId,
         simulId -> o.metadata.simulId,
         tvAt -> o.metadata.tvAt.map(w.date),
-        analysed -> w.boolO(o.metadata.analysed)
+        analysed -> w.boolO(o.metadata.analysed),
     )
   }
 
@@ -167,7 +167,7 @@ object BSONHandlers {
           .read(
               ByteArrayBSONHandler read bin,
               whiteBerserk,
-              blackBerserk
+              blackBerserk,
           )
     }
   private[game] def clockBSONWrite(since: DateTime, clock: Clock) =

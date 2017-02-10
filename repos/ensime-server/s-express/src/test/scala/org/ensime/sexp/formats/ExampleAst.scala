@@ -49,7 +49,7 @@ object ExampleAst {
       field: DatabaseField,
       low: Option[String] = None,
       high: Option[String] = None,
-      inclusive: Boolean = false
+      inclusive: Boolean = false,
   )
       extends Term
   case class LikeTerm(term: FieldTerm, like: Option[Like]) extends Term {

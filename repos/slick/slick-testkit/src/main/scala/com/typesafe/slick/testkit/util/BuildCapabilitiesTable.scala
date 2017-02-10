@@ -28,7 +28,7 @@ object BuildCapabilitiesTable extends App {
           "slick.jdbc.OracleProfile",
           "slick.jdbc.PostgresProfile",
           "slick.jdbc.SQLiteProfile",
-          "slick.jdbc.SQLServerProfile"
+          "slick.jdbc.SQLServerProfile",
       )
 
   val profiles = profileNames.map { n =>
@@ -42,7 +42,7 @@ object BuildCapabilitiesTable extends App {
   val profileCapabilities = Vector(
       RelationalCapabilities.all -> "slick.relational.RelationalCapabilities$@",
       SqlCapabilities.all -> "slick.sql.SqlCapabilities$@",
-      JdbcCapabilities.all -> "slick.jdbc.JdbcCapabilities$@"
+      JdbcCapabilities.all -> "slick.jdbc.JdbcCapabilities$@",
   )
 
   val capabilities = for {

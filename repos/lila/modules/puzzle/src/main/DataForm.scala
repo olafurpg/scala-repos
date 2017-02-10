@@ -7,13 +7,13 @@ object DataForm {
 
   val difficulty = Form(
       single(
-          "difficulty" -> number(min = 1, max = 3)
+          "difficulty" -> number(min = 1, max = 3),
       ))
 
   val attempt = Form(
       mapping(
           "win" -> number,
-          "time" -> number
+          "time" -> number,
       )(AttemptData.apply)(AttemptData.unapply))
 
   case class AttemptData(win: Int, time: Int) {
@@ -23,6 +23,6 @@ object DataForm {
 
   val vote = Form(
       single(
-          "vote" -> number
+          "vote" -> number,
       ))
 }

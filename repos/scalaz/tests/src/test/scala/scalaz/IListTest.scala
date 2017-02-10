@@ -32,7 +32,7 @@ object IListTest extends SpecLite {
             Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
             Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
             intGen.map(n => (_: Int) > n),
-            intGen.map(n => (_: Int) < n)
+            intGen.map(n => (_: Int) < n),
         ))
   }
 

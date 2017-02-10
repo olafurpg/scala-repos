@@ -38,7 +38,7 @@ class BlockManagerId private (
     private var executorId_ : String,
     private var host_ : String,
     private var port_ : Int,
-    private var nettyPort_ : Int
+    private var nettyPort_ : Int,
 )
     extends Externalizable {
 

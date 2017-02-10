@@ -96,7 +96,7 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
                                 StructField("aa", StringType, true),
                                 StructField("bb",
                                             IntegerType,
-                                            true)
+                                            true),
                             )),
                         true),
             StructField(
@@ -106,11 +106,11 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
                         StructField("a",
                                     new StructType(Array(
                                             StructField("b", StringType, true),
-                                            StructField("", IntegerType, true)
+                                            StructField("", IntegerType, true),
                                         )),
-                                    true)
+                                    true),
                     )),
-                true)
+                true),
         ))
     val row = Row("a", 1, Row("b", 2), Row(Row("c", 3)))
     val lit = Literal.create(row, schema)

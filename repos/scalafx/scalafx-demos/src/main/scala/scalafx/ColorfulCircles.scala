@@ -116,7 +116,7 @@ object ColorfulCircles extends JFXApp {
                                             0xef504c,
                                             0xf2660f))
             blendMode = Overlay
-          }
+          },
       )
     }
   }
@@ -130,7 +130,7 @@ object ColorfulCircles extends JFXApp {
           },
           at(40 s) {
             Set(circle.centerX -> random * 800, circle.centerY -> random * 600)
-          }
+          },
       )).flatten
   }.play()
 }

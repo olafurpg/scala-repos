@@ -59,7 +59,7 @@ class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
               JField("mean", results.meanRepTime),
               JField("ptile90", results.ptile(0.9)),
               JField("baseline", results.baseline),
-              JField("times", results.timings.serialize)
+              JField("times", results.timings.serialize),
           ))
   }
 

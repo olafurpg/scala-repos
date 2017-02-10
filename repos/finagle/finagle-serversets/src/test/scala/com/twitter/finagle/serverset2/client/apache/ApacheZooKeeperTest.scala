@@ -700,7 +700,7 @@ class ApacheZooKeeperTest
     verify(mockZK).sync(
         meq(path),
         voidCB.capture,
-        meq(null)
+        meq(null),
     )
 
     voidCB.getValue.processResult(apacheOk, path, null)
@@ -714,7 +714,7 @@ class ApacheZooKeeperTest
     verify(mockZK).sync(
         meq(path),
         voidCB.capture,
-        meq(null)
+        meq(null),
     )
 
     voidCB.getValue.processResult(apacheConnLoss, path, null)
@@ -729,14 +729,14 @@ class ApacheZooKeeperTest
         mockZK.sync(
             meq(path),
             voidCB.capture,
-            meq(null)
+            meq(null),
         )).thenThrow(new IllegalArgumentException)
     val synced = zk.sync(path)
 
     verify(mockZK).sync(
         meq(path),
         voidCB.capture,
-        meq(null)
+        meq(null),
     )
 
     intercept[IllegalArgumentException] {

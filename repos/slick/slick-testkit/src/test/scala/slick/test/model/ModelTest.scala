@@ -23,7 +23,7 @@ class ModelTest {
             Table(B,
                   Seq(
                       b_id,
-                      b_a_id
+                      b_a_id,
                   ),
                   None,
                   Seq(
@@ -40,10 +40,10 @@ class ModelTest {
                                  A,
                                  Seq(a_id),
                                  ForeignKeyAction.NoAction,
-                                 ForeignKeyAction.NoAction)
+                                 ForeignKeyAction.NoAction),
                   ),
                   Seq()),
-            Table(A, Seq(a_id), None, Seq(), Seq())
+            Table(A, Seq(a_id), None, Seq(), Seq()),
         )).assertConsistency
   }
 }

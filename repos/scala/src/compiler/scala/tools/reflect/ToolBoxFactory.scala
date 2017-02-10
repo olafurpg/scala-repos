@@ -442,7 +442,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         if (frontEnd.hasErrors)
           throw ToolBoxError(
               "reflective compilation has failed:" + EOL + EOL +
-              (frontEnd.infos map (_.msg) mkString EOL)
+              (frontEnd.infos map (_.msg) mkString EOL),
           )
       }
     }
@@ -468,7 +468,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             if (frontEnd.hasErrors) {
               throw ToolBoxError(
                   "reflective compilation has failed: cannot initialize the compiler:" +
-                  EOL + EOL + (frontEnd.infos map (_.msg) mkString EOL)
+                  EOL + EOL + (frontEnd.infos map (_.msg) mkString EOL),
               )
             }
             instance

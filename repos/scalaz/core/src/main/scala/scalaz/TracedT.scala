@@ -12,7 +12,7 @@ final case class TracedT[W[_], A, B](run: W[A => B]) {
     TracedT(
         W.extend(run) { wf => m =>
           f(TracedT(W.map(wf)(_.compose(A.append(_, m)))))
-        }
+        },
     )
 
   def trans[M[_]](f: W ~> M): TracedT[M, A, B] =
@@ -149,7 +149,7 @@ private trait TracedTDistributive[W[_], C]
     TracedT(
         W.map(W.cosequence(G.map(fa)(f(_).run))) {
           Distributive[C => ?].cosequence(_)
-        }
+        },
     )
 }
 
@@ -161,8 +161,8 @@ private trait TracedTApply[W[_], C]
       f: => TracedT[W, C, A => B]) =
     TracedT(
         W.ap(fa.run)(
-            W.map(f.run)(cab => ca => c => cab(c).apply(ca(c)))
-        )
+            W.map(f.run)(cab => ca => c => cab(c).apply(ca(c))),
+        ),
     )
 }
 

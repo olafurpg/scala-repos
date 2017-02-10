@@ -14,7 +14,7 @@ case class CreateAStatus(
     /* The target URL to associate with this status. This URL will be linked from the GitHub UI to allow users to easily see the ‘source’ of the Status. */
     target_url: Option[String],
     /* description is a short description of the status.*/
-    description: Option[String]
+    description: Option[String],
 ) {
   def isValid: Boolean = {
     CommitState.valueOf(state).isDefined && // only http

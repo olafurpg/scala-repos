@@ -144,7 +144,7 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
               }
 
               PathStructure(types, columnRefs.map(_.selector))
-            }
+            },
         )
     }
   }
@@ -197,7 +197,7 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         case (p, (r, auth)) =>
           (p, Version.Current) -> r.fold(
               BinaryRecord(_, auth, newVersion),
-              JsonRecord(_, auth, newVersion)
+              JsonRecord(_, auth, newVersion),
           )
       }
 

@@ -129,7 +129,7 @@ trait TwemcachePartitionedClient extends TwemcacheClient {
   private[this] def withKeysGroupedByClient[A](keys: Iterable[String])(
       f: (TwemcacheClient, Iterable[String]) => Future[A]): Future[Seq[A]] = {
     Future.collect(
-        keys.groupBy(twemcacheClientOf).map(Function.tupled(f)).toSeq
+        keys.groupBy(twemcacheClientOf).map(Function.tupled(f)).toSeq,
     )
   }
 }

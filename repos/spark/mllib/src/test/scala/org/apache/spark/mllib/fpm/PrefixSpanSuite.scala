@@ -64,7 +64,7 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(0, 3, 0, 5, 0), 2L),
         (Array(0, 4, 0), 4L),
         (Array(0, 4, 0, 5, 0), 2L),
-        (Array(0, 5, 0), 3L)
+        (Array(0, 5, 0), 3L),
     )
     compareInternalResults(expectedValue1, result1.collect())
 
@@ -75,7 +75,7 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(0, 3, 0), 5L),
         (Array(0, 3, 0, 4, 0), 3L),
         (Array(0, 4, 0), 4L),
-        (Array(0, 5, 0), 3L)
+        (Array(0, 5, 0), 3L),
     )
     compareInternalResults(expectedValue2, result2.collect())
 
@@ -95,7 +95,7 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(0, 3, 0, 5, 0), 2L),
         (Array(0, 4, 0), 4L),
         (Array(0, 4, 0, 5, 0), 2L),
-        (Array(0, 5, 0), 3L)
+        (Array(0, 5, 0), 3L),
     )
     compareInternalResults(expectedValue3, result3.collect())
   }
@@ -315,7 +315,7 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(Array(2)), 3L),
         (Array(Array(3)), 2L),
         (Array(Array(1), Array(3)), 2L),
-        (Array(Array(1, 2)), 3L)
+        (Array(Array(1, 2)), 3L),
     )
     compareResults(expected, model.freqSequences.collect())
   }
@@ -339,7 +339,7 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(Array(2)), 3L),
         (Array(Array(3)), 2L),
         (Array(Array(1), Array(3)), 2L),
-        (Array(Array(1, 2)), 3L)
+        (Array(Array(1, 2)), 3L),
     ).map {
       case (pattern, count) =>
         (pattern.map(itemSet => itemSet.map(intToString)), count)

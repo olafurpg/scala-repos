@@ -28,7 +28,7 @@ private[finagle] trait StringServer {
       extends StdStackServer[String, String, Server] {
     protected def copy1(
         stack: Stack[ServiceFactory[String, String]] = this.stack,
-        params: Stack.Params = this.params
+        params: Stack.Params = this.params,
     ) = copy(stack, params)
 
     protected type In = String

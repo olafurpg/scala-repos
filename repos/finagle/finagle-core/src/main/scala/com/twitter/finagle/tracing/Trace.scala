@@ -48,7 +48,7 @@ object Trace {
   private[this] val someFalse = Some(false)
 
   private[finagle] val idCtx = new Contexts.broadcast.Key[TraceId](
-      "com.twitter.finagle.tracing.TraceContext"
+      "com.twitter.finagle.tracing.TraceContext",
   ) {
     private val local = new ThreadLocal[Array[Byte]] {
       override def initialValue() = new Array[Byte](32)

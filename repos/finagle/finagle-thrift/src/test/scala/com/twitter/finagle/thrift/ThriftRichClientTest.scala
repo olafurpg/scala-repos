@@ -23,13 +23,13 @@ class ThriftRichClientTest
 
     def newService(
         dest: Name,
-        label: String
+        label: String,
     ): Service[ThriftClientRequest, Array[Byte]] =
       mock[Service[ThriftClientRequest, Array[Byte]]]
 
     def newClient(
         dest: Name,
-        label: String
+        label: String,
     ): ServiceFactory[ThriftClientRequest, Array[Byte]] =
       mock[ServiceFactory[ThriftClientRequest, Array[Byte]]]
   }

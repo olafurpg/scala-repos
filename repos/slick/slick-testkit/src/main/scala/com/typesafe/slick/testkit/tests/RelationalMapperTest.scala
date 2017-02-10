@@ -41,7 +41,7 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
         ts.filter(_.b === (False: Bool))
           .to[Set]
           .result
-          .map(_ shouldBe Set((1, False, None)))
+          .map(_ shouldBe Set((1, False, None))),
       )
   }
 
@@ -94,7 +94,7 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
         ts.filter(_.b === (EnumValue2: EnumType))
           .to[Set]
           .result
-          .map(_ shouldBe Set((3, EnumValue2, Some(EnumValue3))))
+          .map(_ shouldBe Set((3, EnumValue2, Some(EnumValue3)))),
       )
   }
 
@@ -132,7 +132,7 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
         ts.filter(_.b === (False: Bool))
           .to[Set]
           .result
-          .map(_ shouldBe Set((1, False, None)))
+          .map(_ shouldBe Set((1, False, None))),
       )
   }
 
@@ -154,7 +154,7 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
         ts.filter(_.id === MyMappedID(1))
           .to[Set]
           .result
-          .map(_ shouldBe Set((MyMappedID(1), 2)))
+          .map(_ shouldBe Set((MyMappedID(1), 2))),
       )
   }
 

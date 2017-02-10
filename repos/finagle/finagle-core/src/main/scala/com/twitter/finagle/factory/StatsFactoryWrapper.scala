@@ -21,7 +21,7 @@ private[finagle] object StatsFactoryWrapper {
         val param.Stats(statsReceiver) = _stats
         new StatsFactoryWrapper(
             next,
-            new RollupStatsReceiver(statsReceiver.scope("service_creation"))
+            new RollupStatsReceiver(statsReceiver.scope("service_creation")),
         )
       }
     }

@@ -25,7 +25,7 @@ case class EnsimeConfig(
     javaLibs: List[File],
     // WORKAROUND: https://github.com/ensime/ensime-server/issues/1042
     disableSourceMonitoring: Boolean = false,
-    disableClassMonitoring: Boolean = false
+    disableClassMonitoring: Boolean = false,
 ) {
   (rootDir :: cacheDir :: javaHome :: referenceSourceRoots ::: javaLibs).foreach {
     f =>
@@ -81,7 +81,7 @@ case class EnsimeModule(
     testDeps: List[File],
     sourceRoots: List[File],
     docJars: List[File],
-    referenceSourceRoots: List[File]
+    referenceSourceRoots: List[File],
 ) {
   // only check the files, not the directories, see below
   (compileDeps ::: runtimeDeps ::: testDeps ::: referenceSourceRoots).foreach {

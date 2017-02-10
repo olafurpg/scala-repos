@@ -172,7 +172,7 @@ private[niocharset] object UTF_8
       -1,
       -1,
       -1,
-      -1
+      -1,
   )
 
   @inline

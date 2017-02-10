@@ -302,7 +302,7 @@ class SparseVectorTest extends FunSuite {
         (1, 2, 3, 4, 5, 6),
         (2, 4, 6, 8, 10, 12),
         (3, 6, 9, 12, 15, 18),
-        (12, 1, 1, 0, 3, 4)
+        (12, 1, 1, 0, 3, 4),
     )
 
     assert((m * x) === m * xd)

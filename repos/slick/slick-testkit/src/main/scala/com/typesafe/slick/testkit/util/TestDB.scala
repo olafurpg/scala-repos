@@ -285,13 +285,13 @@ abstract class ExternalJdbcTestDB(confName: String)
           databaseFor("adminConn").run(
               DBIO
                 .seq((drop ++ create).map(s => sqlu"#$s"): _*)
-                .withPinnedSession
+                .withPinnedSession,
             ))
     }
     if (!postCreate.isEmpty) {
       await(
           createDB().run(
-              DBIO.seq(postCreate.map(s => sqlu"#$s"): _*).withPinnedSession
+              DBIO.seq(postCreate.map(s => sqlu"#$s"): _*).withPinnedSession,
           ))
     }
   }
@@ -301,7 +301,7 @@ abstract class ExternalJdbcTestDB(confName: String)
       println("[Dropping test database " + this + "]")
       await(
           databaseFor("adminConn").run(
-              DBIO.seq(drop.map(s => sqlu"#$s"): _*).withPinnedSession
+              DBIO.seq(drop.map(s => sqlu"#$s"): _*).withPinnedSession,
           ))
     }
   }

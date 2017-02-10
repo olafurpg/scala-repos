@@ -16,7 +16,7 @@ class HashableTest extends FunSuite with GeneratorDrivenPropertyChecks {
       Hashable.FNV1A_64,
       Hashable.HSIEH,
       Hashable.JENKINS,
-      Hashable.MD5_LEInt
+      Hashable.MD5_LEInt,
   )
 
   def testConsistency[T](algo: Hashable[Array[Byte], T]) {

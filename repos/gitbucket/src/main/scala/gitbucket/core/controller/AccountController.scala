@@ -53,7 +53,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
           label("Mail Address",
                 text(required, maxlength(100), uniqueMailAddress()))),
       "url" -> trim(label("URL", optional(text(maxlength(200))))),
-      "fileId" -> trim(label("File ID", optional(text())))
+      "fileId" -> trim(label("File ID", optional(text()))),
   )(AccountNewForm.apply)
 
   val editForm = mapping(
@@ -64,16 +64,16 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               text(required, maxlength(100), uniqueMailAddress("userName")))),
       "url" -> trim(label("URL", optional(text(maxlength(200))))),
       "fileId" -> trim(label("File ID", optional(text()))),
-      "clearImage" -> trim(label("Clear image", boolean()))
+      "clearImage" -> trim(label("Clear image", boolean())),
   )(AccountEditForm.apply)
 
   val sshKeyForm = mapping(
       "title" -> trim(label("Title", text(required, maxlength(100)))),
-      "publicKey" -> trim(label("Key", text(required, validPublicKey)))
+      "publicKey" -> trim(label("Key", text(required, validPublicKey))),
   )(SshKeyForm.apply)
 
   val personalTokenForm = mapping(
-      "note" -> trim(label("Token", text(required, maxlength(100))))
+      "note" -> trim(label("Token", text(required, maxlength(100)))),
   )(PersonalTokenForm.apply)
 
   case class NewGroupForm(groupName: String,
@@ -92,7 +92,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                 text(required, maxlength(100), identifier, uniqueUserName))),
       "url" -> trim(label("URL", optional(text(maxlength(200))))),
       "fileId" -> trim(label("File ID", optional(text()))),
-      "members" -> trim(label("Members", text(required, members)))
+      "members" -> trim(label("Members", text(required, members))),
   )(NewGroupForm.apply)
 
   val editGroupForm = mapping(
@@ -101,7 +101,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
       "url" -> trim(label("URL", optional(text(maxlength(200))))),
       "fileId" -> trim(label("File ID", optional(text()))),
       "members" -> trim(label("Members", text(required, members))),
-      "clearImage" -> trim(label("Clear image", boolean()))
+      "clearImage" -> trim(label("Clear image", boolean())),
   )(EditGroupForm.apply)
 
   case class RepositoryCreationForm(owner: String,
@@ -120,19 +120,19 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                 text(required, maxlength(100), repository, uniqueRepository))),
       "description" -> trim(label("Description", optional(text()))),
       "isPrivate" -> trim(label("Repository Type", boolean())),
-      "createReadme" -> trim(label("Create README", boolean()))
+      "createReadme" -> trim(label("Create README", boolean())),
   )(RepositoryCreationForm.apply)
 
   val forkRepositoryForm = mapping(
       "owner" -> trim(label("Repository owner", text(required))),
-      "name" -> trim(label("Repository name", text(required)))
+      "name" -> trim(label("Repository name", text(required))),
   )(ForkRepositoryForm.apply)
 
   case class AccountForm(accountName: String)
 
   val accountForm = mapping(
       "account" -> trim(
-          label("Group/User name", text(required, validAccountName)))
+          label("Group/User name", text(required, validAccountName))),
   )(AccountForm.apply)
 
   /**
@@ -455,7 +455,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
         }
         helper.html.forkrepository(
             repository,
-            (groups zip managerPermissions).toMap
+            (groups zip managerPermissions).toMap,
         )
       case _ => redirect(s"/${loginUserName}")
     }
@@ -488,7 +488,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               originRepositoryName = Some(originRepositoryName),
               originUserName = Some(originUserName),
               parentRepositoryName = Some(repository.name),
-              parentUserName = Some(repository.owner)
+              parentUserName = Some(repository.owner),
           )
 
           // Add collaborators for group repository

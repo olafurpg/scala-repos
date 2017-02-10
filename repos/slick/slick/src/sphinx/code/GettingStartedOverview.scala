@@ -37,7 +37,7 @@ object GettingStartedOverview extends App {
 //#quick-query
         andThen //#quick-query
         // or
-        coffees.filter(_.price < 10.0).map(_.name).result
+        coffees.filter(_.price < 10.0).map(_.name).result,
     )
 //#quick-query
   Await.result(f1, Duration.Inf)
@@ -63,7 +63,7 @@ object GettingStartedOverview extends App {
           // Automatically using a bind variable to be safe from SQL injection:
           // select COF_NAME from COFFEES where PRICE < ?
           //#what-is-slick-micro-example-plainsql
-        }
+        },
     )
   Await.result(f2, Duration.Inf)
 
@@ -86,7 +86,7 @@ object GettingStartedOverview extends App {
       val coffeeNames: Future[Seq[Double]] = db.run(
           //#features-type-safe
           coffees.schema.create andThen //#features-type-safe
-          coffees.map(_.price).result
+          coffees.map(_.price).result,
       )
 
       // Query builders are type safe:

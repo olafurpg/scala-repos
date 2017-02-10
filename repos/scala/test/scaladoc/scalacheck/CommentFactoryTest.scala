@@ -49,25 +49,25 @@ object Test extends Properties("CommentFactory") {
 
   property("parse") = parse(
       "/** One two three */",
-      Text("One two three")
+      Text("One two three"),
   )
   property("parse") = parse(
       "/** One `two` three */",
-      Chain(List(Text("One "), Monospace(Text("two")), Text(" three")))
+      Chain(List(Text("One "), Monospace(Text("two")), Text(" three"))),
   )
 
   property("parse") = parse(
       """
 /** One two
   * three */""",
-      Text("One two\nthree")
+      Text("One two\nthree"),
   )
   property("parse") = parse(
       """
 /** One `two`
   * three */""",
       Chain(List(
-              Text("One "), Monospace(Text("two")), Text("\n"), Text("three")))
+              Text("One "), Monospace(Text("two")), Text("\n"), Text("three"))),
   )
 
   property("parse") = parse(
@@ -78,7 +78,7 @@ object Test extends Properties("CommentFactory") {
           List(Text("One "),
                Monospace(Text("two")),
                Text("\n"),
-               Text(" three")))
+               Text(" three"))),
   )
 
   property("parse") = parse(
@@ -86,14 +86,14 @@ object Test extends Properties("CommentFactory") {
 /** One
   * `two` three */""",
       Chain(List(
-              Text("One"), Text("\n"), Monospace(Text("two")), Text(" three")))
+              Text("One"), Text("\n"), Monospace(Text("two")), Text(" three"))),
   )
 
   property("Trac #4361 - ^...^") = parse(
       """
 /**
  * hello ^world^ */""",
-      Chain(List(Text("hello "), Superscript(Text("world"))))
+      Chain(List(Text("hello "), Superscript(Text("world")))),
   )
 
   property("Trac #4361 - single ^ symbol") = parse(
@@ -104,7 +104,7 @@ object Test extends Properties("CommentFactory") {
  * </pre>
  *
  */""",
-      Chain(List(Text(""), Text("\n"), HtmlTag("<pre>\nhello ^world\n</pre>")))
+      Chain(List(Text(""), Text("\n"), HtmlTag("<pre>\nhello ^world\n</pre>"))),
   )
 
   property("Trac #4366 - body") = {
@@ -113,13 +113,13 @@ object Test extends Properties("CommentFactory") {
  /**
   * <strong><code>foo</code> has been deprecated and will be removed in a future version. Please call <code>bar</code> instead.</strong>
   */
-      """
+      """,
     )
 
     body == Body(List(Paragraph(Chain(List(
                         Summary(Chain(List(HtmlTag("<strong><code>foo</code> has been deprecated and will be removed in a future version. Please call <code>bar</code> instead.</strong>"),
                                            Text("\n"),
-                                           Text(""))))
+                                           Text("")))),
                     )))))
   }
 
@@ -129,7 +129,7 @@ object Test extends Properties("CommentFactory") {
  /**
   * <strong><code>foo</code> has been deprecated and will be removed in a future version. Please call <code>bar</code> instead.</strong>
   */
-      """
+      """,
     )
     body.summary == Some(
         Chain(
@@ -145,7 +145,7 @@ object Test extends Properties("CommentFactory") {
    * Implicit conversion that invokes the <code>expect</code> method on the <code>EasyMock</code> companion object (<em>i.e.</em>, the
    * static <code>expect</code> method in Java class <code>org.easymock.EasyMock</code>).
   */
-      """
+      """,
     ) match {
       case Body(
           List(Paragraph(Chain(List(
@@ -160,7 +160,7 @@ object Test extends Properties("CommentFactory") {
                              HtmlTag("<code>expect</code>"),
                              Text(" method in Java class "),
                              HtmlTag("<code>org.easymock.EasyMock</code>"),
-                             Text(")")
+                             Text(")"),
                              )),
                              Text(".")))),
           Text("\n")))))) =>

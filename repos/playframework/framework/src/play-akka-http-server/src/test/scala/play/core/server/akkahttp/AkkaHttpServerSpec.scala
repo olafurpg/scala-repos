@@ -111,7 +111,7 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
         request
           .withHeaders(
               ACCEPT_ENCODING -> "utf-8",
-              ACCEPT_LANGUAGE -> "en-US"
+              ACCEPT_LANGUAGE -> "en-US",
           )
           .get()
       } {
@@ -132,7 +132,7 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
           .withHeaders(
               ACCEPT_ENCODING -> "utf-8",
               ACCEPT_LANGUAGE -> "en-US",
-              `Raw-Request-URI`.name -> "/foo/bar/baz"
+              `Raw-Request-URI`.name -> "/foo/bar/baz",
           )
           .get()
       } {

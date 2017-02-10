@@ -270,7 +270,7 @@ object ShowPickled extends Names {
                 buf.readIndex,
                 buf.bytes
                   .slice(index(i), (end max buf.readIndex))
-                  .mkString(", ")
+                  .mkString(", "),
               ))
       }
     }

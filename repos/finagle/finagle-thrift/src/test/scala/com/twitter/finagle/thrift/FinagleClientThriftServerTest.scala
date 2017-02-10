@@ -46,7 +46,7 @@ class FinagleClientThriftServerTest extends FunSuite {
           new B.Processor(processor),
           serverSocketTransport,
           transportFactory,
-          new TBinaryProtocol.Factory()
+          new TBinaryProtocol.Factory(),
       )
 
       (socket.getLocalSocketAddress.asInstanceOf[InetSocketAddress], server)
@@ -67,7 +67,7 @@ class FinagleClientThriftServerTest extends FunSuite {
   def doit(
       transportFactory: TTransportFactory,
       codec: CodecFactory[ThriftClientRequest, Array[Byte]]#Client,
-      named: String
+      named: String,
   ) {
     test("%s:finagle client vs. synchronous thrift server should talk to each other"
           .format(named)) {

@@ -25,7 +25,7 @@ class PersonController @Inject()(
   val personForm: Form[CreatePersonForm] = Form {
     mapping(
         "name" -> nonEmptyText,
-        "age" -> number.verifying(min(0), max(140))
+        "age" -> number.verifying(min(0), max(140)),
     )(CreatePersonForm.apply)(CreatePersonForm.unapply)
   }
 
@@ -58,7 +58,7 @@ class PersonController @Inject()(
               // If successful, we simply redirect to the index page.
               Redirect(routes.PersonController.index)
             }
-        }
+        },
     )
   }
 

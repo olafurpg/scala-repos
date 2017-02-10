@@ -119,7 +119,7 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
           getDirectoryScanner(sourceDir).getIncludedFiles,
           sourceDir,
           destinationDir,
-          mapper
+          mapper,
       ) map (x => new File(sourceDir, x))
 
     /* Nothing to do. */

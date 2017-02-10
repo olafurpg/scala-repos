@@ -16,7 +16,7 @@ class MapContainsTrue extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1, 2).${START}map(_ => true).contains(true)$END",
         "Seq(1, 2).map(_ => true).contains(true)",
-        "Seq(1, 2).exists(_ => true)"
+        "Seq(1, 2).exists(_ => true)",
     )
   }
 
@@ -24,7 +24,7 @@ class MapContainsTrue extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1, 2) ${START}map (_ => true) contains true$END",
         "Seq(1, 2) map (_ => true) contains true",
-        "Seq(1, 2) exists (_ => true)"
+        "Seq(1, 2) exists (_ => true)",
     )
   }
 
@@ -44,7 +44,7 @@ class MapContainsTrue extends OperationsOnCollectionInspectionTest {
         |Seq(1, 2).exists { x =>
         |  true
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 }
@@ -60,7 +60,7 @@ class MapContainsFalse extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1, 2).${START}map(_ => true).contains(false)$END",
         "Seq(1, 2).map(_ => true).contains(false)",
-        "!Seq(1, 2).forall(_ => true)"
+        "!Seq(1, 2).forall(_ => true)",
     )
   }
 
@@ -68,7 +68,7 @@ class MapContainsFalse extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1, 2) ${START}map (_ => true) contains false$END",
         "Seq(1, 2) map (_ => true) contains false",
-        "!(Seq(1, 2) forall (_ => true))"
+        "!(Seq(1, 2) forall (_ => true))",
     )
   }
 
@@ -88,7 +88,7 @@ class MapContainsFalse extends OperationsOnCollectionInspectionTest {
         |!Seq(1, 2).forall { x =>
         |  true
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 }

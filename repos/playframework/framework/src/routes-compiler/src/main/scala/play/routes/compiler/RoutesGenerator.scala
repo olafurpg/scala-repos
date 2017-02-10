@@ -100,7 +100,7 @@ object StaticRoutesGenerator extends RoutesGenerator {
           sourceInfo,
           namespace,
           additionalImports,
-          rules
+          rules,
       )
       .body
 
@@ -110,7 +110,7 @@ object StaticRoutesGenerator extends RoutesGenerator {
       .routesPrefix(
           sourceInfo,
           namespace,
-          _.call.instantiate
+          _.call.instantiate,
       )
       .body
 
@@ -134,7 +134,7 @@ object StaticRoutesGenerator extends RoutesGenerator {
               packageName,
               routes,
               namespaceReverseRouter,
-              _.call.instantiate
+              _.call.instantiate,
           )
           .body
     }
@@ -161,7 +161,7 @@ object StaticRoutesGenerator extends RoutesGenerator {
               packageName,
               routes,
               namespaceReverseRouter,
-              _.call.instantiate
+              _.call.instantiate,
           )
           .body
     }
@@ -304,7 +304,7 @@ object InjectedRoutesGenerator extends RoutesGenerator {
           additionalImports,
           orderedDeps,
           rulesWithDeps,
-          includesDeps.values.toSeq
+          includesDeps.values.toSeq,
       )
       .body
   }
@@ -315,7 +315,7 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       .routesPrefix(
           sourceInfo,
           namespace,
-          _ => true
+          _ => true,
       )
       .body
 
@@ -339,7 +339,7 @@ object InjectedRoutesGenerator extends RoutesGenerator {
               packageName,
               routes,
               namespaceReverseRouter,
-              _ => true
+              _ => true,
           )
           .body
     }
@@ -366,7 +366,7 @@ object InjectedRoutesGenerator extends RoutesGenerator {
               packageName,
               routes,
               namespaceReverseRouter,
-              _ => true
+              _ => true,
           )
           .body
     }

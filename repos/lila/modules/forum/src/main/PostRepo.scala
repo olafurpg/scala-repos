@@ -19,7 +19,7 @@ sealed abstract class PostRepo(troll: Boolean) {
 
   private lazy val trollFilter = troll.fold(
       Json.obj(),
-      Json.obj("troll" -> false)
+      Json.obj("troll" -> false),
   )
 
   def byCategAndId(categSlug: String, id: String): Fu[Option[Post]] =
@@ -32,7 +32,7 @@ sealed abstract class PostRepo(troll: Boolean) {
     $primitive.one(
         selectTopic(topicId),
         "_id",
-        _ sort $sort.createdAsc
+        _ sort $sort.createdAsc,
     )(_.asOpt[String]) map { _.??(postId ==) }
 
   def countByTopics(topics: List[String]): Fu[Int] =
@@ -44,7 +44,7 @@ sealed abstract class PostRepo(troll: Boolean) {
   def recentInCategs(
       nb: Int)(categIds: List[String], langs: List[String]): Fu[List[Post]] =
     $find($query(
-              selectCategs(categIds) ++ selectLangs(langs) ++ selectNotHidden
+              selectCategs(categIds) ++ selectLangs(langs) ++ selectNotHidden,
           ) sort $sort.createdDesc,
           nb)
 
@@ -77,7 +77,7 @@ sealed abstract class PostRepo(troll: Boolean) {
         Json.obj(
             "createdAt" -> $gt($date(DateTime.now.minusHours(1))),
             "userId" -> ~post.userId,
-            "text" -> post.text
+            "text" -> post.text,
         ))
 
   def sortQuery = $sort.createdAsc

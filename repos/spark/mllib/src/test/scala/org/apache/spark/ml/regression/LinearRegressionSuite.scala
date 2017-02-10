@@ -99,7 +99,7 @@ class LinearRegressionSuite
                 Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
                 Instance(19.0, 2.0, Vectors.dense(1.0, 7.0)),
                 Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
-                Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
+                Instance(29.0, 4.0, Vectors.dense(3.0, 13.0)),
             ),
             2))
 
@@ -117,7 +117,7 @@ class LinearRegressionSuite
                 Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
                 Instance(17.0, 2.0, Vectors.dense(1.0, 7.0)),
                 Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
-                Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
+                Instance(17.0, 4.0, Vectors.dense(3.0, 13.0)),
             ),
             2))
     datasetWithWeightZeroLabel = sqlContext.createDataFrame(
@@ -126,7 +126,7 @@ class LinearRegressionSuite
                 Instance(0.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
                 Instance(0.0, 2.0, Vectors.dense(1.0, 7.0)),
                 Instance(0.0, 3.0, Vectors.dense(2.0, 11.0)),
-                Instance(0.0, 4.0, Vectors.dense(3.0, 13.0))
+                Instance(0.0, 4.0, Vectors.dense(3.0, 13.0)),
             ),
             2))
   }
@@ -936,13 +936,13 @@ class LinearRegressionSuite
           case (true, LabeledPoint(label, features)) =>
             Iterator(
                 Instance(label, weight = 1.2, features),
-                Instance(label, weight = 0.8, features)
+                Instance(label, weight = 0.8, features),
             )
           case (false, LabeledPoint(label, features)) =>
             Iterator(
                 Instance(label, weight = 0.3, features),
                 Instance(label, weight = 0.1, features),
-                Instance(label, weight = 0.6, features)
+                Instance(label, weight = 0.6, features),
             )
         }
 
@@ -1198,6 +1198,6 @@ object LinearRegressionSuite {
       "fitIntercept" -> true,
       "tol" -> 0.8,
       "standardization" -> false,
-      "solver" -> "l-bfgs"
+      "solver" -> "l-bfgs",
   )
 }

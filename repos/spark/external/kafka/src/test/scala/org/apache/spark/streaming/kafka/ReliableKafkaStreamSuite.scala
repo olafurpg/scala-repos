@@ -59,7 +59,7 @@ class ReliableKafkaStreamSuite
     kafkaParams = Map(
         "zookeeper.connect" -> kafkaTestUtils.zkAddress,
         "group.id" -> groupId,
-        "auto.offset.reset" -> "smallest"
+        "auto.offset.reset" -> "smallest",
     )
 
     tempDirectory = Utils.createTempDir()

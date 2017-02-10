@@ -15,7 +15,7 @@ private[launchqueue] object RateLimiterActor {
         new RateLimiterActor(
             rateLimiter,
             appRepository,
-            launchQueueRef
+            launchQueueRef,
         ))
 
   case class DelayUpdate(app: AppDefinition, delayUntil: Timestamp)
@@ -50,7 +50,7 @@ private class RateLimiterActor private (rateLimiter: RateLimiter,
   override def receive: Receive = LoggingReceive {
     Seq[Receive](
         receiveCleanup,
-        receiveDelayOps
+        receiveDelayOps,
     ).reduceLeft(_.orElse[Any, Unit](_))
   }
 

@@ -55,8 +55,8 @@ object FunctorDemo extends App {
       Leaf("quux"),
       Node(
           Leaf("foo"),
-          Leaf("wibble")
-      )
+          Leaf("wibble"),
+      ),
   )
 
   val t0 = transform(tree)(_.length)
@@ -66,8 +66,8 @@ object FunctorDemo extends App {
       Leaf(4),
       Node(
           Leaf(3),
-          Leaf(6)
-      )
+          Leaf(6),
+      ),
   )
   assert(t0 == expectedTree)
   assert(t1 == expectedTree)

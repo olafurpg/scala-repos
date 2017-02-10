@@ -67,7 +67,7 @@ class VectorAssemblerSuite
                Vectors.dense(1.0, 2.0),
                "a",
                Vectors.sparse(2, Array(1), Array(3.0)),
-               10L)
+               10L),
           ))
       .toDF("id", "x", "y", "name", "z", "n")
     val assembler = new VectorAssembler()

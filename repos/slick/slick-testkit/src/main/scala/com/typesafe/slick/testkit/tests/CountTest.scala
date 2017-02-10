@@ -92,7 +92,7 @@ class CountTest extends AsyncTest[RelationalTestDB] {
           (a, b) <- as joinLeft bs on (_.id === _.aId)
         } yield (a.id, b.map(_.data))).length.result
           .named("outerJoinLength")
-          .map(_ shouldBe 3)
+          .map(_ shouldBe 3),
       )
   }
 
@@ -113,7 +113,7 @@ class CountTest extends AsyncTest[RelationalTestDB] {
       .seq(
           ts.schema.create,
           ts += (1L, "a", 1L, None, None),
-          ts.length.result.map(_ shouldBe 1)
+          ts.length.result.map(_ shouldBe 1),
       )
       .withPinnedSession
   }

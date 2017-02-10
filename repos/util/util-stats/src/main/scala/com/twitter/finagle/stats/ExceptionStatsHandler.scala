@@ -22,7 +22,7 @@ object ExceptionStatsHandler {
   private[stats] def statPaths(
       t: Throwable,
       labels: Seq[Seq[String]],
-      rollup: Boolean
+      rollup: Boolean,
   ): Seq[Seq[String]] = {
     val exceptionChain = Throwables.mkString(t)
 

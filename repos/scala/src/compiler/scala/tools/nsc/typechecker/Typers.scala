@@ -1806,7 +1806,7 @@ trait Typers
           x :: fixDuplicateSyntheticParents(
               if (isPossibleSyntheticParent(sym))
                 xs filterNot (_.symbol == sym)
-              else xs
+              else xs,
           )
       }
 
@@ -2077,7 +2077,7 @@ trait Typers
         case vd @ ValDef(_, _, tpt, EmptyTree) =>
           val tpt1 = checkNoEscaping.privates(
               clazz.thisSym,
-              treeCopy.TypeTree(tpt).setOriginal(tpt) setType vd.symbol.tpe
+              treeCopy.TypeTree(tpt).setOriginal(tpt) setType vd.symbol.tpe,
           )
           copyValDef(vd)(tpt = tpt1, rhs = EmptyTree) setType NoType
       }
@@ -2835,7 +2835,7 @@ trait Typers
                   // hence the cast, which will be erased in posterasure
                   // (the cast originally caused  extremely weird types to show up
                   //  in test/scaladoc/run/SI-5933.scala because `variantToSkolem` was missing `tpSym.initialize`)
-                  gen.mkCastPreservingAnnotations(Ident(paramSym), argTp)
+                  gen.mkCastPreservingAnnotations(Ident(paramSym), argTp),
               ))
 
       def mkParam(methodSym: Symbol, tp: Type = argTp) =
@@ -2936,7 +2936,7 @@ trait Typers
           val B1Tpt = typedIdent(B1)
           Map(
               x -> A1Tpt,
-              default -> gen.scalaFunctionConstr(List(A1Tpt), B1Tpt)
+              default -> gen.scalaFunctionConstr(List(A1Tpt), B1Tpt),
           )
         }
         def newParam(param: Symbol): ValDef = {
@@ -3027,7 +3027,7 @@ trait Typers
               atPos(tree.pos.focus)(
                   Apply(Select(New(Ident(anonClass.name).setSymbol(anonClass)),
                                nme.CONSTRUCTOR),
-                        List())
+                        List()),
               ))
       }
 
@@ -3215,7 +3215,7 @@ trait Typers
               constrMods = NoMods,
               vparamss = ListOfNil,
               body = List(samDef),
-              superPos = sampos.focus
+              superPos = sampos.focus,
           ))
 
       // type checking the whole block, so that everything is packaged together nicely
@@ -3225,7 +3225,7 @@ trait Typers
             samBodyDef,
             classDef,
             Apply(Select(New(Ident(tpnme.ANON_FUN_NAME)), nme.CONSTRUCTOR),
-                  Nil)
+                  Nil),
         )
       }
 
@@ -4217,7 +4217,7 @@ trait Typers
             if ((typedAnn.tpe == null) || typedAnn.tpe.isErroneous)
               ErroneousAnnotation
             else annInfo(typedAnn)
-          }
+          },
       )
     }
 
@@ -5113,7 +5113,7 @@ trait Typers
             op = _.typed(fun, mode.forFunMode, funpt),
             reportAmbiguousErrors = !mode.inExprMode &&
               context.ambiguousErrors,
-            newtree = if (mode.inExprMode) tree else context.tree
+            newtree = if (mode.inExprMode) tree else context.tree,
         )
         silentResult match {
           case SilentResultValue(fun1) =>
@@ -5186,7 +5186,7 @@ trait Typers
         def mkAssign(vble: Tree): Tree =
           Assign(
               vble,
-              Apply(Select(vble.duplicate, prefix) setPos fun.pos.focus, args) setPos tree.pos.makeTransparent
+              Apply(Select(vble.duplicate, prefix) setPos fun.pos.focus, args) setPos tree.pos.makeTransparent,
           ) setPos tree.pos
 
         def mkUpdate(table: Tree, indices: List[Tree]) = {
@@ -5194,11 +5194,11 @@ trait Typers
             case tab :: is =>
               def mkCall(name: Name, extraArgs: Tree*) = (Apply(
                       Select(tab(), name) setPos table.pos,
-                      is.map(i => i()) ++ extraArgs
+                      is.map(i => i()) ++ extraArgs,
                   ) setPos tree.pos)
               mkCall(
                   nme.update,
-                  Apply(Select(mkCall(nme.apply), prefix) setPos fun.pos, args) setPos tree.pos
+                  Apply(Select(mkCall(nme.apply), prefix) setPos fun.pos, args) setPos tree.pos,
               )
             case _ => EmptyTree
           }
@@ -5295,7 +5295,7 @@ trait Typers
                   |If this type reaches the backend, we are likely doomed to crash.
                   |$t has these overloads:
                   |${alts map (s => "  " + s.defStringSeenAs(pre memberType s)) mkString "\n"}
-                  |""".stripMargin
+                  |""".stripMargin,
                 )("")
             case _ =>
           }
@@ -5743,7 +5743,7 @@ trait Typers
                   val block2 = adapt(block1, mode, lub)
                   val catches2 = catches1 map (adaptCase(_, mode, lub))
                   treeCopy.Try(tree, block2, catches2, fin1) setType lub
-              }
+              },
         )
       }
 

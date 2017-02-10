@@ -84,11 +84,11 @@ object ThriftResponseClassifier {
     * which will automatically apply these transformations to a [[ResponseClassifier]].
     */
   private[finagle] def usingDeserializeCtx(
-      classifier: ResponseClassifier
+      classifier: ResponseClassifier,
   ): ResponseClassifier = new ResponseClassifier {
     private[this] def deserialized(
         deserCtx: DeserializeCtx[_],
-        bytes: Array[Byte]
+        bytes: Array[Byte],
     ): ReqRep = {
       ReqRep(deserCtx.request, deserCtx.deserialize(bytes))
     }

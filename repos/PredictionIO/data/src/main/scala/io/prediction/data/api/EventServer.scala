@@ -135,15 +135,15 @@ class EventServiceActor(val eventClient: LEvents,
   private val FailedAuth = Left(
       AuthenticationFailedRejection(
           AuthenticationFailedRejection.CredentialsRejected,
-          List()
-      )
+          List(),
+      ),
   )
 
   private val MissedAuth = Left(
       AuthenticationFailedRejection(
           AuthenticationFailedRejection.CredentialsMissing,
-          List()
-      )
+          List(),
+      ),
   )
 
   lazy val statsActorRef = actorRefFactory.actorSelection("/user/StatsActor")
@@ -176,7 +176,7 @@ class EventServiceActor(val eventClient: LEvents,
                     n -> Map("name" -> p.pluginName,
                              "description" -> p.pluginDescription,
                              "class" -> p.getClass.getName)
-                }
+                },
                 ))
           }
         }
@@ -230,7 +230,7 @@ class EventServiceActor(val eventClient: LEvents,
                           .map(event => (StatusCodes.OK, event))
                           .getOrElse(
                               (StatusCodes.NotFound,
-                               Map("message" -> "Not Found"))
+                               Map("message" -> "Not Found")),
                           )
                     }
                   data
@@ -624,7 +624,7 @@ object EventServer {
               accessKeysClient,
               channelsClient,
               config),
-        "EventServerActor"
+        "EventServerActor",
     )
     if (config.stats) system.actorOf(Props[StatsActor], "StatsActor")
     system.actorOf(Props[PluginsActor], "PluginsActor")

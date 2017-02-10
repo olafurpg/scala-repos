@@ -360,7 +360,7 @@ object AFTSurvivalRegressionModel
 
   /** [[MLWriter]] instance for [[AFTSurvivalRegressionModel]] */
   private[AFTSurvivalRegressionModel] class AFTSurvivalRegressionModelWriter(
-      instance: AFTSurvivalRegressionModel
+      instance: AFTSurvivalRegressionModel,
   )
       extends MLWriter with Logging {
 

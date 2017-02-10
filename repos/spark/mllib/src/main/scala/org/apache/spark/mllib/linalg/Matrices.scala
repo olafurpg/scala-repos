@@ -181,7 +181,7 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
             StructField("values",
                         ArrayType(DoubleType, containsNull = false),
                         nullable = true),
-            StructField("isTransposed", BooleanType, nullable = false)
+            StructField("isTransposed", BooleanType, nullable = false),
         ))
   }
 

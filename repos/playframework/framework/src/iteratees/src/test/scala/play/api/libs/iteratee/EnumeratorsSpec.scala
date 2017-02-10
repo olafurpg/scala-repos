@@ -163,7 +163,7 @@ object EnumeratorsSpec
         val count = new java.util.concurrent.atomic.AtomicInteger()
         mustPropagateFailure(
             Enumerator(1, 2, 3).onDoneEnumerating(count.incrementAndGet())(
-                onDoneEC)
+                onDoneEC),
         )
         count.get() must_== 1
       }
@@ -231,7 +231,7 @@ object EnumeratorsSpec
       val enum = Enumerator.fromCallback1[String](
           b => Future.successful(None),
           () => (),
-          (msg, input) => errorCount.incrementAndGet()
+          (msg, input) => errorCount.incrementAndGet(),
       )
 
       val result = enum |>>> it
@@ -251,7 +251,7 @@ object EnumeratorsSpec
       val enum = Enumerator.fromCallback1[String](
           b => Future.successful(Some("")),
           () => (),
-          (msg, input) => errorCount.incrementAndGet()
+          (msg, input) => errorCount.incrementAndGet(),
       )
 
       val result1 = enum |>>> it1

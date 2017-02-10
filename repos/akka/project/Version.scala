@@ -24,7 +24,7 @@ object Version {
          |object Version {
          |  val current: String = "%s"
          |}
-         |""")
+         |"""),
         ))
 
   def generateVersion(

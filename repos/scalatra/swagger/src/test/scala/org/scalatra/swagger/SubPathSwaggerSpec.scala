@@ -19,7 +19,7 @@ class SubPathSwaggerSpec extends ScalatraSpec with JsonMatchers {
       termsOfServiceUrl = "http://helloreverb.com/terms/",
       contact = "apiteam@wordnik.com",
       license = "Apache 2.0",
-      licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
+      licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html",
   )
   val swagger = new Swagger("1.2", "1.0.0", apiInfo)
 

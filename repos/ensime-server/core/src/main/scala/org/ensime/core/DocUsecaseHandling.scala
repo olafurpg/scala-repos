@@ -88,6 +88,6 @@ trait DocUsecaseHandling { self: DocResolver =>
       "updated",
       "zip",
       "zipAll",
-      "zipWithIndex"
+      "zipWithIndex",
   )
 }

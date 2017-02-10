@@ -88,7 +88,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
           SubqueryHolder(new SQLBuilder(e.query, sqlContext).toSQL)
         case e: NonSQLExpression =>
           throw new UnsupportedOperationException(
-              s"Expression $e doesn't have a SQL representation"
+              s"Expression $e doesn't have a SQL representation",
           )
         case e => e
       }
@@ -189,14 +189,14 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
       build(
           toSQL(p.child),
           if (p.global) "ORDER BY" else "SORT BY",
-          p.order.map(_.sql).mkString(", ")
+          p.order.map(_.sql).mkString(", "),
       )
 
     case p: RepartitionByExpression =>
       build(
           toSQL(p.child),
           "DISTRIBUTE BY",
-          p.partitionExpressions.map(_.sql).mkString(", ")
+          p.partitionExpressions.map(_.sql).mkString(", "),
       )
 
     case p: ScriptTransformation =>
@@ -223,7 +223,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         if (isDistinct) "DISTINCT" else "",
         plan.projectList.map(_.sql).mkString(", "),
         if (plan.child == OneRowRelation) "" else "FROM",
-        toSQL(plan.child)
+        toSQL(plan.child),
     )
   }
 
@@ -248,7 +248,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         "AS (" + outputSchema + ")",
         outputRowFormatSQL,
         if (plan.child == OneRowRelation) "" else "FROM",
-        toSQL(plan.child)
+        toSQL(plan.child),
     )
   }
 
@@ -260,7 +260,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         if (plan.child == OneRowRelation) "" else "FROM",
         toSQL(plan.child),
         if (groupingSQL.isEmpty) "" else "GROUP BY",
-        groupingSQL
+        groupingSQL,
     )
   }
 
@@ -297,7 +297,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         g.generator.sql,
         newSubqueryName(),
         "AS",
-        columnAliases
+        columnAliases,
     )
   }
 
@@ -386,7 +386,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         toSQL(project.child),
         "GROUP BY",
         groupingSQL,
-        groupingSetSQL
+        groupingSetSQL,
     )
   }
 
@@ -395,7 +395,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         "SELECT",
         (w.child.output ++ w.windowExpressions).map(_.sql).mkString(", "),
         if (w.child == OneRowRelation) "" else "FROM",
-        toSQL(w.child)
+        toSQL(w.child),
     )
   }
 
@@ -436,7 +436,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
               // that table relation, as we can only convert table sample to standard SQL string.
               ResolveSQLTable,
               // Insert sub queries on top of operators that need to appear after FROM clause.
-              AddSubquery)
+              AddSubquery),
     )
 
     object NormalizedAttribute extends Rule[LogicalPlan] {

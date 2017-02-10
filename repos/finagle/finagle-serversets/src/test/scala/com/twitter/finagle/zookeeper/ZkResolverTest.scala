@@ -79,7 +79,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
           .join(
               sockAddr,
               Map[String, InetSocketAddress]().asJava,
-              sockAddr.getPort
+              sockAddr.getPort,
           )
           .update(ALIVE)
       }
@@ -90,7 +90,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val filteredAddr = new ZkResolver(factory).resolve(
           Set(inst.zookeeperAddress),
           path,
-          shardId = Some(ephAddr2.getPort)
+          shardId = Some(ephAddr2.getPort),
       )
       eventually {
         Var.sample(filteredAddr) match {
@@ -123,7 +123,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val status = serverSet.join(
           sockAddr.addr,
           Map[String, InetSocketAddress]("blah" -> blahAddr.addr).asJava,
-          ALIVE
+          ALIVE,
       )
 
       eventually { assert(Var.sample(va) == Addr.Bound(sockAddr)) }
@@ -155,7 +155,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
           .join(
               sockAddr,
               Map[String, InetSocketAddress](
-                  sockAddr.getPort.toString -> sockAddr).asJava
+                  sockAddr.getPort.toString -> sockAddr).asJava,
           )
           .update(ALIVE)
       }
@@ -165,7 +165,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val filteredAddr = new ZkResolver(factory).resolve(
           Set(inst.zookeeperAddress),
           path,
-          endpoint = Some(ephAddr1.getPort.toString)
+          endpoint = Some(ephAddr1.getPort.toString),
       )
 
       eventually {

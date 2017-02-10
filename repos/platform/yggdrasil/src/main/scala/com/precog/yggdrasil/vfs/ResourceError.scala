@@ -52,7 +52,7 @@ object ResourceError {
       errors flatMap {
         case ResourceErrors(e0) => e0
         case other => NonEmptyList(other)
-      }
+      },
   )
 
   def fromExtractorError(msg: String): Extractor.Error => ResourceError = {

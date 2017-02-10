@@ -124,7 +124,7 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
               WorksheetCompiler.setMakeBeforeRun(
                   PsiManager getInstance project findFile file, box.isSelected)
             }
-        }
+        },
     )
   }
 
@@ -143,7 +143,7 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
             override def stateChanged(e: ChangeEvent) {
               WorksheetAutoRunner.setAutorun(psiFile, box.isSelected)
             }
-        }
+        },
     )
   }
 

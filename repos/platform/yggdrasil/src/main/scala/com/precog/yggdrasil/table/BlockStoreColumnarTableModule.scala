@@ -200,7 +200,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       def dequeueEqual(
           queue: mutable.PriorityQueue[Cell],
           cellMatrix: CellMatrix,
-          cells: List[Cell]
+          cells: List[Cell],
       ): List[Cell] =
         if (queue.isEmpty) {
           cells
@@ -217,7 +217,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       def consumeToBoundary(
           queue: mutable.PriorityQueue[Cell],
           cellMatrix: CellMatrix,
-          idx: Int
+          idx: Int,
       ): (Int, List[Cell]) = {
         val cellBlock = dequeueEqual(queue, cellMatrix, Nil)
 
@@ -474,7 +474,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
             lstate: A,
             rstate: B,
             leftWriteState: JDBMState,
-            rightWriteState: JDBMState
+            rightWriteState: JDBMState,
         ): M[(JDBMState, JDBMState)] = {
 
           @tailrec
@@ -916,7 +916,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                                 SortAscending),
                       loadTable(sortMergeEngine,
                                 closedRightState.indices,
-                                SortAscending)
+                                SortAscending),
                   )
                 }
 
@@ -1258,8 +1258,8 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                         path
                     }
                 }
-              }
-          )
+              },
+          ),
       )
 
       Table(StreamT(M.point(head)), ExactSize(totalCount))
@@ -1584,7 +1584,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                   case Leaf(_) => TransSpec1.DerefArray0
                 }, "0"), WrapObject(TransSpec1.DerefArray1, "1"))
               },
-              deepMap(valueSpec) { case Leaf(_) => TransSpec1.DerefArray0 }
+              deepMap(valueSpec) { case Leaf(_) => TransSpec1.DerefArray0 },
           )
         } else {
           (Leaf(Source), groupKeys, valueSpec)

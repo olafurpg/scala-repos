@@ -267,7 +267,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
         prevXml) & ".all-pages *" #> pagesXml(0 until numPages) _ & ".zoomed-pages *" #> pagesXml(
         zoomedPages) _ & ".next *" #> pageXml(
         max(0, min(first + itemsPerPage, itemsPerPage * (numPages - 1))),
-        nextXml
+        nextXml,
     ) & ".last *" #> pageXml(itemsPerPage * (numPages - 1), lastXml) & ".records *" #> currentXml & ".records-start *" #> recordsFrom & ".records-end *" #> recordsTo & ".records-count *" #> count
   }
 }
@@ -318,7 +318,7 @@ trait SortedPaginatorSnippet[T, C]
     case (col, ascending) =>
       (
           S.param("sort").map(toInt) openOr col,
-          S.param("asc").map(toBoolean) openOr ascending
+          S.param("asc").map(toBoolean) openOr ascending,
       )
   }
 

@@ -10,6 +10,6 @@ object TaskFailureTestHelper {
       message = "Process exited with status [1]",
       host = "slave5.mega.co",
       version = Timestamp(1000),
-      timestamp = Timestamp(2000)
+      timestamp = Timestamp(2000),
   )
 }

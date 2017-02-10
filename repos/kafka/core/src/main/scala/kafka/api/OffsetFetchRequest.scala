@@ -106,7 +106,7 @@ case class OffsetFetchRequest(
       case (topicAndPartition) =>
         (topicAndPartition,
          OffsetMetadataAndError(
-             Errors.forException(e).code
+             Errors.forException(e).code,
          ))
     }.toMap
     val errorResponse = OffsetFetchResponse(

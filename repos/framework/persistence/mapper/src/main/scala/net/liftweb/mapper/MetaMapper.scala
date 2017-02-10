@@ -728,7 +728,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     meth.invoke(inst).asInstanceOf[MappedField[AnyBound, A]]
 
   def dirty_?(toTest: A): Boolean = mappedFieldList.exists(
-      mft => ??(mft.method, toTest).dirty_?
+      mft => ??(mft.method, toTest).dirty_?,
   )
 
   def indexedField(toSave: A): Box[MappedField[Any, A]] =
@@ -1525,7 +1525,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
       .flatMap(
           field =>
             field.toForm.toList
-              .flatMap(form => formatFormLine(Text(field.displayName), form))
+              .flatMap(form => formatFormLine(Text(field.displayName), form)),
       )
 
   /**
@@ -1540,7 +1540,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
       .map(e => ??(e.method, toMap))
       .filter(f => f.dbDisplay_?)
       .flatMap(
-          field => formatFormLine(Text(field.displayName), field.asHtml)
+          field => formatFormLine(Text(field.displayName), field.asHtml),
       )
 
   /**
@@ -2217,11 +2217,11 @@ trait KeyedMetaMapper[Type, A <: KeyedMapper[Type, A]]
                   (fk.name + "_obj",
                    JE.AnonFunc(
                        "index",
-                       JE.JsRaw("return index[" + key.encJs + "];").cmd))
+                       JE.JsRaw("return index[" + key.encJs + "];").cmd)),
               )
             case x => x.asJs
           }
-          .toList ::: actual.suplementalJs(Full(f)): _*
+          .toList ::: actual.suplementalJs(Full(f)): _*,
     )
   }
 

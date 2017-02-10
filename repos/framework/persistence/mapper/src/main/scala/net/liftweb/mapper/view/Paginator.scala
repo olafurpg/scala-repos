@@ -92,7 +92,7 @@ class SortedMapperPaginator[T <: Mapper[T]](
     case (fieldIndex, ascending) =>
       OrderBy(
           headers(fieldIndex) match { case (_, f) => f },
-          if (ascending) Ascending else Descending
+          if (ascending) Ascending else Descending,
       )
   }
 }
@@ -106,7 +106,7 @@ class SortedMapperPaginator[T <: Mapper[T]](
 class SortedMapperPaginatorSnippet[T <: Mapper[T]](
     meta: MetaMapper[T],
     initialSort: net.liftweb.mapper.MappedField[_, T],
-    headers: (String, MappedField[_, T])*
+    headers: (String, MappedField[_, T])*,
 )
     extends SortedMapperPaginator[T](meta, initialSort, headers: _*)
     with SortedPaginatorSnippet[T, MappedField[_, T]]

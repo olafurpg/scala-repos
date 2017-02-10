@@ -296,7 +296,7 @@ abstract class Erasure
                    else fullNameInSig(sym)
                  } else fullNameInSig(sym)) +
                 (if (args.isEmpty) ""
-                 else "<" + (args map argSig).mkString + ">") + (";")
+                 else "<" + (args map argSig).mkString + ">") + (";"),
             )
           }
 
@@ -505,7 +505,7 @@ abstract class Erasure
                 (bridgeTarget(e.sym) == member))) e = bridgesScope
               .lookupNextEntry(e)
             (e eq null)
-          }
+          },
       )
       if (!bridgeNeeded) return
 
@@ -1024,9 +1024,9 @@ abstract class Erasure
                           qual1(),
                           fun.symbol,
                           List(specialErasure(fun.symbol)(arg.tpe)),
-                          Nil
+                          Nil,
                       ),
-                      isArrayTest(qual1())
+                      isArrayTest(qual1()),
                   )
                 }
             }

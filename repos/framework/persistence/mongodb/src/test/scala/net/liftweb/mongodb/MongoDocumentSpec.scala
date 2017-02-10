@@ -43,7 +43,7 @@ package mongodocumentspecs {
       jlf: java.lang.Float,
       jlb: java.lang.Byte,
       jlbool: java.lang.Boolean,
-      jlsh: java.lang.Short
+      jlsh: java.lang.Short,
   )
       extends MongoDocument[Primitives] {
 
@@ -147,7 +147,7 @@ class MongoDocumentSpec extends Specification with MongoTestKit {
           new java.lang.Float(133.5),
           new java.lang.Byte("12"),
           java.lang.Boolean.TRUE,
-          new java.lang.Short("135")
+          new java.lang.Short("135"),
       )
       passSaveAndRetrieveTests(primitives, Primitives)
     }

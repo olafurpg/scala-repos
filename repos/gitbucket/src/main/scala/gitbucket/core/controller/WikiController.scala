@@ -31,7 +31,7 @@ trait WikiControllerBase extends ControllerBase {
       "content" -> trim(label("Content", text(required, conflictForNew))),
       "message" -> trim(label("Message", optional(text()))),
       "currentPageName" -> trim(label("Current page name", text())),
-      "id" -> trim(label("Latest commit id", text()))
+      "id" -> trim(label("Latest commit id", text())),
   )(WikiPageEditForm.apply)
 
   val editForm = mapping(
@@ -40,7 +40,7 @@ trait WikiControllerBase extends ControllerBase {
       "content" -> trim(label("Content", text(required, conflictForEdit))),
       "message" -> trim(label("Message", optional(text()))),
       "currentPageName" -> trim(label("Current page name", text(required))),
-      "id" -> trim(label("Latest commit id", text(required)))
+      "id" -> trim(label("Latest commit id", text(required))),
   )(WikiPageEditForm.apply)
 
   get("/:owner/:repository/wiki")(referrersOnly { repository =>
@@ -184,7 +184,7 @@ trait WikiControllerBase extends ControllerBase {
               appendNewLine(convertLineSeparator(form.content, "LF"), "LF"),
               loginAccount,
               form.message.getOrElse(""),
-              Some(form.id)
+              Some(form.id),
           ).map { commitId =>
             updateLastActivityDate(repository.owner, repository.name)
             recordEditWikiPageActivity(repository.owner,

@@ -323,7 +323,7 @@ trait ItemsListEditor[T <: Mapper[T]] {
                                   sortFn(f),
                                   Text(capify(f.displayName)))
           },
-          fieldFilter
+          fieldFilter,
       )
     } & ".table" #> {
       ".title *" #> title & ".insertBtn" #> SHtml.submit(?("Insert"),

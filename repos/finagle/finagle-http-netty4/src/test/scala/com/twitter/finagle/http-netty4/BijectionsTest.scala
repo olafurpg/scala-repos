@@ -71,20 +71,20 @@ object BijectionsTest {
 
   val arbNettyMethod = Gen.oneOf(
       HttpMethod.GET,
-      HttpMethod.POST
+      HttpMethod.POST,
   )
 
   val arbNettyStatus = Gen.oneOf(
       HttpResponseStatus.OK,
       HttpResponseStatus.BAD_REQUEST,
       HttpResponseStatus.SERVICE_UNAVAILABLE,
-      HttpResponseStatus.GATEWAY_TIMEOUT
+      HttpResponseStatus.GATEWAY_TIMEOUT,
   )
 
   val arbNettyVersion = Gen.oneOf(
       HttpVersion.HTTP_1_0,
       HttpVersion.HTTP_1_1,
-      new HttpVersion("SECURE-HTTP/1.4", true)
+      new HttpVersion("SECURE-HTTP/1.4", true),
   )
 
   val arbNettyRequest = for {
@@ -102,7 +102,7 @@ object BijectionsTest {
         uri,
         Unpooled.wrappedBuffer(body.getBytes(UTF_8)),
         headers,
-        EmptyHttpHeaders.INSTANCE
+        EmptyHttpHeaders.INSTANCE,
     )
     (req, body)
   }
@@ -121,7 +121,7 @@ object BijectionsTest {
         status,
         Unpooled.wrappedBuffer(body.getBytes(UTF_8)),
         headers,
-        EmptyHttpHeaders.INSTANCE
+        EmptyHttpHeaders.INSTANCE,
     )
     (req, body)
   }

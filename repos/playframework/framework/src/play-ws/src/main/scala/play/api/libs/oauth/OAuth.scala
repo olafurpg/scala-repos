@@ -71,7 +71,7 @@ case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
     _root_.oauth.signpost.OAuth.addQueryParameters(
         provider.getAuthorizationWebsiteUrl(),
         _root_.oauth.signpost.OAuth.OAUTH_TOKEN,
-        token
+        token,
     )
   }
 }

@@ -1221,7 +1221,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
   def newValDef(sym: Symbol, rhs: Tree)(
       mods: Modifiers = Modifiers(sym.flags),
       name: TermName = sym.name.toTermName,
-      tpt: Tree = TypeTreeMemberType(sym)
+      tpt: Tree = TypeTreeMemberType(sym),
   ): ValDef = (atPos(sym.pos)(ValDef(mods, name, tpt, rhs)) setSymbol sym)
 
   def newDefDef(sym: Symbol, rhs: Tree)(
@@ -1229,14 +1229,14 @@ trait Trees extends api.Trees { self: SymbolTable =>
       name: TermName = sym.name.toTermName,
       tparams: List[TypeDef] = sym.typeParams map TypeDef.apply,
       vparamss: List[List[ValDef]] = mapParamss(sym)(ValDef.apply),
-      tpt: Tree = TypeTreeMemberType(sym)
+      tpt: Tree = TypeTreeMemberType(sym),
   ): DefDef =
     (atPos(sym.pos)(DefDef(mods, name, tparams, vparamss, tpt, rhs)) setSymbol sym)
 
   def newTypeDef(sym: Symbol, rhs: Tree)(
       mods: Modifiers = Modifiers(sym.flags),
       name: TypeName = sym.name.toTypeName,
-      tparams: List[TypeDef] = sym.typeParams map TypeDef.apply
+      tparams: List[TypeDef] = sym.typeParams map TypeDef.apply,
   ): TypeDef =
     (atPos(sym.pos)(TypeDef(mods, name, tparams, rhs)) setSymbol sym)
 
@@ -1579,7 +1579,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
             transform(pid).asInstanceOf[RefTree],
             atOwner(mclass(tree.symbol)) {
               transformStats(stats, currentOwner)
-            }
+            },
         )
       case Annotated(annot, arg) =>
         treeCopy.Annotated(tree, transform(annot), transform(arg))
@@ -1895,7 +1895,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       tparams: List[TypeDef] = null,
       vparamss: List[List[ValDef]] = null,
       tpt: Tree = null,
-      rhs: Tree = null
+      rhs: Tree = null,
   ): DefDef = tree match {
     case DefDef(mods0, name0, tparams0, vparamss0, tpt0, rhs0) =>
       treeCopy.DefDef(tree,
@@ -1912,7 +1912,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       mods: Modifiers = null,
       name: Name = null,
       tpt: Tree = null,
-      rhs: Tree = null
+      rhs: Tree = null,
   ): ValDef = tree match {
     case ValDef(mods0, name0, tpt0, rhs0) =>
       treeCopy.ValDef(tree,
@@ -1927,7 +1927,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       mods: Modifiers = null,
       name: Name = null,
       tparams: List[TypeDef] = null,
-      rhs: Tree = null
+      rhs: Tree = null,
   ): TypeDef = tree match {
     case TypeDef(mods0, name0, tparams0, rhs0) =>
       treeCopy.TypeDef(tree,
@@ -1942,7 +1942,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       mods: Modifiers = null,
       name: Name = null,
       tparams: List[TypeDef] = null,
-      impl: Template = null
+      impl: Template = null,
   ): ClassDef = tree match {
     case ClassDef(mods0, name0, tparams0, impl0) =>
       treeCopy.ClassDef(tree,
@@ -1957,7 +1957,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
   def copyModuleDef(tree: Tree)(
       mods: Modifiers = null,
       name: Name = null,
-      impl: Template = null
+      impl: Template = null,
   ): ModuleDef = tree match {
     case ModuleDef(mods0, name0, impl0) =>
       treeCopy.ModuleDef(tree,

@@ -410,7 +410,7 @@ sealed abstract class ZipperInstances {
             .foldMapRight1Opt(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
             case Some(b) => F.append(b, f(fa.focus))
             case None => f(fa.focus)
-          }
+          },
       )((b, a) => F.append(b, f(a)))
     override def foldMapRight1[A, B](fa: Zipper[A])(
         z: A => B)(f: (A, => B) => B) =
@@ -419,14 +419,14 @@ sealed abstract class ZipperInstances {
           Foldable[Stream].foldMapRight1Opt(fa.rights)(z)(f) match {
             case Some(b) => f(fa.focus, b)
             case None => z(fa.focus)
-          }
+          },
       )((b, a) => f(a, b))
     override def foldMapLeft1[A, B](fa: Zipper[A])(z: A => B)(f: (B, A) => B) =
       fa.rights.foldLeft(
           Foldable[Stream].foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
             case Some(b) => f(b, fa.focus)
             case None => z(fa.focus)
-          }
+          },
       )(f)
     override def traverse1Impl[G[_], A, B](fa: Zipper[A])(f: A => G[B])(
         implicit G: Apply[G]) = {

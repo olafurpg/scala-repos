@@ -36,7 +36,7 @@ import org.apache.spark.util.Utils
 private[spark] case class NarrowCoGroupSplitDep(
     @transient rdd: RDD[_],
     @transient splitIndex: Int,
-    var split: Partition
+    var split: Partition,
 )
     extends Serializable {
 

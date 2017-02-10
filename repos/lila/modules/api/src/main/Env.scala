@@ -119,7 +119,7 @@ final class Env(config: Config,
 
   system.actorOf(
       Props(new KamonPusher(
-              countUsers = () => userEnv.onlineUserIdMemo.count
+              countUsers = () => userEnv.onlineUserIdMemo.count,
           )))
 }
 

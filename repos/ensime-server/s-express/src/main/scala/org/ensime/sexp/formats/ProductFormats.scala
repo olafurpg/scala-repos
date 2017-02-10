@@ -30,7 +30,7 @@ trait LowPriorityProductFormats {
 
     implicit def hListFormat[H, T <: HList](
         implicit h: Lazy[SexpFormat[H]],
-        t: Lazy[HListFormat[T]]
+        t: Lazy[HListFormat[T]],
     ): HListFormat[H :: T] = new HListFormat[H :: T] {
       def write(x: H :: T) = h.value.write(x.head) :: t.value.write(x.tail)
 
@@ -58,7 +58,7 @@ trait LowPriorityProductFormats {
       lg: LabelledGeneric.Aux[T, LR],
       k: ops.record.Keys.Aux[LR, K],
       ltl: ops.hlist.ToList[K, Symbol],
-      r: Lazy[HListFormat[R]]
+      r: Lazy[HListFormat[R]],
   ): SexpFormat[T] = new SexpFormat[T] {
 
     private val keys = k().toList[Symbol].map { sym =>
@@ -99,7 +99,7 @@ trait ProductFormats extends LowPriorityProductFormats {
       implicit g: Generic.Aux[T, R],
       t: ops.hlist.Tupler.Aux[R, T2],
       p: T =:= T2,
-      r: Lazy[HListFormat[R]]
+      r: Lazy[HListFormat[R]],
   ): SexpFormat[T] = new SexpFormat[T] {
     def write(x: T): Sexp = SexpList(r.value.write(g.to(x)))
     def read(value: Sexp): T = value match {

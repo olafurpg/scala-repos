@@ -409,7 +409,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
                 d.getArtifact.getGroupId,
                 d.getArtifact.getArtifactId,
                 d.getArtifact.getVersion,
-                props.asJava
+                props.asJava,
             )
           case _ => tmp
         }
@@ -605,7 +605,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
               art.getExt,
               t.module.getRevision,
               getArtifactProperties(t.module),
-              file
+              file,
           )
         }
         publishArtifacts(artifacts)

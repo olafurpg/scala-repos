@@ -22,7 +22,7 @@ object Accuracy {
     (pov.color == pov.game.startColor)
       .fold(
           Info.start(pov.game.startedAtTurn) :: analysis.infos,
-          analysis.infos
+          analysis.infos,
       )
       .grouped(2)
       .foldLeft(List[Int]()) {
@@ -39,7 +39,7 @@ object Accuracy {
     (pov.color == pov.game.startColor)
       .fold(
           Info.start(pov.game.startedAtTurn) :: analysis.infos,
-          analysis.infos
+          analysis.infos,
       )
       .zipWithIndex
       .collect {

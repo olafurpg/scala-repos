@@ -34,7 +34,7 @@ object Osgi {
             ("scala.*;version=\"${range;[==,=+);${ver}}\",*"),
             "Bundle-Version" -> v,
             "Bundle-RequiredExecutionEnvironment" -> "JavaSE-1.8",
-            "-eclipse" -> "false"
+            "-eclipse" -> "false",
         )
       },
       bundle <<= Def.task {
@@ -55,8 +55,8 @@ object Osgi {
           "Bundle-Version" -> versionProperties.value.osgiVersion,
           "Eclipse-SourceBundle" ->
           (bundleSymbolicName.value + ";version=\"" +
-              versionProperties.value.osgiVersion + "\";roots:=\".\"")
-      )
+              versionProperties.value.osgiVersion + "\";roots:=\".\""),
+      ),
   )
 
   def bundleTask(headers: Map[String, String],

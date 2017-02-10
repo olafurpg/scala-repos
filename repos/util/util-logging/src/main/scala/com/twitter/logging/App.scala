@@ -77,13 +77,13 @@ trait Logging { self: App =>
             appendFlag(),
             rotateCountFlag(),
             defaultFormatter,
-            level
+            level,
         )
 
     List(
         if (asyncFlag())
           QueueingHandler(handler, asyncMaxSizeFlag(), inferClassNamesFlag())
-        else handler
+        else handler,
     )
   }
 
@@ -91,7 +91,7 @@ trait Logging { self: App =>
     LoggerFactory(
         node = "",
         level = Some(levelFlag()),
-        handlers = handlers
+        handlers = handlers,
     ) :: Nil
   }
 

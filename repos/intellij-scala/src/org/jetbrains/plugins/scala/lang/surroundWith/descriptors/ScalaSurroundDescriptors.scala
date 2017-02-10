@@ -14,7 +14,7 @@ class ScalaSurroundDescriptors extends SurroundDescriptors {
   private val SURROUND_DESCRIPTORS: Array[SurroundDescriptor] = Array.apply(
       new ScalaExpressionSurroundDescriptor(),
       new ScalaDocCommentDataSurroundDescriptor(),
-      new ScalaIgnoreErrorHighlightingSurroundDescriptor()
+      new ScalaIgnoreErrorHighlightingSurroundDescriptor(),
   )
 
   override def getSurroundDescriptors: Array[SurroundDescriptor] =

@@ -37,6 +37,6 @@ abstract class HttpRequestHandlerBase extends HttpRequestHandler {
       "js" -> "application/javascript",
       "eot" -> "application/vnd.ms-fontobject",
       "svg" -> "image/svg+xml",
-      "ttf" -> "application/font-ttf"
+      "ttf" -> "application/font-ttf",
   )
 }

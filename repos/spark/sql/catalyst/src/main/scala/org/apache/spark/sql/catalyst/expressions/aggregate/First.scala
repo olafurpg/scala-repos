@@ -62,19 +62,19 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
 
   override lazy val initialValues: Seq[Literal] = Seq(
       /* first = */ Literal.create(null, child.dataType),
-      /* valueSet = */ Literal.create(false, BooleanType)
+      /* valueSet = */ Literal.create(false, BooleanType),
   )
 
   override lazy val updateExpressions: Seq[Expression] = {
     if (ignoreNulls) {
       Seq(
           /* first = */ If(Or(valueSet, IsNull(child)), first, child),
-          /* valueSet = */ Or(valueSet, IsNotNull(child))
+          /* valueSet = */ Or(valueSet, IsNotNull(child)),
       )
     } else {
       Seq(
           /* first = */ If(valueSet, first, child),
-          /* valueSet = */ Literal.create(true, BooleanType)
+          /* valueSet = */ Literal.create(true, BooleanType),
       )
     }
   }
@@ -85,7 +85,7 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
     // false, we are safe to do so because first.right will be null in this case).
     Seq(
         /* first = */ If(valueSet.left, first.left, first.right),
-        /* valueSet = */ Or(valueSet.left, valueSet.right)
+        /* valueSet = */ Or(valueSet.left, valueSet.right),
     )
   }
 

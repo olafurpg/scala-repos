@@ -104,7 +104,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
       stub.getChildrenByType(TokenSet.create(
                                  ScalaElementTypes.OBJECT_DEF,
                                  ScalaElementTypes.CLASS_DEF,
-                                 ScalaElementTypes.TRAIT_DEF
+                                 ScalaElementTypes.TRAIT_DEF,
                              ),
                              JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else {

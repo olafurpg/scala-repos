@@ -134,7 +134,7 @@ object RoutesFileParser {
             file,
             "Using different overloaded methods is not allowed. If you are using a single method in combination with default parameters, make sure you declare them all explicitly.",
             Some(firstOverloadedRoute.call.pos.line),
-            Some(firstOverloadedRoute.call.pos.column)
+            Some(firstOverloadedRoute.call.pos.column),
         )
     }
 

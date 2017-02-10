@@ -351,7 +351,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   if (settings.verbose || settings.Ylogcp)
     reporter.echo(
         s"[search path for source files: ${classPath.asSourcePathString}]\n" +
-        s"[search path for class files: ${classPath.asClassPathString}]"
+        s"[search path for class files: ${classPath.asClassPathString}]",
     )
 
   // The current division between scala.reflect.* and scala.tools.nsc.* is pretty
@@ -619,7 +619,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   object typer
       extends analyzer.Typer(
-          analyzer.NoContext.make(EmptyTree, RootClass, newScope)
+          analyzer.NoContext.make(EmptyTree, RootClass, newScope),
       )
 
   /** Add the internal compiler phases to the phases set.
@@ -650,7 +650,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         mixer -> "mixin composition",
         delambdafy -> "remove lambdas",
         cleanup -> "platform-specific cleanups, generate reflective calls",
-        terminal -> "the last phase during a compilation run"
+        terminal -> "the last phase during a compilation run",
     )
 
     phs foreach (addToPhasesSet _).tupled
@@ -660,7 +660,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   private val otherPhaseDescriptions =
     Map(
         "flatten" -> "eliminate inner classes",
-        "jvm" -> "generate JVM bytecode"
+        "jvm" -> "generate JVM bytecode",
     ) withDefaultValue ""
 
   protected def computePlatformPhases() = platform.platformPhases foreach {
@@ -1105,7 +1105,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
            else "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
           "library version" -> scala.util.Properties.versionString,
           "compiler version" -> Properties.versionString,
-          "reconstructed args" -> settings.recreateArgs.mkString(" ")
+          "reconstructed args" -> settings.recreateArgs.mkString(" "),
       )
       val info2 = formatExplain(
           "last tree to typer" -> tree.summaryString,
@@ -1117,7 +1117,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           "symbol package" -> sym.enclosingPackage.fullName,
           "symbol owners" -> ownerChainString(sym),
           "call site" ->
-          (site.fullLocationString + " in " + site.enclosingPackage)
+          (site.fullLocationString + " in " + site.enclosingPackage),
       )
       ("\n  " + errorMessage + "\n" +
           info1) :: info2 :: context_s :: Nil mkString "\n\n"
@@ -1701,7 +1701,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         settings.outputDirs.outputDirFor(source).path match {
           case "" => "."
           case path => path
-        }
+        },
     )
     val dir = segments.init.foldLeft(outDir)(_ / _).createDirectory()
     new File(dir.path, segments.last + suffix)

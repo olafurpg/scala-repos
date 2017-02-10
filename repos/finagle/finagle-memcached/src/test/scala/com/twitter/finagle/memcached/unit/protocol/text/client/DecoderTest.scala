@@ -110,7 +110,7 @@ class DecoderTest extends FunSuite with MockitoSugar {
                 Tokens(Seq("STAT", "items:1:age", "1468") map { Buf.Utf8(_) }),
                 Tokens(Seq("ITEM", "foo", "[5", "b;", "1322514067", "s]") map {
           Buf.Utf8(_)
-        })
+        }),
             )))
   }
 }

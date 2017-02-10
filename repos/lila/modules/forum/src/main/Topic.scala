@@ -86,6 +86,6 @@ object Topic {
       Json.writes[Topic] andThen
       (__.json update
           (writeDate('createdAt) andThen writeDate('updatedAt) andThen writeDate(
-                  'updatedAtTroll)))
+                  'updatedAtTroll))),
   )
 }

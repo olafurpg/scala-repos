@@ -69,7 +69,7 @@ object Test extends ScaladocModelTest {
           "scala.Int@toLong:Long",
           "scala.package",
           "scala.package@AbstractMethodError=AbstractMethodError",
-          "scala.Predef$@String=String"
+          "scala.Predef$@String=String",
       )
       .map(scalaURL + "/index.html#" + _)
 

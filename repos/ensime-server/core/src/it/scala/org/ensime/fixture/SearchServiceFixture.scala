@@ -43,7 +43,7 @@ trait SharedSearchServiceFixture
   }
 
   def withSearchService(
-      testCode: (EnsimeConfig, SearchService) => Any
+      testCode: (EnsimeConfig, SearchService) => Any,
   ): Unit = testCode(_config, _search)
 
   def withSearchService(testCode: SearchService => Any): Unit =

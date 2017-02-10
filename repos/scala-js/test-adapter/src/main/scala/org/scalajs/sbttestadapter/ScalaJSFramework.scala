@@ -20,7 +20,7 @@ final class ScalaJSFramework(
     private[testadapter] val frameworkName: String,
     private[testadapter] val libEnv: ComJSEnv,
     private[testadapter] val logger: Logger,
-    private[testadapter] val jsConsole: JSConsole
+    private[testadapter] val jsConsole: JSConsole,
 )
     extends Framework {
 

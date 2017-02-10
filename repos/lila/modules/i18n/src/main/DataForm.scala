@@ -17,7 +17,7 @@ final class DataForm(keys: I18nKeys,
       mapping(
           "comment" -> optional(nonEmptyText),
           "gameId" -> nonEmptyText,
-          "move" -> nonEmptyText
+          "move" -> nonEmptyText,
       )(TransMetadata.apply)(TransMetadata.unapply)
         .verifying(captchaFailMessage, validateCaptcha _))
 

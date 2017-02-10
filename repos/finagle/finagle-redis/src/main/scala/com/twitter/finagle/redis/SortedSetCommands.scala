@@ -10,7 +10,7 @@ import org.jboss.netty.buffer.ChannelBuffer
 
 trait SortedSets { self: BaseClient =>
   private[this] def parseMBulkReply(
-      withScores: JBoolean
+      withScores: JBoolean,
   ): PartialFunction[Reply, Future[Either[ZRangeResults, Seq[ChannelBuffer]]]] = {
     val parse: PartialFunction[
         Reply, Either[ZRangeResults, Seq[ChannelBuffer]]] = {
@@ -21,7 +21,7 @@ trait SortedSets { self: BaseClient =>
   }
 
   private[this] def withScoresHelper(
-      withScores: JBoolean
+      withScores: JBoolean,
   )(messages: List[Reply]): Either[ZRangeResults, Seq[ChannelBuffer]] = {
     val chanBufs = ReplyFormat.toChannelBuffers(messages)
     if (withScores) Left(ZRangeResults(returnPairs(chanBufs)))
@@ -92,10 +92,10 @@ trait SortedSets { self: BaseClient =>
       min: ZInterval,
       max: ZInterval,
       withScores: JBoolean,
-      limit: Option[Limit]
+      limit: Option[Limit],
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(
-        ZRangeByScore(key, min, max, WithScores.option(withScores), limit)
+        ZRangeByScore(key, min, max, WithScores.option(withScores), limit),
     )(parseMBulkReply(withScores))
 
   /**
@@ -119,10 +119,10 @@ trait SortedSets { self: BaseClient =>
       key: ChannelBuffer,
       start: JLong,
       stop: JLong,
-      withScores: JBoolean
+      withScores: JBoolean,
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(ZRevRange(key, start, stop, WithScores.option(withScores)))(
-        parseMBulkReply(withScores)
+        parseMBulkReply(withScores),
     )
 
   /**
@@ -137,11 +137,11 @@ trait SortedSets { self: BaseClient =>
       max: ZInterval,
       min: ZInterval,
       withScores: JBoolean,
-      limit: Option[Limit]
+      limit: Option[Limit],
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(
         ZRevRangeByScore(key, max, min, WithScores.option(withScores), limit))(
-        parseMBulkReply(withScores)
+        parseMBulkReply(withScores),
     )
 
   /**
@@ -236,7 +236,7 @@ trait SortedSets { self: BaseClient =>
       key: ChannelBuffer,
       start: JLong,
       stop: JLong,
-      withScores: JBoolean
+      withScores: JBoolean,
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(ZRange(key, start, stop, WithScores.option(withScores))) {
       parseMBulkReply(withScores)

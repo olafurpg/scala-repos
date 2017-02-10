@@ -65,7 +65,7 @@ trait Exprs extends Core with Types with Xml {
       val PostfixLambda = P(PostfixExpr ~ (`=>` ~ LambdaRhs.?).?)
       val SmallerExprOrLambda = P(ParenedLambda | PostfixLambda)
       P(
-          If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda
+          If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda,
       )
     }
     val AscriptionType = if (curlyBlock) P(PostfixType) else P(Type)

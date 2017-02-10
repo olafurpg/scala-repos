@@ -437,7 +437,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           Nil,
           ListOfNil,
           TypeTree(),
-          Block(List(Apply(gen.mkSuperInitCall, Nil)), literalUnit)
+          Block(List(Apply(gen.mkSuperInitCall, Nil)), literalUnit),
       )
 
       // def main
@@ -1002,7 +1002,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
             val tuple = atPos(start) { makeSafeTupleType(ts, start) }
             infixTypeRest(
                 compoundTypeRest(annotTypeRest(simpleTypeRest(tuple))),
-                InfixMode.FirstOp
+                InfixMode.FirstOp,
             )
           }
         }
@@ -1104,7 +1104,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         */
       def compoundType(): Tree = compoundTypeRest(
           if (in.token == LBRACE) atInPos(scalaAnyRefConstr)
-          else annotType()
+          else annotType(),
       )
 
       def compoundTypeRest(t: Tree): Tree = {
@@ -1836,7 +1836,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       */
     def argumentExprs(): List[Tree] = {
       def args(): List[Tree] = commaSeparated(
-          if (isIdent) treeInfo.assignmentToMaybeNamedArg(expr()) else expr()
+          if (isIdent) treeInfo.assignmentToMaybeNamedArg(expr()) else expr(),
       )
       in.token match {
         case LBRACE => List(blockExpr())
@@ -2081,7 +2081,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
             peekingAhead(
                 if (isCloseDelim)
                   atPos(top.pos.start, in.prev.offset)(Star(stripParens(top)))
-                else EmptyTree
+                else EmptyTree,
             )
           case _ => EmptyTree
         }
@@ -2279,7 +2279,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         OVERRIDE -> Flags.OVERRIDE,
         PRIVATE -> Flags.PRIVATE,
         PROTECTED -> Flags.PROTECTED,
-        SEALED -> Flags.SEALED
+        SEALED -> Flags.SEALED,
     )
 
     /** {{{
@@ -2944,7 +2944,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
             syntaxErrorOrIncompleteAnd("`=', `>:', or `<:' expected",
                                        skipIt = true)(
                 // assume a dummy type def so as to have somewhere to stash the annotations
-                TypeDef(mods, tpnme.ERROR, Nil, EmptyTree)
+                TypeDef(mods, tpnme.ERROR, Nil, EmptyTree),
             )
         }
       }
@@ -2992,7 +2992,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
               "expected start of definition", skipIt = true)(
               // assume a class definition so as to have somewhere to stash the annotations
               atPos(pos)(gen.mkClassDef(
-                      mods, tpnme.ERROR, Nil, Template(Nil, noSelfType, Nil)))
+                      mods, tpnme.ERROR, Nil, Template(Nil, noSelfType, Nil))),
           )
       }
     }

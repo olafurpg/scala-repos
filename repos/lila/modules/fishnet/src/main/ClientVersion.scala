@@ -12,7 +12,7 @@ object ClientVersion {
     case Success(version) =>
       Failure(
           new Exception(
-              s"Version $v is no longer supported. Please restart fishnet to upgrade."
+              s"Version $v is no longer supported. Please restart fishnet to upgrade.",
           ))
     case Failure(error) => Failure(error)
   }

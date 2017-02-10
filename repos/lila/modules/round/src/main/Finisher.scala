@@ -48,7 +48,7 @@ private[round] final class Finisher(messenger: Messenger,
     casualOnly.fold(
         GameRepo unrate prog.game.id inject prog.game.copy(
             mode = chess.Mode.Casual),
-        fuccess(prog.game)
+        fuccess(prog.game),
     ) flatMap { g =>
       (GameRepo save prog) >> GameRepo.finish(
           id = g.id,

@@ -70,7 +70,7 @@ private[ml] object GradientBoostedTrees extends Logging {
   def runWithValidation(
       input: RDD[LabeledPoint],
       validationInput: RDD[LabeledPoint],
-      boostingStrategy: OldBoostingStrategy
+      boostingStrategy: OldBoostingStrategy,
   ): (Array[DecisionTreeRegressionModel], Array[Double]) = {
     val algo = boostingStrategy.treeStrategy.algo
     algo match {

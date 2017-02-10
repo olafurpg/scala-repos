@@ -15,7 +15,7 @@ class ProxyCredentialsTest extends FunSuite {
     val creds = ProxyCredentials(
         Map(
             "http_proxy_user" -> "foo",
-            "http_proxy_pass" -> "bar"
+            "http_proxy_pass" -> "bar",
         )).get
     assert(creds.basicAuthorization == "Basic Zm9vOmJhcg==")
   }

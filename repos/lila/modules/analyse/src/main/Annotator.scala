@@ -16,7 +16,7 @@ private[analyse] final class Annotator(netDomain: String) {
       annotateOpening(opening) {
         annotateTurns(p, analysis ?? (_.advices))
       }.copy(
-          tags = p.tags :+ Tag("Annotator", netDomain)
+          tags = p.tags :+ Tag("Annotator", netDomain),
       )
     }
 
@@ -62,7 +62,7 @@ private[analyse] final class Annotator(netDomain: String) {
                             move.copy(
                                 nag = advice.nag.code.some,
                                 comment = advice.makeComment(true, true).some,
-                                variation = makeVariation(turn, advice)
+                                variation = makeVariation(turn, advice),
                           )))
     }
 
@@ -71,6 +71,6 @@ private[analyse] final class Annotator(netDomain: String) {
         advice.info.variation take 20 map { san =>
           Move(san)
         },
-        turn plyOf advice.color
+        turn plyOf advice.color,
     )
 }

@@ -133,7 +133,7 @@ val  SimpleA = CustomTyping.SimpleA
                  Seq("/dbs/oracle1.sql")) {
         override def useSingleLineStatements = true
         override def testCode = "DBIO.successful(())"
-      }
+      },
   )
 
   //Unified UUID config

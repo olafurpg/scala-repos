@@ -50,13 +50,13 @@ private final class AggregationPipeline {
     Group(dimensionGroupId(d))(
         "v" -> f,
         "nb" -> SumValue(1),
-        "ids" -> AddToSet("_id")
+        "ids" -> AddToSet("_id"),
     ).some
   private def groupMulti(d: Dimension[_], metricDbKey: String) =
     Group(BSONDocument("dimension" -> dimensionGroupId(d),
                        "metric" -> ("$" + metricDbKey)))(
         "v" -> SumValue(1),
-        "ids" -> AddToSet("_id")
+        "ids" -> AddToSet("_id"),
     ).some
   private val regroupStacked = GroupField("_id.dimension")(
       "nb" -> SumField("v"),
@@ -67,14 +67,14 @@ private final class AggregationPipeline {
           "_id" -> true,
           "v" -> true,
           "nb" -> true,
-          "ids" -> BSONDocument("$slice" -> BSONArray("$ids", 4))
+          "ids" -> BSONDocument("$slice" -> BSONArray("$ids", 4)),
       )).some
   private val sliceStackedIds = Project(
       BSONDocument(
           "_id" -> true,
           "nb" -> true,
           "stack" -> true,
-          "ids" -> BSONDocument("$slice" -> BSONArray("$ids", 4))
+          "ids" -> BSONDocument("$slice" -> BSONArray("$ids", 4)),
       )).some
 
   def apply(question: Question[_],
@@ -106,7 +106,7 @@ private final class AggregationPipeline {
             (Metric.requiresStableRating(metric) ||
                 Dimension.requiresStableRating(dimension)).?? {
               BSONDocument(F.provisional -> BSONDocument("$ne" -> true))
-            }
+            },
         ),
         /* sortDate :: */ sampleGames ::
         ((metric match {
@@ -117,7 +117,7 @@ private final class AggregationPipeline {
                     matchMoves(),
                     sampleMoves,
                     group(dimension, Avg(F.moves("c"))),
-                    sliceIds
+                    sliceIds,
                 )
               case M.Material =>
                 List(
@@ -126,7 +126,7 @@ private final class AggregationPipeline {
                     matchMoves(),
                     sampleMoves,
                     group(dimension, Avg(F.moves("i"))),
-                    sliceIds
+                    sliceIds,
                 )
               case M.Opportunism =>
                 List(
@@ -142,7 +142,7 @@ private final class AggregationPipeline {
                                                 "$" +
                                                 F.moves("o"),
                                                 1,
-                                                0)
+                                                0),
                                         ))),
                     sliceIds,
                     Project(
@@ -152,8 +152,8 @@ private final class AggregationPipeline {
                                                                          BSONDocument(
                                                                              "$avg" -> "$v"))),
                             "nb" -> true,
-                            "ids" -> true
-                        )).some
+                            "ids" -> true,
+                        )).some,
                 )
               case M.Luck =>
                 List(
@@ -169,7 +169,7 @@ private final class AggregationPipeline {
                                                 "$" +
                                                 F.moves("l"),
                                                 1,
-                                                0)
+                                                0),
                                         ))),
                     sliceIds,
                     Project(
@@ -179,8 +179,8 @@ private final class AggregationPipeline {
                                                                          BSONDocument(
                                                                              "$avg" -> "$v"))),
                             "nb" -> true,
-                            "ids" -> true
-                        )).some
+                            "ids" -> true,
+                        )).some,
                 )
               case M.NbMoves =>
                 List(
@@ -192,17 +192,17 @@ private final class AggregationPipeline {
                     Project(BSONDocument(
                             "v" -> true,
                             "ids" -> true,
-                            "nb" -> BSONDocument("$size" -> "$ids")
+                            "nb" -> BSONDocument("$size" -> "$ids"),
                         )).some,
                     Project(
                         BSONDocument(
                             "v" -> BSONDocument(
-                                "$divide" -> BSONArray("$v", "$nb")
+                                "$divide" -> BSONArray("$v", "$nb"),
                             ),
                             "nb" -> true,
                             "ids" -> BSONDocument(
-                                "$slice" -> BSONArray("$ids", 4))
-                        )).some
+                                "$slice" -> BSONArray("$ids", 4)),
+                        )).some,
                 )
               case M.Movetime =>
                 List(
@@ -214,29 +214,29 @@ private final class AggregationPipeline {
                           GroupFunction("$avg",
                                         BSONDocument("$divide" -> BSONArray(
                                                 "$" + F.moves("t"), 10)))),
-                    sliceIds
+                    sliceIds,
                 )
               case M.RatingDiff =>
                 List(
                     group(dimension, Avg(F.ratingDiff)),
-                    sliceIds
+                    sliceIds,
                 )
               case M.OpponentRating =>
                 List(
                     group(dimension, Avg(F.opponentRating)),
-                    sliceIds
+                    sliceIds,
                 )
               case M.Result =>
                 List(
                     groupMulti(dimension, F.result),
                     regroupStacked,
-                    sliceStackedIds
+                    sliceStackedIds,
                 )
               case M.Termination =>
                 List(
                     groupMulti(dimension, F.termination),
                     regroupStacked,
-                    sliceStackedIds
+                    sliceStackedIds,
                 )
               case M.PieceRole =>
                 List(
@@ -246,13 +246,13 @@ private final class AggregationPipeline {
                     sampleMoves,
                     groupMulti(dimension, F.moves("r")),
                     regroupStacked,
-                    sliceStackedIds
+                    sliceStackedIds,
                 )
             }) :::
             (dimension match {
                   case D.Opening => List(sortNb, limit(12))
                   case _ => Nil
-                })).flatten
+                })).flatten,
     )
   }
 }

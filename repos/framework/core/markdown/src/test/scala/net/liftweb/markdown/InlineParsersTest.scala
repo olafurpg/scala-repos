@@ -64,7 +64,7 @@ class InlineParsersTest
       ("``code``", "<code>code</code>"),
       ("` *italic* `", "<code> *italic* </code>"),
       ("`code\ncode`", "<code>code\ncode</code>"),
-      ("``code ` code``", "<code>code ` code</code>")
+      ("``code ` code``", "<code>code ` code</code>"),
   )
 
   val entityTest = List(
@@ -89,12 +89,12 @@ class InlineParsersTest
       ("""[link text](  http://example.com  "link title"  )""",
        """<a href="http://example.com" title="link title">link text</a>"""),
       ("""[link text](  http://example.com  "li)nk" title"  )""",
-       """<a href="http://example.com" title="li)nk&quot; title">link text</a>""")
+       """<a href="http://example.com" title="li)nk&quot; title">link text</a>"""),
   )
 
   val fastLinkTests = List(
       ("""<http://www.example.com?foo=a&bar=b\*>""",
-       """<a href="http://www.example.com?foo=a&amp;bar=b*">http://www.example.com?foo=a&amp;bar=b*</a>""")
+       """<a href="http://www.example.com?foo=a&amp;bar=b*">http://www.example.com?foo=a&amp;bar=b*</a>"""),
   )
 
   val imageTests = List(
@@ -105,17 +105,17 @@ class InlineParsersTest
       ("""![alt text](  /src/img.png  "img title"  )""",
        """<img src="/src/img.png" alt="alt text" title="img title" />"""),
       ("""![alt text](  /src/img.png  "i)mg" title"  )""",
-       """<img src="/src/img.png" alt="alt text" title="i)mg&quot; title" />""")
+       """<img src="/src/img.png" alt="alt text" title="i)mg&quot; title" />"""),
   )
 
   val brTests = List(
-      ("  \n", "<br />\n")
+      ("  \n", "<br />\n"),
   )
 
   val xmlNameTests = List(
       ("foo", "foo"),
       ("foo_bar", "foo_bar"),
-      ("a", "a")
+      ("a", "a"),
   )
 
   val xmlNameExTests = List(
@@ -125,7 +125,7 @@ class InlineParsersTest
       "foo>bar",
       "foo\"bar",
       "foo\\bar",
-      "foo bar"
+      "foo bar",
   )
 
   val xmlStartTagTests = List(
@@ -139,12 +139,12 @@ class InlineParsersTest
       ("""<foo attr="bar" attr2='baz'>""",
        """<foo attr="bar" attr2='baz'>"""),
       ("""<a href='http://www.example.com?p1=a&p2=b'>""",
-       """<a href='http://www.example.com?p1=a&amp;p2=b'>""")
+       """<a href='http://www.example.com?p1=a&amp;p2=b'>"""),
   )
 
   val xmlEndTagTests = List(
       ("</foo>", "</foo>"),
-      ("</a>", "</a>")
+      ("</a>", "</a>"),
   )
 
   val xmlInlineTests = List(
@@ -155,7 +155,7 @@ class InlineParsersTest
       ("""hallo <foo attr='&"<>'>*italic*</foo> ballo""",
        """hallo <foo attr='&amp;&quot;&lt;&gt;'><em>italic</em></foo> ballo"""),
       ("""hallo <foo attr='&"<>'/>*italic*<foo/> ballo""",
-       """hallo <foo attr='&amp;&quot;&lt;&gt;'/><em>italic</em><foo/> ballo""")
+       """hallo <foo attr='&amp;&quot;&lt;&gt;'/><em>italic</em><foo/> ballo"""),
   )
 
   val mixedTests = List(
@@ -163,7 +163,7 @@ class InlineParsersTest
        "<em>italic</em> <strong>bold</strong> <em>italic</em>"),
       ("*italic***bold***italic*",
        "<em>italic<strong>*bold</strong></em>italic*"),
-      ("***foo***", "<strong><em>foo</em></strong>")
+      ("***foo***", "<strong><em>foo</em></strong>"),
   )
 
   /**
@@ -173,7 +173,7 @@ class InlineParsersTest
   val dummyTests = List(
       ("lorem ipsum ", "lorem ipsum "),
       (" lorem ipsum", " lorem ipsum"),
-      (" lorem \n ipsum ", " lorem \n ipsum ")
+      (" lorem \n ipsum ", " lorem \n ipsum "),
   )
 
   val allInlineTests =

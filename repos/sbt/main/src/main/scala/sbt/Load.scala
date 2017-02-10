@@ -173,7 +173,7 @@ object Load {
             (project,
             config) => configInherit(lb, project, config, rootProject),
             task => task.extend,
-            (project, extra) => Nil
+            (project, extra) => Nil,
         )
     }
   def configInherit(lb: sbt.LoadedBuild,
@@ -1088,7 +1088,7 @@ object Load {
                      opts)
         },
             onLoadMessage :=
-            ("Loading project definition from " + baseDirectory.value)
+            ("Loading project definition from " + baseDirectory.value),
         ))
   private[this] def removeEntries(
       cp: Seq[Attributed[File]],
@@ -1104,7 +1104,7 @@ object Load {
     config.copy(
         injectSettings = config.injectSettings.copy(
               global = autoPluginSettings ++ config.injectSettings.global,
-              project = config.pluginManagement.inject ++ config.injectSettings.project
+              project = config.pluginManagement.inject ++ config.injectSettings.project,
           ))
   def activateGlobalPlugin(
       config: sbt.LoadBuildConfiguration): sbt.LoadBuildConfiguration =

@@ -44,7 +44,7 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
       case e: Throwable ⇒
         throw new ConnectorException(
             s"Cannot extract Common field from $data. ${e.getMessage}",
-            e
+            e,
         )
     }
 
@@ -53,42 +53,42 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
         case "identify" ⇒
           toEventJson(
               common = common,
-              identify = data.extract[Events.Identify]
+              identify = data.extract[Events.Identify],
           )
 
         case "track" ⇒
           toEventJson(
               common = common,
-              track = data.extract[Events.Track]
+              track = data.extract[Events.Track],
           )
 
         case "alias" ⇒
           toEventJson(
               common = common,
-              alias = data.extract[Events.Alias]
+              alias = data.extract[Events.Alias],
           )
 
         case "page" ⇒
           toEventJson(
               common = common,
-              page = data.extract[Events.Page]
+              page = data.extract[Events.Page],
           )
 
         case "screen" ⇒
           toEventJson(
               common = common,
-              screen = data.extract[Events.Screen]
+              screen = data.extract[Events.Screen],
           )
 
         case "group" ⇒
           toEventJson(
               common = common,
-              group = data.extract[Events.Group]
+              group = data.extract[Events.Group],
           )
 
         case _ ⇒
           throw new ConnectorException(
-              s"Cannot convert unknown type ${common.`type`} to event JSON."
+              s"Cannot convert unknown type ${common.`type`} to event JSON.",
           )
       }
     } catch {
@@ -96,7 +96,7 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
       case e: Exception =>
         throw new ConnectorException(
             s"Cannot convert $data to event JSON. ${e.getMessage}",
-            e
+            e,
         )
     }
   }
@@ -154,7 +154,7 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
         case e: Throwable ⇒
           throw new ConnectorException(
               s"Cannot convert $context to event JSON. ${e.getMessage}",
-              e
+              e,
           )
       }
     } getOrElse eventProps
@@ -172,7 +172,7 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
 
       case None ⇒
         throw new ConnectorException(
-            "there was no `userId` or `anonymousId` in the common fields."
+            "there was no `userId` or `anonymousId` in the common fields.",
         )
     }
   }
@@ -182,29 +182,29 @@ object Events {
 
   private[prediction] case class Track(
       event: String,
-      properties: Option[JObject] = None
+      properties: Option[JObject] = None,
   )
 
   private[prediction] case class Alias(previous_id: String, user_id: String)
 
   private[prediction] case class Group(
       group_id: String,
-      traits: Option[JObject] = None
+      traits: Option[JObject] = None,
   )
 
   private[prediction] case class Screen(
       name: Option[String] = None,
-      properties: Option[JObject] = None
+      properties: Option[JObject] = None,
   )
 
   private[prediction] case class Page(
       name: Option[String] = None,
-      properties: Option[JObject] = None
+      properties: Option[JObject] = None,
   )
 
   private[prediction] case class Identify(
       user_id: String,
-      traits: Option[JObject]
+      traits: Option[JObject],
   )
 }
 
@@ -214,7 +214,7 @@ object Common {
       All: Boolean = false,
       Mixpanel: Boolean = false,
       Marketo: Boolean = false,
-      Salesforse: Boolean = false
+      Salesforse: Boolean = false,
   )
 
   private[prediction] case class Context(
@@ -229,7 +229,7 @@ object Common {
       os: Option[OS] = None,
       referrer: Option[Referrer] = None,
       screen: Option[Screen] = None,
-      timezone: Option[String] = None
+      timezone: Option[String] = None,
   )
 
   private[prediction] case class Screen(width: Int, height: Int, density: Int)
@@ -243,7 +243,7 @@ object Common {
       country: Option[String] = None,
       latitude: Option[Double] = None,
       longitude: Option[Double] = None,
-      speed: Option[Int] = None
+      speed: Option[Int] = None,
   )
 
   case class Page(
@@ -251,14 +251,14 @@ object Common {
       referrer: String,
       search: String,
       title: String,
-      url: String
+      url: String,
   )
 
   private[prediction] case class Network(
       bluetooth: Option[Boolean] = None,
       carrier: Option[String] = None,
       cellular: Option[Boolean] = None,
-      wifi: Option[Boolean] = None
+      wifi: Option[Boolean] = None,
   )
 
   private[prediction] case class Library(name: String, version: String)
@@ -271,7 +271,7 @@ object Common {
       model: Option[String] = None,
       name: Option[String] = None,
       `type`: Option[String] = None,
-      token: Option[String] = None
+      token: Option[String] = None,
   )
 
   private[prediction] case class Campaign(
@@ -279,13 +279,13 @@ object Common {
       source: Option[String] = None,
       medium: Option[String] = None,
       term: Option[String] = None,
-      content: Option[String] = None
+      content: Option[String] = None,
   )
 
   private[prediction] case class App(
       name: Option[String] = None,
       version: Option[String] = None,
-      build: Option[String] = None
+      build: Option[String] = None,
   )
 }
 
@@ -297,5 +297,5 @@ private[prediction] case class Common(
     anonymous_id: Option[String] = None,
     user_id: Option[String] = None,
     context: Option[Common.Context] = None,
-    integrations: Option[Common.Integrations] = None
+    integrations: Option[Common.Integrations] = None,
 )

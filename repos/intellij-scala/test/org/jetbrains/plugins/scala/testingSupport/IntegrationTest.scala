@@ -29,7 +29,7 @@ trait IntegrationTest {
       runConfig: RunnerAndConfigurationSettings,
       checkOutputs: Boolean = false,
       duration: Int = 3000,
-      debug: Boolean = false
+      debug: Boolean = false,
   ): (String, Option[AbstractTestProxy])
 
   protected def createTestFromLocation(

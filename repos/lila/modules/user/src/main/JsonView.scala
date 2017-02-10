@@ -32,7 +32,7 @@ final class JsonView(isOnline: String => Boolean) {
           "perfs" -> perfs(u, onlyPerf),
           "createdAt" -> u.createdAt,
           "seenAt" -> u.seenAt,
-          "playTime" -> u.playTime
+          "playTime" -> u.playTime,
       )
       .noNull
 
@@ -63,7 +63,7 @@ object JsonView {
           "username" -> l.user.name,
           "title" -> l.user.title,
           "perfs" -> Json.obj(l.perfKey -> Json.obj("rating" -> l.rating,
-                                                    "progress" -> l.progress))
+                                                    "progress" -> l.progress)),
       )
       .noNull
   }

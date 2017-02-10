@@ -11,6 +11,6 @@ object B extends Build {
     (libraryDependencies += "junit" % "junit" % "4.5", externalIvySettings())
   lazy val baseSettings = Seq(
       autoScalaLibrary := false,
-      unmanagedJars in Compile <++= scalaInstance map (_.allJars.toSeq)
+      unmanagedJars in Compile <++= scalaInstance map (_.allJars.toSeq),
   )
 }

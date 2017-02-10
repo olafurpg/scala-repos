@@ -28,7 +28,7 @@ private[reconcile] object OffersWantedForReconciliationActor {
             reviveOffersConfig,
             clock,
             eventStream,
-            offersWanted
+            offersWanted,
         ))
 
   private case class RequestOffers(reason: String)
@@ -77,7 +77,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
         val terminatedResidentAppsString =
           terminatedResidentApps.map(_.id).mkString(", ")
         self ! OffersWantedForReconciliationActor.RequestOffers(
-            s"terminated resident app(s) $terminatedResidentAppsString"
+            s"terminated resident app(s) $terminatedResidentAppsString",
         )
       }
   }
@@ -95,7 +95,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
     context.system.scheduler.scheduleOnce(
         interestDuration,
         self,
-        OffersWantedForReconciliationActor.RecheckInterest
+        OffersWantedForReconciliationActor.RecheckInterest,
     )(context.dispatcher)
   }
 

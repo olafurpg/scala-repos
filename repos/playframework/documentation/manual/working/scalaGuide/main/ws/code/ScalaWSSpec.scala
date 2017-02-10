@@ -210,7 +210,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
         import play.api.libs.json._
         val data = Json.obj(
             "key1" -> "value1",
-            "key2" -> "value2"
+            "key2" -> "value2",
         )
         val futureResponse: Future[WSResponse] = ws.url(url).post(data)
         // #scalaws-post-json
@@ -385,7 +385,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
         val file = File.createTempFile("stream-to-file-", ".txt")
         await(
             downloadFile(FakeRequest())
-              .flatMap(_.body.dataStream.runFold(0l)((t, b) => t + b.length))
+              .flatMap(_.body.dataStream.runFold(0l)((t, b) => t + b.length)),
         ) must_== 10000l
         file.delete()
       }

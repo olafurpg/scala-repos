@@ -50,7 +50,7 @@ class NRootTest extends FunSuite {
       BigDecimal(2),
       BigDecimal(3),
       BigDecimal("3492919288716623419872.99818234", HighPrecision),
-      BigDecimal("0.00000000000000000000000000000012345")
+      BigDecimal("0.00000000000000000000000000000012345"),
   )
 
   val roots = Seq(2, 3, 6, 9, 23, 53)

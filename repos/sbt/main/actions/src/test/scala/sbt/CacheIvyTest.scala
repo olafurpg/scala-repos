@@ -23,7 +23,7 @@ class CacheIvyTest extends Properties("CacheIvy") {
         n <- Gen.alphaStr
         a <- Gen.alphaStr
         cs <- arbitrary[List[String]]
-      } yield ExclusionRule(o, n, a, cs)
+      } yield ExclusionRule(o, n, a, cs),
   )
 
   implicit val arbCrossVersion: Arbitrary[CrossVersion] = Arbitrary {

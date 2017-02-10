@@ -54,7 +54,7 @@ class JsonExporterTest
     val sample = Map[String, Number](
         "jvm_uptime" -> 15.0,
         "abc" -> 42,
-        "ill_be_partially_matched" -> 1
+        "ill_be_partially_matched" -> 1,
     )
     val filteredSample = exporter.filterSample(sample)
     assert(filteredSample.size == 1,

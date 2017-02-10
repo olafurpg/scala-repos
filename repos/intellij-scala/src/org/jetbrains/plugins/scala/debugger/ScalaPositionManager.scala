@@ -557,7 +557,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
       if (lastRefTypeLine - firstRefTypeLine >= 2) {
         val offsetsInTheMiddle = Seq(
             document.getLineEndOffset(firstRefTypeLine),
-            document.getLineEndOffset(firstRefTypeLine + 1)
+            document.getLineEndOffset(firstRefTypeLine + 1),
         )
         offsetsInTheMiddle.flatMap(findAt).distinct
       } else {

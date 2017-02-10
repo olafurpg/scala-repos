@@ -79,7 +79,7 @@ object FileUtils {
           } yield {
             file.writeString(contents)(cs)
             file
-          }
+          },
       )
     } catch {
       case e: Exception => Left(e)

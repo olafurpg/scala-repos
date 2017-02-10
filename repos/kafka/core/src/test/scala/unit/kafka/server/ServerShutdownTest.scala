@@ -51,7 +51,7 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
           TestUtils.getBrokerListStrFromServers(Seq(server)),
           retries = 5,
           keySerializer = new IntegerSerializer,
-          valueSerializer = new StringSerializer
+          valueSerializer = new StringSerializer,
       )
 
     var server = new KafkaServer(

@@ -59,7 +59,7 @@ class EnsembleInnerShadow extends EnsembleExample {
             font = new Font("Arial Black", 30)
             textFill = Color.web("#BBBBBB")
             effect = new InnerShadow()
-          }
+          },
       )
     }
   }

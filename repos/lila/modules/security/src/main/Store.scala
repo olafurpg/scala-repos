@@ -28,7 +28,7 @@ object Store {
               "ua" -> HTTPRequest.userAgent(req).|("?"),
               "date" -> DateTime.now,
               "up" -> true,
-              "api" -> apiVersion
+              "api" -> apiVersion,
           ))
       .void
 
@@ -36,7 +36,7 @@ object Store {
     storeColl
       .find(
           BSONDocument("_id" -> sessionId, "up" -> true),
-          BSONDocument("user" -> true, "_id" -> false)
+          BSONDocument("user" -> true, "_id" -> false),
       )
       .one[BSONDocument] map { _ flatMap (_.getAs[String]("user")) }
 
@@ -49,7 +49,7 @@ object Store {
     storeColl
       .find(
           BSONDocument("_id" -> sessionId, "up" -> true),
-          BSONDocument("user" -> true, "fp" -> true, "_id" -> false)
+          BSONDocument("user" -> true, "fp" -> true, "_id" -> false),
       )
       .one[UserIdAndFingerprint]
 
@@ -87,7 +87,7 @@ object Store {
   def openSessions(userId: String, nb: Int): Fu[List[UserSession]] =
     storeColl
       .find(
-          BSONDocument("user" -> userId, "up" -> true)
+          BSONDocument("user" -> userId, "up" -> true),
       )
       .sort(BSONDocument("date" -> -1))
       .cursor[UserSession]()
@@ -103,7 +103,7 @@ object Store {
     } flatMap { hash =>
       storeColl.update(
           BSONDocument("_id" -> id),
-          BSONDocument("$set" -> BSONDocument("fp" -> hash))
+          BSONDocument("$set" -> BSONDocument("fp" -> hash)),
       ) inject hash
     }
   }
@@ -118,7 +118,7 @@ object Store {
       .find(
           BSONDocument("user" -> userId),
           BSONDocument(
-              "_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true)
+              "_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true),
       )
       .cursor[Info]()
       .collect[List]()
@@ -132,7 +132,7 @@ object Store {
     storeColl
       .find(BSONDocument(
               "user" -> userId,
-              "up" -> true
+              "up" -> true,
           ))
       .sort(BSONDocument("date" -> -1))
       .cursor[DedupInfo]()
@@ -145,7 +145,7 @@ object Store {
         .filter(_._id != keepSessionId)
       storeColl
         .remove(
-            BSONDocument("_id" -> BSONDocument("$in" -> olds.map(_._id)))
+            BSONDocument("_id" -> BSONDocument("$in" -> olds.map(_._id))),
         )
         .void
     }

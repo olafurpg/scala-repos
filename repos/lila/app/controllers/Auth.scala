@@ -35,13 +35,13 @@ object Auth extends LilaController {
           html = Redirect {
             get("referrer").filter(_.nonEmpty) orElse req.session.get(api.AccessUri) getOrElse routes.Lobby.home.url
           }.fuccess,
-          api = _ => mobileUserOk(u)
+          api = _ => mobileUserOk(u),
         ) map {
             _ withCookies LilaCookie.withSession { session =>
               session + ("sessionId" -> sessionId) - api.AccessUri
             }
           }
-      } recoverWith authRecovery
+      } recoverWith authRecovery,
     )
   }
 
@@ -68,9 +68,9 @@ object Auth extends LilaController {
       api.loginForm.bindFromRequest.fold(
         err => negotiate(
           html = Unauthorized(html.auth.login(err, get("referrer"))).fuccess,
-          api = _ => Unauthorized(errorsAsJson(err)).fuccess
+          api = _ => Unauthorized(errorsAsJson(err)).fuccess,
         ),
-        _.fold(InternalServerError("Authentication error").fuccess)(authenticateUser)
+        _.fold(InternalServerError("Authentication error").fuccess)(authenticateUser),
       )
     }
   }
@@ -80,7 +80,7 @@ object Auth extends LilaController {
     req.session get "sessionId" foreach lila.security.Store.delete
     negotiate(
       html = fuccess(Redirect(routes.Main.mobile)),
-      api = apiVersion => Ok(Json.obj("ok" -> true)).fuccess
+      api = apiVersion => Ok(Json.obj("ok" -> true)).fuccess,
     ) map (_ withCookies LilaCookie.newSession)
   }
 
@@ -132,8 +132,8 @@ object Auth extends LilaController {
             val email = data.email flatMap env.emailAddress.validate
             UserRepo.create(data.username, data.password, email, false, apiVersion.some)
               .flatten(s"No user could be created for ${data.username}") flatMap mobileUserOk
-          }
-        )
+          },
+        ),
       )
     }
   }
@@ -199,7 +199,7 @@ object Auth extends LilaController {
             case (form, captcha) => BadRequest(html.auth.passwordReset(form, captcha, false.some))
           }
         }
-      }
+      },
     )
   }
 

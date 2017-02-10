@@ -36,7 +36,7 @@ trait BitraverseTests[F[_, _]]
       val props = Seq(
           "bitraverse identity" -> forAll(laws.bitraverseIdentity[A, B] _),
           "bitraverse composition" -> forAll(
-              laws.bitraverseCompose[G, A, B, C, D, E, H] _)
+              laws.bitraverseCompose[G, A, B, C, D, E, H] _),
       )
     }
 }

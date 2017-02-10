@@ -36,9 +36,9 @@ object QueryableMacros {
                         Utils[c.type](c)
                           .removeDoubleReify(
                               Apply(Select(c.prefix.tree, TermName(name)),
-                                    List(projection.tree))
+                                    List(projection.tree)),
                           )
-                          .asInstanceOf[Tree]
+                          .asInstanceOf[Tree],
                       )))
     c.universe.reify { Queryable.factory[S](foo.splice) }
   }

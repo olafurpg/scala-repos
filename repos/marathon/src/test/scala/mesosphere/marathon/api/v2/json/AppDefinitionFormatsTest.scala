@@ -21,7 +21,7 @@ class AppDefinitionFormatsTest
     val a1 = AppDefinition(
         id = "app1".toPath,
         cmd = Some("sleep 10"),
-        versionInfo = AppDefinition.VersionInfo.OnlyVersion(Timestamp(1))
+        versionInfo = AppDefinition.VersionInfo.OnlyVersion(Timestamp(1)),
     )
 
     val j1 = Json.parse("""
@@ -82,7 +82,7 @@ class AppDefinitionFormatsTest
         a1.copy(versionInfo = AppDefinition.VersionInfo.FullVersionInfo(
                   version = Timestamp(3),
                   lastScalingAt = Timestamp(2),
-                  lastConfigChangeAt = Timestamp(1)
+                  lastConfigChangeAt = Timestamp(1),
               )))
     (r1 \ "version").as[String] should equal("1970-01-01T00:00:00.003Z")
     (r1 \ "versionInfo" \ "lastScalingAt").as[String] should equal(

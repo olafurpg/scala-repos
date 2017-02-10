@@ -288,6 +288,6 @@ object NumericRange {
       Numeric.ShortIsIntegral -> Ordering.Short,
       Numeric.ByteIsIntegral -> Ordering.Byte,
       Numeric.CharIsIntegral -> Ordering.Char,
-      Numeric.LongIsIntegral -> Ordering.Long
+      Numeric.LongIsIntegral -> Ordering.Long,
   )
 }

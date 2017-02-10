@@ -214,7 +214,7 @@ object ValidatePullRequest extends AutoPlugin {
         log.info("Detected changes in directories: " +
             allModuleNames.mkString("[", ", ", "]"))
         allModuleNames
-      }
+      },
   )
 
   override lazy val projectSettings =
@@ -290,7 +290,7 @@ object ValidatePullRequest extends AutoPlugin {
               () /* Ignore the sequence of unit returned */
             }
           }
-        }.value
+        }.value,
     )
 }
 
@@ -309,7 +309,7 @@ object MultiNodeWithPrValidation extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ValidatePullRequest && MultiNode
   override lazy val projectSettings = Seq(
-      additionalTasks in ValidatePR += MultiNode.multiTest
+      additionalTasks in ValidatePR += MultiNode.multiTest,
   )
 }
 
@@ -323,7 +323,7 @@ object MimaWithPrValidation extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ValidatePullRequest && MimaPlugin
   override lazy val projectSettings = Seq(
-      additionalTasks in ValidatePR += reportBinaryIssues
+      additionalTasks in ValidatePR += reportBinaryIssues,
   )
 }
 
@@ -332,6 +332,6 @@ object UnidocWithPrValidation extends AutoPlugin {
 
   override def trigger = noTrigger
   override lazy val projectSettings = Seq(
-      additionalTasks in ValidatePR += unidoc in Compile
+      additionalTasks in ValidatePR += unidoc in Compile,
   )
 }

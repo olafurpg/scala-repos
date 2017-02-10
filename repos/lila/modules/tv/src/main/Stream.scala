@@ -32,7 +32,7 @@ object Twitch {
                     name = status,
                     streamer = streamer,
                     url = url,
-                    streamId = c.name
+                    streamId = c.name,
                 ))
           case _ => None
         }

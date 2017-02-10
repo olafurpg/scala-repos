@@ -12,7 +12,7 @@ object Test extends Properties("NaN-Ordering") {
       Float.NegativeInfinity,
       Float.PositiveInfinity,
       -0.0f,
-      +0.0f
+      +0.0f,
   )
 
   property("Float min") = forAll(specFloats, specFloats) { (d1, d2) =>
@@ -98,7 +98,7 @@ object Test extends Properties("NaN-Ordering") {
       Double.NegativeInfinity,
       Double.PositiveInfinity,
       -0.0,
-      +0.0
+      +0.0,
   )
 
   // ticket #5104

@@ -80,7 +80,7 @@ case class DataSource(sqlContext: SQLContext,
         "org.apache.spark.sql.parquet" -> classOf[parquet.DefaultSource].getCanonicalName,
         "org.apache.spark.sql.parquet.DefaultSource" -> classOf[
             parquet.DefaultSource].getCanonicalName,
-        "com.databricks.spark.csv" -> classOf[csv.DefaultSource].getCanonicalName
+        "com.databricks.spark.csv" -> classOf[csv.DefaultSource].getCanonicalName,
     )
 
   /** Given a provider name, look up the data source class definition. */

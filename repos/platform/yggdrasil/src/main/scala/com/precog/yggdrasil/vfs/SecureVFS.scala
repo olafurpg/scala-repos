@@ -309,7 +309,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                       \/.left(
                           storageError(PermissionsError(
                                   "API key %s has no permission to write to the caching path %s."
-                                    .format(ctx.apiKey, cachePath)))
+                                    .format(ctx.apiKey, cachePath))),
                       )
                 }
               }
@@ -320,7 +320,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                           path.path),
                       "Cached query run.",
                       None,
-                      Some(clock.now()))
+                      Some(clock.now())),
               )
             } yield {
               logger.debug(
@@ -400,7 +400,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                                 apiKey, path.path, writeAs, errors.shows))
                         None
                     },
-                    _ => Some((x, (pseudoOffset + 1, xs)))
+                    _ => Some((x, (pseudoOffset + 1, xs))),
                 )
               }
 

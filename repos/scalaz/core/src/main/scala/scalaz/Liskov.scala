@@ -82,7 +82,7 @@ object Liskov extends LiskovInstances {
   /**lift2(a,b) = co1_2(a) compose co2_2(b) */
   def lift2[T[+ _, + _], A, A2, B, B2](
       a: A <~< A2,
-      b: B <~< B2
+      b: B <~< B2,
   ): (T[A, B] <~< T[A2, B2]) = {
     type a[-X] = T[X, B2] <~< T[A2, B2]
     type b[-X] = T[A, X] <~< T[A2, B2]
@@ -93,7 +93,7 @@ object Liskov extends LiskovInstances {
   def lift3[T[+ _, + _, + _], A, A2, B, B2, C, C2](
       a: A <~< A2,
       b: B <~< B2,
-      c: C <~< C2
+      c: C <~< C2,
   ): (T[A, B, C] <~< T[A2, B2, C2]) = {
     type a[-X] = T[X, B2, C2] <~< T[A2, B2, C2]
     type b[-X] = T[A, X, C2] <~< T[A2, B2, C2]
@@ -106,7 +106,7 @@ object Liskov extends LiskovInstances {
       a: A <~< A2,
       b: B <~< B2,
       c: C <~< C2,
-      d: D <~< D2
+      d: D <~< D2,
   ): (T[A, B, C, D] <~< T[A2, B2, C2, D2]) = {
     type a[-X] = T[X, B2, C2, D2] <~< T[A2, B2, C2, D2]
     type b[-X] = T[A, X, C2, D2] <~< T[A2, B2, C2, D2]
@@ -160,7 +160,7 @@ object Liskov extends LiskovInstances {
     */
   def liftF1[F[- _, + _], A, A2, R, R2](
       a: A <~< A2,
-      r: R <~< R2
+      r: R <~< R2,
   ): (F[A2, R] <~< F[A, R2]) = {
     type a[-X] = F[A2, R2] <~< F[X, R2]
     type r[-X] = F[A2, X] <~< F[A, R2]
@@ -173,7 +173,7 @@ object Liskov extends LiskovInstances {
   def liftF2[F[- _, - _, + _], A, A2, B, B2, R, R2](
       a: A <~< A2,
       b: B <~< B2,
-      r: R <~< R2
+      r: R <~< R2,
   ): (F[A2, B2, R] <~< F[A, B, R2]) = {
     type a[-X] = F[A2, B2, R2] <~< F[X, B2, R2]
     type b[-X] = F[A2, B2, R2] <~< F[A, X, R2]
@@ -188,7 +188,7 @@ object Liskov extends LiskovInstances {
       a: A <~< A2,
       b: B <~< B2,
       c: C <~< C2,
-      r: R <~< R2
+      r: R <~< R2,
   ): (F[A2, B2, C2, R] <~< F[A, B, C, R2]) = {
     type a[-X] = F[A2, B2, C2, R2] <~< F[X, B2, C2, R2]
     type b[-X] = F[A2, B2, C2, R2] <~< F[A, X, C2, R2]
@@ -203,7 +203,7 @@ object Liskov extends LiskovInstances {
       b: B <~< B2,
       c: C <~< C2,
       d: D <~< D2,
-      r: R <~< R2
+      r: R <~< R2,
   ): (F[A2, B2, C2, D2, R] <~< F[A, B, C, D, R2]) = {
     type a[-X] = F[A2, B2, C2, D2, R2] <~< F[X, B2, C2, D2, R2]
     type b[-X] = F[A2, B2, C2, D2, R2] <~< F[A, X, C2, D2, R2]
@@ -228,26 +228,26 @@ object Liskov extends LiskovInstances {
     }
 
   def unco[F[_]: Injective, Z, A](
-      a: F[A] <~< F[Z]
+      a: F[A] <~< F[Z],
   ): (A <~< Z) = force[A, Z]
 
   def unco2_1[F[+ _, _]: Injective2, Z, A, B](
-      a: F[A, B] <~< F[Z, B]
+      a: F[A, B] <~< F[Z, B],
   ): (A <~< Z) = force[A, Z]
 
   def unco2_2[F[_, + _]: Injective2, Z, A, B](
-      a: F[A, B] <~< F[A, Z]
+      a: F[A, B] <~< F[A, Z],
   ): (B <~< Z) = force[B, Z]
 
   def uncontra[F[- _]: Injective, Z, A](
-      a: F[A] <~< F[Z]
+      a: F[A] <~< F[Z],
   ): (Z <~< A) = force[Z, A]
 
   def uncontra2_1[F[- _, _]: Injective2, Z, A, B](
-      a: F[A, B] <~< F[Z, B]
+      a: F[A, B] <~< F[Z, B],
   ): (Z <~< A) = force[Z, A]
 
   def uncontra2_2[F[_, - _]: Injective2, Z, A, B](
-      a: F[A, B] <~< F[A, Z]
+      a: F[A, B] <~< F[A, Z],
   ): (Z <~< B) = force[Z, B]
 }

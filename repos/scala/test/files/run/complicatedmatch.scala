@@ -26,6 +26,6 @@ object Test extends App {
       3 -> "foo",
       7 -> "flob",
       3 -> "bar",
-      12 -> LongWord
+      12 -> LongWord,
   ).foreach({ case (x, y) => println(foo(x, y)) });
 }

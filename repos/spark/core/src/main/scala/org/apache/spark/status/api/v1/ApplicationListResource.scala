@@ -79,9 +79,9 @@ private[spark] object ApplicationsListResource {
               },
               lastUpdated = new Date(internalAttemptInfo.lastUpdated),
               sparkUser = internalAttemptInfo.sparkUser,
-              completed = internalAttemptInfo.completed
+              completed = internalAttemptInfo.completed,
           )
-        }
+        },
     )
   }
 
@@ -107,8 +107,8 @@ private[spark] object ApplicationsListResource {
             },
                   lastUpdated = new Date(internal.endTime),
                   sparkUser = internal.desc.user,
-                  completed = completed
-              ))
+                  completed = completed,
+              )),
     )
   }
 }

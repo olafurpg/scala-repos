@@ -13,7 +13,7 @@ import org.ensime.core._
 class RequestHandler(
     envelope: RpcRequestEnvelope,
     project: ActorRef,
-    server: ActorRef
+    server: ActorRef,
 )
     extends Actor with ActorLogging {
 
@@ -54,6 +54,6 @@ object RequestHandler {
   def apply(
       env: RpcRequestEnvelope,
       project: ActorRef,
-      server: ActorRef
+      server: ActorRef,
   ): Props = Props(classOf[RequestHandler], env, project, server)
 }

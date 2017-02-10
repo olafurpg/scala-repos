@@ -62,17 +62,17 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
     case e: AppLockedException =>
       Json.obj(
           "message" -> e.getMessage,
-          "deployments" -> e.deploymentIds.map(id => Json.obj("id" -> id))
+          "deployments" -> e.deploymentIds.map(id => Json.obj("id" -> id)),
       )
     case e: JsonParseException =>
       Json.obj(
           "message" -> "Invalid JSON",
-          "details" -> e.getOriginalMessage
+          "details" -> e.getOriginalMessage,
       )
     case e: JsonMappingException =>
       Json.obj(
           "message" -> "Please specify data in JSON format",
-          "details" -> e.getMessage
+          "details" -> e.getMessage,
       )
     case e: JsResultException =>
       val errors = e.errors.map {
@@ -81,7 +81,7 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
       }
       Json.obj(
           "message" -> s"Invalid JSON",
-          "details" -> errors
+          "details" -> errors,
       )
     case ValidationFailedException(obj, failure) => Json.toJson(failure)
     case e: WebApplicationException =>

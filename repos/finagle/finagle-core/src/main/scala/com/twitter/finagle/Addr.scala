@@ -41,7 +41,7 @@ object Addr {
     */
   case class Bound(
       addrs: immutable.Set[Address],
-      metadata: Metadata
+      metadata: Metadata,
   )
       extends Addr
 

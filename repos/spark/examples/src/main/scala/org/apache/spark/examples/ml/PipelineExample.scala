@@ -43,7 +43,7 @@ object PipelineExample {
               (0L, "a b c d e spark", 1.0),
               (1L, "b d", 0.0),
               (2L, "spark f g h", 1.0),
-              (3L, "hadoop mapreduce", 0.0)
+              (3L, "hadoop mapreduce", 0.0),
           ))
       .toDF("id", "text", "label")
 
@@ -75,7 +75,7 @@ object PipelineExample {
               (4L, "spark i j k"),
               (5L, "l m n"),
               (6L, "mapreduce spark"),
-              (7L, "apache hadoop")
+              (7L, "apache hadoop"),
           ))
       .toDF("id", "text")
 

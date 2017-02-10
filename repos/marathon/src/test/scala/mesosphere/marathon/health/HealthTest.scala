@@ -18,7 +18,7 @@ class HealthTest extends MarathonSpec with Formats with Matchers {
         consecutiveFailures = 0,
         firstSuccess = Some(Timestamp(1)),
         lastSuccess = Some(Timestamp(3)),
-        lastFailure = Some(Timestamp(2))
+        lastFailure = Some(Timestamp(2)),
     )
 
     val h3 = Health(
@@ -26,7 +26,7 @@ class HealthTest extends MarathonSpec with Formats with Matchers {
         consecutiveFailures = 1,
         firstSuccess = Some(Timestamp(1)),
         lastSuccess = Some(Timestamp(2)),
-        lastFailure = Some(Timestamp(3))
+        lastFailure = Some(Timestamp(3)),
     )
   }
 

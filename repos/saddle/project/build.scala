@@ -33,7 +33,7 @@ object SaddleBuild extends sbt.Build {
                       "META-INF/BCKEY.DSA" =>
                     MergeStrategy.discard
                   case _ => MergeStrategy.first
-                }
+                },
               ),
             base = file(".")) aggregate (core, hdf5, test_framework)
 
@@ -57,9 +57,9 @@ object SaddleBuild extends sbt.Build {
                       "com.googlecode.efficient-java-matrix-library" % "ejml" % "0.19",
                       "org.apache.commons" % "commons-math" % "2.2",
                       "it.unimi.dsi" % "fastutil" % "6.5.4",
-                      "it.unimi.dsi" % "dsiutils" % "2.0.15"
+                      "it.unimi.dsi" % "dsiutils" % "2.0.15",
                   ) ++ Shared.testDeps(v)),
-            testOptions in Test += Tests.Argument("console", "junitxml")
+            testOptions in Test += Tests.Argument("console", "junitxml"),
         ))
 
   lazy val hdf5 =
@@ -73,9 +73,9 @@ object SaddleBuild extends sbt.Build {
                 |import org.saddle.io._""".stripMargin('|'),
                   libraryDependencies <++= scalaVersion(v =>
                         Seq(
-                            "org.scala-saddle" % "jhdf5" % "2.9"
+                            "org.scala-saddle" % "jhdf5" % "2.9",
                         ) ++ Shared.testDeps(v)),
-                  testOptions in Test += Tests.Argument("console", "junitxml")
+                  testOptions in Test += Tests.Argument("console", "junitxml"),
               )) dependsOn (core)
 
   lazy val test_framework =
@@ -84,8 +84,8 @@ object SaddleBuild extends sbt.Build {
         base = file("saddle-test-framework"),
         settings = Seq(
               libraryDependencies <++=
-                scalaVersion(v => Shared.testDeps(v, "compile"))
-          )
+                scalaVersion(v => Shared.testDeps(v, "compile")),
+          ),
     ) dependsOn (core)
 
   def project(
@@ -112,7 +112,7 @@ object Shared {
     Seq(
         specs2 % conf,
         scalacheck % conf,
-        "junit" % "junit" % "4.11" % conf
+        "junit" % "junit" % "4.11" % conf,
     )
   }
 
@@ -159,7 +159,7 @@ object Shared {
       },
       resolvers ++= Seq(
           "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
-          "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+          "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
       ),
       publishTo <<= (version) { version: String =>
         val nexus = "https://oss.sonatype.org/"
@@ -168,6 +168,6 @@ object Shared {
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
       },
       credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
-      compile <<= (compile in Compile) dependsOn (compile in Test)
+      compile <<= (compile in Compile) dependsOn (compile in Test),
   )
 }

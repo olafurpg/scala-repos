@@ -18,8 +18,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
         FullVersionInfo(
             version = Timestamp(1),
             lastScalingAt = Timestamp(1),
-            lastConfigChangeAt = versionOfNoVersion
-        )
+            lastConfigChangeAt = versionOfNoVersion,
+        ),
     )
   }
 
@@ -35,8 +35,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
         FullVersionInfo(
             version = Timestamp(1),
             lastScalingAt = Timestamp(1),
-            lastConfigChangeAt = Timestamp(1)
-        )
+            lastConfigChangeAt = Timestamp(1),
+        ),
     )
   }
 
@@ -52,8 +52,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
         FullVersionInfo(
             version = Timestamp(2),
             lastScalingAt = Timestamp(2),
-            lastConfigChangeAt = Timestamp(1)
-        )
+            lastConfigChangeAt = Timestamp(1),
+        ),
     )
   }
 
@@ -69,8 +69,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
         FullVersionInfo(
             version = Timestamp(2),
             lastScalingAt = Timestamp(2),
-            lastConfigChangeAt = Timestamp(2)
-        )
+            lastConfigChangeAt = Timestamp(2),
+        ),
     )
   }
 
@@ -79,7 +79,7 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
     val versionInfo = AppDefinition.VersionInfo.FullVersionInfo(
         version = Timestamp(2),
         lastScalingAt = Timestamp(2),
-        lastConfigChangeAt = Timestamp(1)
+        lastConfigChangeAt = Timestamp(1),
     )
 
     When("Applying a scaling change")
@@ -90,8 +90,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
         FullVersionInfo(
             version = Timestamp(3),
             lastScalingAt = Timestamp(3),
-            lastConfigChangeAt = Timestamp(1)
-        )
+            lastConfigChangeAt = Timestamp(1),
+        ),
     )
   }
 
@@ -100,7 +100,7 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
     val versionInfo = AppDefinition.VersionInfo.FullVersionInfo(
         version = Timestamp(2),
         lastScalingAt = Timestamp(2),
-        lastConfigChangeAt = Timestamp(1)
+        lastConfigChangeAt = Timestamp(1),
     )
 
     When("Applying a scaling change")
@@ -111,8 +111,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
         FullVersionInfo(
             version = Timestamp(3),
             lastScalingAt = Timestamp(3),
-            lastConfigChangeAt = Timestamp(3)
-        )
+            lastConfigChangeAt = Timestamp(3),
+        ),
     )
   }
 }

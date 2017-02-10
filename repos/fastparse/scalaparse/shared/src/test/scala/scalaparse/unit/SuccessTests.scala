@@ -16,7 +16,7 @@ object SuccessTests extends TestSuite {
         """package torimatomeru
         |
         |package lols
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -26,19 +26,19 @@ object SuccessTests extends TestSuite {
         |    (1)
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """package torimatomeru
         |import a
         |import b
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Foo{
         |  val a = (null): Int => Int
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
@@ -47,7 +47,7 @@ object SuccessTests extends TestSuite {
         |    (_, node) <- signature
         |  } ()
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -55,33 +55,33 @@ object SuccessTests extends TestSuite {
         |  { x => x: A }
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
-        """class ScProjectionType (val x: Boolean /* todo*/)""".stripMargin
+        """class ScProjectionType (val x: Boolean /* todo*/)""".stripMargin,
     )
     * - check(
         """
         |class Baz {
         |    ba /*caret*/r
         |}
-        |""".stripMargin
+        |""".stripMargin,
     )
     * - check(
-        """class GroupManager @Singleton @Inject() ()""".stripMargin
+        """class GroupManager @Singleton @Inject() ()""".stripMargin,
     )
     * - check(
         """object O{
         |  val service = Service.mk { _: Request => Future.value(res) }
         |  val service2 = Service.mk { _ => Future.value(res) }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Foo{
         |  q"\$result.putExtra(\${toName(c)(value)}, \$value)"
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -95,7 +95,7 @@ object SuccessTests extends TestSuite {
         |import scala.util.{Failure, Success}
         |
         |object SyntaxTest extends TestSuite
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -104,13 +104,13 @@ object SuccessTests extends TestSuite {
         |
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class JSCodePhase{
         |  def genRTCall(args: Tree*)
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
@@ -119,64 +119,64 @@ object SuccessTests extends TestSuite {
         |  }
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{ ((newEntries)): Int => 1
         |
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class NodexSpec extends Spec {
         |  val x = ! <a/>.isSpaceNode
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O {
         |  def x: Q.type#/* line: 2 */Inner
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O {
         |  def x: Q.type#/* line: 2 */Inner
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O {
         |  val x = (x +/* */ 1)
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O {
         |  val x = x +// {
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O {
         |  val x:// {{{
         |    Int
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O {
         |  val x: A +// {{{
         |    Int
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class OptionLikeMatcher{
         |  type A = _ \/ B
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -184,7 +184,7 @@ object SuccessTests extends TestSuite {
         |  a()
         |  throw 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -195,7 +195,7 @@ object SuccessTests extends TestSuite {
         |  )
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -204,14 +204,14 @@ object SuccessTests extends TestSuite {
         |       @volatile var getCollectionTime: Long
         |       )
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class NodexSpec {
         |  (! <a/>.isSpaceNode)
         |  ! <a/>.isSpaceNode
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -221,14 +221,14 @@ object SuccessTests extends TestSuite {
         |        throw 1
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object ParserTests {
         |  def f(x: Try[T])
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -238,7 +238,7 @@ object SuccessTests extends TestSuite {
         |
         |  c
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -247,7 +247,7 @@ object SuccessTests extends TestSuite {
         |        .asInstanceOf[Literal]
         |10
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -256,14 +256,14 @@ object SuccessTests extends TestSuite {
         |
         |  1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object O{
         | private[this] val applyMacroFull = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -275,7 +275,7 @@ object SuccessTests extends TestSuite {
         |                      : c.Expr[Frag] = {
         |                      }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -284,7 +284,7 @@ object SuccessTests extends TestSuite {
         |
         |  1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -294,7 +294,7 @@ object SuccessTests extends TestSuite {
         |
         |import org.parboiled2._
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -303,7 +303,7 @@ object SuccessTests extends TestSuite {
         |    case A | B => 0
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -318,7 +318,7 @@ object SuccessTests extends TestSuite {
       |  }
       |}
       |
-    """.stripMargin
+    """.stripMargin,
     )
     * - check(
         """
@@ -326,14 +326,14 @@ object SuccessTests extends TestSuite {
         |    A(A(A(A(A(A(A(A())))))))
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object O{
         |   A(A(A(A(A(A(A(A(A(A(A(A(A(A(A(A())))))))))))))))
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -341,7 +341,7 @@ object SuccessTests extends TestSuite {
         |  a.b = c
         |  a().b = c
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -349,7 +349,7 @@ object SuccessTests extends TestSuite {
         |  a b c
         |  d = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
@@ -363,7 +363,7 @@ object SuccessTests extends TestSuite {
         |
         |package scala.scalajs.cli
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -375,7 +375,7 @@ object SuccessTests extends TestSuite {
         |    1
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -384,14 +384,14 @@ object SuccessTests extends TestSuite {
         |      try { 1 }
         |      catch { case _: F => G }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object F{
         |  func{ case _: F => fail }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -400,7 +400,7 @@ object SuccessTests extends TestSuite {
         |    val b = e // h
         |    val c = f
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -409,7 +409,7 @@ object SuccessTests extends TestSuite {
         |    case y.Y(z) => z
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object K{
@@ -419,7 +419,7 @@ object SuccessTests extends TestSuite {
         |
         |  1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -428,14 +428,14 @@ object SuccessTests extends TestSuite {
         |
         |    def apply() {}
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object O{
         |  a =:= b.c
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -444,7 +444,7 @@ object SuccessTests extends TestSuite {
         |    1: _*
         |  )
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -453,28 +453,28 @@ object SuccessTests extends TestSuite {
         |        case stats :+ expr  => 1
         |      }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object K{
         |  val trueA = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object K{
         |  val nullo :: cow = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object K{
         |  val omg_+ = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -482,7 +482,7 @@ object SuccessTests extends TestSuite {
         |  val + = 1
         |  var * = 2
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -491,7 +491,7 @@ object SuccessTests extends TestSuite {
         |    case b_  => 1
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -500,13 +500,13 @@ object SuccessTests extends TestSuite {
         |    case C => true; case _ => false
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait Basic {
         |  !a.b
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -514,7 +514,7 @@ object SuccessTests extends TestSuite {
         |  {() => }
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -533,7 +533,7 @@ object SuccessTests extends TestSuite {
         |;
         |
         |;
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -541,13 +541,13 @@ object SuccessTests extends TestSuite {
         |object GenJSCode {
         |  code: @switch
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O{
         |  { case _: Int | () => 1 }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -555,13 +555,13 @@ object SuccessTests extends TestSuite {
         |  ucheck(id_TSa_T [Unit   , Array[Unit   ]](uarray));
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class SymbolicXMLBuilder {
         |  (_scala_xml_PrefixedAttribute  , 1)
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -569,19 +569,19 @@ object SuccessTests extends TestSuite {
         |  x: Sequencer[D, (T1)]
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
         |object A extends B with (C)
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object B {
         |  { a: L => }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O{
@@ -591,7 +591,7 @@ object SuccessTests extends TestSuite {
         |    0
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -601,14 +601,14 @@ object SuccessTests extends TestSuite {
         |  @tailrec private[this] def doLoadFailed
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object GenJSCode{
         |  val g: G.this.g.type
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait ParserApi{
@@ -616,20 +616,20 @@ object SuccessTests extends TestSuite {
         |  /** */
         |  def flatMap: Y
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object ThreadPoolConfig {
         |     { case _: SecurityException | 1 => None }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object K{
         |  class RTTypeTest
         |  private object O
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X {
@@ -637,7 +637,7 @@ object SuccessTests extends TestSuite {
         |
         |  ResultLogicalCombinators.mapMessage{}
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -648,7 +648,7 @@ object SuccessTests extends TestSuite {
         |  (1) match{ case x => x}
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -662,7 +662,7 @@ object SuccessTests extends TestSuite {
         |
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -672,7 +672,7 @@ object SuccessTests extends TestSuite {
         |
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O{
@@ -680,7 +680,7 @@ object SuccessTests extends TestSuite {
         |
         |    false)  1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -691,7 +691,7 @@ object SuccessTests extends TestSuite {
         |  (x => x)
         |  ) yield x
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -703,7 +703,7 @@ object SuccessTests extends TestSuite {
         |    1 == 2
         |  } yield x
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -711,7 +711,7 @@ object SuccessTests extends TestSuite {
         |  def withScopedVars(ass: Seq[_]) = 1
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -719,7 +719,7 @@ object SuccessTests extends TestSuite {
         |  def show: this.type = ()
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Traversers {
@@ -728,31 +728,31 @@ object SuccessTests extends TestSuite {
         |        cases foreach nil
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Utils {
         |  "\\"
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object F{
         |  this eq that.asInstanceOf[AnyRef]
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class C{
         |  0x00 <= 2 && 1
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class Runtime private
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -760,42 +760,42 @@ object SuccessTests extends TestSuite {
         |  def a[@b T[@b V]] = 1
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object U{
         |  private val _fragment = fld(Fragment)
         |  _fld = null
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class Array{
         |  def length_= = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object K{
         |  @inline def a = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait Function12[-T1, +R]
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """@a // Don't do this at home!
         |trait B
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object T{
         |  type B = { def F: S }
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -806,30 +806,30 @@ object SuccessTests extends TestSuite {
         |      )
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait Writer{
         | '\f'
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """import com.twitter.scalding.macros.{ _ => _ }
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object CyclicDependencyException {
         |  s"${info.resourceName}"
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object CyclicDependencyException {
         |    def str(info: ResolutionInfo) =
         |      s"${info.resourceName} from: ${info.origins.mkString(", ")}"
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object OptimizerCore {
@@ -837,20 +837,20 @@ object SuccessTests extends TestSuite {
         |    case NothingType | _:RecordType=> 1
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class A{
         |  1
         |  () => 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait ReactorCanReply {
         |  _: InternalReplyReactor =>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
@@ -858,31 +858,31 @@ object SuccessTests extends TestSuite {
         |  def isBefore(pd: SubComponent) = settings.stopBefore
         |  phaseDescriptors sliding 2 collectFirst ()
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class SymbolLoaders {
         |  type T = ClassPath[AbstractFile]#ClassRep
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait ContextErrors {
         |    def isUnaffiliatedExpr = expanded.isInstanceOf[scala.reflect.api.Exprs#Expr[_]]
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait Typers{
         |  s"nested ${ if (1) "trait" else "class" }"
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait ReflectSetup { this: Global =>
         |  phase = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait Predef {
@@ -890,7 +890,7 @@ object SuccessTests extends TestSuite {
         |  // a
         |  type T
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -903,73 +903,73 @@ object SuccessTests extends TestSuite {
           }"
 
         }
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait Growable {
         |    +=
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """package immutable {
         |  object O
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
         """object immutable {
           |  new (((String)))
           |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """package immutable {
         |  class C extends (((D)))
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class immutable {
         |  new ({val x = 1})
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """import java.util.concurrent.TimeUnit.{ NANOSECONDS => NANOS, MILLISECONDS ⇒ MILLIS }
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class FunFinder{
         |  val targetName = s"$name${ if (isModule) "$" else "" }"
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class AkkaException{
         |  for (i ← 0 until trace.length)
         |    ()
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Test4 {
         |  @BeanProperty val x
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """package `dmacro` {
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class A {
         |  def fn1 = List apply 1
         |  def fn2 = List apply[Int] 2
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class C {
@@ -978,13 +978,13 @@ object SuccessTests extends TestSuite {
         |    class D;
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait B[T] {
         |  def f1(a: T): Unit { }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object test {
@@ -992,7 +992,7 @@ object SuccessTests extends TestSuite {
         |    case _   => 1
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object A {
@@ -1000,7 +1000,7 @@ object SuccessTests extends TestSuite {
         |    implicit lazy val e: Int = 0
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object test {
@@ -1009,7 +1009,7 @@ object SuccessTests extends TestSuite {
         |    a <- B
         |  } yield n
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 //        * - check(
 //          """object Test {
@@ -1019,52 +1019,52 @@ object SuccessTests extends TestSuite {
 //        )
     * - check(
         """abstract class Mix___eFoo___wBar_I_ extends Foo___ with Bar_I_    { ; ; f; }
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """package test2 {
         |object N1M0;
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class IP extends {
         |  val baz = "bar";
         |} with Foo(() => baz);
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Test extends App {
         |  val x: C {} = 1
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """trait LensFunctions {
         |  type T = A @> B
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object ContravariantCoyonedaUsage {
         |  (schwartzian[Vector[String], ccord.I]
         |      (unstructuredData)(v => ccord.k(v(i)))(ccord.fi))
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object MapTest{
         |  forAll { a: Int ==>> Int =>
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class ScalaJavaCompletionProposalComputer {
         |  completionProposals: java.util.List[ICompletionProposal]
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Test {
@@ -1075,7 +1075,7 @@ object SuccessTests extends TestSuite {
         |      1
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
@@ -1087,31 +1087,31 @@ object SuccessTests extends TestSuite {
         |    ;;;
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  <div />
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  <div id="hello" />
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  <url>https://github.com/lihaoyi/scalatags</url>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  <url>{ ;;;1 + 1 }</url>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object UserAgentCalculator extends Factory {
@@ -1120,32 +1120,32 @@ object SuccessTests extends TestSuite {
         |      findResult = ieMatch.find if findResult
         |    } yield ver
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class FunctionalBuilder{
           |  a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a(a1, a2), a3), a4), a5), a6), a7), a8), a9), a10), a11), a12), a13), a14), a15), a16), a17), a18), a19), a20), a21), a22)
           |}
-        """.stripMargin
+        """.stripMargin,
     )
     * - check(
         """class HtmlPage {
         |  <meta http-equiv="content-type" content={ 1 }/>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object K{
         |  <script> {{</script>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object O{
         |  e match { case <title>{ _* }</title> => }
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object Publish {
@@ -1159,13 +1159,13 @@ object SuccessTests extends TestSuite {
         |        <connection>scm:git:git@github.com:akka/akka.git</connection>
         |      </scm>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object K{
         |    <foo baz="&amp;dog"/>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
@@ -1189,14 +1189,14 @@ object SuccessTests extends TestSuite {
         |          </developer>
         |        </developers>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
       |  // parses as ~?>.$(1)
       |  ~?>$ 1
       |}
-    """.stripMargin
+    """.stripMargin,
     )
     * - check(
         """object X{
@@ -1208,19 +1208,19 @@ object SuccessTests extends TestSuite {
         |  a m "txt" t = 18; println("x")
         |  X x = 1 match {case _ => 2}
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  type x = {def t: Int = 1}
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  {x: Int => 1}
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check( // This should parse as a postfix call
         """object Foo{
@@ -1243,7 +1243,7 @@ object SuccessTests extends TestSuite {
         |  )
         |  Await.result(result, Duration.Inf) must be equalTo "$slash$u$d1$slash$u$d2$slash$u$d3"
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
@@ -1251,7 +1251,7 @@ object SuccessTests extends TestSuite {
         |  '$slash$u$d1'
         |  '$slash$u$d2'
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     val o1 = "252"
@@ -1262,7 +1262,7 @@ object SuccessTests extends TestSuite {
         |  println('$slash$o1')
         |  printl('$slash$o2')
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
@@ -1271,7 +1271,7 @@ object SuccessTests extends TestSuite {
         |  trait Inner extends { val x : Int = 3 }
         |  class Inner extends { val x : Int = 3 }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
@@ -1280,7 +1280,7 @@ object SuccessTests extends TestSuite {
         |
         |    </library>
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -1290,7 +1290,7 @@ object SuccessTests extends TestSuite {
         |class Bar extends Foo {
         |  trait Inner <: super.Inner { val y : Int = x }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
 
     * - check(
@@ -1298,13 +1298,13 @@ object SuccessTests extends TestSuite {
         |
         |trait B extends { val x = 1} with A { println("B") }
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
         |  for(a <- "" ; (b, c) = (1, 2)) {}
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """object X{
@@ -1313,7 +1313,7 @@ object SuccessTests extends TestSuite {
         |+
         |)
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class C{
@@ -1321,7 +1321,7 @@ object SuccessTests extends TestSuite {
         |    && b) c
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class C{
@@ -1332,14 +1332,14 @@ object SuccessTests extends TestSuite {
         |  b)
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class C{
         |  x match{ case a @ _ ** y => z}
         |}
         |
-      """.stripMargin
+      """.stripMargin,
     )
 
     // These are currently illegal but parse correctly,
@@ -1351,14 +1351,14 @@ object SuccessTests extends TestSuite {
         |    case Cell[a](x: Int) => ()
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         s"""trait T2 extends {
          |  type X = Int
          |} with Base
          |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         s"""
@@ -1371,12 +1371,12 @@ object SuccessTests extends TestSuite {
          |
          |}
          |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """class Toto extends Expr with Case1(12);
         |
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
         """
@@ -1387,10 +1387,10 @@ object SuccessTests extends TestSuite {
         |      c =  c
         |    } yield { }
         |}
-      """.stripMargin
+      """.stripMargin,
     )
     * - check(
-        """class A extends B()""".stripMargin
+        """class A extends B()""".stripMargin,
     )
     * - check(
         """
@@ -1398,7 +1398,7 @@ object SuccessTests extends TestSuite {
         |  contents += new RadioMenuItem
         |
         |  contents += 1
-        |}""".stripMargin
+        |}""".stripMargin,
     )
   }
 }

@@ -117,7 +117,7 @@ object Ratatoskr {
       ZookeeperTools,
       ImportTools,
       CSVTools,
-      APIKeyTools
+      APIKeyTools,
   )
 
   val commandMap: Map[String, Command] =
@@ -931,7 +931,7 @@ object ImportTools extends Command with Logging {
       var accountId: AccountId = "not-a-real-account",
       var verbose: Boolean = false,
       var storageRoot: File = new File("./data"),
-      var archiveRoot: File = new File("./archive")
+      var archiveRoot: File = new File("./archive"),
   )
 
   def run(args: Array[String]) {
@@ -1103,7 +1103,7 @@ object ImportTools extends Command with Logging {
                                    records,
                                    None,
                                    yggConfig.clock.instant,
-                                   StreamRef.Append)))
+                                   StreamRef.Append))),
             )
 
             (vfsModule.projectionsActor ? update) flatMap { _ =>
@@ -1264,12 +1264,12 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
         MongoAPIKeyManager.createRootAPIKey(
             database,
             config.mongoSettings.apiKeys,
-            config.mongoSettings.grants
+            config.mongoSettings.grants,
         )
       } else {
         MongoAPIKeyManager.findRootAPIKey(
             database,
-            config.mongoSettings.apiKeys
+            config.mongoSettings.apiKeys,
         )
       }
 
@@ -1350,7 +1350,7 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
 
     def mongoSettings: MongoAPIKeyManagerSettings = MongoAPIKeyManagerSettings(
         apiKeys = collection,
-        deletedAPIKeys = deletedCollection
+        deletedAPIKeys = deletedCollection,
     )
 
     def mongoConfig: Configuration = {

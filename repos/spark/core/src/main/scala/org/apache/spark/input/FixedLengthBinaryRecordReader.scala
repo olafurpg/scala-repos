@@ -68,7 +68,7 @@ private[spark] class FixedLengthBinaryRecordReader
           .min(
               ((currentPosition -
                       splitStart) / (splitEnd - splitStart)).toFloat,
-              1.0
+              1.0,
           )
           .toFloat
     }

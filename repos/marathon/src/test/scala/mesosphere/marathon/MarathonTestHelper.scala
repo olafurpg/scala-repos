@@ -58,7 +58,7 @@ object MarathonTestHelper {
         "--min_revive_offers_interval",
         minReviveOffersInterval.toString,
         "--mesos_authentication_principal",
-        "marathon"
+        "marathon",
     )
 
     mesosRole.foreach(args ++= Seq("--mesos_role", _))
@@ -109,7 +109,7 @@ object MarathonTestHelper {
             heedReserved(RangesResource(
                     Resource.PORTS,
                     Seq(Range(beginPort.toLong, endPort.toLong)),
-                    role
+                    role,
                 )))
       } else {
         None
@@ -221,7 +221,7 @@ object MarathonTestHelper {
         List
           .tabulate(ranges)(_ * 2 + 1)
           .map(p => Range(p.toLong, (p + 1).toLong)),
-        role
+        role,
     )
 
     val offerBuilder = Offer.newBuilder
@@ -246,7 +246,7 @@ object MarathonTestHelper {
     val portsResource = RangesResource(
         Resource.PORTS,
         Seq(Range(beginPort.toLong, endPort.toLong)),
-        role
+        role,
     )
     val cpusResource = ScalarResource(Resource.CPUS, cpus, role)
     val memResource = ScalarResource(Resource.MEM, mem, role)
@@ -283,13 +283,13 @@ object MarathonTestHelper {
         agentInfo = Task.AgentInfo(
               host = offer.getHostname,
               agentId = Some(offer.getSlaveId.getValue),
-              attributes = offer.getAttributesList.asScala
+              attributes = offer.getAttributesList.asScala,
           ),
         appVersion = version,
         status = Task.Status(
-              stagedAt = now
+              stagedAt = now,
           ),
-        networking = Task.HostPorts(Seq(1, 2, 3))
+        networking = Task.HostPorts(Seq(1, 2, 3)),
     )
   }
 
@@ -298,7 +298,7 @@ object MarathonTestHelper {
       cpus = 1.0,
       mem = 64.0,
       disk = 1.0,
-      executor = "//cmd"
+      executor = "//cmd",
   )
 
   lazy val appSchema = {
@@ -342,7 +342,7 @@ object MarathonTestHelper {
                       .setId(UUID.randomUUID().toString)
                       .build()),
             prefix = TaskRepository.storePrefix),
-        metrics
+        metrics,
     )
 
     new TaskTrackerModule(
@@ -385,9 +385,9 @@ object MarathonTestHelper {
         status = Task.Status(
               stagedAt = now,
               startedAt = None,
-              mesosStatus = None
+              mesosStatus = None,
           ),
-        networking = Task.NoNetworking
+        networking = Task.NoNetworking,
     )
   }
 
@@ -421,13 +421,13 @@ object MarathonTestHelper {
     startingTask(
         Task.Id.forApp(appId).idString,
         appVersion = appVersion,
-        stagedAt = stagedAt
+        stagedAt = stagedAt,
     )
   def startingTask(taskId: String,
                    appVersion: Timestamp = Timestamp(1),
                    stagedAt: Long = 2): Task =
     TaskSerializer.fromProto(
-        startingTaskProto(taskId, appVersion = appVersion, stagedAt = stagedAt)
+        startingTaskProto(taskId, appVersion = appVersion, stagedAt = stagedAt),
     )
 
   def startingTaskProto(appId: PathId): Protos.MarathonTask =
@@ -461,9 +461,9 @@ object MarathonTestHelper {
             stagedAt = Timestamp(stagedAt),
             startedAt = None,
             mesosStatus = Some(
-                  statusForState(taskId, Mesos.TaskState.TASK_STAGING))
+                  statusForState(taskId, Mesos.TaskState.TASK_STAGING)),
         ),
-        Task.NoNetworking
+        Task.NoNetworking,
     )
 
   def stagedTaskProto(appId: PathId): Protos.MarathonTask =
@@ -484,7 +484,7 @@ object MarathonTestHelper {
         Task.Id.forApp(appId).idString,
         appVersion = appVersion,
         stagedAt = stagedAt,
-        startedAt = startedAt
+        startedAt = startedAt,
     )
   def runningTask(taskId: String,
                   appVersion: Timestamp = Timestamp(1),
@@ -495,8 +495,8 @@ object MarathonTestHelper {
             taskId,
             appVersion = appVersion,
             stagedAt = stagedAt,
-            startedAt = startedAt
-        )
+            startedAt = startedAt,
+        ),
     )
 
   def runningTaskProto(appId: PathId): Protos.MarathonTask =
@@ -562,7 +562,7 @@ object MarathonTestHelper {
               .newBuilder()
               .setPrincipal("principal")
               .setLabels(
-                  TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
+                  TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels),
           )
         .setDisk(Mesos.Resource.DiskInfo
               .newBuilder()
@@ -582,7 +582,7 @@ object MarathonTestHelper {
       .makeBasicOffer(
           reservation = Some(
                 TaskLabels.labelsForTask(frameworkId, Task.Id(taskId))),
-          role = "test"
+          role = "test",
       )
       .addAllResources(persistentVolumeResources(Task.Id(taskId),
                                                  localVolumeIds: _*).asJava)
@@ -607,7 +607,7 @@ object MarathonTestHelper {
           container = Some(mesosContainerWithPersistentVolume),
           residency = Some(
                 Residency(Residency.defaultRelaunchEscalationTimeoutSeconds,
-                          Residency.defaultTaskLostBehaviour))
+                          Residency.defaultTaskLostBehaviour)),
       )
   }
 
@@ -627,7 +627,7 @@ object MarathonTestHelper {
         status = Task.Status(
               stagedAt = now,
               startedAt = None,
-              mesosStatus = None
+              mesosStatus = None,
           ),
         networking = Task.NoNetworking,
         reservation = Task.Reservation(
@@ -640,10 +640,10 @@ object MarathonTestHelper {
             PersistentVolume(
                 containerPath = "persistent-volume",
                 persistent = PersistentVolumeInfo(10), // must match persistentVolumeResources
-                mode = Mesos.Volume.Mode.RW
-            )
+                mode = Mesos.Volume.Mode.RW,
+            ),
         ),
-      docker = None
+      docker = None,
   )
 
   def addNetworking(task: Task, networking: Task.Networking): Task =

@@ -43,7 +43,7 @@ class HivePlanTest extends QueryTest with TestHiveSingleton {
     val query = df.select(
         $"id",
         sum($"val").over(window.rowsBetween(-1, 1)),
-        sum($"val").over(window.rangeBetween(-1, 1))
+        sum($"val").over(window.rangeBetween(-1, 1)),
     )
     val plan = query.queryExecution.analyzed
     assert(plan.collect { case w: logical.Window => w }.size === 1,

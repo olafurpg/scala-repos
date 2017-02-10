@@ -60,7 +60,7 @@ class RegressionMetrics @Since("2.0.0")(
           Vectors.dense(observation, observation - prediction)
       }.aggregate(new MultivariateOnlineSummarizer())(
           (summary, v) => summary.add(v),
-          (sum1, sum2) => sum1.merge(sum2)
+          (sum1, sum2) => sum1.merge(sum2),
       )
     summary
   }

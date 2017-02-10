@@ -28,7 +28,7 @@ trait LatticeLaws[A] extends Laws {
       "join.associative" → forAll(
           (x: A, y: A, z: A) => ((x join y) join z) === (x join (y join z))),
       "join.commutative" → forAll((x: A, y: A) => (x join y) === (y join x)),
-      "join.idempotent" → forAll((x: A) => (x join x) === x)
+      "join.idempotent" → forAll((x: A) => (x join x) === x),
   )
 
   def meetSemilattice(implicit A: MeetSemilattice[A]) = new LatticeProperties(
@@ -37,14 +37,14 @@ trait LatticeLaws[A] extends Laws {
       "meet.associative" → forAll(
           (x: A, y: A, z: A) => ((x meet y) meet z) === (x meet (y meet z))),
       "meet.commutative" → forAll((x: A, y: A) => (x meet y) === (y meet x)),
-      "meet.idempotent" → forAll((x: A) => (x meet x) === x)
+      "meet.idempotent" → forAll((x: A) => (x meet x) === x),
   )
 
   def lattice(implicit A: Lattice[A]) = new LatticeProperties(
       name = "lattice",
       parents = Seq(joinSemilattice, meetSemilattice),
       "absorption" → forAll((x: A,
-          y: A) => ((x join (x meet y)) === x) && ((x meet (x join y)) === x))
+          y: A) => ((x join (x meet y)) === x) && ((x meet (x join y)) === x)),
   )
 
   def boundedJoinSemilattice(implicit A: BoundedJoinSemilattice[A]) =
@@ -52,7 +52,7 @@ trait LatticeLaws[A] extends Laws {
         name = "boundedJoinSemilattice",
         parents = Seq(joinSemilattice),
         "join.identity" → forAll(
-            (x: A) => (x join A.zero) === x && (A.zero join x) === x)
+            (x: A) => (x join A.zero) === x && (A.zero join x) === x),
     )
 
   def boundedMeetSemilattice(implicit A: BoundedMeetSemilattice[A]) =
@@ -60,32 +60,32 @@ trait LatticeLaws[A] extends Laws {
         name = "boundedMeetSemilattice",
         parents = Seq(meetSemilattice),
         "meet.identity" → forAll(
-            (x: A) => (x meet A.one) === x && (A.one meet x) === x)
+            (x: A) => (x meet A.one) === x && (A.one meet x) === x),
     )
 
   def boundedBelowLattice(
       implicit A: Lattice[A] with BoundedJoinSemilattice[A]) =
     new LatticeProperties(
         name = "boundedBelowLattice",
-        parents = Seq(boundedJoinSemilattice, lattice)
+        parents = Seq(boundedJoinSemilattice, lattice),
     )
 
   def boundedAboveLattice(
       implicit A: Lattice[A] with BoundedMeetSemilattice[A]) =
     new LatticeProperties(
         name = "boundedAboveLattice",
-        parents = Seq(boundedMeetSemilattice, lattice)
+        parents = Seq(boundedMeetSemilattice, lattice),
     )
 
   def boundedLattice(implicit A: BoundedLattice[A]) = new LatticeProperties(
       name = "boundedLattice",
-      parents = Seq(boundedJoinSemilattice, boundedMeetSemilattice, lattice)
+      parents = Seq(boundedJoinSemilattice, boundedMeetSemilattice, lattice),
   )
 
   class LatticeProperties(
       val name: String,
       val parents: Seq[LatticeProperties],
-      val props: (String, Prop)*
+      val props: (String, Prop)*,
   )
       extends RuleSet {
     val bases = Seq.empty

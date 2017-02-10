@@ -102,7 +102,7 @@ trait DB extends Loggable {
               .lookup(name.jndiName)
               .asInstanceOf[DataSource]
               .getConnection
-        }
+        },
     )
 
     first(toTry)(f =>

@@ -266,14 +266,14 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
             taskTracker,
             rateLimiterActor.ref,
             app,
-            tasksToLaunch = 1
+            tasksToLaunch = 1,
         ) {
           override protected def scheduleTaskOperationTimeout(
               context: ActorContext, message: TaskOpRejected): Cancellable = {
             scheduleCalled = true
             mock[Cancellable]
           }
-        }
+        },
     )
     val launcherRef = actorSystem.actorOf(props, "launcher")
 
@@ -339,7 +339,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
       TaskStatusUpdateTestHelper.finished,
       TaskStatusUpdateTestHelper.lost,
       TaskStatusUpdateTestHelper.killed,
-      TaskStatusUpdateTestHelper.error
+      TaskStatusUpdateTestHelper.error,
   )) {
     test(
         s"Remove terminated task (${update.wrapped.status.getClass.getSimpleName})") {
@@ -359,7 +359,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
       val counts = Await
         .result(
             launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
-            3.seconds
+            3.seconds,
         )
         .asInstanceOf[QueuedTaskInfo]
 
@@ -377,7 +377,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
       TaskStatusUpdateTestHelper.finished,
       TaskStatusUpdateTestHelper.lost,
       TaskStatusUpdateTestHelper.killed,
-      TaskStatusUpdateTestHelper.error
+      TaskStatusUpdateTestHelper.error,
   )) {
     test(
         s"Revive offers if task with constraints terminates (${update.wrapped.status.getClass.getSimpleName})") {
@@ -418,7 +418,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
   for (update <- Seq(
       TaskStatusUpdateTestHelper.staging,
-      TaskStatusUpdateTestHelper.running
+      TaskStatusUpdateTestHelper.running,
   )) {
     test(
         s"DO NOT REMOVE running task (${update.wrapped.status.getClass.getSimpleName})") {
@@ -438,7 +438,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
       val counts = Await
         .result(
             launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
-            3.seconds
+            3.seconds,
         )
         .asInstanceOf[QueuedTaskInfo]
 
@@ -490,7 +490,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
         rateLimiterActor.ref) _
     actorSystem.actorOf(
         props(appToLaunch, instances),
-        "launcher"
+        "launcher",
     )
   }
 

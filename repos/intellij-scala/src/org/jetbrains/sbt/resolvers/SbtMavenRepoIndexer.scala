@@ -44,7 +44,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
   private val indexers = Seq(
       container.lookup(classOf[IndexCreator], "min"),
       container.lookup(classOf[IndexCreator], "jarContent"),
-      container.lookup(classOf[IndexCreator], "maven-plugin")
+      container.lookup(classOf[IndexCreator], "maven-plugin"),
   ).asJava
 
   private var context = {
@@ -62,7 +62,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
         null,
         true,
         true,
-        indexers
+        indexers,
     )
   }
 
@@ -107,7 +107,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
         new DefaultScanner(new DefaultArtifactContextProducer(
                 new DefaultArtifactPackagingMapper)),
         indexerEngine,
-        queryCreator
+        queryCreator,
     )
     val nexusContext = nexusIndexer.addIndexingContext(root.shaDigest,
                                                        root.shaDigest,
@@ -128,7 +128,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
         null,
         true,
         true,
-        indexers
+        indexers,
     )
   }
 

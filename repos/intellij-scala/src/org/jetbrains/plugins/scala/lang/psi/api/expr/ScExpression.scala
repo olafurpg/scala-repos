@@ -115,7 +115,7 @@ trait ScExpression
                       .getCachedClass(
                           "scala.Function1",
                           getResolveScope,
-                          ScalaPsiManager.ClassCategory.TYPE
+                          ScalaPsiManager.ClassCategory.TYPE,
                       ) match {
                       case function1: ScTrait =>
                         ScParameterizedType(

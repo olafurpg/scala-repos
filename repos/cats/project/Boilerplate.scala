@@ -24,7 +24,7 @@ object Boilerplate {
   val templates: Seq[Template] = Seq(
       GenCartesianBuilders,
       GenCartesianArityFunctions,
-      GenApplyArityFunctions
+      GenApplyArityFunctions,
   )
 
   val header =

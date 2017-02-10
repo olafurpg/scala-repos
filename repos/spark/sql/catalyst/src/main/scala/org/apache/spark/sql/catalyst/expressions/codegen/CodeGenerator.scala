@@ -691,7 +691,7 @@ object CodeGenerator extends Logging {
             classOf[MapData].getName,
             classOf[UnsafeMapData].getName,
             classOf[MutableRow].getName,
-            classOf[Expression].getName
+            classOf[Expression].getName,
         ))
     evaluator.setExtendedClass(classOf[GeneratedClass])
 

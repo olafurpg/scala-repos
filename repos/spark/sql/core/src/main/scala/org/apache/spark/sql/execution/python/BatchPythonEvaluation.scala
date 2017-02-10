@@ -80,7 +80,7 @@ case class BatchPythonEvaluation(
       val outputIterator = new PythonRunner(
           udf.func,
           bufferSize,
-          reuseWorker
+          reuseWorker,
       ).compute(inputIterator, context.partitionId(), context)
 
       val unpickle = new Unpickler

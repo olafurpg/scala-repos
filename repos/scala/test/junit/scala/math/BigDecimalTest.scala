@@ -19,14 +19,14 @@ class BigDecimalTest {
         BigDecimal(new BD("19127981892347012385719827340123471923850195")),
         BigDecimal("1e1000000000"),
         BigDecimal(14.1928857191985e22),
-        BigDecimal(14.12519823759817, new MC(2))
+        BigDecimal(14.12519823759817, new MC(2)),
     )
     val fracs = List(
         BigDecimal(0.1),
         BigDecimal(new BD("1.000000000000000000000000000000000001")),
         BigDecimal(new BD("275712375971892375127591745810580123751.99999")),
         BigDecimal("14.19238571927581e6"),
-        BigDecimal("912834718237510238591285") / 2
+        BigDecimal("912834718237510238591285") / 2,
     )
     assert(wholes.forall(_.isWhole) && fracs.forall(!_.isWhole))
   }
@@ -38,15 +38,15 @@ class BigDecimalTest {
         BigDecimal(1),
         BigDecimal(19571.125),
         BigDecimal.decimal(0.1),
-        BigDecimal(1e15)
+        BigDecimal(1e15),
     )
     val invalids = List(
         BigDecimal(new BD("1.0000000000000000000000000000000000000000001")),
         BigDecimal("10e1000000"),
-        BigDecimal("10e-1000000")
+        BigDecimal("10e-1000000"),
     )
     assert(
-        valids.forall(_.isDecimalDouble) && invalids.forall(!_.isDecimalDouble)
+        valids.forall(_.isDecimalDouble) && invalids.forall(!_.isDecimalDouble),
     )
   }
 
@@ -60,7 +60,7 @@ class BigDecimalTest {
         reasonable.hashCode == reasonableInt.hashCode &&
         reasonable == reasonableInt && reasonableInt == reasonable &&
         troublemaker.hashCode != reasonable.hashCode &&
-        !(troublemaker == reasonableInt) && !(reasonableInt == troublemaker)
+        !(troublemaker == reasonableInt) && !(reasonableInt == troublemaker),
     )
   }
 
@@ -77,7 +77,7 @@ class BigDecimalTest {
         isIAE(new BigDecimal(null: BD, new MC(2))) &&
         isIAE(new BigDecimal(new BD("5.7"), null: MC)) &&
         isNPE(BigDecimal(null: BigInt)) && isNPE(BigDecimal(null: String)) &&
-        isNPE(BigDecimal(null: Array[Char]))
+        isNPE(BigDecimal(null: Array[Char])),
     )
   }
 
@@ -91,7 +91,7 @@ class BigDecimalTest {
     assert(
         d.## == l.## && l.## == bd.## &&
         bd.## == bi.## && (bd pow 4).hashCode == (bi pow 4).hashCode &&
-        BigDecimal("1e150000").hashCode != BigDecimal("1e150000").toBigInt.hashCode
+        BigDecimal("1e150000").hashCode != BigDecimal("1e150000").toBigInt.hashCode,
     )
   }
 
@@ -108,7 +108,7 @@ class BigDecimalTest {
         BigDecimal(new BD("0.1")),
         BigDecimal(1L, 1),
         BigDecimal(1) / BigDecimal(10),
-        BigDecimal(10).pow(-1)
+        BigDecimal(10).pow(-1),
     )
     for (a <- tenths; b <- tenths) assert(
         a == b, s"$a != $b but both should be 0.1")
@@ -134,7 +134,7 @@ class BigDecimalTest {
             BigDecimal(BigInt(1234567890), 1, mc6),
             BigDecimal.decimal(123456789, mc6),
             BigDecimal.decimal(123456789d, mc6),
-            BigDecimal.decimal(new BD("123456789"), mc6)
+            BigDecimal.decimal(new BD("123456789"), mc6),
         ),
         List(
             123456789,
@@ -151,8 +151,8 @@ class BigDecimalTest {
             BigDecimal(BigInt(1234567890), 1),
             BigDecimal.decimal(123456789),
             BigDecimal.decimal(123456789d),
-            BigDecimal.valueOf(123456789d, mc6)
-        )
+            BigDecimal.valueOf(123456789d, mc6),
+        ),
     )
     sameRounding.map(_.zipWithIndex).foreach {
       case xs =>
@@ -175,7 +175,7 @@ class BigDecimalTest {
     val same = List[Any](
         BigInt(text),
         BigDecimal(text),
-        BigDecimal(new BD(text))
+        BigDecimal(new BD(text)),
     )
     for (a <- same; b <- same) assert(
         a == b, s"$a != $b but should be the same")
@@ -224,7 +224,7 @@ class BigDecimalTest {
         BigDecimal.binary(0.1, new MC(25)),
         BigDecimal.exact(0.1),
         BigDecimal.exact(0.1f),
-        BigDecimal.decimal((0.1f).toDouble)
+        BigDecimal.decimal((0.1f).toDouble),
     )
     for (a <- different; b <- different if (a ne b)) assert(
         a != b, "BigDecimal representations of Double mistakenly conflated")

@@ -128,7 +128,7 @@ class UTF8StringPropertyCheckSuite
     forAll(
         whitespaceString,
         randomString,
-        whitespaceString
+        whitespaceString,
     ) { (start: String, middle: String, end: String) =>
       val s = start + middle + end
       assert(toUTF8(s).trim() === toUTF8(s.trim()))
@@ -188,7 +188,7 @@ class UTF8StringPropertyCheckSuite
     forAll(
         randomString,
         randomString,
-        randomInt
+        randomInt,
     ) { (s: String, pad: String, length: Int) =>
       assert(toUTF8(s).lpad(length, toUTF8(pad)) === toUTF8(
               padding(s, pad, length, true)))

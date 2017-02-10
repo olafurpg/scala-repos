@@ -73,7 +73,7 @@ object SourceGenerator {
     ScalaFormatter.format(
         code,
         scalariformPreferences,
-        scalaVersion = pureScalaVersion(scalaVersion)
+        scalaVersion = pureScalaVersion(scalaVersion),
     )
   }
 

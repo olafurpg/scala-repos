@@ -18,7 +18,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] Xor G[A]) {
       implicit F: CoflatMap[F], G: CoflatMap[G]): Coproduct[F, G, B] =
     Coproduct(
         run.bimap(a => F.coflatMap(a)(x => f(leftc(x))),
-                  a => G.coflatMap(a)(x => f(rightc(x))))
+                  a => G.coflatMap(a)(x => f(rightc(x)))),
     )
 
   def coflatten(implicit F: CoflatMap[F],
@@ -52,7 +52,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] Xor G[A]) {
       A: Applicative[X]): X[Coproduct[F, G, B]] =
     run.fold(
         x => A.map(F.traverse(x)(g))(leftc(_)),
-        x => A.map(G.traverse(x)(g))(rightc(_))
+        x => A.map(G.traverse(x)(g))(rightc(_)),
     )
 
   def isLeft: Boolean =

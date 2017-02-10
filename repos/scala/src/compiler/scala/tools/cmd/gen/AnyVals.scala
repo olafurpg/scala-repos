@@ -160,7 +160,7 @@ import scala.language.implicitConversions"""
       val xs2 = List(
           mkBinOpsGroup(comparisonOps, numeric, _ => Z),
           mkBinOpsGroup(bitwiseOps, cardinal, this opType _),
-          mkBinOpsGroup(otherOps, numeric, this opType _)
+          mkBinOpsGroup(otherOps, numeric, this opType _),
       )
       xs1 ++ xs2
     }
@@ -202,7 +202,7 @@ import scala.language.implicitConversions"""
     def classLines: List[String]
     def objectLines: List[String]
     def commonClassLines = List(
-        "override def getClass(): Class[@name@] = null"
+        "override def getClass(): Class[@name@] = null",
     )
 
     def lcname = name.toLowerCase
@@ -238,7 +238,7 @@ import scala.language.implicitConversions"""
         "@unboxImpl@" -> "x.asInstanceOf[%s].%sValue()".format(
             boxedName, lcname),
         "@unboxDoc@" -> "the %s resulting from calling %sValue() on `x`"
-          .format(name, lcname)
+          .format(name, lcname),
     )
     def interpolations =
       Map(
@@ -247,7 +247,7 @@ import scala.language.implicitConversions"""
           "@javaequiv@" -> javaEquiv,
           "@boxed@" -> boxedName,
           "@lcname@" -> lcname,
-          "@zero@" -> zeroRep
+          "@zero@" -> zeroRep,
       ) ++ boxUnboxImpls
 
     def interpolate(s: String): String = interpolations.foldLeft(s) {
@@ -269,7 +269,7 @@ import scala.language.implicitConversions"""
           classDoc,
           mkClass,
           objectDoc,
-          mkObject
+          mkObject,
       ) mkString ""
 
     def assemble(decl: String, lines: List[String]): String = {
@@ -480,7 +480,7 @@ override def getClass(): Class[Boolean] = null
  */
 """
     def classLines = List(
-        """override def getClass(): Class[Unit] = null"""
+        """override def getClass(): Class[Unit] = null""",
     )
     def objectLines = interpolate(allCompanions).lines.toList
 
@@ -489,7 +489,7 @@ override def getClass(): Class[Boolean] = null
         "@boxImpl@" -> "scala.runtime.BoxedUnit.UNIT",
         "@unboxRunTimeDoc@" -> "",
         "@unboxImpl@" -> "()",
-        "@unboxDoc@" -> "the Unit value ()"
+        "@unboxDoc@" -> "the Unit value ()",
     )
   }
 

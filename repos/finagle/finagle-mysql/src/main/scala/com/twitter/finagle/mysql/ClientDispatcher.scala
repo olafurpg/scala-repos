@@ -30,7 +30,7 @@ case class LostSyncException(underlying: Throwable)
   */
 private[mysql] class PrepareCache(
     svc: Service[Request, Result],
-    max: Int = 20
+    max: Int = 20,
 )
     extends ServiceProxy[Request, Result](svc) {
 
@@ -80,7 +80,7 @@ object ClientDispatcher {
     */
   def apply(
       trans: Transport[Packet, Packet],
-      handshake: HandshakeInit => Try[HandshakeResponse]
+      handshake: HandshakeInit => Try[HandshakeResponse],
   ): Service[Request, Result] = {
     new PrepareCache(new ClientDispatcher(trans, handshake))
   }
@@ -105,7 +105,7 @@ object ClientDispatcher {
   */
 class ClientDispatcher(
     trans: Transport[Packet, Packet],
-    handshake: HandshakeInit => Try[HandshakeResponse]
+    handshake: HandshakeInit => Try[HandshakeResponse],
 )
     extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans) {
   import ClientDispatcher._
@@ -178,7 +178,7 @@ class ClientDispatcher(
   private[this] def decodePacket(
       packet: Packet,
       cmd: Byte,
-      signal: Promise[Unit]
+      signal: Promise[Unit],
   ): Future[Result] = packet.body.headOption match {
     case Some(Packet.OkByte) if cmd == Command.COM_STMT_PREPARE =>
       // decode PrepareOk Result: A header packet potentially followed

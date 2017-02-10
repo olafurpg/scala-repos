@@ -9,7 +9,7 @@ object RandomEngineFactory extends IEngineFactory {
         classOf[LIdentityPreparator[FriendRecommendationTrainingData]],
         Map("RandomAlgorithm" -> classOf[RandomAlgorithm]),
         classOf[LFirstServing[
-                FriendRecommendationQuery, FriendRecommendationPrediction]]
+                FriendRecommendationQuery, FriendRecommendationPrediction]],
     )
   }
 }

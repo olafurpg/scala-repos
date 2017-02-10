@@ -13,13 +13,13 @@ private[lobby] object Biter {
   def apply(hook: Hook, uid: String, user: Option[LobbyUser]): Fu[JoinHook] =
     canJoin(hook, user).fold(
         join(hook, uid, user),
-        fufail(s"$user cannot bite hook $hook")
+        fufail(s"$user cannot bite hook $hook"),
     )
 
   def apply(seek: Seek, user: LobbyUser): Fu[JoinSeek] =
     canJoin(seek, user).fold(
         join(seek, user),
-        fufail(s"$user cannot join seek $seek")
+        fufail(s"$user cannot join seek $seek"),
     )
 
   private def join(hook: Hook,
@@ -33,7 +33,7 @@ private[lobby] object Biter {
       game = blame(
           !creatorColor,
           userOption,
-          blame(creatorColor, ownerOption, makeGame(hook))
+          blame(creatorColor, ownerOption, makeGame(hook)),
       ).start
       _ ← GameRepo insertDenormalized game
     } yield JoinHook(uid, hook, game, creatorColor)
@@ -46,7 +46,7 @@ private[lobby] object Biter {
       game = blame(
           !creatorColor,
           user.some,
-          blame(creatorColor, owner.some, makeGame(seek))
+          blame(creatorColor, owner.some, makeGame(seek)),
       ).start
       _ ← GameRepo insertDenormalized game
     } yield JoinSeek(user.id, seek, game, creatorColor)
@@ -92,7 +92,7 @@ private[lobby] object Biter {
   def canJoin(hook: Hook, user: Option[LobbyUser]): Boolean =
     hook.realMode.casual.fold(
         user.isDefined || hook.allowAnon,
-        user ?? { _.lame == hook.lame }
+        user ?? { _.lame == hook.lame },
     ) && !(hook.userId ?? (user ?? (_.blocking)).contains) && !((user map
             (_.id)) ?? (hook.user ?? (_.blocking)).contains) &&
     hook.realRatingRange.fold(true) { range =>

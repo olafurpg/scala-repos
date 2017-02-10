@@ -97,7 +97,7 @@ object UserRepo {
     coll
       .find(
           BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(u1, u2))),
-          BSONDocument(s"${F.count}.game" -> true)
+          BSONDocument(s"${F.count}.game" -> true),
       )
       .cursor[BSONDocument]()
       .collect[List]() map { docs =>
@@ -118,7 +118,7 @@ object UserRepo {
         coll
           .find(
               BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(u1, u2))),
-              BSONDocument("_id" -> true)
+              BSONDocument("_id" -> true),
           )
           .sort(BSONDocument(F.colorIt -> 1))
           .one[BSONDocument]
@@ -147,14 +147,14 @@ object UserRepo {
       }
     diff.nonEmpty ?? $update(
         $select(user.id),
-        BSONDocument("$set" -> BSONDocument(diff))
+        BSONDocument("$set" -> BSONDocument(diff)),
     )
   }
 
   def setPerf(userId: String, perfName: String, perf: Perf) =
     $update($select(userId),
             $setBson(
-                s"${F.perfs}.$perfName" -> Perf.perfBSONHandler.write(perf)
+                s"${F.perfs}.$perfName" -> Perf.perfBSONHandler.write(perf),
             ))
 
   def setProfile(id: ID, profile: Profile): Funit =
@@ -215,10 +215,10 @@ object UserRepo {
             case 1 => "count.winH".some
             case 0 => "count.drawH".some
             case _ => none
-          }) ifFalse ai
+          }) ifFalse ai,
       ).flatten.map(_ -> 1) ::: List(
           totalTime map (s"${F.playTime}.total" -> _),
-          tvTime map (s"${F.playTime}.tv" -> _)
+          tvTime map (s"${F.playTime}.tv" -> _),
       ).flatten
 
     $update($select(id), $incBson(incs: _*))
@@ -296,7 +296,7 @@ object UserRepo {
         $select.byId($regex(regex)) ++ enabledSelect,
         F.username,
         _ sort $sort.desc("_id"),
-        max.some
+        max.some,
     )(_.asOpt[String])
   }
 
@@ -331,8 +331,8 @@ object UserRepo {
       BSONDocument("$set" -> BSONDocument("enabled" -> false)) ++ user.lameOrTroll
         .fold(
           BSONDocument(),
-          BSONDocument("$unset" -> BSONDocument("email" -> true))
-      )
+          BSONDocument("$unset" -> BSONDocument("email" -> true)),
+      ),
   )
 
   def passwd(id: ID, password: String): Funit =
@@ -356,7 +356,7 @@ object UserRepo {
     coll
       .find(
           BSONDocument("_id" -> id),
-          BSONDocument(s"${F.perfs}.${perfType.key}" -> true)
+          BSONDocument(s"${F.perfs}.${perfType.key}" -> true),
       )
       .one[BSONDocument]
       .map {
@@ -374,7 +374,7 @@ object UserRepo {
                       F.enabled -> true,
                       "seenAt" -> BSONDocument("$gt" -> since),
                       "count.game" -> BSONDocument("$gt" -> 9),
-                      "kid" -> BSONDocument("$ne" -> true)
+                      "kid" -> BSONDocument("$ne" -> true),
                   ).some) map lila.db.BSON.asStrings
 
   def setLang(id: ID, lang: String) = $update.field(id, "lang", lang)
@@ -384,7 +384,7 @@ object UserRepo {
       .aggregate(Match(BSONDocument("_id" -> BSONDocument("$in" -> ids))),
                  List(Group(BSONNull)(F.toints -> SumField(F.toints))))
       .map(
-          _.documents.headOption flatMap { _.getAs[Int](F.toints) }
+          _.documents.headOption flatMap { _.getAs[Int](F.toints) },
       )
       .map(~_)
 
@@ -396,7 +396,7 @@ object UserRepo {
     coll.count(
         BSONDocument(
             "_id" -> BSONDocument("$in" -> userIds),
-            F.engine -> true
+            F.engine -> true,
         ).some)
 
   def mustConfirmEmail(id: String): Fu[Boolean] =

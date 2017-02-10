@@ -81,7 +81,7 @@ sealed class AnnotatingTracingFilter[Req, Rep](
     after: Annotation,
     afterFailure: String => Annotation,
     finagleVersion: () => String = () => Init.finagleVersion,
-    traceMetaData: Boolean = true
+    traceMetaData: Boolean = true,
 )
     extends SimpleFilter[Req, Rep] {
   def this(label: String,
@@ -141,7 +141,7 @@ object ServerTracingFilter {
 
   case class TracingFilter[Req, Rep](
       label: String,
-      finagleVersion: () => String = () => Init.finagleVersion
+      finagleVersion: () => String = () => Init.finagleVersion,
   )
       extends AnnotatingTracingFilter[Req, Rep](label,
                                                 "srv",
@@ -170,7 +170,7 @@ object ClientTracingFilter {
 
   case class TracingFilter[Req, Rep](
       label: String,
-      finagleVersion: () => String = () => Init.finagleVersion
+      finagleVersion: () => String = () => Init.finagleVersion,
   )
       extends AnnotatingTracingFilter[Req, Rep](label,
                                                 "clnt",
@@ -199,7 +199,7 @@ private[finagle] object WireTracingFilter {
 
   case class TracingFilter[Req, Rep](
       label: String,
-      finagleVersion: () => String = () => Init.finagleVersion
+      finagleVersion: () => String = () => Init.finagleVersion,
   )
       extends AnnotatingTracingFilter[Req, Rep](label,
                                                 "clnt",

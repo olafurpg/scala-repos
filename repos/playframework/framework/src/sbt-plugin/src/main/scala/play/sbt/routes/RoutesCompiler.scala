@@ -99,7 +99,7 @@ object RoutesCompiler extends AutoPlugin {
           configuration.value.name),
       routes <<= compileRoutesFiles,
       sourceGenerators <+= routes,
-      managedSourceDirectories <+= target in routes
+      managedSourceDirectories <+= target in routes,
   )
 
   def defaultSettings = Seq(
@@ -126,7 +126,7 @@ object RoutesCompiler extends AutoPlugin {
       },
       namespaceReverseRouter := false,
       routesGenerator := InjectedRoutesGenerator, // changed from StaticRoutesGenerator in 2.5.0
-      sourcePositionMappers += routesPositionMapper
+      sourcePositionMappers += routesPositionMapper,
   )
 
   private val compileRoutesFiles = Def.task[Seq[File]] {

@@ -79,7 +79,7 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
                                     intRatingLens(perfsW) -
                                     intRatingLens(white.perfs),
                                     intRatingLens(perfsB) -
-                                    intRatingLens(black.perfs))
+                                    intRatingLens(black.perfs)),
         ) zip UserRepo.setPerfs(white, perfsW, white.perfs) zip UserRepo
           .setPerfs(black, perfsB, black.perfs) zip historyApi.add(
             white,

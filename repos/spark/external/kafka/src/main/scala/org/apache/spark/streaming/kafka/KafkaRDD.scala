@@ -52,7 +52,7 @@ private[kafka] class KafkaRDD[K : ClassTag,
     kafkaParams: Map[String, String],
     val offsetRanges: Array[OffsetRange],
     leaders: Map[TopicAndPartition, (String, Int)],
-    messageHandler: MessageAndMetadata[K, V] => R
+    messageHandler: MessageAndMetadata[K, V] => R,
 )
     extends RDD[R](sc, Nil) with Logging with HasOffsetRanges {
   override def getPartitions: Array[Partition] = {
@@ -68,7 +68,7 @@ private[kafka] class KafkaRDD[K : ClassTag,
 
   override def countApprox(
       timeout: Long,
-      confidence: Double = 0.95
+      confidence: Double = 0.95,
   ): PartialResult[BoundedDouble] = {
     val c = count
     new PartialResult(new BoundedDouble(c, 1.0, c, c), true)
@@ -175,7 +175,7 @@ private[kafka] class KafkaRDD[K : ClassTag,
                 throw new SparkException(
                     s"Couldn't connect to leader for topic ${part.topic} ${part.partition}: " +
                     errs.mkString("\n")),
-              consumer => consumer
+              consumer => consumer,
           )
       } else {
         kc.connect(part.host, part.port)
@@ -272,7 +272,7 @@ private[kafka] object KafkaRDD {
       kafkaParams: Map[String, String],
       fromOffsets: Map[TopicAndPartition, Long],
       untilOffsets: Map[TopicAndPartition, LeaderOffset],
-      messageHandler: MessageAndMetadata[K, V] => R
+      messageHandler: MessageAndMetadata[K, V] => R,
   ): KafkaRDD[K, V, U, T, R] = {
     val leaders = untilOffsets.map {
       case (tp, lo) =>

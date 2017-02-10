@@ -147,7 +147,7 @@ object eigSym extends UFunc {
         evs.data,
         work /* workspace */,
         lwork /* workspace size */,
-        info
+        info,
     )
     // A value of info.`val` < 0 would tell us that the i-th argument
     // of the call to dsyev was erroneous (where i == |info.`val`|).

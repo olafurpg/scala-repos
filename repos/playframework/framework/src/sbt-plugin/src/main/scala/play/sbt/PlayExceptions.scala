@@ -29,7 +29,7 @@ object PlayExceptions {
                   t => "%s: %s".format(t.getClass.getSimpleName, t.getMessage))
               .getOrElse("")
           },
-          unexpected.orNull
+          unexpected.orNull,
       )
 
   case class CompilationException(problem: xsbti.Problem)

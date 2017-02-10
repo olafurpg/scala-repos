@@ -496,7 +496,7 @@ abstract class LensInstances extends LensInstances0 {
                 val c = a run x
                 val (p, q) = c.pos
                 IndexedStore(a => c.put((p, a)): R, q)
-            })
+            }),
         )
     }
 
@@ -508,7 +508,7 @@ abstract class LensInstances extends LensInstances0 {
     /** Setting the value of this lens will change whether or not it is present in the set */
     def contains(key: K) = lensFamilyg[S1, S2, Boolean, Boolean](
         s => b => lens.mod(m => if (b) m + key else m - key, s): Id[S2],
-        s => lens.get(s).contains(key)
+        s => lens.get(s).contains(key),
     )
 
     def &=(that: Set[K]): IndexedState[S1, S2, Set[K]] =
@@ -659,7 +659,7 @@ abstract class LensInstances extends LensInstances0 {
                            copy
                        },
                        s): Id[S2],
-          s => lens.get(s) apply n
+          s => lens.get(s) apply n,
       )
 
     def length: State[S1, Int] =

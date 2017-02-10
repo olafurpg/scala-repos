@@ -29,7 +29,7 @@ class FakePsiMethod(
     name: String,
     val params: Array[Parameter],
     val retType: ScType,
-    hasModifier: String => Boolean
+    hasModifier: String => Boolean,
 )
     extends {
   val project: Project = navElement.getProject

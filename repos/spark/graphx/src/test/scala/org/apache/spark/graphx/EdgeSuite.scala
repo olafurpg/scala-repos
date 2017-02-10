@@ -27,7 +27,7 @@ class EdgeSuite extends SparkFunSuite {
         Edge(0x2345L, 0x1234L, 1),
         Edge(0x1234L, 0x5678L, 1),
         Edge(0x1234L, 0x2345L, 1),
-        Edge(-0x7FEDCBA987654321L, 0x7FEDCBA987654321L, 1)
+        Edge(-0x7FEDCBA987654321L, 0x7FEDCBA987654321L, 1),
     )
     // to ascending order
     val sortedEdges = testEdges.sorted(Edge.lexicographicOrdering[Int])

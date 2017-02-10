@@ -105,7 +105,7 @@ class ObjectMapping1[R, A1](apply: Function1[A1, R],
       case Right(values) => {
           applyConstraints(
               apply(
-                  values(0).asInstanceOf[A1]
+                  values(0).asInstanceOf[A1],
               ))
         }
     }
@@ -161,7 +161,7 @@ class ObjectMapping2[R, A1, A2](apply: Function2[A1, A2, R],
           applyConstraints(
               apply(
                   values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2]
+                  values(1).asInstanceOf[A2],
               ))
         }
     }
@@ -223,7 +223,7 @@ class ObjectMapping3[R, A1, A2, A3](
               apply(
                   values(0).asInstanceOf[A1],
                   values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3]
+                  values(2).asInstanceOf[A3],
               ))
         }
     }
@@ -296,7 +296,7 @@ class ObjectMapping4[R, A1, A2, A3, A4](
                   values(0).asInstanceOf[A1],
                   values(1).asInstanceOf[A2],
                   values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4]
+                  values(3).asInstanceOf[A4],
               ))
         }
     }
@@ -382,7 +382,7 @@ class ObjectMapping5[R, A1, A2, A3, A4, A5](
                   values(1).asInstanceOf[A2],
                   values(2).asInstanceOf[A3],
                   values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5]
+                  values(4).asInstanceOf[A5],
               ))
         }
     }
@@ -476,7 +476,7 @@ class ObjectMapping6[R, A1, A2, A3, A4, A5, A6](
                   values(2).asInstanceOf[A3],
                   values(3).asInstanceOf[A4],
                   values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6]
+                  values(5).asInstanceOf[A6],
               ))
         }
     }
@@ -577,7 +577,7 @@ class ObjectMapping7[R, A1, A2, A3, A4, A5, A6, A7](
                   values(3).asInstanceOf[A4],
                   values(4).asInstanceOf[A5],
                   values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7]
+                  values(6).asInstanceOf[A7],
               ))
         }
     }
@@ -697,7 +697,7 @@ class ObjectMapping8[R, A1, A2, A3, A4, A5, A6, A7, A8](
                   values(4).asInstanceOf[A5],
                   values(5).asInstanceOf[A6],
                   values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8]
+                  values(7).asInstanceOf[A8],
               ))
         }
     }
@@ -825,7 +825,7 @@ class ObjectMapping9[R, A1, A2, A3, A4, A5, A6, A7, A8, A9](
                   values(5).asInstanceOf[A6],
                   values(6).asInstanceOf[A7],
                   values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9]
+                  values(8).asInstanceOf[A9],
               ))
         }
     }
@@ -961,7 +961,7 @@ class ObjectMapping10[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
                   values(6).asInstanceOf[A7],
                   values(7).asInstanceOf[A8],
                   values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10]
+                  values(9).asInstanceOf[A10],
               ))
         }
     }
@@ -1106,7 +1106,7 @@ class ObjectMapping11[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11](
                   values(7).asInstanceOf[A8],
                   values(8).asInstanceOf[A9],
                   values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11]
+                  values(10).asInstanceOf[A11],
               ))
         }
     }
@@ -1260,7 +1260,7 @@ class ObjectMapping12[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12](
                   values(8).asInstanceOf[A9],
                   values(9).asInstanceOf[A10],
                   values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12]
+                  values(11).asInstanceOf[A12],
               ))
         }
     }
@@ -1424,7 +1424,7 @@ class ObjectMapping13[
                   values(9).asInstanceOf[A10],
                   values(10).asInstanceOf[A11],
                   values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13]
+                  values(12).asInstanceOf[A13],
               ))
         }
     }
@@ -1598,7 +1598,7 @@ class ObjectMapping14[
                   values(10).asInstanceOf[A11],
                   values(11).asInstanceOf[A12],
                   values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14]
+                  values(13).asInstanceOf[A14],
               ))
         }
     }
@@ -1783,7 +1783,7 @@ class ObjectMapping15[
                   values(11).asInstanceOf[A12],
                   values(12).asInstanceOf[A13],
                   values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15]
+                  values(14).asInstanceOf[A15],
               ))
         }
     }
@@ -1991,7 +1991,7 @@ class ObjectMapping16[
                   values(12).asInstanceOf[A13],
                   values(13).asInstanceOf[A14],
                   values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16]
+                  values(15).asInstanceOf[A16],
               ))
         }
     }
@@ -2257,7 +2257,7 @@ class ObjectMapping17[R,
                   values(13).asInstanceOf[A14],
                   values(14).asInstanceOf[A15],
                   values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17]
+                  values(16).asInstanceOf[A17],
               ))
         }
     }
@@ -2563,7 +2563,7 @@ class ObjectMapping18[R,
                   values(14).asInstanceOf[A15],
                   values(15).asInstanceOf[A16],
                   values(16).asInstanceOf[A17],
-                  values(17).asInstanceOf[A18]
+                  values(17).asInstanceOf[A18],
               ))
         }
     }
@@ -2883,7 +2883,7 @@ class ObjectMapping19[R,
                   values(15).asInstanceOf[A16],
                   values(16).asInstanceOf[A17],
                   values(17).asInstanceOf[A18],
-                  values(18).asInstanceOf[A19]
+                  values(18).asInstanceOf[A19],
               ))
         }
     }
@@ -3218,7 +3218,7 @@ class ObjectMapping20[R,
                   values(16).asInstanceOf[A17],
                   values(17).asInstanceOf[A18],
                   values(18).asInstanceOf[A19],
-                  values(19).asInstanceOf[A20]
+                  values(19).asInstanceOf[A20],
               ))
         }
     }
@@ -3567,7 +3567,7 @@ class ObjectMapping21[R,
                   values(17).asInstanceOf[A18],
                   values(18).asInstanceOf[A19],
                   values(19).asInstanceOf[A20],
-                  values(20).asInstanceOf[A21]
+                  values(20).asInstanceOf[A21],
               ))
         }
     }
@@ -3930,7 +3930,7 @@ class ObjectMapping22[R,
                   values(18).asInstanceOf[A19],
                   values(19).asInstanceOf[A20],
                   values(20).asInstanceOf[A21],
-                  values(21).asInstanceOf[A22]
+                  values(21).asInstanceOf[A22],
               ))
         }
     }

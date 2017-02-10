@@ -40,7 +40,7 @@ class PolynomialExpansionSuite
       Vectors.dense(-2.0, 2.3),
       Vectors.dense(0.0, 0.0, 0.0),
       Vectors.dense(0.6, -1.1, -3.0),
-      Vectors.sparse(3, Seq())
+      Vectors.sparse(3, Seq()),
   )
 
   private val twoDegreeExpansion: Array[Vector] = Array(

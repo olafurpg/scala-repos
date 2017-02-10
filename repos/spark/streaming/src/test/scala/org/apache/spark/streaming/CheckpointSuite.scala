@@ -84,7 +84,7 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
       expectedOutput: Seq[Seq[V]],
       numBatchesBeforeRestart: Int,
       batchDuration: Duration = Milliseconds(500),
-      stopSparkContextAfterTest: Boolean = true
+      stopSparkContextAfterTest: Boolean = true,
   ) {
     require(
         numBatchesBeforeRestart < expectedOutput.size,
@@ -125,7 +125,7 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     logInfo(
         "\n-------------------------------------------\n" +
         "        Restarting stream computation          " +
-        "\n-------------------------------------------\n"
+        "\n-------------------------------------------\n",
     )
 
     val restartedSsc = new StreamingContext(checkpointDir)
@@ -160,7 +160,7 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
       ssc: StreamingContext,
       targetBatchTime: Time,
       checkpointDir: String,
-      stopSparkContext: Boolean
+      stopSparkContext: Boolean,
   ): Seq[Seq[V]] = {
     try {
       val batchDuration = ssc.graph.batchDuration
@@ -468,9 +468,9 @@ class CheckpointSuite
             Seq(),
             Seq(("a", 2), ("b", 1)),
             Seq(("", 2)),
-            Seq()
+            Seq(),
         ),
-        3
+        3,
     )
   }
 
@@ -520,7 +520,7 @@ class CheckpointSuite
               Seq(("a", 2), ("b", 1)),
               Seq(("", 2)),
               Seq()),
-          3
+          3,
       )
     } finally {
       Utils.deleteRecursively(tempDir)
@@ -554,7 +554,7 @@ class CheckpointSuite
               Seq(("a", 2), ("b", 1)),
               Seq(("", 2)),
               Seq()),
-          3
+          3,
       )
     } finally {
       Utils.deleteRecursively(tempDir)
@@ -609,7 +609,7 @@ class CheckpointSuite
               Seq(("a", 2), ("b", 1)),
               Seq(("", 2)),
               Seq()),
-          3
+          3,
       )
     } finally {
       Utils.deleteRecursively(tempDir)
@@ -880,7 +880,7 @@ class CheckpointSuite
     // create a class which is invisible to app class loader
     val jar = TestUtils.createJarWithClasses(
         classNames = Seq("testClz"),
-        toStringValue = "testStringValue"
+        toStringValue = "testStringValue",
     )
 
     // invisible to current class loader

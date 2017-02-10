@@ -38,15 +38,15 @@ object BuildCommons {
       "catalyst",
       "sql",
       "hive",
-      "hive-thriftserver"
+      "hive-thriftserver",
   ).map(ProjectRef(buildLocation, _))
 
   val streamingProjects @ Seq(
   streaming,
-  streamingKafka
+  streamingKafka,
   ) = Seq(
       "streaming",
-      "streaming-kafka"
+      "streaming-kafka",
   ).map(ProjectRef(buildLocation, _))
 
   val allProjects @ Seq(
@@ -60,7 +60,7 @@ object BuildCommons {
   unsafe,
   testTags,
   sketch,
-  _ *
+  _ *,
   ) =
     Seq(
         "core",
@@ -72,7 +72,7 @@ object BuildCommons {
         "launcher",
         "unsafe",
         "test-tags",
-        "sketch"
+        "sketch",
     ).map(ProjectRef(buildLocation, _)) ++ sqlProjects ++ streamingProjects
 
   val optionallyEnabledProjects @ Seq(yarn,
@@ -213,7 +213,7 @@ object SparkBuild extends PomBuild {
             Resolver.mavenLocal,
             Resolver.file("local",
                           file(Path.userHome.absolutePath + "/.ivy2/local"))(
-                Resolver.ivyStylePatterns)
+                Resolver.ivyStylePatterns),
         ),
         externalResolvers := resolvers.value,
         otherResolvers <<= SbtPomKeys.mvnLocalRepository(
@@ -242,14 +242,14 @@ object SparkBuild extends PomBuild {
             "-encoding",
             "UTF-8",
             "-source",
-            javacJVMVersion.value
+            javacJVMVersion.value,
         ),
         // This -target option cannot be set in the Compile configuration scope since `javadoc` doesn't
         // play nicely with it; see https://github.com/sbt/sbt/issues/355#issuecomment-3817629 for
         // additional discussion and explanation.
         javacOptions in (Compile, compile) ++= Seq(
             "-target",
-            javacJVMVersion.value
+            javacJVMVersion.value,
         ),
         scalacOptions in Compile ++= Seq(
             s"-target:jvm-${scalacJVMVersion.value}",
@@ -295,7 +295,7 @@ object SparkBuild extends PomBuild {
             sys.error(s"$failed fatal warnings")
           }
           analysis
-        }
+        },
     )
 
   def enable(settings: Seq[Setting[_]])(projectRef: ProjectRef) = {
@@ -326,7 +326,7 @@ object SparkBuild extends PomBuild {
         networkYarn,
         unsafe,
         testTags,
-        sketch
+        sketch,
     ).contains(x)
   }
 
@@ -409,7 +409,7 @@ object SparkBuild extends PomBuild {
         (runMain in Compile)
           .toTask(" org.apache.spark.sql.hive.thriftserver.SparkSQLCLIDriver")
           .value
-      }
+      },
       ))(assembly)
 
   enable(Seq(sparkShell := sparkShell in "assembly"))(spark)
@@ -426,14 +426,14 @@ object SparkBuild extends PomBuild {
 object Unsafe {
   lazy val settings = Seq(
       // This option is needed to suppress warnings from sun.misc.Unsafe usage
-      javacOptions in Compile += "-XDignore.symbol.file"
+      javacOptions in Compile += "-XDignore.symbol.file",
   )
 }
 
 object DockerIntegrationTests {
   // This serves to override the override specified in DependencyOverrides:
   lazy val settings = Seq(
-      dependencyOverrides += "com.google.guava" % "guava" % "18.0"
+      dependencyOverrides += "com.google.guava" % "guava" % "18.0",
   )
 }
 
@@ -453,7 +453,7 @@ object ExcludedDependencies {
   lazy val settings = Seq(
       libraryDependencies ~= { libs =>
         libs.filterNot(_.name == "groovy-all")
-      }
+      },
   )
 }
 
@@ -474,7 +474,7 @@ object OldDeps {
   def oldDepsSettings() = Defaults.coreDefaultSettings ++ Seq(
       name := "old-deps",
       scalaVersion := "2.10.5",
-      libraryDependencies := allPreviousArtifactKeys.value.flatten
+      libraryDependencies := allPreviousArtifactKeys.value.flatten,
   )
 }
 
@@ -532,7 +532,7 @@ object Catalyst {
       // Include ANTLR tokens files.
       resourceGenerators in Compile += Def.task {
         ((sourceManaged in Compile).value ** "*.tokens").get.toSeq
-      }.taskValue
+      }.taskValue,
   )
 }
 
@@ -557,7 +557,7 @@ object SQL {
         |import sqlContext.implicits._
         |import sqlContext._
       """.stripMargin,
-      cleanupCommands in console := "sc.stop()"
+      cleanupCommands in console := "sc.stop()",
   )
 }
 
@@ -593,7 +593,7 @@ object Hive {
       // new query tests.
       fullClasspath in Test := (fullClasspath in Test).value.filterNot { f =>
         f.toString.contains("jcl-over")
-      }
+      },
   )
 }
 
@@ -659,7 +659,7 @@ object Assembly {
             }
           }
         },
-        assembly <<= assembly.dependsOn(deployDatanucleusJars)
+        assembly <<= assembly.dependsOn(deployDatanucleusJars),
     )
 }
 
@@ -680,7 +680,7 @@ object PySparkAssembly {
         zipFile.delete()
         zipRecursive(src, zipFile)
         Seq[File]()
-      }
+      },
   )
 
   private def zipRecursive(source: File, destZipFile: File) = {
@@ -788,7 +788,7 @@ object Unidoc {
             packageList(
                 "streaming.api.java",
                 "streaming.kafka",
-                "streaming.kinesis"
+                "streaming.kinesis",
             ),
             "-group",
             "MLlib",
@@ -824,7 +824,7 @@ object Unidoc {
                 "ml.param",
                 "ml.recommendation",
                 "ml.regression",
-                "ml.tuning"
+                "ml.tuning",
             ),
             "-group",
             "Spark SQL",
@@ -832,7 +832,7 @@ object Unidoc {
                         "sql.api.java.types",
                         "sql.hive.api.java"),
             "-noqualifier",
-            "java.lang"
+            "java.lang",
         ),
         // Use GitHub repository for Scaladoc source links
         unidocSourceBase :=
@@ -845,7 +845,7 @@ object Unidoc {
               Opts.doc.sourceUrl(unidocSourceBase.value + "€{FILE_PATH}.scala")
             } else {
               Seq()
-            })
+            }),
     )
 }
 
@@ -876,7 +876,7 @@ object CopyDependencies {
           }
       },
       crossTarget in (Compile, packageBin) := destPath.value,
-      packageBin in Compile <<= (packageBin in Compile).dependsOn(copyDeps)
+      packageBin in Compile <<= (packageBin in Compile).dependsOn(copyDeps),
   )
 }
 
@@ -887,7 +887,7 @@ object Java8TestSettings {
       javacJVMVersion := "1.8",
       // Targeting Java 8 bytecode is only supported in Scala 2.11.4 and higher:
       scalacJVMVersion :=
-      (if (System.getProperty("scala-2.10") == "true") "1.7" else "1.8")
+      (if (System.getProperty("scala-2.10") == "true") "1.7" else "1.8"),
   )
 }
 
@@ -975,10 +975,10 @@ object TestSettings {
               "org.apache.spark.api.python",
               "org.apache.spark.network",
               "org.apache.spark.deploy",
-              "org.apache.spark.util.collection"
+              "org.apache.spark.util.collection",
           ).mkString(":"),
           "-doc-title",
-          "Spark " + version.value.replaceAll("-SNAPSHOT", "") + " ScalaDoc"
-      )
+          "Spark " + version.value.replaceAll("-SNAPSHOT", "") + " ScalaDoc",
+      ),
   )
 }

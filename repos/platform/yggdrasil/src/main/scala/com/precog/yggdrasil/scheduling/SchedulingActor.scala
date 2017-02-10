@@ -262,7 +262,7 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
                       }
                     } yield PrecogUnit
                 }
-            }
+            },
         ) flatMap {
           identity[Future[PrecogUnit]]
         } onFailure {

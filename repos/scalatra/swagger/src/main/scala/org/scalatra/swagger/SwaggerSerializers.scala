@@ -334,7 +334,7 @@ object SwaggerSerializers {
                 (json \ "description").getAs[String].flatMap(_.blankOption),
                 properties,
                 (json \ "extends").getAs[String].flatMap(_.blankOption),
-                (json \ "discriminator").getAs[String].flatMap(_.blankOption)
+                (json \ "discriminator").getAs[String].flatMap(_.blankOption),
             )
         }, {
           case x: Model =>
@@ -393,7 +393,7 @@ object SwaggerSerializers {
                   case JBool(value) => value
                   case _ => false
                 },
-                (json \ "paramAccess").getAs[String].flatMap(_.blankOption)
+                (json \ "paramAccess").getAs[String].flatMap(_.blankOption),
             )
         }, {
           case x: Parameter =>
@@ -424,7 +424,7 @@ object SwaggerSerializers {
                 (value \ "consumes").extract[List[String]],
                 (value \ "produces").extract[List[String]],
                 (value \ "protocols").extract[List[String]],
-                (value \ "authorizations").extract[List[String]]
+                (value \ "authorizations").extract[List[String]],
             )
         }, {
           case obj: Operation =>
@@ -486,7 +486,7 @@ object SwaggerSerializers {
                   .extractOpt[Map[String, Model]]
                   .getOrElse(Map.empty),
                 (json \ "authorizations").extractOrElse(List.empty[String]),
-                (json \ "position").extractOrElse(0)
+                (json \ "position").extractOrElse(0),
             )
         }, {
           case x: Api =>
@@ -539,7 +539,7 @@ object SwaggerSerializers {
                     (value \ "tokenRequestEndpoint" \ "clientIdName")
                       .as[String],
                     (value \ "tokenRequestEndpoint" \ "clientSecretName")
-                      .as[String]
+                      .as[String],
                 ),
                 TokenEndpoint(
                     (value \ "tokenEndpoint" \ "url").as[String],

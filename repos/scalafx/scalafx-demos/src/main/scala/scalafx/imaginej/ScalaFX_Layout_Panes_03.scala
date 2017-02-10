@@ -85,7 +85,7 @@ object ScalaFX_Layout_Panes_03 extends JFXApp {
       },
       new Text {
         text = "  Costs"
-      }
+      },
   )
   stage = new PrimaryStage {
     title = "ScalaFX Layout Panes 03"

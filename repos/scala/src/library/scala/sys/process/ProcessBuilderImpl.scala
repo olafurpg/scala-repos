@@ -40,7 +40,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
   private[process] class OStreamBuilder(
       stream: => OutputStream,
-      label: String
+      label: String,
   )
       extends ThreadBuilder(label, _ writeInput protect(stream)) {
     override def hasExitValue = false
@@ -48,7 +48,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
   private[process] class IStreamBuilder(
       stream: => InputStream,
-      label: String
+      label: String,
   )
       extends ThreadBuilder(label, _ processOutput protect(stream)) {
     override def hasExitValue = false
@@ -56,7 +56,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
   private[process] abstract class ThreadBuilder(
       override val toString: String,
-      runImpl: ProcessIO => Unit
+      runImpl: ProcessIO => Unit,
   )
       extends AbstractBuilder {
 
@@ -157,7 +157,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
     private[this] def lineStream(
         withInput: Boolean,
         nonZeroException: Boolean,
-        log: Option[ProcessLogger]
+        log: Option[ProcessLogger],
     ): Stream[String] = {
       val streamed = Streamed[String](nonZeroException)
       val process = run(BasicIO(withInput, streamed.process, log))
@@ -203,7 +203,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
   private[process] abstract class SequentialBuilder(
       a: ProcessBuilder,
       b: ProcessBuilder,
-      operatorString: String
+      operatorString: String,
   )
       extends BasicBuilder {
 
@@ -215,7 +215,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
   private[process] class PipedBuilder(
       first: ProcessBuilder,
       second: ProcessBuilder,
-      toError: Boolean
+      toError: Boolean,
   )
       extends SequentialBuilder(first, second, if (toError) "#|!" else "#|") {
 
@@ -225,7 +225,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
   private[process] class AndBuilder(
       first: ProcessBuilder,
-      second: ProcessBuilder
+      second: ProcessBuilder,
   )
       extends SequentialBuilder(first, second, "#&&") {
     override def createProcess(io: ProcessIO) =
@@ -234,7 +234,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
   private[process] class OrBuilder(
       first: ProcessBuilder,
-      second: ProcessBuilder
+      second: ProcessBuilder,
   )
       extends SequentialBuilder(first, second, "#||") {
     override def createProcess(io: ProcessIO) =
@@ -243,7 +243,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
   private[process] class SequenceBuilder(
       first: ProcessBuilder,
-      second: ProcessBuilder
+      second: ProcessBuilder,
   )
       extends SequentialBuilder(first, second, "###") {
     override def createProcess(io: ProcessIO) =

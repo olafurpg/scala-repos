@@ -161,7 +161,7 @@ object HelpersSpec extends Specification {
     val complexForm = Form(
         single("foo" -> Forms.seq(tuple(
                     "a" -> Forms.text,
-                    "b" -> Forms.text
+                    "b" -> Forms.text,
                 ))))
     def renderComplex(form: Form[_], min: Int = 1) =
       repeat
@@ -196,14 +196,14 @@ object HelpersSpec extends Specification {
 
     "render the right number of fields if there's multiple sub fields at a given index when filled" in {
       renderComplex(
-          complexForm.fill(Seq("somea" -> "someb"))
+          complexForm.fill(Seq("somea" -> "someb")),
       ) must exactly("foo[0].a=somea,foo[0].b=someb")
     }
 
     "render fill the right number of fields out if there's multiple sub fields at a given index when bound" in {
       renderComplex(
           // Don't bind, we don't want it to use the successfully bound value
-          form.copy(data = Map("foo[0].a" -> "somea", "foo[0].b" -> "someb"))
+          form.copy(data = Map("foo[0].a" -> "somea", "foo[0].b" -> "someb")),
       ) must exactly("foo[0].a=somea,foo[0].b=someb")
     }
 

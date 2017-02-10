@@ -39,7 +39,7 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
       AttributeReference("d2", DecimalType(5, 2))(),
       AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
       AttributeReference("f", FloatType)(),
-      AttributeReference("b", DoubleType)()
+      AttributeReference("b", DoubleType)(),
   )
 
   val i: Expression = UnresolvedAttribute("i")

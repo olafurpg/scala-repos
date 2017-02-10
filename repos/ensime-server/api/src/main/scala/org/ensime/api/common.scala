@@ -98,7 +98,7 @@ object RefactorType {
 case class SourceFileInfo(
     file: File,
     contents: Option[String] = None,
-    contentsIn: Option[File] = None
+    contentsIn: Option[File] = None,
 ) {
   // keep the log file sane for unsaved files
   override def toString =

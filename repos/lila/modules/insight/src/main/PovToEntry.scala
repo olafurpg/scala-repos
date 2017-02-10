@@ -68,7 +68,7 @@ object PovToEntry {
                     _.advices.map { a =>
                       a.info.ply -> a
                     }.toMap
-                  }
+                  },
               )
         }
       }

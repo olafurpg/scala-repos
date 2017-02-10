@@ -83,12 +83,12 @@ object SampleData extends CValueGenerators {
                     case _: RuntimeException => None
                   }
               },
-              Some((idCount, jschema))
+              Some((idCount, jschema)),
           )
         } catch {
           case ex => println("depth: " + depth); throw ex
         }
-      }
+      },
   )
 
   def distinctBy[T, C[X] <: Seq[X], S](c: C[T])(key: T => S)(
@@ -121,7 +121,7 @@ object SampleData extends CValueGenerators {
           sampleData <- arbitrary(sample)
         } yield {
           SampleData(sampleData.data.sorted, sampleData.schema)
-        }
+        },
     )
   }
 
@@ -141,7 +141,7 @@ object SampleData extends CValueGenerators {
           sampleData <- arbitrary(sample)
         } yield {
           SampleData(sampleData.data.distinct, sampleData.schema)
-        }
+        },
     )
   }
 
@@ -152,7 +152,7 @@ object SampleData extends CValueGenerators {
         } yield {
           SampleData(
               distinctBy(sampleData.data)(_ \ "keys"), sampleData.schema)
-        }
+        },
     )
   }
 
@@ -163,7 +163,7 @@ object SampleData extends CValueGenerators {
         } yield {
           SampleData(
               distinctBy(sampleData.data)(_ \ "value"), sampleData.schema)
-        }
+        },
     )
   }
 

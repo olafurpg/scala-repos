@@ -30,7 +30,7 @@ class IllegalInheritanceTest extends AnnotatorTestBase(IllegalInheritance) {
         |  trait A {self: X => };
         |  trait X extends A
         |}
-      """.stripMargin
+      """.stripMargin,
         ))
     assertNothing(
         messages(
@@ -45,7 +45,7 @@ class IllegalInheritanceTest extends AnnotatorTestBase(IllegalInheritance) {
         |    this: C =>
         |  }
         |}
-      """.stripMargin
+      """.stripMargin,
         ))
   }
 

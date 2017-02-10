@@ -111,7 +111,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
       CNum,
       CNull,
       CEmptyObject,
-      CEmptyArray
+      CEmptyArray,
   )
 
   // FIXME: TODO Should this provide some form for CDate?
@@ -224,7 +224,7 @@ trait SValueGenerators extends ArbitraryBigDecimal {
       arbitrary[BigDecimal] map { bd =>
         SDecimal(bd)
       }, //scalacheck's BigDecimal gen will overflow at random
-      value(SNull)
+      value(SNull),
   )
 
   def sevent(idCount: Int, vdepth: Int): Gen[SEvent] = {

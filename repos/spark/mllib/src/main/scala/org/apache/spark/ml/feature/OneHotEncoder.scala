@@ -153,7 +153,7 @@ class OneHotEncoder(override val uid: String)
               (m0, m1) =>
                 {
                   math.max(m0, m1)
-              }
+              },
           )
           .toInt + 1
       val outputAttrNames = Array.tabulate(numAttrs)(_.toString)

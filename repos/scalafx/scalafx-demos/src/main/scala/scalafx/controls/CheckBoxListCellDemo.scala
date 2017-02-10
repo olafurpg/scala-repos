@@ -51,7 +51,7 @@ object CheckBoxListCellDemo extends JFXApp {
   val data = ObservableBuffer[Item](
       (1 to 10).map { i =>
         new Item(i % 2 == 0, s"Item $i")
-      }
+      },
   )
 
   stage = new PrimaryStage {
@@ -70,7 +70,7 @@ object CheckBoxListCellDemo extends JFXApp {
                 println(
                     data.map(d => d.name + ": " + d.selected()).mkString("\n"))
               }
-            }
+            },
         )
       }
     }

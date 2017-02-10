@@ -46,7 +46,7 @@ private[streaming] class WriteAheadLogBackedBlockRDDPartition(
     val index: Int,
     val blockId: BlockId,
     val isBlockIdValid: Boolean,
-    val walRecordHandle: WriteAheadLogRecordHandle
+    val walRecordHandle: WriteAheadLogRecordHandle,
 )
     extends Partition
 

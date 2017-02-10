@@ -14,7 +14,7 @@ trait StructureViewBuilder { self: RichPresentationCompiler =>
       keyword: String,
       name: String,
       pos: SourcePosition,
-      members: ListBuffer[DefsBuilder]
+      members: ListBuffer[DefsBuilder],
   ) {
     def build: StructureViewMember =
       StructureViewMember(keyword, name, pos, members.map(_.build).toList)

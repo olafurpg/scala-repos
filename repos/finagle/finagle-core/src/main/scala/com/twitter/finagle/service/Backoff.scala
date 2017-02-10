@@ -61,7 +61,7 @@ object Backoff {
   private[service] def exponentialJittered(
       start: Duration,
       maximum: Duration,
-      rng: Rng
+      rng: Rng,
   ): Stream[Duration] = {
     require(start > Duration.Zero)
     require(maximum > Duration.Zero)
@@ -93,7 +93,7 @@ object Backoff {
   private[service] def decorrelatedJittered(
       start: Duration,
       maximum: Duration,
-      rng: Rng
+      rng: Rng,
   ): Stream[Duration] = {
     require(start > Duration.Zero)
     require(maximum > Duration.Zero)
@@ -126,7 +126,7 @@ object Backoff {
   private[service] def equalJittered(
       start: Duration,
       maximum: Duration,
-      rng: Rng = Rng.threadLocal
+      rng: Rng = Rng.threadLocal,
   ): Stream[Duration] = {
     require(start > Duration.Zero)
     require(maximum > Duration.Zero)

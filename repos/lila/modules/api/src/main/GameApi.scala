@@ -47,15 +47,15 @@ private[api] final class GameApi(netBaseUrl: String,
                                         BSONDocument("$exists" -> false))),
                                 G.analysed -> analysed.map(
                                     _.fold[BSONValue](BSONBoolean(true),
-                                                      BSONDocument("$exists" -> false)))
+                                                      BSONDocument("$exists" -> false))),
                             ),
                           projection = BSONDocument(),
-                          sort = BSONDocument(G.createdAt -> -1)
+                          sort = BSONDocument(G.createdAt -> -1),
                       ),
                     nbResults = fuccess {
                     rated.fold(user.count.game)(
                         _.fold(user.count.rated, user.count.casual))
-                  }
+                  },
                 ),
               currentPage = math.max(0, page | 1),
               maxPerPage = math.max(1, math.min(100, nb | 10))) flatMap {
@@ -85,7 +85,7 @@ private[api] final class GameApi(netBaseUrl: String,
             withOpening = withOpening,
             withFens = withFens && g.finished,
             withMoveTimes = withMoveTimes,
-            token = token
+            token = token,
         )(List(g)) map (_.headOption)
       }
     }
@@ -151,7 +151,7 @@ private[api] final class GameApi(netBaseUrl: String,
             Json.obj(
                 "initial" -> clock.limit,
                 "increment" -> clock.increment,
-                "totalTime" -> clock.estimateTotalTime
+                "totalTime" -> clock.estimateTotalTime,
             )
           },
           "daysPerTurn" -> g.daysPerTurn,
@@ -175,11 +175,11 @@ private[api] final class GameApi(netBaseUrl: String,
                         Json.obj(
                             "ply" -> h.ply,
                             "mean" -> h.mean,
-                            "sd" -> h.sd
+                            "sd" -> h.sd,
                         )
                       },
                     "analysis" -> analysisOption.flatMap(
-                        analysisApi.player(p.color))
+                        analysisApi.player(p.color)),
                 )
                 .noNull
           }),
@@ -197,7 +197,7 @@ private[api] final class GameApi(netBaseUrl: String,
             }
           },
           "winner" -> g.winnerColor.map(_.name),
-          "url" -> url
+          "url" -> url,
       )
       .noNull
 }

@@ -44,7 +44,7 @@ object IndexService extends SLF4JLogging {
   case class FieldIndex(fqn: String, file: Option[FileCheck]) extends FqnIndex
   abstract class AFqnIndexS[T <: FqnIndex](
       clazz: Class[T],
-      cons: (String, Option[FileCheck]) => T
+      cons: (String, Option[FileCheck]) => T,
   )
       extends EntityS(clazz) {
     def addFields(doc: Document, i: T): Unit = {
@@ -133,7 +133,7 @@ class IndexService(path: File) {
   def searchClassesMethods(terms: List[String], max: Int): List[FqnIndex] = {
     val query = new DisjunctionMaxQuery(
         terms.map(buildTermClassMethodQuery),
-        0f
+        0f,
     )
     lucene.search(query, max).map(_.toEntity[ClassIndex]).distinct
   }

@@ -30,7 +30,7 @@ trait EnumerateeTFunctions {
           in(
               el = e => k(elInput(f(e))) >>== doneOr(loop),
               empty = cont(step(k)),
-              eof = done(scont(k), in)
+              eof = done(scont(k), in),
           )
         }
 
@@ -51,10 +51,10 @@ trait EnumerateeTFunctions {
                     .fold(
                         el = en => en.apply(step) >>== loop,
                         empty = contf(emptyInput) >>== loop,
-                        eof = done(step, emptyInput)
+                        eof = done(step, emptyInput),
                     )
               },
-              done = (a, _) => done(sdone(a, emptyInput), emptyInput)
+              done = (a, _) => done(sdone(a, emptyInput), emptyInput),
           )
         }
 
@@ -74,7 +74,7 @@ trait EnumerateeTFunctions {
                   if (pf.isDefinedAt(e))
                     k(elInput(pf(e))) >>== doneOr(loop) else cont(step(k)),
               empty = cont(step(k)),
-              eof = done(scont(k), in)
+              eof = done(scont(k), in),
           )
         }
 
@@ -93,7 +93,7 @@ trait EnumerateeTFunctions {
                   if (p(e)) k(in) >>== doneOr(loop)
                   else cont(step(k)),
               empty = cont(step(k)),
-              eof = done(scont(k), in)
+              eof = done(scont(k), in),
           )
         }
 
@@ -138,7 +138,7 @@ trait EnumerateeTFunctions {
               .fold(
                   el = e => k(elInput(e)) >>== doneOr(loop(i + 1)),
                   empty = cont(step(k, i)),
-                  eof = done(scont(k), in)
+                  eof = done(scont(k), in),
               )
         }
 

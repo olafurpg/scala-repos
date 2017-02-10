@@ -396,7 +396,7 @@ class Json extends Writer2 {
         'f'.toInt -> "\f",
         'n'.toInt -> "\n",
         'r'.toInt -> "\r",
-        't'.toInt -> "\t"
+        't'.toInt -> "\t",
     )
     // *** Import Shared Data ***
 

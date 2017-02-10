@@ -65,8 +65,8 @@ class ZkClientTest extends WordSpec with MockitoSugar {
               meq(acls.asJava),
               meq(mode),
               any[AsyncCallback.StringCallback],
-              meq(null)
-          )
+              meq(null),
+          ),
       ) thenAnswer answer[AsyncCallback.StringCallback](4) { cbValue =>
         wait onSuccess { newPath =>
           cbValue.processResult(0, path, null, newPath)
@@ -99,8 +99,8 @@ class ZkClientTest extends WordSpec with MockitoSugar {
               meq(path),
               meq(false),
               any[AsyncCallback.StatCallback],
-              meq(null)
-          )
+              meq(null),
+          ),
       ) thenAnswer answer[AsyncCallback.StatCallback](2) { cbValue =>
         stat onSuccess {
           cbValue.processResult(0, path, null, _)

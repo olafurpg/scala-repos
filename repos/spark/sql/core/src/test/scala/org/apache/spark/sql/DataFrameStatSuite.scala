@@ -37,7 +37,7 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
     checkAnswer(
         data.sample(withReplacement = true, 0.05, seed = 13),
-        Seq(5, 10, 52, 73).map(Row(_))
+        Seq(5, 10, 52, 73).map(Row(_)),
     )
   }
 
@@ -46,7 +46,7 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
     checkAnswer(
         data.sample(withReplacement = false, 0.05, seed = 13),
-        Seq(3, 17, 27, 58, 62).map(Row(_))
+        Seq(3, 17, 27, 58, 62).map(Row(_)),
     )
   }
 
@@ -193,7 +193,7 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
         (null, 2.0, "ho"),
         ("a.b", Double.NegativeInfinity, ""),
         ("b", Double.PositiveInfinity, "`ha`"),
-        ("a", 1.0, null)
+        ("a", 1.0, null),
     )
     val df = data.toDF("1", "2", "3")
     val ct1 = df.stat.crosstab("1", "2")

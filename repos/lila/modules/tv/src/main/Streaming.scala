@@ -83,7 +83,7 @@ private final class Streaming(system: ActorSystem,
                     "type" -> "video",
                     "eventType" -> "live",
                     "q" -> keyword,
-                    "key" -> googleApiKey
+                    "key" -> googleApiKey,
                 )
                 .get() map {
                 res =>

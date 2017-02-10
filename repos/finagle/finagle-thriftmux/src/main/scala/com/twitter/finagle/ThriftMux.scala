@@ -84,7 +84,7 @@ object ThriftMux
     private[this] val rpcTracer = new SimpleFilter[mux.Request, mux.Response] {
       def apply(
           request: mux.Request,
-          svc: Service[mux.Request, mux.Response]
+          svc: Service[mux.Request, mux.Response],
       ): Future[mux.Response] = {
         // we're reasonably sure that this filter sits just after the ThriftClientRequest's
         // message array is wrapped by a ChannelBuffer
@@ -177,7 +177,7 @@ object ThriftMux
       val classifier =
         if (params.contains[param.ResponseClassifier]) {
           ThriftMuxResponseClassifier.usingDeserializeCtx(
-              params[param.ResponseClassifier].responseClassifier
+              params[param.ResponseClassifier].responseClassifier,
           )
         } else {
           ThriftMuxResponseClassifier.DeserializeCtxOnly
@@ -243,13 +243,13 @@ object ThriftMux
 
   def newClient(
       dest: Name,
-      label: String
+      label: String,
   ): ServiceFactory[ThriftClientRequest, Array[Byte]] =
     client.newClient(dest, label)
 
   def newService(
       dest: Name,
-      label: String
+      label: String,
   ): Service[ThriftClientRequest, Array[Byte]] =
     client.newService(dest, label)
 
@@ -300,7 +300,7 @@ object ThriftMux
 
     protected def copy1(
         stack: Stack[ServiceFactory[mux.Request, mux.Response]] = this.stack,
-        params: Stack.Params = this.params
+        params: Stack.Params = this.params,
     ) = copy(stack, params)
 
     protected def newListener(): Listener[In, Out] = {
@@ -314,18 +314,18 @@ object ThriftMux
       new Listener[In, Out] {
         private[this] val underlying = Netty3Listener[In, Out](
             new thriftmux.PipelineFactory(scoped, pf),
-            params
+            params,
         )
 
         def listen(addr: SocketAddress)(
-            serveTransport: Transport[In, Out] => Unit
+            serveTransport: Transport[In, Out] => Unit,
         ): ListeningServer = underlying.listen(addr)(serveTransport)
       }
     }
 
     protected def newDispatcher(
         transport: Transport[In, Out],
-        service: Service[mux.Request, mux.Response]
+        service: Service[mux.Request, mux.Response],
     ): Closable = {
       val param.Tracer(tracer) = params[param.Tracer]
 
@@ -351,7 +351,7 @@ object ThriftMux
       new Filter[mux.Request, mux.Response, Array[Byte], Array[Byte]] {
         def apply(
             request: mux.Request,
-            service: Service[Array[Byte], Array[Byte]]
+            service: Service[Array[Byte], Array[Byte]],
         ): Future[mux.Response] = {
           val reqBytes = Buf.ByteArray.Owned.extract(request.body)
           service(reqBytes) map { repBytes =>
@@ -364,7 +364,7 @@ object ThriftMux
         extends SimpleFilter[mux.Request, mux.Response] {
       def apply(
           request: mux.Request,
-          service: Service[mux.Request, mux.Response]
+          service: Service[mux.Request, mux.Response],
       ): Future[mux.Response] =
         service(request).rescue {
           case e @ RetryPolicy.RetryableWriteException(_) =>
@@ -384,7 +384,7 @@ object ThriftMux
           "Translates uncaught application exceptions into Thrift messages"
         def make(
             _pf: Thrift.param.ProtocolFactory,
-            next: ServiceFactory[mux.Request, mux.Response]
+            next: ServiceFactory[mux.Request, mux.Response],
         ) = {
           val Thrift.param.ProtocolFactory(pf) = _pf
           val exnFilter = new ExnFilter(pf)
@@ -449,7 +449,7 @@ object ThriftMux
 
     def serve(
         addr: SocketAddress,
-        factory: ServiceFactory[Array[Byte], Array[Byte]]
+        factory: ServiceFactory[Array[Byte], Array[Byte]],
     ): ListeningServer = {
       muxer.serve(
           addr, MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
@@ -483,7 +483,7 @@ object ThriftMux
 
   def serve(
       addr: SocketAddress,
-      factory: ServiceFactory[Array[Byte], Array[Byte]]
+      factory: ServiceFactory[Array[Byte], Array[Byte]],
   ): ListeningServer =
     server.serve(addr, factory)
 }

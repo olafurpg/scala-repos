@@ -118,7 +118,7 @@ class AppDeployIntegrationTest
                        withHealth = false).copy(
         cmd = Some("false"),
         backoff = 1.hour,
-        maxLaunchDelay = 1.hour
+        maxLaunchDelay = 1.hour,
     )
 
     When("we request to deploy the app")
@@ -215,7 +215,7 @@ class AppDeployIntegrationTest
                        withHealth = false).copy(
         portDefinitions = PortDefinitions(31000),
         requirePorts = true,
-        healthChecks = Set(healthCheck.copy(port = Some(31000)))
+        healthChecks = Set(healthCheck.copy(port = Some(31000))),
     )
     val check = appProxyCheck(app.id, "v1", true)
 
@@ -654,8 +654,8 @@ class AppDeployIntegrationTest
         cmd = Some("sleep 1"),
         instances = 0,
         container = Some(Container(
-                  `type` = MesosProtos.ContainerInfo.Type.MESOS
-              ))
+                  `type` = MesosProtos.ContainerInfo.Type.MESOS,
+              )),
     )
 
     app.container should not be empty

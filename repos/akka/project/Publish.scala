@@ -24,7 +24,7 @@ object Publish extends AutoPlugin {
       pomIncludeRepository := { x =>
         false
       },
-      defaultPublishTo := crossTarget.value / "repository"
+      defaultPublishTo := crossTarget.value / "repository",
   )
 
   def akkaPomExtra = {

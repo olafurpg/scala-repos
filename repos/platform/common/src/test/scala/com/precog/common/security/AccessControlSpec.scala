@@ -189,7 +189,7 @@ class AccessControlSpec extends Specification {
 
       val readReduceOther = Set[Permission](
           ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          ReducePermission(Path("/other"), WrittenByAccount(otherAccountId))
+          ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
       )
 
       apiKeyManager
@@ -253,7 +253,7 @@ class AccessControlSpec extends Specification {
           WritePermission(Path("/other"), WriteAs(userAccountId)),
           DeletePermission(Path("/other"), WrittenByAccount(userAccountId)),
           WritePermission(Path("/other"), WriteAs(otherAccountId)),
-          DeletePermission(Path("/other"), WrittenByAccount(otherAccountId))
+          DeletePermission(Path("/other"), WrittenByAccount(otherAccountId)),
       )
 
       apiKeyManager
@@ -327,7 +327,7 @@ class AccessControlSpec extends Specification {
           ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
           ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
           WritePermission(Path("/other"), WriteAsAny),
-          DeletePermission(Path("/other"), WrittenByAny)
+          DeletePermission(Path("/other"), WrittenByAny),
       )
 
       val accessOtherGrant = apiKeyManager
@@ -384,7 +384,7 @@ class AccessControlSpec extends Specification {
           ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
           ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
           WritePermission(Path("/other"), WriteAsAny),
-          DeletePermission(Path("/other"), WrittenByAny)
+          DeletePermission(Path("/other"), WrittenByAny),
       )
 
       val expiredAccessOtherGrant = apiKeyManager
@@ -433,7 +433,7 @@ class AccessControlSpec extends Specification {
           ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
           ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
           WritePermission(Path("/other"), WriteAsAny),
-          DeletePermission(Path("/other"), WrittenByAny)
+          DeletePermission(Path("/other"), WrittenByAny),
       )
 
       val user1AccessOtherGrant = apiKeyManager

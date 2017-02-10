@@ -9,7 +9,7 @@ trait MarkovChainFixture {
           MatrixEntry(0, 0, 3),
           MatrixEntry(0, 1, 7),
           MatrixEntry(1, 0, 10),
-          MatrixEntry(1, 1, 10)
+          MatrixEntry(1, 1, 10),
       )
     }
   }
@@ -32,7 +32,7 @@ trait MarkovChainFixture {
           MatrixEntry(3, 4, 4),
           MatrixEntry(4, 1, 7),
           MatrixEntry(4, 3, 8),
-          MatrixEntry(4, 4, 10)
+          MatrixEntry(4, 4, 10),
       )
     }
   }

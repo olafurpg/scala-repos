@@ -34,5 +34,5 @@ case class Activity(
     message: String,
     additionalInfo: Option[String],
     activityDate: java.util.Date,
-    activityId: Int = 0
+    activityId: Int = 0,
 )

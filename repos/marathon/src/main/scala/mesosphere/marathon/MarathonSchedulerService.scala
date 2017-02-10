@@ -400,7 +400,7 @@ class MarathonSchedulerService @Inject()(
           }
         },
         scaleAppsInitialDelay.toMillis,
-        scaleAppsInterval.toMillis
+        scaleAppsInterval.toMillis,
     )
 
     timer.schedule(
@@ -413,7 +413,7 @@ class MarathonSchedulerService @Inject()(
           }
         },
         reconciliationInitialDelay.toMillis,
-        reconciliationInterval.toMillis
+        reconciliationInterval.toMillis,
     )
   }
 

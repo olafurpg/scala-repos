@@ -68,7 +68,7 @@ trait DestructureTypes {
           case x: NameTree => atom(x.name.toString, x)
           case _ => wrapAtom(tree)
         },
-        tree.productPrefix
+        tree.productPrefix,
     )
     def wrapSymbolInfo(sym: Symbol): Node = {
       if ((sym eq NoSymbol) || openSymbols(sym)) wrapEmpty
@@ -126,19 +126,19 @@ trait DestructureTypes {
         "AnnotationInfo",
         this("atp", ann.atp),
         node("args", treeList(ann.args)),
-        assocsNode(ann)
+        assocsNode(ann),
     )
     def typeConstraint(constr: TypeConstraint): Node = product(
         "TypeConstraint",
         node("lo", typeList(constr.loBounds)),
         node("hi", typeList(constr.hiBounds)),
-        this("inst", constr.inst)
+        this("inst", constr.inst),
     )
     def annotatedType(annotations: List[AnnotationInfo], underlying: Type) =
       product(
           "AnnotatedType",
           node("annotations", annotationList(annotations)),
-          this("underlying", underlying)
+          this("underlying", underlying),
       )
 
     /** This imposes additional structure beyond that which is visible in
@@ -161,7 +161,7 @@ trait DestructureTypes {
           wrapSymbolInfo(sym),
           typeArgs(args),
           if (tp ne tp.normalize) this("normalize", tp.normalize)
-          else wrapEmpty
+          else wrapEmpty,
       )
     }
 

@@ -146,7 +146,7 @@ object JavaLangObject {
               Apply(This()(ThisType),
                     Ident("toString__T", Some("toString__T")),
                     Nil)(ClassType(StringClass))
-            })(OptimizerHints.empty, None)
+            })(OptimizerHints.empty, None),
         ))(OptimizerHints.empty)
 
     val hashedClassedDef = Hashers.hashClassDef(classDef)

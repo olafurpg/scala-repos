@@ -74,7 +74,7 @@ object Ciphers {
       "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
       "TLS_RSA_WITH_AES_128_CBC_SHA",
       "TLS_RSA_WITH_AES_256_CBC_SHA",
-      "SSL_RSA_WITH_3DES_EDE_CBC_SHA"
+      "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
   )
 
   val exportCiphers = """SSL_RSA_EXPORT_WITH_RC4_40_MD5

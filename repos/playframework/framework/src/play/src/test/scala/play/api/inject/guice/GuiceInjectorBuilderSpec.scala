@@ -118,7 +118,7 @@ object GuiceInjectorBuilderSpec extends Specification {
         .requireExplicitBindings()
         .bindings(
             bind[A].to[A1],
-            bind[B].to[B1]
+            bind[B].to[B1],
         )
         .injector
       injector.instanceOf[A] must beAnInstanceOf[A1]
@@ -132,13 +132,13 @@ object GuiceInjectorBuilderSpec extends Specification {
 
   class EnvironmentModule extends Module {
     def bindings(env: Environment, conf: Configuration) = Seq(
-        bind[Environment] to env
+        bind[Environment] to env,
     )
   }
 
   class ConfigurationModule extends Module {
     def bindings(env: Environment, conf: Configuration) = Seq(
-        bind[Configuration] to conf
+        bind[Configuration] to conf,
     )
   }
 

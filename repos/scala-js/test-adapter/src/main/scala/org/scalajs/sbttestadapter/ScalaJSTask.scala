@@ -25,7 +25,7 @@ final class ScalaJSTask private (
     runner: ScalaJSRunner,
     val taskDef: TaskDef,
     val tags: Array[String],
-    serializedTask: String
+    serializedTask: String,
 )
     extends Task {
 

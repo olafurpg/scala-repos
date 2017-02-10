@@ -4,7 +4,7 @@ abstract class DependencyException(msg: String) extends Exception(msg)
 
 class MissingDependencyException(
     val originatingLib: FlatJSDependency,
-    val missingLib: String
+    val missingLib: String,
 )
     extends DependencyException(
         s"The JS dependency ${originatingLib.relPath} declared " +
@@ -12,7 +12,7 @@ class MissingDependencyException(
         s"dependency $missingLib")
 
 class CyclicDependencyException(
-    val participants: List[ResolutionInfo]
+    val participants: List[ResolutionInfo],
 )
     extends DependencyException(CyclicDependencyException.mkMsg(participants))
 
@@ -39,7 +39,7 @@ private object CyclicDependencyException {
 }
 
 class ConflictingNameException(
-    val participants: List[FlatJSDependency]
+    val participants: List[FlatJSDependency],
 )
     extends DependencyException(ConflictingNameException.mkMsg(participants))
 
@@ -58,7 +58,7 @@ private object ConflictingNameException {
 }
 
 class ConflictingMinifiedJSException(
-    val participants: List[FlatJSDependency]
+    val participants: List[FlatJSDependency],
 )
     extends DependencyException(
         ConflictingMinifiedJSException.mkMsg(participants))

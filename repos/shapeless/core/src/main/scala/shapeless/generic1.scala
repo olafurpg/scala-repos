@@ -289,7 +289,7 @@ class IsHCons1Macros(val c: whitebox.Context) extends IsCons1Macros {
       """,
         q"""
         def unpack[$nme](p: $lTpt): ($hdTpt, $tlTpt) = (p.head, p.tail)
-      """
+      """,
     )
 }
 
@@ -320,7 +320,7 @@ class IsCCons1Macros(val c: whitebox.Context) extends IsCons1Macros {
           case _root_.shapeless.Inl(hd) => _root_.scala.Left[$hdTpt, $tlTpt](hd)
           case _root_.shapeless.Inr(tl) => _root_.scala.Right[$hdTpt, $tlTpt](tl)
         }
-      """
+      """,
     )
 }
 

@@ -28,7 +28,7 @@ class PluginRegistry {
   private val renderers = mutable.Map[String, Renderer]()
   renderers ++= Seq(
       "md" -> MarkdownRenderer,
-      "markdown" -> MarkdownRenderer
+      "markdown" -> MarkdownRenderer,
   )
   private val repositoryRoutings = new ListBuffer[GitRepositoryRouting]
   private val receiveHooks = new ListBuffer[ReceiveHook]
@@ -114,14 +114,14 @@ class PluginRegistry {
   private case class GlobalAction(
       method: String,
       path: String,
-      function: (HttpServletRequest, HttpServletResponse, Context) => Any
+      function: (HttpServletRequest, HttpServletResponse, Context) => Any,
   )
 
   private case class RepositoryAction(
       method: String,
       path: String,
       function: (HttpServletRequest, HttpServletResponse, Context,
-      RepositoryInfo) => Any
+      RepositoryInfo) => Any,
   )
 }
 
@@ -202,7 +202,7 @@ object PluginRegistry {
                     pluginName = plugin.pluginName,
                     version = plugin.versions.head.versionString,
                     description = plugin.description,
-                    pluginClass = plugin
+                    pluginClass = plugin,
                 ))
           } catch {
             case e: Throwable => {
@@ -231,5 +231,5 @@ case class PluginInfo(
     pluginName: String,
     version: String,
     description: String,
-    pluginClass: Plugin
+    pluginClass: Plugin,
 )

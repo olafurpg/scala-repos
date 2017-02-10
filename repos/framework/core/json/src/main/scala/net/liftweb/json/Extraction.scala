@@ -189,10 +189,10 @@ object Extraction {
                   t._1 == prefix || t._1.startsWith(prefix + ".") ||
                   t._1.startsWith(prefix + "["))
             .map(
-                t => (t._1.substring(prefix.length), t._2)
+                t => (t._1.substring(prefix.length), t._2),
             )
             .toList
-            .toArray: _*
+            .toArray: _*,
       )
 
     val ArrayProp = new Regex("""^(\.([^\.\[]+))\[(\d+)\].*$""")

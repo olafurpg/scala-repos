@@ -23,7 +23,7 @@ import scala.language.reflectiveCalls
 object RawZipkinTracer {
   private[this] def newClient(
       scribeHost: String,
-      scribePort: Int
+      scribePort: Int,
   ): Scribe.FutureIface = {
     val transport = ClientBuilder()
       .name("zipkin-tracer")
@@ -55,7 +55,7 @@ object RawZipkinTracer {
       scribeHost: String = "localhost",
       scribePort: Int = 1463,
       statsReceiver: StatsReceiver = NullStatsReceiver,
-      timer: Timer = DefaultTimer.twitter
+      timer: Timer = DefaultTimer.twitter,
   ): RawZipkinTracer = synchronized {
     map.getOrElseUpdate(
         scribeHost + ":" + scribePort,
@@ -102,7 +102,7 @@ private[thrift] class RawZipkinTracer(
     timer: Timer = DefaultTimer.twitter,
     poolSize: Int = 10,
     initialBufferSize: StorageUnit = 512.bytes,
-    maxBufferSize: StorageUnit = 1.megabyte
+    maxBufferSize: StorageUnit = 1.megabyte,
 )
     extends Tracer {
   private[this] val TraceCategory = "zipkin" // scribe category
@@ -340,7 +340,7 @@ private[thrift] class RawZipkinTracer(
       record: Record,
       key: String,
       value: ByteBuffer,
-      annotationType: thrift.AnnotationType
+      annotationType: thrift.AnnotationType,
   ) {
     spanMap.update(record.traceId) { span =>
       span.addBinaryAnnotation(

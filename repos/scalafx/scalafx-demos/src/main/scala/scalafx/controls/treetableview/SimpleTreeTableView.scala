@@ -53,7 +53,7 @@ object SimpleTreeTableView extends JFXApp {
               text = "Last Name"
               cellValueFactory = { _.value.getValue.lastName }
               prefWidth = 180
-            }
+            },
         )
       }
     }

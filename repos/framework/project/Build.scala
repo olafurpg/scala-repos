@@ -161,7 +161,7 @@ object BuildDef extends Build {
 
                 Seq(
                     new Group("others", others, InProcess),
-                    new Group("webapptests", webapptests, InProcess)
+                    new Group("webapptests", webapptests, InProcess),
                 )
               })
     .enablePlugins(SbtWeb)
@@ -239,7 +239,7 @@ object BuildDef extends Build {
               case (revision, file) =>
                 (file -> url("http://www.scala-lang.org/api/" + version))
             }.toMap
-          }
+          },
       )
   }
 }

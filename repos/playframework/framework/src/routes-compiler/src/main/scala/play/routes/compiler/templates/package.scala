@@ -202,7 +202,7 @@ package object templates {
       "with",
       "yield",
       // Not scala keywords, but are used in the router
-      "queryString"
+      "queryString",
   )
 
   /**

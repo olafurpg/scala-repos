@@ -57,7 +57,7 @@ object BatcherLaws extends Properties("Batcher") {
       val b = batcher.batchOf(d)
       val list = BatchID
         .toIterable(
-            batcher.batchesCoveredBy(batcher.toInterval(b))
+            batcher.batchesCoveredBy(batcher.toInterval(b)),
         )
         .toList
       list == List(b)

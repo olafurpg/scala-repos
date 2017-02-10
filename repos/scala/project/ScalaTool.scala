@@ -42,7 +42,7 @@ case class ScalaTool(mainClass: String,
             (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
         ("@javaflags@" -> javaOpts),
         ("@toolflags@" -> toolFlags),
-        ("@classpath@" -> platformClasspath)
+        ("@classpath@" -> platformClasspath),
     )
 
     val (from, to) = variables.unzip

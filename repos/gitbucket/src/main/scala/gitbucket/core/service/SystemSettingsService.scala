@@ -121,7 +121,7 @@ trait SystemSettingsService {
                     getOptionValue(props, LdapKeystore, None)))
           } else {
             None
-          }
+          },
       )
     }
   }

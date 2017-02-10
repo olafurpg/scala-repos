@@ -26,7 +26,7 @@ private[serverset2] object Epoch {
 
 private[serverset2] class Epoch(
     val event: Event[Unit],
-    val period: Duration
+    val period: Duration,
 )
 
 private[serverset2] object Stabilizer {
@@ -68,7 +68,7 @@ private[serverset2] object Stabilizer {
             }
           }
         },
-        period
+        period,
     )
 
   // Used for delaying removals

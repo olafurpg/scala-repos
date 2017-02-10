@@ -67,7 +67,7 @@ object MultiNode extends AutoPlugin {
         (ScalariformKeys.format in MultiJvm),
         scalacOptions in MultiJvm <<= scalacOptions in Test,
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy
-        (compile in Test)
+        (compile in Test),
     ) ++ CliOptions.hostsFileName.map(multiNodeHostsFileName in MultiJvm := _) ++ CliOptions.javaName
       .map(multiNodeJavaName in MultiJvm := _) ++ CliOptions.targetDirName.map(
         multiNodeTargetDirName in MultiJvm := _) ++ // make sure that MultiJvm tests are executed by the default test target,
@@ -112,6 +112,6 @@ object MultiNodeScalaTest extends AutoPlugin {
                if (MultiNode.CliOptions.multiNode.get)
                  onlyTestTags.value.mkString("\"", " ", "\"")
                else onlyTestTags.value.mkString(" ")))
-      }
+      },
   )
 }

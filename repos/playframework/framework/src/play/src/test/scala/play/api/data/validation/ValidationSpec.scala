@@ -16,7 +16,7 @@ object ValidationSpec extends Specification {
     "throw an IllegalArgumentException if maxLength is negative" in {
       {
         Form(
-            "value" -> Forms.text(maxLength = -1)
+            "value" -> Forms.text(maxLength = -1),
         ).bind(Map("value" -> "hello"))
       }.must(throwAn[IllegalArgumentException])
     }
@@ -38,7 +38,7 @@ object ValidationSpec extends Specification {
     "throw an IllegalArgumentException if minLength is negative" in {
       {
         Form(
-            "value" -> Forms.text(minLength = -1)
+            "value" -> Forms.text(minLength = -1),
         ).bind(Map("value" -> "hello"))
       }.must(throwAn[IllegalArgumentException])
     }
@@ -79,7 +79,7 @@ object ValidationSpec extends Specification {
       {
         Form(
             "value" -> Forms.text.verifying(
-                Constraints.pattern(null, "nullRegex", "error"))
+                Constraints.pattern(null, "nullRegex", "error")),
         ).bind(Map("value" -> "hello"))
       }.must(throwAn[IllegalArgumentException])
     }
@@ -88,7 +88,7 @@ object ValidationSpec extends Specification {
       {
         Form(
             "value" -> Forms.text.verifying(
-                Constraints.pattern(".*".r, null, "error"))
+                Constraints.pattern(".*".r, null, "error")),
         ).bind(Map("value" -> "hello"))
       }.must(throwAn[IllegalArgumentException])
     }
@@ -96,7 +96,7 @@ object ValidationSpec extends Specification {
     "throw an IllegalArgumentException if error is null" in {
       {
         Form(
-            "value" -> Forms.text.verifying(pattern(".*".r, "nullRegex", null))
+            "value" -> Forms.text.verifying(pattern(".*".r, "nullRegex", null)),
         ).bind(Map("value" -> "hello"))
       }.must(throwAn[IllegalArgumentException])
     }
@@ -109,7 +109,7 @@ object ValidationSpec extends Specification {
         """$A12345@example.com""",
         """!def!xyz%abc@example.com""",
         """_somename@example.com""",
-        """Ken.O'Brian@company.com"""
+        """Ken.O'Brian@company.com""",
     )
     "validate valid addresses" in {
       valid.map { addr =>
@@ -129,7 +129,7 @@ object ValidationSpec extends Specification {
         "\"\"test\blah\"\"@example.com",
         "\"test\rblah\"@example.com",
         "\"\"test\"\"blah\"\"@example.com",
-        "Ima Fool@example.com"
+        "Ima Fool@example.com",
     )
     "invalidate invalid addresses" in {
       invalid.map { addr =>

@@ -5,7 +5,7 @@ import sbt.testing._
 abstract class BaseRunner(
     val args: Array[String],
     val remoteArgs: Array[String],
-    private[framework] val testClassLoader: ClassLoader
+    private[framework] val testClassLoader: ClassLoader,
 )
     extends Runner {
 

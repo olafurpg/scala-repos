@@ -142,7 +142,7 @@ object CORSConfig {
             .getOrElse(_ => true),
         exposedHeaders = config.get[Seq[String]]("exposedHeaders"),
         supportsCredentials = config.get[Boolean]("supportsCredentials"),
-        preflightMaxAge = config.get[Duration]("preflightMaxAge")
+        preflightMaxAge = config.get[Duration]("preflightMaxAge"),
     )
   }
 }

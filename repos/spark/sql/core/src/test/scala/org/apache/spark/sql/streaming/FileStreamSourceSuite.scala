@@ -248,7 +248,7 @@ class FileStreamSourceSuite
         StartStream,
         CheckAnswer("keep2", "keep3", "keep5", "keep6"),
         AddTextFileData(textSource, "drop7\nkeep8\nkeep9", src, tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9"),
     )
 
     Utils.deleteRecursively(src)
@@ -283,7 +283,7 @@ class FileStreamSourceSuite
             "{'value': 'drop7'}\n{'value': 'keep8'}\n{'value': 'keep9'}",
             src,
             tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9"),
     )
 
     Utils.deleteRecursively(src)
@@ -308,7 +308,7 @@ class FileStreamSourceSuite
                         "{'c': 'drop4'}\n{'c': 'keep5'}\n{'c': 'keep6'}",
                         src,
                         tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6")
+        CheckAnswer("keep2", "keep3", "keep5", "keep6"),
     )
 
     Utils.deleteRecursively(src)
@@ -334,7 +334,7 @@ class FileStreamSourceSuite
         CheckAnswer("keep2", "keep3", "keep5", "keep6"),
         AddParquetFileData(
             fileSource, Seq("drop7", "keep8", "keep9"), src, tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9"),
     )
 
     Utils.deleteRecursively(src)
@@ -383,7 +383,7 @@ class FileStreamSourceSuite
         StartStream,
         CheckAnswer("keep2", "keep3", "keep5", "keep6"),
         AddTextFileData(textSource, "drop7\nkeep8\nkeep9", src, tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9"),
     )
 
     val textSource2 = createFileStreamSource("text", src.getCanonicalPath)

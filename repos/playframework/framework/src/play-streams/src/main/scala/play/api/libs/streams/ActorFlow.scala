@@ -61,7 +61,7 @@ object ActorFlow {
               SupervisorStrategy.Stop
           }
         })), Status.Success(())),
-        Source.fromPublisher(publisher)
+        Source.fromPublisher(publisher),
     )
   }
 }

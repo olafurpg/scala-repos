@@ -345,7 +345,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   def toThese: A \&/ B =
     fold(
         a => \&/.This(a),
-        b => \&/.That(b)
+        b => \&/.That(b),
     )
 }
 
@@ -528,17 +528,17 @@ sealed abstract class DisjunctionInstances2 {
           a => \/.left(\/.left(a)),
           _.fold(
               b => \/.left(\/.right(b)),
-              \/.right
-          )
+              \/.right,
+          ),
       )
 
     def reassociateRight[A, B, C](f: \/[\/[A, B], C]) =
       f.fold(
           _.fold(
               \/.left,
-              b => \/.right(\/.left(b))
+              b => \/.right(\/.left(b)),
           ),
-          c => \/.right(\/.right(c))
+          c => \/.right(\/.right(c)),
       )
   }
 }

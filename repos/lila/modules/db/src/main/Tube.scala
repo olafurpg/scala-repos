@@ -62,12 +62,12 @@ case class JsTube[Doc](reader: Reads[Doc],
 
   def toMongo(doc: Doc): JsResult[JsObject] = flag(_.NoId)(
       write(doc),
-      write(doc) flatMap JsTube.toMongoId
+      write(doc) flatMap JsTube.toMongoId,
   )
 
   def fromMongo(js: JsObject): JsResult[Doc] = flag(_.NoId)(
       read(js),
-      JsTube.depath(JsTube fromMongoId js) flatMap read
+      JsTube.depath(JsTube fromMongoId js) flatMap read,
   )
 
   def inColl(c: Coll): JsTubeInColl[Doc] =

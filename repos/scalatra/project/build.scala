@@ -40,18 +40,18 @@ object ScalatraBuild extends Build {
             Opts.resolver.sonatypeSnapshots,
             Opts.resolver.sonatypeReleases,
             "bintray/non" at "http://dl.bintray.com/non/maven",
-            "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+            "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
         ),
         dependencyOverrides := Set(
             "org.scala-lang" % "scala-library" % scalaVersion.value,
             "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-            "org.scala-lang" % "scala-compiler" % scalaVersion.value
+            "org.scala-lang" % "scala-compiler" % scalaVersion.value,
         ),
         previousArtifacts := {
           Set("2.4.0").map {
             organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
           }
-        }
+        },
     ) ++ net.virtualvoid.sbt.graph.Plugin.graphSettings ++ mavenCentralFrouFrou ++ scalariformSettings
 
   lazy val scalatraProject = Project(
@@ -60,7 +60,7 @@ object ScalatraBuild extends Build {
       settings = scalatraSettings ++ Unidoc.unidocSettings ++ doNotPublish ++ Seq(
             description := "A tiny, Sinatra-like web framework for Scala",
             Unidoc.unidocExclude := Seq("scalatra-example"),
-            previousArtifacts := Set.empty
+            previousArtifacts := Set.empty,
         ),
       aggregate = Seq(scalatraCore,
                       scalatraAuth,
@@ -81,15 +81,15 @@ object ScalatraBuild extends Build {
                       scalatraSpring,
                       scalatraMetrics,
                       scalatraCache,
-                      scalatraCacheGuava)
+                      scalatraCacheGuava),
   )
 
   lazy val scalatraCommon = Project(
       id = "scalatra-common",
       base = file("common"),
       settings = scalatraSettings ++ Seq(
-            libraryDependencies ++= Seq(servletApi % "provided,test")
-        )
+            libraryDependencies ++= Seq(servletApi % "provided,test"),
+        ),
   )
 
   lazy val scalatraCore =
@@ -108,7 +108,7 @@ object ScalatraBuild extends Build {
                     mimeUtil,
                     jodaTime,
                     jodaConvert,
-                    akkaActor % "test"
+                    akkaActor % "test",
                 )
                 if (sv.startsWith("2.10")) default
                 else default ++ Seq(parserCombinators, xml)
@@ -119,9 +119,9 @@ object ScalatraBuild extends Build {
                   exclude[MissingTypesProblem]("org.scalatra.HaltException"),
                   exclude[MissingTypesProblem]("org.scalatra.PassException"),
                   exclude[MissingMethodProblem](
-                      "org.scalatra.i18n.I18nSupport.provideMessages")
-              )
-          )
+                      "org.scalatra.i18n.I18nSupport.provideMessages"),
+              ),
+          ),
     ) dependsOn
     (scalatraSpecs2 % "test->compile", scalatraScalatest % "test->compile",
         scalatraCommon % "compile;test->test")
@@ -132,8 +132,8 @@ object ScalatraBuild extends Build {
         base = file("auth"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(base64),
-              description := "Scalatra authentication module"
-          )
+              description := "Scalatra authentication module",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraFileupload =
@@ -142,8 +142,8 @@ object ScalatraBuild extends Build {
         base = file("fileupload"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(commonsFileupload, commonsIo),
-              description := "Commons-Fileupload integration with Scalatra"
-          )
+              description := "Commons-Fileupload integration with Scalatra",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraAtmosphere =
@@ -159,8 +159,8 @@ object ScalatraBuild extends Build {
                                           atmosphereCompatTomcat7,
                                           atmosphereClient % "test",
                                           jettyWebsocket % "test"),
-              description := "Atmosphere integration for scalatra"
-          )
+              description := "Atmosphere integration for scalatra",
+          ),
     ) dependsOn (scalatraJson % "compile;test->test;provided->provided")
 
   lazy val scalatraScalate =
@@ -169,8 +169,8 @@ object ScalatraBuild extends Build {
         base = file("scalate"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies += scalate,
-              description := "Scalate integration with Scalatra"
-          )
+              description := "Scalate integration with Scalatra",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraJson =
@@ -181,8 +181,8 @@ object ScalatraBuild extends Build {
               description := "JSON support for Scalatra",
               libraryDependencies ++= Seq(json4sJackson % "provided",
                                           json4sNative % "provided",
-                                          json4sCore)
-          )
+                                          json4sCore),
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraCommands =
@@ -192,7 +192,7 @@ object ScalatraBuild extends Build {
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(
                   "commons-validator" % "commons-validator" % "1.5.0",
-                  "io.backchat.inflector" %% "scala-inflector" % "1.3.5"
+                  "io.backchat.inflector" %% "scala-inflector" % "1.3.5",
               ),
               libraryDependencies ++= Seq(scalaz, jodaTime, jodaConvert),
               initialCommands := """
@@ -204,8 +204,8 @@ object ScalatraBuild extends Build {
           |import commands._
           |import BindingSyntax._
         """.stripMargin,
-              description := "Data binding and validation with scalaz for Scalatra"
-          )
+              description := "Data binding and validation with scalaz for Scalatra",
+          ),
     ) dependsOn (scalatraJson % "compile;test->test;provided->provided")
 
   lazy val scalatraJetty =
@@ -215,10 +215,10 @@ object ScalatraBuild extends Build {
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(
                   servletApi,
-                  jettyServlet
+                  jettyServlet,
               ),
-              description := "Embedded Jetty server for Scalatra apps"
-          )
+              description := "Embedded Jetty server for Scalatra apps",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraTest =
@@ -235,10 +235,10 @@ object ScalatraBuild extends Build {
                   httpclient,
                   httpmime,
                   jodaTime % "provided",
-                  jodaConvert % "provided"
+                  jodaConvert % "provided",
               ) ++ specs2.map(_ % "test"),
-              description := "The abstract Scalatra test framework"
-          )
+              description := "The abstract Scalatra test framework",
+          ),
     ) dependsOn (scalatraCommon % "compile;test->test;provided->provided")
 
   lazy val scalatraScalatest =
@@ -248,8 +248,8 @@ object ScalatraBuild extends Build {
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++=
                 Seq(scalatest, junit, testng % "optional", guice % "optional"),
-              description := "ScalaTest support for the Scalatra test framework"
-          )
+              description := "ScalaTest support for the Scalatra test framework",
+          ),
     ) dependsOn (scalatraTest % "compile;test->test;provided->provided")
 
   lazy val scalatraSpecs2 =
@@ -258,8 +258,8 @@ object ScalatraBuild extends Build {
         base = file("specs2"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= specs2,
-              description := "Specs2 support for the Scalatra test framework"
-          )
+              description := "Specs2 support for the Scalatra test framework",
+          ),
     ) dependsOn (scalatraTest % "compile;test->test;provided->provided")
 
   lazy val scalatraSwagger =
@@ -271,8 +271,8 @@ object ScalatraBuild extends Build {
               val com = Seq(json4sExt, logbackClassic % "provided")
               if (sv.startsWith("2.10")) com else parserCombinators +: com
             },
-              description := "Scalatra integration with Swagger"
-          )
+              description := "Scalatra integration with Swagger",
+          ),
     ) dependsOn
     (scalatraCore % "compile;test->test;provided->provided",
         scalatraJson % "compile;test->test;provided->provided")
@@ -282,8 +282,8 @@ object ScalatraBuild extends Build {
         id = "scalatra-swagger-ext",
         base = file("swagger-ext"),
         settings = scalatraSettings ++ Seq(
-              description := "Deeper Swagger integration for scalatra"
-          )
+              description := "Deeper Swagger integration for scalatra",
+          ),
     ) dependsOn
     (scalatraSwagger % "compile;test->test;provided->provided",
         scalatraCommands % "compile;test->test;provided->provided",
@@ -296,8 +296,8 @@ object ScalatraBuild extends Build {
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++=
                 Seq(grizzledSlf4j, logbackClassic % "provided"),
-              description := "Scalatra integration with SLF4J and Logback"
-          )
+              description := "Scalatra integration with SLF4J and Logback",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraSpring =
@@ -306,8 +306,8 @@ object ScalatraBuild extends Build {
         base = file("spring"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies += springWeb,
-              description := "Scalatra integration with Spring Framework"
-          )
+              description := "Scalatra integration with Spring Framework",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraMetrics =
@@ -317,8 +317,8 @@ object ScalatraBuild extends Build {
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++=
                 Seq(metricsScala, metricsServlets, metricsServlet),
-              description := "Scalatra integration with Metrics"
-          )
+              description := "Scalatra integration with Metrics",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraCache =
@@ -327,8 +327,8 @@ object ScalatraBuild extends Build {
         base = file("cache"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(),
-              description := "Scalatra Cache support"
-          )
+              description := "Scalatra Cache support",
+          ),
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
   lazy val scalatraCacheGuava =
@@ -337,8 +337,8 @@ object ScalatraBuild extends Build {
         base = file("cache-guava"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(googleGuava, googleFindBugs),
-              description := "Scalatra Cache integration with Google Guava"
-          )
+              description := "Scalatra Cache integration with Google Guava",
+          ),
     ) dependsOn
     (scalatraCore % "compile;test->test;provided->provided",
         scalatraCache % "compile;test->test;provided->provided")
@@ -357,8 +357,8 @@ object ScalatraBuild extends Build {
               libraryDependencies += json4sJackson,
               libraryDependencies += atmosphereJQuery,
               description := "Scalatra example project",
-              previousArtifacts := Set.empty
-          )
+              previousArtifacts := Set.empty,
+          ),
     ) dependsOn
     (scalatraCore % "compile;test->test;provided->provided", scalatraScalate,
         scalatraAuth, scalatraFileupload, scalatraJetty, scalatraCommands,
@@ -430,7 +430,7 @@ object ScalatraBuild extends Build {
     lazy val specs2 = Seq(
         "org.specs2" %% "specs2-core",
         "org.specs2" %% "specs2-mock",
-        "org.specs2" %% "specs2-matcher-extra"
+        "org.specs2" %% "specs2-matcher-extra",
     ).map(_ % specs2Version)
     lazy val testJettyServlet =
       "org.eclipse.jetty" % "test-jetty-servlet" % jettyVersion
@@ -468,7 +468,7 @@ object ScalatraBuild extends Build {
             "Implementation-Title" -> title,
             "Implementation-Version" -> version,
             "Implementation-Vendor-Id" -> vendor,
-            "Implementation-Vendor" -> vendor
+            "Implementation-Vendor" -> vendor,
         )
     }
 
@@ -561,9 +561,9 @@ object ScalatraBuild extends Build {
           <name>Kazuhiro Sera</name>
           <url>hhttps://github.com/seratch</url>
         </developer>
-      </developers>
+      </developers>,
         )
-      }
+      },
   )
 
   lazy val doNotPublish = Seq(publish := {},

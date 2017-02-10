@@ -72,7 +72,7 @@ class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
 
   // Lazy transient as const futures are not serializable
   @transient private[this] lazy val noData = List(
-      (List(), Future.value(Nil))
+      (List(), Future.value(Nil)),
   )
 
   private def formatResult(outData: Map[Key, (Seq[S], Value)])
@@ -118,8 +118,8 @@ class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
         // Here we handle mapping to nothing, option map et. al
         Future.value(
             List(
-                (List(state), Future.value(Nil))
-            )
+                (List(state), Future.value(Nil)),
+            ),
         )
       }
     } catch {

@@ -104,7 +104,7 @@ object CanConvolve extends SerializableLogging {
                   case op =>
                     require(false, "cannot handle OptPadding value " + op);
                     DenseVector[T]()
-                }
+                },
             )
 
           //Overhangs on both sides will sum to kernel.length - 1, thereby giving the same output length as input length
@@ -142,7 +142,7 @@ object CanConvolve extends SerializableLogging {
                     case op =>
                       require(false, "cannot handle OptPadding value " + op);
                       DenseVector[T]()
-                  }
+                  },
               )
             }
           case oc =>
@@ -248,7 +248,7 @@ object CanConvolve extends SerializableLogging {
                     ki = ki + 1
                   }
                   sum
-              }
+              },
           )
           .toArray
 
@@ -288,7 +288,7 @@ object CanConvolve extends SerializableLogging {
                     ki = ki + 1
                   }
                   sum.toInt
-              }
+              },
           )
           .toArray
         DenseVector[Int](tempArr)

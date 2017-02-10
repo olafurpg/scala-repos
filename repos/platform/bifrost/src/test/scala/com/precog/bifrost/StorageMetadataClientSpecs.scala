@@ -38,7 +38,7 @@ abstract class BrowseServiceSpecs[M[+ _]](
     implicit val M: Monad[M] with Comonad[M])
     extends Specification {
   def colSizeMetadata(descriptor: ColumnRef, size: Long): ColumnMetadata = Map(
-      descriptor -> Map(StringValueStats -> StringValueStats(size, "a", "z"))
+      descriptor -> Map(StringValueStats -> StringValueStats(size, "a", "z")),
   )
 
   lazy val projectionMetadata: Map[Path, Map[ColumnRef, Long]] = Map(
@@ -47,7 +47,7 @@ abstract class BrowseServiceSpecs[M[+ _]](
       Path("/foo/bar2/baz/quux2") -> Map(ColumnRef(CPath(), CString) -> 30L),
       Path("/foo2/bar1/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 40L),
       Path("/foo/bar/") -> Map(ColumnRef(CPath(".bar"), CLong) -> 50,
-                               ColumnRef(CPath(".baz"), CLong) -> 60L)
+                               ColumnRef(CPath(".baz"), CLong) -> 60L),
   )
 
   val metadata = new StubVFSMetadata[M](projectionMetadata)

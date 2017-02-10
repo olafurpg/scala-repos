@@ -31,7 +31,7 @@ object EnumeratorPTest extends SpecLite {
               middle3((8, 8)),
               middle3((8, 8)),
               middle3((8, 8)),
-              middle3((8, 8))
+              middle3((8, 8)),
           ))
     }
 
@@ -59,7 +59,7 @@ object EnumeratorPTest extends SpecLite {
               middle3((8, 8)),
               middle3((8, 8)),
               middle3((8, 8)),
-              middle3((8, 8))
+              middle3((8, 8)),
           ))
     }
   }

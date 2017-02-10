@@ -44,7 +44,7 @@ private final class ExplorerIndexer(
         val query = $query(
             Query.createdSince(since) ++ Query.rated ++ Query.finished ++ Query
               .turnsMoreThan(8) ++ Query.noProvisional ++ Query
-              .bothRatingsGreaterThan(1501)
+              .bothRatingsGreaterThan(1501),
         )
         import reactivemongo.api._
         pimpQB(query)

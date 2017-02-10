@@ -21,7 +21,7 @@ import scala.collection.concurrent
 private[serverset2] class ZkSession(
     retryStream: RetryStream,
     watchedZk: Watched[ZooKeeperReader],
-    statsReceiver: StatsReceiver
+    statsReceiver: StatsReceiver,
 )(implicit timer: Timer) {
   import ZkSession.logger
 
@@ -295,7 +295,7 @@ private[serverset2] object ZkSession {
       retryStream: RetryStream,
       hosts: String,
       sessionTimeout: Duration = DefaultSessionTimeout,
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   )(implicit timer: Timer): ZkSession =
     new ZkSession(retryStream,
                   ClientBuilder()
@@ -315,7 +315,7 @@ private[serverset2] object ZkSession {
     */
   def retrying(
       backoff: RetryStream,
-      newZkSession: () => ZkSession
+      newZkSession: () => ZkSession,
   )(implicit timer: Timer): Var[ZkSession] = {
     val v = Var(ZkSession.nil)
 

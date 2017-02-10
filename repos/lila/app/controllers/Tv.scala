@@ -53,7 +53,7 @@ object Tv extends LilaController {
               Env.api.roundApi.watcher(
                   pov, apiVersion, tv = onTv.some, withOpening = false) map {
               Ok(_)
-          }
+          },
       )
     }
 
@@ -129,7 +129,7 @@ object Tv extends LilaController {
             views.html.tv.embed(
                 Pov first game,
                 get("bg", req) | "light",
-                lila.pref.Theme(~get("theme", req)).cssClass
+                lila.pref.Theme(~get("theme", req)).cssClass,
             ))
     }
   }

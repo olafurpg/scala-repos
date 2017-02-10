@@ -25,7 +25,7 @@ object StatusPlugin extends AutoPlugin {
         if (isSnapshot.value) "snapshots"
         else "releases"
       },
-      commands += stampVersion
+      commands += stampVersion,
   )
   def stampVersion = Command.command("stamp-version") { state =>
     val extracted = Project.extract(state)

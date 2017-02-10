@@ -57,7 +57,7 @@ object TournamentRepo {
   def byIdAndPlayerId(id: String, userId: String): Fu[Option[Tournament]] =
     coll
       .find(
-          selectId(id) ++ BSONDocument("players.id" -> userId)
+          selectId(id) ++ BSONDocument("players.id" -> userId),
       )
       .one[Tournament]
 
@@ -117,7 +117,7 @@ object TournamentRepo {
     coll
       .find(finishedSelect ++ BSONDocument("$or" -> BSONArray(
                   BSONDocument("nbPlayers" -> BSONDocument("$gte" -> 15)),
-                  scheduledSelect
+                  scheduledSelect,
               )))
       .sort(BSONDocument("startsAt" -> -1))
       .cursor[Tournament]()
@@ -128,7 +128,7 @@ object TournamentRepo {
                     collection = coll,
                     selector = finishedSelect,
                     projection = BSONDocument(),
-                    sort = BSONDocument("startsAt" -> -1)
+                    sort = BSONDocument("startsAt" -> -1),
                 ),
               currentPage = page,
               maxPerPage = maxPerPage)
@@ -137,7 +137,7 @@ object TournamentRepo {
     coll
       .update(
           selectId(tourId),
-          BSONDocument("$set" -> BSONDocument("status" -> status.id))
+          BSONDocument("$set" -> BSONDocument("status" -> status.id)),
       )
       .void
 
@@ -145,7 +145,7 @@ object TournamentRepo {
     coll
       .update(
           selectId(tourId),
-          BSONDocument("$set" -> BSONDocument("nbPlayers" -> nb))
+          BSONDocument("$set" -> BSONDocument("nbPlayers" -> nb)),
       )
       .void
 
@@ -153,7 +153,7 @@ object TournamentRepo {
     coll
       .update(
           selectId(tourId),
-          BSONDocument("$set" -> BSONDocument("winner" -> userId))
+          BSONDocument("$set" -> BSONDocument("winner" -> userId)),
       )
       .void
 
@@ -161,7 +161,7 @@ object TournamentRepo {
     coll
       .update(
           selectId(tourId),
-          BSONDocument("$set" -> BSONDocument("featured" -> gameId))
+          BSONDocument("$set" -> BSONDocument("featured" -> gameId)),
       )
       .void
 
@@ -169,7 +169,7 @@ object TournamentRepo {
     coll
       .find(
           selectId(tourId),
-          BSONDocument("featured" -> true)
+          BSONDocument("featured" -> true),
       )
       .one[BSONDocument]
       .map(_.flatMap(_.getAs[String]("featured")))
@@ -179,15 +179,15 @@ object TournamentRepo {
         "$or" -> BSONArray(
             BSONDocument("schedule" -> BSONDocument("$exists" -> false)),
             BSONDocument("startsAt" -> BSONDocument("$lt" ->
-                    (DateTime.now plusMinutes aheadMinutes)))
-        )
+                    (DateTime.now plusMinutes aheadMinutes))),
+        ),
     )
 
   def publicCreatedSorted(aheadMinutes: Int): Fu[List[Tournament]] =
     coll
       .find(
           allCreatedSelect(aheadMinutes) ++ BSONDocument(
-              "private" -> BSONDocument("$exists" -> false))
+              "private" -> BSONDocument("$exists" -> false)),
       )
       .sort(BSONDocument("startsAt" -> 1))
       .cursor[Tournament]()
@@ -202,7 +202,7 @@ object TournamentRepo {
   private def stillWorthEntering: Fu[List[Tournament]] =
     coll
       .find(startedSelect ++ BSONDocument(
-              "private" -> BSONDocument("$exists" -> false)
+              "private" -> BSONDocument("$exists" -> false),
           ))
       .sort(BSONDocument("startsAt" -> 1))
       .toList[Tournament](none) map {
@@ -273,8 +273,8 @@ object TournamentRepo {
               chess.variant.Standard) ++ BSONDocument(
               "schedule.freq" -> freq.name,
               "schedule.speed" -> BSONDocument(
-                  "$in" -> Schedule.Speed.mostPopular.map(_.name))
-          )
+                  "$in" -> Schedule.Speed.mostPopular.map(_.name)),
+          ),
       )
       .sort(BSONDocument("startsAt" -> -1))
       .toList[Tournament](Schedule.Speed.mostPopular.size.some)
@@ -284,7 +284,7 @@ object TournamentRepo {
       .find(
           finishedSelect ++ sinceSelect(DateTime.now minusDays 1) ++ variantSelect(
               variant) ++ BSONDocument(
-              "schedule.freq" -> Schedule.Freq.Daily.name)
+              "schedule.freq" -> Schedule.Freq.Daily.name),
       )
       .sort(BSONDocument("startsAt" -> -1))
       .one[Tournament]
@@ -310,8 +310,8 @@ object TournamentRepo {
               "_id" -> BSONDocument("$ne" -> tourId),
               "schedule.freq" -> BSONDocument("$nin" -> List(
                       Schedule.Freq.Marathon.name,
-                      Schedule.Freq.Unique.name
-                  ))
+                      Schedule.Freq.Unique.name,
+                  )),
           ) ++ nonEmptySelect)
       .cursor[Tournament]()
       .collect[List]()

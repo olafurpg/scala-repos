@@ -49,10 +49,10 @@ class InMemoryAPIKeyManager[M[+ _]](clock: Clock)(implicit val M: Monad[M])
         Set(
             ReadPermission(Path.Root, WrittenByAny),
             WritePermission(Path.Root, WriteAsAny),
-            DeletePermission(Path.Root, WrittenByAny)
+            DeletePermission(Path.Root, WrittenByAny),
         ),
         new Instant(0L),
-        None
+        None,
     )
 
     val rootAPIKeyRecord = APIKeyRecord(rootAPIKey,

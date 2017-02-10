@@ -19,7 +19,7 @@ class ThriftCodecTest extends FunSuite {
       method: String,
       `type`: Byte,
       seqId: Int,
-      message: { def write(p: TProtocol) }
+      message: { def write(p: TProtocol) },
   ): ChannelBuffer = {
     val buffer = ChannelBuffers.dynamicBuffer()
     val transport = new ChannelBufferToTransport(buffer)

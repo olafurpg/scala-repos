@@ -42,7 +42,7 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
             }),
         "color" -> c.colorChoice.toString.toLowerCase,
         "perf" -> Json.obj("icon" -> iconChar(c).toString,
-                           "name" -> c.perfType.name)
+                           "name" -> c.perfType.name),
     )
 
   private def iconChar(c: Challenge) =
@@ -57,7 +57,7 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
           "name" -> light.fold(r.id)(_.name),
           "title" -> light.map(_.title),
           "rating" -> r.rating.int,
-          "provisional" -> r.rating.provisional
+          "provisional" -> r.rating.provisional,
       )
       .noNull
   }

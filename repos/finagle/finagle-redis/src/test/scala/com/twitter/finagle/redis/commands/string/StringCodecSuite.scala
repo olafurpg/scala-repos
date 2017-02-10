@@ -61,7 +61,7 @@ final class StringCodecSuite extends RedisRequestTest {
             BitOp(BitOp.And,
                   StringToChannelBuffer("baz"),
                   Seq(StringToChannelBuffer("foo"),
-                      StringToChannelBuffer("bar")))
+                      StringToChannelBuffer("bar"))),
         ))
   }
 

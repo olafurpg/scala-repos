@@ -131,7 +131,7 @@ private[kafka] class ZookeeperConsumerConnector(
         def value = {
           com.yammer.metrics.Metrics.defaultRegistry().allMetrics().size()
         }
-      }
+      },
   )
 
   val consumerIdString = {
@@ -812,7 +812,7 @@ private[kafka] class ZookeeperConsumerConnector(
                     topicRegistry
                       .map(topics => topics._1 -> topics._2.keys)
                       .toMap).asInstanceOf[java.util.Map[
-                        String, java.util.Set[java.lang.Integer]]]
+                        String, java.util.Set[java.lang.Integer]]],
           )
         }
         releasePartitionOwnership(topicRegistry)
@@ -889,7 +889,7 @@ private[kafka] class ZookeeperConsumerConnector(
               consumerRebalanceListener.beforeStartingFetchers(
                   consumerIdString,
                   mapAsJavaMap(collection.mutable.Map(
-                          partitionAssigmentMapForCallback.toSeq: _*))
+                          partitionAssigmentMapForCallback.toSeq: _*)),
               )
             }
             updateFetcher(cluster)
@@ -1112,7 +1112,7 @@ private[kafka] class ZookeeperConsumerConnector(
             },
             Map("clientId" -> config.clientId,
                 "topic" -> topicThreadId._1,
-                "threadId" -> topicThreadId._2.threadId.toString)
+                "threadId" -> topicThreadId._2.threadId.toString),
         )
     })
 

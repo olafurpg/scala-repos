@@ -236,7 +236,7 @@ class GroupManager @Singleton @Inject()(
         .find(!taken.contains(_))
         .getOrElse(throw new PortRangeExhaustedException(
                 config.localPortMin(),
-                config.localPortMax()
+                config.localPortMax(),
             ))
       log.info(s"Take next configured free port: $port")
       taken += port
@@ -264,7 +264,7 @@ class GroupManager @Singleton @Inject()(
             .app(app.id)
             .map(_.portNumbers.filter(p =>
                       portRange.contains(p) && !app.servicePorts.contains(p)))
-            .getOrElse(Nil): _*
+            .getOrElse(Nil): _*,
       )
 
       def nextFreeAppPort: Int =
@@ -285,14 +285,14 @@ class GroupManager @Singleton @Inject()(
           case (pm, sp) => pm.copy(servicePort = sp)
         }
         c.copy(
-            docker = Some(d.copy(portMappings = Some(mappings)))
+            docker = Some(d.copy(portMappings = Some(mappings))),
         )
       }
 
       app.copy(
           portDefinitions = mergeServicePortsAndPortDefinitions(
                 app.portDefinitions, servicePorts),
-          container = newContainer.orElse(app.container)
+          container = newContainer.orElse(app.container),
       )
     }
 
@@ -302,7 +302,7 @@ class GroupManager @Singleton @Inject()(
         // Always set the ports to service ports, even if we do not have dynamic ports in our port mappings
         app.copy(
             portDefinitions = mergeServicePortsAndPortDefinitions(
-                  app.portDefinitions, app.servicePorts)
+                  app.portDefinitions, app.servicePorts),
         )
     }
 

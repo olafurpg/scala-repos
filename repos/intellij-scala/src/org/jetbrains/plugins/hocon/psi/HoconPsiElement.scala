@@ -163,9 +163,9 @@ sealed trait HKeyedField
                     obj =>
                       obj.prefixingField
                         .map(_.fieldsInAllPathsBackward)
-                        .getOrElse(Stream.empty)
+                        .getOrElse(Stream.empty),
                   ))
-            .get
+            .get,
       )
 
   /**
@@ -313,13 +313,13 @@ final class HKey(ast: ASTNode)
   def allKeysFromToplevel: Option[List[HKey]] =
     forParent(
         path => path.allKeys,
-        keyedEntry => keyedEntry.keysInAllPaths
+        keyedEntry => keyedEntry.keysInAllPaths,
     )
 
   def enclosingEntries: HObjectEntries =
     forParent(
         path => getContainingFile.toplevelEntries,
-        keyedField => keyedField.enclosingEntries
+        keyedField => keyedField.enclosingEntries,
     )
 
   def stringValue =
@@ -393,7 +393,7 @@ sealed trait HValue extends HoconPsiElement with HInnerElement {
   def prefixingField: Option[HValuedField] = forParent(
       vf => if (vf.isArrayAppend) None else Some(vf),
       arr => None,
-      concat => concat.prefixingField
+      concat => concat.prefixingField,
   )
 }
 

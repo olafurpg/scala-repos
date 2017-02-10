@@ -71,7 +71,7 @@ object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint] {
       Quality,
       Scale,
       Rotate,
-      ScaleAndRotate
+      ScaleAndRotate,
   )
 }
 

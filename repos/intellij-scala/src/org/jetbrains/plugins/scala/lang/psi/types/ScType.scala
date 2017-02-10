@@ -237,7 +237,7 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
       "scala.Double" -> Double,
       "scala.Byte" -> Byte,
       "scala.Short" -> Short,
-      "scala.AnyVal" -> AnyVal
+      "scala.AnyVal" -> AnyVal,
   )
 
   @tailrec

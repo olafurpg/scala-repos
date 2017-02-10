@@ -28,7 +28,7 @@ class DocResolverSpec
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Some"),
                        Some("map[B](f:A=>B):Option[B]")),
-                DocSig(DocFqn("scala", "Some"), Some("map(scala.Function1)"))
+                DocSig(DocFqn("scala", "Some"), Some("map(scala.Function1)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@map[B](f:A=>B):Option[B]")
 
@@ -36,13 +36,13 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Boolean"), None),
-                DocSig(DocFqn("", "boolean"), None)
+                DocSig(DocFqn("", "boolean"), None),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Boolean")
 
@@ -50,13 +50,13 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Option"), Some("isDefined:Boolean")),
-                DocSig(DocFqn("scala", "Option"), Some("isDefined"))
+                DocSig(DocFqn("scala", "Option"), Some("isDefined")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Option@isDefined:Boolean")
 
@@ -64,7 +64,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -72,7 +72,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala", "Some"),
                        Some("flatMap[B](f:A=>Option[B]):Option[B]")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("flatMap(scala.Function1)"))
+                       Some("flatMap(scala.Function1)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@flatMap[B](f:A=>Option[B]):Option[B]")
 
@@ -80,7 +80,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -89,7 +89,7 @@ class DocResolverSpec
                     DocFqn("scala", "Some"),
                     Some("flatten[B](implicitev:<:<[A,Option[B]]):Option[B]")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("flatten(scala.Predef.<:<)"))
+                       Some("flatten(scala.Predef.<:<)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@flatten[B](implicitev:<:<[A,Option[B]]):Option[B]")
 
@@ -97,7 +97,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -105,7 +105,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala", "Some"),
                        Some("fold[B](ifEmpty:=>B)(f:A=>B):B")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("fold(scala.<byname>, scala.Function1)"))
+                       Some("fold(scala.<byname>, scala.Function1)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@fold[B](ifEmpty:=>B)(f:A=>B):B")
 
@@ -113,7 +113,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -124,7 +124,7 @@ class DocResolverSpec
                     Some(
                         "mkString(start:String,sep:String,end:String):String")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("mkString(java.lang.String, java.lang.String, java.lang.String)"))
+                       Some("mkString(java.lang.String, java.lang.String, java.lang.String)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@mkString(start:String,sep:String,end:String):String")
 
@@ -132,13 +132,13 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Some"), Some("mkString:String")),
-                DocSig(DocFqn("scala", "Some"), Some("mkString"))
+                DocSig(DocFqn("scala", "Some"), Some("mkString")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@mkString:String")
 
@@ -146,7 +146,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -154,7 +154,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala", "Some"),
                        Some("mkString(sep:String):String")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("mkString(java.lang.String)"))
+                       Some("mkString(java.lang.String)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@mkString(sep:String):String")
 
@@ -162,7 +162,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -170,7 +170,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala", "Some"),
                        Some("getOrElse[B>:A](default:=>B):B")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("getOrElse(scala.<byname>)"))
+                       Some("getOrElse(scala.<byname>)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@getOrElse[B>:A](default:=>B):B")
 
@@ -178,14 +178,14 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Some"),
                        Some("grouped(size:Int):Iterator[Repr]")),
-                DocSig(DocFqn("scala", "Some"), Some("grouped(int)"))
+                DocSig(DocFqn("scala", "Some"), Some("grouped(int)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@grouped(size:Int):Iterator[Repr]")
 
@@ -193,7 +193,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -201,7 +201,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala.collection.immutable", "List$"),
                        Some("empty[A]:List[A]")),
                 DocSig(DocFqn("scala.collection.immutable", "List"),
-                       Some("empty"))
+                       Some("empty")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.collection.immutable.List$@empty[A]:List[A]")
 
@@ -209,7 +209,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -217,7 +217,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("move(x$1:java.io.File,x$2:java.io.File):Unit")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("move(java.io.File, java.io.File)"))
+                       Some("move(java.io.File, java.io.File)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#move(java.io.File, java.io.File)")
 
@@ -225,7 +225,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -233,7 +233,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("asByteSource(x$1:java.io.File):com.google.common.io.ByteSource")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("asByteSource(java.io.File)"))
+                       Some("asByteSource(java.io.File)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#asByteSource(java.io.File)")
 
@@ -241,7 +241,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -249,7 +249,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("map(x$1:java.io.File,x$2:java.nio.channels.FileChannel.MapMode):java.nio.MappedByteBuffer")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("map(java.io.File, java.nio.channels.FileChannel.MapMode)"))
+                       Some("map(java.io.File, java.nio.channels.FileChannel.MapMode)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#map(java.io.File, java.nio.channels.FileChannel.MapMode)")
 
@@ -257,7 +257,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -265,7 +265,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("map(x$1:java.io.File,x$2:java.nio.channels.FileChannel.MapMode,x$3:Long):java.nio.MappedByteBuffer")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("map(java.io.File, java.nio.channels.FileChannel.MapMode, long)"))
+                       Some("map(java.io.File, java.nio.channels.FileChannel.MapMode, long)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#map(java.io.File, java.nio.channels.FileChannel.MapMode, long)")
 
@@ -273,7 +273,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -281,7 +281,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("write(x$1:Array[Byte],x$2:java.io.File):Unit")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("write(byte[], java.io.File)"))
+                       Some("write(byte[], java.io.File)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#write(byte[], java.io.File)")
 
@@ -289,13 +289,13 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Some"), None),
-                DocSig(DocFqn("scala", "Some"), None)
+                DocSig(DocFqn("scala", "Some"), None),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some")
 
@@ -303,7 +303,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -311,13 +311,13 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Int"), None),
-                DocSig(DocFqn("", "int"), None)
+                DocSig(DocFqn("", "int"), None),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Int")
 
@@ -325,7 +325,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -333,7 +333,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -341,13 +341,13 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "Predef$$DummyImplicit$"), None),
-                DocSig(DocFqn("scala", "Predef.DummyImplicit"), None)
+                DocSig(DocFqn("scala", "Predef.DummyImplicit"), None),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Predef$$DummyImplicit$")
 
@@ -355,7 +355,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -363,7 +363,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -371,7 +371,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -379,7 +379,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -387,27 +387,27 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala.collection", ".package"), None),
-                DocSig(DocFqn("scala.collection", "package"), None)
+                DocSig(DocFqn("scala.collection", "package"), None),
             )) shouldBe None
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
         serv.resolve(DocSigPair(
                 DocSig(DocFqn("scala", "package"),
                        Some("Exception=Exception")),
-                DocSig(DocFqn("scala", "package"), Some("Exception"))
+                DocSig(DocFqn("scala", "package"), Some("Exception")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.package@Exception=Exception")
 
@@ -415,7 +415,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -423,7 +423,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala", "Some"),
                        Some("++[B>:A,That](that:scala.collection.GenTraversableOnce[B])(implicitbf:scala.collection.generic.CanBuildFrom[Repr,B,That]):That")),
                 DocSig(DocFqn("scala", "Some"),
-                       Some("++(scala.collection.GenTraversableOnce, scala.collection.generic.CanBuildFrom)"))
+                       Some("++(scala.collection.GenTraversableOnce, scala.collection.generic.CanBuildFrom)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.Some@++[B](that:scala.collection.GenTraversableOnce[B]):Option[B]")
 
@@ -431,7 +431,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -439,7 +439,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala.collection.immutable", "List"),
                        Some("flatMap[B,That](f:A=>scala.collection.GenTraversableOnce[B])(implicitbf:scala.collection.generic.CanBuildFrom[List[A],B,That]):That")),
                 DocSig(DocFqn("scala.collection.immutable", "List"),
-                       Some("flatMap(scala.Function1, scala.collection.generic.CanBuildFrom)"))
+                       Some("flatMap(scala.Function1, scala.collection.generic.CanBuildFrom)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.collection.immutable.List@flatMap[B](f:A=>scala.collection.GenTraversableOnce[B]):List[B]")
 
@@ -447,7 +447,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
@@ -455,7 +455,7 @@ class DocResolverSpec
                 DocSig(DocFqn("scala.collection.immutable", "List"),
                        Some("collect[B,That](pf:PartialFunction[A,B])(implicitbf:scala.collection.generic.CanBuildFrom[List[A],B,That]):That")),
                 DocSig(DocFqn("scala.collection.immutable", "List"),
-                       Some("collect(scala.PartialFunction, scala.collection.generic.CanBuildFrom)"))
+                       Some("collect(scala.PartialFunction, scala.collection.generic.CanBuildFrom)")),
             )) shouldBe Some("docs/scala-library-" + c.scalaVersion +
             "-javadoc.jar/index.html#scala.collection.immutable.List@collect[B](pf:PartialFunction[A,B]):List[B]")
 
@@ -463,7 +463,7 @@ class DocResolverSpec
                 DocSig(DocFqn("com.google.common.io", "Files$"),
                        Some("simplifyPath(x$1:String):String")),
                 DocSig(DocFqn("com.google.common.io", "Files"),
-                       Some("simplifyPath(java.lang.String)"))
+                       Some("simplifyPath(java.lang.String)")),
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
       }
@@ -477,17 +477,17 @@ class DocResolverSpec
         val serv = resolver(Some("1.6"))
 
         serv.resolve(
-            DocSig(DocFqn("java.io", "File"), None)
+            DocSig(DocFqn("java.io", "File"), None),
         ) shouldBe Some(
             "http://docs.oracle.com/javase/6/docs/api/java/io/File.html")
 
         serv.resolve(
-            DocSig(DocFqn("java.util", "Map.Entry"), None)
+            DocSig(DocFqn("java.util", "Map.Entry"), None),
         ) shouldBe Some(
             "http://docs.oracle.com/javase/6/docs/api/java/util/Map.Entry.html")
 
         serv.resolve(
-            DocSig(DocFqn("java.util", "package"), None)
+            DocSig(DocFqn("java.util", "package"), None),
         ) shouldBe Some(
             "http://docs.oracle.com/javase/6/docs/api/java/util/package-summary.html")
       }
@@ -501,23 +501,23 @@ class DocResolverSpec
       // a local java 8 javadoc
       serv.resolve(
           DocSig(DocFqn("com.github.dvdme.ForecastIOLib", "ForecastIO"),
-                 Some("getForecast(com.eclipsesource.json.JsonObject)"))
+                 Some("getForecast(com.eclipsesource.json.JsonObject)")),
       ) shouldBe Some(
           "docs/ForecastIOLib-1.5.1-javadoc.jar/com/github/dvdme/ForecastIOLib/ForecastIO.html#getForecast-com.eclipsesource.json.JsonObject-")
 
       serv.resolve(
-          DocSig(DocFqn("java.io", "File"), Some("delete()"))
+          DocSig(DocFqn("java.io", "File"), Some("delete()")),
       ) shouldBe Some(
           "http://docs.oracle.com/javase/8/docs/api/java/io/File.html#delete--")
 
       serv.resolve(
-          DocSig(DocFqn("java.lang", "Math"), Some("max(int, int)"))
+          DocSig(DocFqn("java.lang", "Math"), Some("max(int, int)")),
       ) shouldBe Some(
           "http://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#max-int-int-")
 
       serv.resolve(
           DocSig(DocFqn("java.util", "Arrays"),
-                 Some("binarySearch(int[], int)"))
+                 Some("binarySearch(int[], int)")),
       ) shouldBe Some(
           "http://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html#binarySearch-int:A-int-")
     }

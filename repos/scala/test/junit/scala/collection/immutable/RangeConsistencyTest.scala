@@ -14,7 +14,7 @@ class RangeConsistencyTest {
       puff: T,
       stride: T,
       check: (T, T) => Boolean,
-      bi: T => BigInt
+      bi: T => BigInt,
   ): List[(BigInt, Try[Int])] = {
     val num = implicitly[Integral[T]]
     import num._
@@ -94,7 +94,7 @@ class RangeConsistencyTest {
             lpuff,
             lstride,
             (a, b) => { val x = BigInt(a) * BigInt(b); x.isValidLong },
-            x => BigInt(x)
+            x => BigInt(x),
         )
 
         lr.foreach {
@@ -104,7 +104,7 @@ class RangeConsistencyTest {
                   case Failure(_) => n > Int.MaxValue
                   case Success(m) => n == m
                 },
-                (r.start, r.end, r.step, r.isInclusive, lpuff, lstride, n, t)
+                (r.start, r.end, r.step, r.isInclusive, lpuff, lstride, n, t),
             )
         }
 
@@ -127,7 +127,7 @@ class RangeConsistencyTest {
                   case Failure(_) => n > Int.MaxValue
                   case Success(m) => n == m
                 },
-                (r.start, r.end, r.step, r.isInclusive, bipuff, bistride, n, t)
+                (r.start, r.end, r.step, r.isInclusive, bipuff, bistride, n, t),
             )
         }
       }

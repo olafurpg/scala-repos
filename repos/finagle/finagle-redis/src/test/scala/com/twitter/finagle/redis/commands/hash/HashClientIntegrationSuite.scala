@@ -76,7 +76,7 @@ final class HashClientIntegrationSuite extends RedisClientTest {
   test(
       "Correctly set multiple values one of which is an empty string value",
       RedisTest,
-      ClientTest
+      ClientTest,
   ) {
     withRedisClient { client =>
       Await.result(

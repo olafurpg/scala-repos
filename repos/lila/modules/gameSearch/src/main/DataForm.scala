@@ -19,7 +19,7 @@ private[gameSearch] final class DataForm {
                 "b" -> optional(nonEmptyText),
                 "winner" -> optional(nonEmptyText),
                 "white" -> optional(nonEmptyText),
-                "black" -> optional(nonEmptyText)
+                "black" -> optional(nonEmptyText),
             )(SearchPlayer.apply)(SearchPlayer.unapply),
             "winnerColor" -> optional(numberIn(Query.winnerColors)),
             "perf" -> optional(numberIn(Query.perfs)),
@@ -38,7 +38,7 @@ private[gameSearch] final class DataForm {
                 "initMin" -> optional(numberIn(Query.clockInits)),
                 "initMax" -> optional(numberIn(Query.clockInits)),
                 "incMin" -> optional(numberIn(Query.clockIncs)),
-                "incMax" -> optional(numberIn(Query.clockIncs))
+                "incMax" -> optional(numberIn(Query.clockIncs)),
             )(SearchClock.apply)(SearchClock.unapply),
             "dateMin" -> DataForm.dateField,
             "dateMax" -> DataForm.dateField,
@@ -46,8 +46,8 @@ private[gameSearch] final class DataForm {
             "analysed" -> optional(number),
             "sort" -> optional(mapping(
                     "field" -> stringIn(Sorting.fields),
-                    "order" -> stringIn(Sorting.orders)
-                )(SearchSort.apply)(SearchSort.unapply))
+                    "order" -> stringIn(Sorting.orders),
+                )(SearchSort.apply)(SearchSort.unapply)),
         )(SearchData.apply)(SearchData.unapply)) fill SearchData()
 }
 

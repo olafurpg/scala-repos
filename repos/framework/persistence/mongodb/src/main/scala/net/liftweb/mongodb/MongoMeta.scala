@@ -185,7 +185,7 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
           qry,
           newobj,
           dboOpts.find(_ == Upsert).map(x => true).getOrElse(false),
-          dboOpts.find(_ == Multi).map(x => true).getOrElse(false)
+          dboOpts.find(_ == Multi).map(x => true).getOrElse(false),
       )
   }
 
@@ -197,7 +197,7 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
         JObjectParser.parse(qry),
         JObjectParser.parse(newobj),
         db,
-        opts: _*
+        opts: _*,
     )
   }
 

@@ -8,7 +8,7 @@ import scala.tools.nsc.{Global, Settings}
 object PerfTests extends TestSuite {
   val genJsCodeSource = scala.io.Source
     .fromInputStream(
-        getClass.getResourceAsStream("/scalaparse/GenJSCode.scala")
+        getClass.getResourceAsStream("/scalaparse/GenJSCode.scala"),
     )
     .mkString
   val tests = TestSuite {
@@ -19,7 +19,7 @@ object PerfTests extends TestSuite {
           System
             .getProperty("sun.boot.class.path")
             .split(":")
-            .map(new java.io.File(_))
+            .map(new java.io.File(_)),
         )
       while (current != null) {
         current match {

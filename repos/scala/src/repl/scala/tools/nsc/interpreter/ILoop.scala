@@ -257,7 +257,7 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
           kindCommand),
       nullary("warnings",
               "show the suppressed warnings from the most recent line which had any",
-              warningsCommand)
+              warningsCommand),
   )
 
   /** Power user commands */
@@ -265,7 +265,7 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
       cmd("phase",
           "<phase>",
           "set the implicit phase for power commands",
-          phaseCommand)
+          phaseCommand),
   )
 
   private def importsCommand(line: String): Result = {
@@ -292,7 +292,7 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
                 idx + 1,
                 handler.importString,
                 statsMsg,
-                foundMsg
+                foundMsg,
             ))
     }
   }

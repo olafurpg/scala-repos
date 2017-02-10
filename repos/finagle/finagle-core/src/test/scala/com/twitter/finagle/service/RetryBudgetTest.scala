@@ -32,14 +32,14 @@ class RetryBudgetTest extends FunSuite with Matchers {
   def newRetryBudget(
       ttl: Duration = 60.seconds,
       minRetriesPerSec: Int = 0,
-      maxPercentOver: Double = 0.0
+      maxPercentOver: Double = 0.0,
   ): RetryBudget =
     RetryBudget(ttl, minRetriesPerSec, maxPercentOver, Stopwatch.timeMillis)
 
   def testBudget(
       ttl: Duration = 60.seconds,
       minRetriesPerSec: Int = 0,
-      percentCanRetry: Double = 0.0
+      percentCanRetry: Double = 0.0,
   ): Unit = withClue(s"percentCanRetry=$percentCanRetry:") {
     // freeze time to simplify the tests
     Time.withCurrentTimeFrozen { _ =>
