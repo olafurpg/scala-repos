@@ -99,7 +99,7 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
         ConfVars.METASTOREWAREHOUSE.varname -> warehousePath.toURI.toString,
         ConfVars.METASTORE_INTEGER_JDO_PUSHDOWN.varname -> "true",
         ConfVars.SCRATCHDIR.varname -> scratchDirPath.toURI.toString,
-        ConfVars.METASTORE_CLIENT_CONNECT_RETRY_DELAY.varname -> "1"
+        ConfVars.METASTORE_CLIENT_CONNECT_RETRY_DELAY.varname -> "1",
     )
   }
 
@@ -405,7 +405,7 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
           "src_json",
           s"""CREATE TABLE src_json (json STRING) STORED AS TEXTFILE
        """.stripMargin.cmd,
-          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/json.txt")}' INTO TABLE src_json".cmd)
+          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/json.txt")}' INTO TABLE src_json".cmd),
   )
 
   hiveQTestUtilTables.foreach(registerTestTable)
@@ -518,6 +518,6 @@ private[hive] object TestHiveContext {
     */
   val overrideConfs: Map[String, String] = Map(
       // Fewer shuffle partitions to speed up testing.
-      SQLConf.SHUFFLE_PARTITIONS.key -> "5"
+      SQLConf.SHUFFLE_PARTITIONS.key -> "5",
   )
 }

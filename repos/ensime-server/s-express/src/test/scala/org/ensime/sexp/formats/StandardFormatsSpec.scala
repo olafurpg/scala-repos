@@ -23,11 +23,11 @@ class StandardFormatsSpec
     val right = Right("thirteen")
     assertFormat(
         left: Either[Int, String],
-        SexpNumber(13)
+        SexpNumber(13),
     )
     assertFormat(
         right: Either[Int, String],
-        SexpString("thirteen")
+        SexpString("thirteen"),
     )
   }
 

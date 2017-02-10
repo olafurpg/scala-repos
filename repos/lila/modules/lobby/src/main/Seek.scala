@@ -57,7 +57,7 @@ case class Seek(_id: String,
       "days" -> daysPerTurn,
       "color" -> chess.Color(color).??(_.name),
       "perf" -> Json.obj("icon" -> perfType.map(_.iconChar.toString),
-                         "name" -> perfType.map(_.name))
+                         "name" -> perfType.map(_.name)),
   )
 
   lazy val perfType =

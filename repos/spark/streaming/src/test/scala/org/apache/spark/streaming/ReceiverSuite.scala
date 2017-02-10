@@ -168,7 +168,7 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
     assert(
         numMessages >= minExpectedMessages &&
         numMessages <= maxExpectedMessages,
-        s"#records received = $numMessages, not between $minExpectedMessages and $maxExpectedMessages"
+        s"#records received = $numMessages, not between $minExpectedMessages and $maxExpectedMessages",
     )
 
     // XXX Checking every block would require an even distribution of messages across blocks,
@@ -188,7 +188,7 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
         averageBlockSize >= minExpectedMessagesPerBlock &&
         averageBlockSize <= maxExpectedMessagesPerBlock,
         s"# records in received blocks = [$receivedBlockSizes], not between " +
-        s"$minExpectedMessagesPerBlock and $maxExpectedMessagesPerBlock, on average"
+        s"$minExpectedMessagesPerBlock and $maxExpectedMessagesPerBlock, on average",
     )
   }
 

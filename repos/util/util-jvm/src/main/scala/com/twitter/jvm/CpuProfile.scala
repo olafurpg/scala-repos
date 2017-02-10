@@ -20,7 +20,7 @@ case class CpuProfile(
     // The number of samples taken.
     count: Int,
     // The number of samples missed.
-    missed: Int
+    missed: Int,
 ) {
 
   /**
@@ -74,7 +74,7 @@ object CpuProfile {
       ("java.net.SocketInputStream", "socketRead0"),
       ("java.net.SocketOutputStream", "socketWrite0"),
       ("java.net.PlainSocketImpl", "socketAvailable"),
-      ("java.net.PlainSocketImpl", "socketAccept")
+      ("java.net.PlainSocketImpl", "socketAccept"),
   )
 
   /**

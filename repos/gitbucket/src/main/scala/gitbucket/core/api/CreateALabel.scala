@@ -6,7 +6,7 @@ package gitbucket.core.api
   */
 case class CreateALabel(
     name: String,
-    color: String
+    color: String,
 ) {
   def isValid: Boolean = {
     name.length <= 100 && !name.startsWith("_") && !name.startsWith("-") &&

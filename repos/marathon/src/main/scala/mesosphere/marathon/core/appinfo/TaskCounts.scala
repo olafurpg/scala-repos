@@ -21,7 +21,7 @@ case class TaskCounts(tasksStaged: Int,
         tasksRunning = tasksRunning + counts.tasksRunning,
         tasksStaged = tasksStaged + counts.tasksStaged,
         tasksHealthy = tasksHealthy + counts.tasksHealthy,
-        tasksUnhealthy = tasksUnhealthy + counts.tasksUnhealthy
+        tasksUnhealthy = tasksUnhealthy + counts.tasksUnhealthy,
     )
   }
 
@@ -30,7 +30,7 @@ case class TaskCounts(tasksStaged: Int,
         tasksRunning = tasksRunning - counts.tasksRunning,
         tasksStaged = tasksStaged - counts.tasksStaged,
         tasksHealthy = tasksHealthy - counts.tasksHealthy,
-        tasksUnhealthy = tasksUnhealthy - counts.tasksUnhealthy
+        tasksUnhealthy = tasksUnhealthy - counts.tasksUnhealthy,
     )
   }
 }
@@ -53,7 +53,7 @@ object TaskCounts {
         tasksStaged = appTasks.count(_.staging),
         tasksRunning = appTasks.count(_.running),
         tasksHealthy = appTasks.count(_.healthy),
-        tasksUnhealthy = appTasks.count(_.unhealthy)
+        tasksUnhealthy = appTasks.count(_.unhealthy),
     )
   }
 }

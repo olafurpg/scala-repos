@@ -138,7 +138,7 @@ object QueryCompiler {
       /* Optimize for SQL */
       Phase.rewriteJoins,
       Phase.verifySymbols,
-      Phase.relabelUnions
+      Phase.relabelUnions,
   )
 
   /** Extra phases for translation to SQL comprehensions */
@@ -163,7 +163,7 @@ object QueryCompiler {
   val interpreterPhases = Vector(
       Phase.pruneProjections,
       Phase.createResultSetMapping,
-      Phase.removeFieldNames
+      Phase.removeFieldNames,
   )
 
   /** The default compiler */

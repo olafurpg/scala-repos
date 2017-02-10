@@ -181,7 +181,7 @@ class ClientBuilderTest
       assert(inMemory.counters(Seq("test", "tries", "requests")) == 1)
       assert(
           // 1 request and 1 retry
-          inMemory.counters(Seq("test", "requests")) == 2
+          inMemory.counters(Seq("test", "requests")) == 2,
       )
     }
   }

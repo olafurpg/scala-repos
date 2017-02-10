@@ -45,7 +45,7 @@ private[i18n] object TransInfos {
             name = name,
             contributors = Contributors(code),
             nbTranslated = messages.get(code) ?? (_.size),
-            nbMissing = nbMessages - (messages.get(code) ?? (_.size))
+            nbMissing = nbMessages - (messages.get(code) ?? (_.size)),
         )
     }
   }

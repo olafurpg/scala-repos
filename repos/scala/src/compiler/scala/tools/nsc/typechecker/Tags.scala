@@ -24,7 +24,7 @@ trait Tags { self: Analyzer =>
                 isView = false,
                 context,
                 saveAmbiguousDivergent = true,
-                pos
+                pos,
             ).tree)
       }
 

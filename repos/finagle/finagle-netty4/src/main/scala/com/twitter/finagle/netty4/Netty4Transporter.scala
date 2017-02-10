@@ -19,7 +19,7 @@ private[netty4] object Netty4Transporter {
   private[this] def build[In, Out](
       init: ChannelInitializer[SocketChannel],
       params: Stack.Params,
-      transportP: Promise[Transport[In, Out]]
+      transportP: Promise[Transport[In, Out]],
   ): Transporter[In, Out] = new Transporter[In, Out] {
     def apply(addr: SocketAddress): Future[Transport[In, Out]] = {
       val Transport.Options(noDelay, reuseAddr) = params[Transport.Options]
@@ -75,7 +75,7 @@ private[netty4] object Netty4Transporter {
     */
   def apply[In, Out](
       pipeCb: ChannelPipeline => Unit,
-      params: Stack.Params
+      params: Stack.Params,
   ): Transporter[In, Out] = {
     val transportP = new Promise[Transport[In, Out]]
     val init = new RawNetty4ClientChannelInitializer[In, Out](
@@ -91,7 +91,7 @@ private[netty4] object Netty4Transporter {
   def apply[In, Out](
       enc: Option[FrameEncoder[In]],
       decoderFactory: Option[() => FrameDecoder[Out]],
-      params: Stack.Params
+      params: Stack.Params,
   ): Transporter[In, Out] = {
     val transportP = new Promise[Transport[In, Out]]
     val init = new Netty4ClientChannelInitializer[In, Out](

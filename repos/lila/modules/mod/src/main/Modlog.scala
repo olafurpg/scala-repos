@@ -74,7 +74,7 @@ object Modlog {
       (__.json update (merge(defaults) andThen readDate('date))) andThen Json
         .reads[Modlog],
       Json.writes[Modlog] andThen (__.json update writeDate('date)),
-      flags = Seq(_.NoId)
+      flags = Seq(_.NoId),
   )
 
   private def defaults = Json.obj("details" -> none[String])

@@ -22,7 +22,7 @@ private[finagle] object TimerStats {
   def deviation(
       hwt: netty.HashedWheelTimer,
       tickDuration: Duration,
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   ): Unit = {
     val deviation = statsReceiver.stat("deviation_ms")
 
@@ -55,7 +55,7 @@ private[finagle] object TimerStats {
   def hashedWheelTimerInternals(
       hwt: netty.HashedWheelTimer,
       nextRunAt: () => Duration,
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   ): Unit = {
     val pendingTimeouts = statsReceiver.stat("pending_tasks")
 

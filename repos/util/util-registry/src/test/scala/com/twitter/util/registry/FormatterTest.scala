@@ -21,14 +21,14 @@ class FormatterTest extends FunSuite {
   test("add should handle empties") {
     assert(
         Formatter.add(Map.empty, Seq.empty, "big") == Map(
-            Formatter.Eponymous -> "big")
+            Formatter.Eponymous -> "big"),
     )
   }
 
   test(
       "add should handle putting an entry in an existing map if nothing's there") {
     assert(
-        Formatter.add(Map.empty, Seq("it's"), "big") == Map("it's" -> "big")
+        Formatter.add(Map.empty, Seq("it's"), "big") == Map("it's" -> "big"),
     )
   }
 

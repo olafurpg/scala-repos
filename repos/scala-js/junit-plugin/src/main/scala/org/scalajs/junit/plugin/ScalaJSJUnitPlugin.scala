@@ -129,7 +129,7 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           getRequiredClass("org.junit.After"),
           getRequiredClass("org.junit.BeforeClass"),
           getRequiredClass("org.junit.AfterClass"),
-          getRequiredClass("org.junit.Ignore")
+          getRequiredClass("org.junit.Ignore"),
       )
 
       private val jUnitClassMetadataType = getRequiredClass(
@@ -223,7 +223,7 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
         }
         val bootParents = List(
             TypeTree(definitions.ObjectTpe),
-            TypeTree(jUnitTestMetadataType)
+            TypeTree(jUnitTestMetadataType),
         )
         val bootImpl =
           treeCopy.Template(clazz.impl, bootParents, clazz.impl.self, bootBody)
@@ -238,7 +238,7 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
         val newClazzInfo = {
           val newParentsInfo = List(
               definitions.ObjectTpe,
-              jUnitTestMetadataType
+              jUnitTestMetadataType,
           )
           val decls = bootSym.info.decls
           decls.enter(getJUnitMetadataDef.symbol)
@@ -418,7 +418,7 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
                             gen.mkNil,
                             mkMethodList(jUnitMethodMetadataTypeTree)(methods),
                             modMethods.fold(gen.mkNil)(
-                                mkMethodList(jUnitMethodMetadataTypeTree))
+                                mkMethodList(jUnitMethodMetadataTypeTree)),
                         ))
         }
 

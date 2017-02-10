@@ -86,7 +86,7 @@ object HandlerInvokerFactory {
       play.api.routing.Router.Tags.RouteVerb -> handlerDef.verb,
       play.api.routing.Router.Tags.RouteController -> handlerDef.controller,
       play.api.routing.Router.Tags.RouteActionMethod -> handlerDef.method,
-      play.api.routing.Router.Tags.RouteComments -> handlerDef.comments
+      play.api.routing.Router.Tags.RouteComments -> handlerDef.comments,
   )
 
   private[routing] def taggedRequest(

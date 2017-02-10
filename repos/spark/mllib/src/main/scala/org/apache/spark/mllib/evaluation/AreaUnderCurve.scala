@@ -47,7 +47,7 @@ private[evaluation] object AreaUnderCurve {
       .aggregate(0.0)(
           seqOp = (auc: Double,
             points: Array[(Double, Double)]) => auc + trapezoid(points),
-          combOp = _ + _
+          combOp = _ + _,
       )
   }
 
@@ -63,7 +63,7 @@ private[evaluation] object AreaUnderCurve {
       .aggregate(0.0)(
           seqop = (auc: Double,
             points: Seq[(Double, Double)]) => auc + trapezoid(points),
-          combop = _ + _
+          combop = _ + _,
       )
   }
 }

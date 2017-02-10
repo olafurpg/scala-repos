@@ -28,7 +28,7 @@ import ComUtils.LoopHandler
 final class ScalaJSRunner private[testadapter](
     framework: ScalaJSFramework,
     val args: Array[String],
-    val remoteArgs: Array[String]
+    val remoteArgs: Array[String],
 )
     extends Runner {
 

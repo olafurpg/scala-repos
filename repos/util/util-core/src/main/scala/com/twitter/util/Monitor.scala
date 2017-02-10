@@ -8,7 +8,7 @@ import java.util.logging.{Level, Logger}
   */
 case class MonitorException(
     handlingExc: Throwable,
-    monitorExc: Throwable
+    monitorExc: Throwable,
 )
     extends Exception(monitorExc) {
   override def getMessage =

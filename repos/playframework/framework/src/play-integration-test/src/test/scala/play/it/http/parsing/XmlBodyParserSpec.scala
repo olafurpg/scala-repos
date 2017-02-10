@@ -24,7 +24,7 @@ object XmlBodyParserSpec extends PlaySpecification {
       await(
           bodyParser(FakeRequest().withHeaders(
                   contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-            .run(Source.single(ByteString(xml, encoding)))
+            .run(Source.single(ByteString(xml, encoding))),
       )
     }
 

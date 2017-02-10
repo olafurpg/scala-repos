@@ -59,7 +59,7 @@ trait CrossSpec[M[+ _]]
 
     val result = ltable.cross(rtable)(
         InnerObjectConcat(WrapObject(Leaf(SourceLeft), "left"),
-                          WrapObject(Leaf(SourceRight), "right"))
+                          WrapObject(Leaf(SourceRight), "right")),
     )
 
     val jsonResult: M[Stream[JValue]] = toJson(result)
@@ -90,7 +90,7 @@ trait CrossSpec[M[+ _]]
             toRecord(Array(8), JParser.parseUnsafe("""{ "a": 8 }""")),
             toRecord(Array(9), JParser.parseUnsafe("""{ "a": 9 }""")),
             toRecord(Array(10), JParser.parseUnsafe("""{ "a": 10 }""")),
-            toRecord(Array(11), JParser.parseUnsafe("""{ "a": 11 }"""))
+            toRecord(Array(11), JParser.parseUnsafe("""{ "a": 11 }""")),
         ))
 
     val s2 = SampleData(

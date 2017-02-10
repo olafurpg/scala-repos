@@ -48,7 +48,7 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
                     context.getEditor,
                     new Condition[PsiFile] {
                       def value(t: PsiFile): Boolean = t == context.getFile
-                    }
+                    },
                 )
             }
           })

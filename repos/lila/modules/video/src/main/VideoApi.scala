@@ -56,10 +56,10 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       Paginator(adapter = new BSONAdapter[Video](
                       collection = videoColl,
                       selector = BSONDocument(
-                            "$text" -> BSONDocument("$search" -> q)
+                            "$text" -> BSONDocument("$search" -> q),
                         ),
                       projection = textScore,
-                      sort = textScore
+                      sort = textScore,
                   ) mapFutureList videoViews(user),
                 currentPage = page,
                 maxPerPage = maxPerPage)
@@ -75,7 +75,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
     def removeNotIn(ids: List[Video.ID]) =
       videoColl
         .remove(
-            BSONDocument("_id" -> BSONDocument("$nin" -> ids))
+            BSONDocument("_id" -> BSONDocument("$nin" -> ids)),
         )
         .void
 
@@ -84,7 +84,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         .update(
             BSONDocument("_id" -> id),
             BSONDocument("$set" -> BSONDocument("metadata" -> metadata)),
-            upsert = false
+            upsert = false,
         )
         .void
 
@@ -96,7 +96,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                       collection = videoColl,
                       selector = BSONDocument(),
                       projection = BSONDocument(),
-                      sort = BSONDocument("metadata.likes" -> -1)
+                      sort = BSONDocument("metadata.likes" -> -1),
                   ) mapFutureList videoViews(user),
                 currentPage = page,
                 maxPerPage = maxPerPage)
@@ -109,10 +109,10 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         Paginator(adapter = new BSONAdapter[Video](
                         collection = videoColl,
                         selector = BSONDocument(
-                              "tags" -> BSONDocument("$all" -> tags)
+                              "tags" -> BSONDocument("$all" -> tags),
                           ),
                         projection = BSONDocument(),
-                        sort = BSONDocument("metadata.likes" -> -1)
+                        sort = BSONDocument("metadata.likes" -> -1),
                     ) mapFutureList videoViews(user),
                   currentPage = page,
                   maxPerPage = maxPerPage)
@@ -123,10 +123,10 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       Paginator(adapter = new BSONAdapter[Video](
                       collection = videoColl,
                       selector = BSONDocument(
-                            "author" -> author
+                            "author" -> author,
                         ),
                       projection = BSONDocument(),
-                      sort = BSONDocument("metadata.likes" -> -1)
+                      sort = BSONDocument("metadata.likes" -> -1),
                   ) mapFutureList videoViews(user),
                 currentPage = page,
                 maxPerPage = maxPerPage)
@@ -136,7 +136,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       videoColl
         .find(BSONDocument(
                 "tags" -> BSONDocument("$in" -> video.tags),
-                "_id" -> BSONDocument("$ne" -> video.id)
+                "_id" -> BSONDocument("$ne" -> video.id),
             ))
         .sort(BSONDocument("metadata.likes" -> -1))
         .cursor[Video]()
@@ -163,7 +163,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
     def find(videoId: Video.ID, userId: String): Fu[Option[View]] =
       viewColl
         .find(BSONDocument(
-                View.BSONFields.id -> View.makeId(videoId, userId)
+                View.BSONFields.id -> View.makeId(videoId, userId),
             ))
         .one[View]
 
@@ -172,7 +172,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     def hasSeen(user: User, video: Video): Fu[Boolean] =
       viewColl.count(BSONDocument(
-              View.BSONFields.id -> View.makeId(video.id, user.id)
+              View.BSONFields.id -> View.makeId(video.id, user.id),
           ).some) map (0 !=)
 
     def seenVideoIds(user: User, videos: Seq[Video]): Fu[Set[Video.ID]] =
@@ -180,7 +180,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                         BSONDocument(
                             "_id" -> BSONDocument("$in" -> videos.map { v =>
                               View.makeId(v.id, user.id)
-                            })
+                            }),
                         ).some) map lila.db.BSON.asStringSet
   }
 

@@ -62,7 +62,7 @@ object CoreWorkflow {
           sc = sc,
           engineParams = engineParams,
           engineInstanceId = engineInstance.id,
-          params = params
+          params = params,
       )
 
       val instanceId = Storage.getMetaDataEngineInstances
@@ -78,7 +78,7 @@ object CoreWorkflow {
       engineInstances.update(
           engineInstance.copy(
               status = "COMPLETED",
-              endTime = DateTime.now
+              endTime = DateTime.now,
           ))
 
       logger.info("Training completed successfully.")
@@ -137,7 +137,7 @@ object CoreWorkflow {
           endTime = DateTime.now,
           evaluatorResults = evaluatorResult.toOneLiner,
           evaluatorResultsHTML = evaluatorResult.toHTML,
-          evaluatorResultsJSON = evaluatorResult.toJSON
+          evaluatorResultsJSON = evaluatorResult.toJSON,
       )
 
       logger.info(

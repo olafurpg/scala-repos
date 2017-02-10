@@ -14,7 +14,7 @@ import com.twitter.util.Future
 class MinimumSetCluster[T](
     minimum: Set[T],
     supplementary: Cluster[T],
-    statsReceiver: StatsReceiver = NullStatsReceiver
+    statsReceiver: StatsReceiver = NullStatsReceiver,
 )
     extends Cluster[T] {
 

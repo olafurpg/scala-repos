@@ -232,7 +232,7 @@ private object ApplicationEvolutions {
   val lockPlayEvolutionsLockSqls = List(
       """
         select lock from ${schema}play_evolutions_lock where lock = 1 for update nowait
-      """
+      """,
   )
 
   val lockPlayEvolutionsLockMysqlSqls = List(
@@ -241,7 +241,7 @@ private object ApplicationEvolutions {
       """,
       """
         select `lock` from ${schema}play_evolutions_lock where `lock` = 1 for update
-      """
+      """,
   )
 }
 

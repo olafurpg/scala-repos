@@ -14,14 +14,14 @@ case class RandomForestAlgorithmParams(
     featureSubsetStrategy: String,
     impurity: String,
     maxDepth: Int,
-    maxBins: Int
+    maxBins: Int,
 )
     extends Params
 
 class PIORandomForestModel(
     val gendersMap: Map[String, Double],
     val educationMap: Map[String, Double],
-    val randomForestModel: RandomForestModel
+    val randomForestModel: RandomForestModel,
 )
     extends Serializable
 
@@ -49,7 +49,7 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
     new PIORandomForestModel(
         gendersMap = data.gendersMap,
         educationMap = data.educationMap,
-        randomForestModel = m
+        randomForestModel = m,
     )
   }
 

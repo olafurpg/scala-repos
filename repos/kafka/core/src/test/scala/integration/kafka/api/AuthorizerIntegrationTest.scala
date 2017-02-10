@@ -145,7 +145,7 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
       ((resp: requests.StopReplicaResponse) =>
             resp.responses().asScala.find(_._1 == tp).get._2),
       ApiKeys.CONTROLLED_SHUTDOWN_KEY.id ->
-      ((resp: requests.ControlledShutdownResponse) => resp.errorCode())
+      ((resp: requests.ControlledShutdownResponse) => resp.errorCode()),
   )
 
   val RequestKeysToAcls = Map[Short, Map[Resource, Set[Acl]]](
@@ -163,7 +163,7 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
       ApiKeys.LEAVE_GROUP.id -> GroupReadAcl,
       ApiKeys.LEADER_AND_ISR.id -> ClusterAcl,
       ApiKeys.STOP_REPLICA.id -> ClusterAcl,
-      ApiKeys.CONTROLLED_SHUTDOWN_KEY.id -> ClusterAcl
+      ApiKeys.CONTROLLED_SHUTDOWN_KEY.id -> ClusterAcl,
   )
 
   // configure the servers and clients
@@ -332,7 +332,7 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
         ApiKeys.LEAVE_GROUP.id -> createLeaveGroupRequest,
         ApiKeys.LEADER_AND_ISR.id -> createLeaderAndIsrRequest,
         ApiKeys.STOP_REPLICA.id -> createStopReplicaRequest,
-        ApiKeys.CONTROLLED_SHUTDOWN_KEY.id -> createControlledShutdownRequest
+        ApiKeys.CONTROLLED_SHUTDOWN_KEY.id -> createControlledShutdownRequest,
     )
 
     val socket = new Socket("localhost", servers.head.boundPort())

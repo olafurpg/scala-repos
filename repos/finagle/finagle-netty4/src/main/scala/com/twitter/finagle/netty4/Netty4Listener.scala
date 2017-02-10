@@ -51,7 +51,7 @@ private[netty4] object PipelineInit {
 private[finagle] case class Netty4Listener[In, Out](
     params: Stack.Params,
     transportFactory: SocketChannel => Transport[In, Out] = new ChannelTransport[
-          In, Out](_)
+          In, Out](_),
 )
     extends Listener[In, Out] {
 
@@ -83,12 +83,12 @@ private[finagle] case class Netty4Listener[In, Out](
       val newBridge = () =>
         new ServerBridge(
             transportFactory,
-            serveTransport
+            serveTransport,
       )
 
       val bossLoop: EventLoopGroup = new NioEventLoopGroup(
           1 /*nThreads*/,
-          new NamedPoolThreadFactory("finagle/netty4/boss", makeDaemons = true)
+          new NamedPoolThreadFactory("finagle/netty4/boss", makeDaemons = true),
       )
 
       val bootstrap = new ServerBootstrap()

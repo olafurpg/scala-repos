@@ -8,7 +8,7 @@ object B extends Build {
 
   def ss = Seq(
       TaskKey[Unit]("check-first") <<= checkTask("First"),
-      TaskKey[Unit]("check-second") <<= checkTask("Second")
+      TaskKey[Unit]("check-second") <<= checkTask("Second"),
   )
   private def checkTask(className: String) =
     fullClasspath in Configurations.Runtime map { runClasspath =>

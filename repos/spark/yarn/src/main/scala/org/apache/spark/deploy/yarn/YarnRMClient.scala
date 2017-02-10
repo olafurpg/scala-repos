@@ -61,7 +61,7 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
       sparkConf: SparkConf,
       uiAddress: String,
       uiHistoryAddress: String,
-      securityMgr: SecurityManager
+      securityMgr: SecurityManager,
   ): YarnAllocator = {
     amClient = AMRMClient.createAMRMClient()
     amClient.init(conf)

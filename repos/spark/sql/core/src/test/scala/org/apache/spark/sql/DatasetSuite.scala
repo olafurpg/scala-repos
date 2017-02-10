@@ -297,7 +297,7 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
     checkDataset(
         count,
         (Tuple1(3), 2L),
-        (Tuple1(5), 1L)
+        (Tuple1(5), 1L),
     )
   }
 
@@ -536,9 +536,9 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
             StructField("f",
                         StructType(Seq(
                                 StructField("a", StringType, nullable = true),
-                                StructField("b", IntegerType, nullable = false)
+                                StructField("b", IntegerType, nullable = false),
                             )),
-                        nullable = true)
+                        nullable = true),
         ))
 
     def buildDataset(rows: Row*): Dataset[NestedStruct] = {
@@ -548,7 +548,7 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
 
     checkDataset(
         buildDataset(Row(Row("hello", 1))),
-        NestedStruct(ClassData("hello", 1))
+        NestedStruct(ClassData("hello", 1)),
     )
 
     // Shouldn't throw runtime exception when parent object (`ClassData`) is null

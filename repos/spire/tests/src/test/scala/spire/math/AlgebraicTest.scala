@@ -150,7 +150,7 @@ class AlgebraicTest extends SpireProperties {
     import spire.implicits._
     val roots = List(
         Rational("16279/50267"),
-        Rational("223/175")
+        Rational("223/175"),
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
@@ -168,7 +168,7 @@ class AlgebraicTest extends SpireProperties {
     val roots = List(
         Rational("8791167214431305472/8377325351665"),
         Rational("12785/4238682313717812603653317580032"),
-        Rational("0")
+        Rational("0"),
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
@@ -216,7 +216,7 @@ class AlgebraicTest extends SpireProperties {
     */
   case class RationalAlgebraic(
       algebraic: Algebraic,
-      rational: Rational
+      rational: Rational,
   )
 
   object RationalAlgebraic {
@@ -259,7 +259,7 @@ class AlgebraicTest extends SpireProperties {
         },
         genBigDecimal,
         genDouble,
-        genLong
+        genLong,
     )
 
     def genAdd(depth: Int): Gen[RationalAlgebraic] =

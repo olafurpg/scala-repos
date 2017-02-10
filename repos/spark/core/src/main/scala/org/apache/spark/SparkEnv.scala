@@ -195,7 +195,7 @@ object SparkEnv extends Logging {
         isLocal = isLocal,
         numUsableCores = numCores,
         listenerBus = listenerBus,
-        mockOutputCommitCoordinator = mockOutputCommitCoordinator
+        mockOutputCommitCoordinator = mockOutputCommitCoordinator,
     )
   }
 
@@ -216,7 +216,7 @@ object SparkEnv extends Logging {
         port,
         isDriver = false,
         isLocal = isLocal,
-        numUsableCores = numCores
+        numUsableCores = numCores,
     )
     SparkEnv.set(env)
     env
@@ -451,7 +451,7 @@ object SparkEnv extends Logging {
     val jvmInformation = Seq(
         ("Java Version", s"$javaVersion ($javaVendor)"),
         ("Java Home", javaHome),
-        ("Scala Version", versionString)
+        ("Scala Version", versionString),
     ).sorted
 
     // Spark properties

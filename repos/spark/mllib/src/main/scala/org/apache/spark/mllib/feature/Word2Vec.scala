@@ -46,7 +46,7 @@ private case class VocabWord(
     var cn: Int,
     var point: Array[Int],
     var code: Array[Int],
-    var codeLen: Int
+    var codeLen: Int,
 )
 
 /**

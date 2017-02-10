@@ -23,7 +23,7 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val list = List(1,2,3)
         |  val javaList = lis<caret>t
         |}
-      """
+      """,
     )
   }
 
@@ -36,7 +36,7 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val map = mutable.Map(1 -> "1")
         |  val javaMap = ma<caret>p
         |}
-      """
+      """,
     )
   }
 
@@ -47,7 +47,7 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val seq = Seq("1")
         |  val javaList = se<caret>q
         |}
-      """
+      """,
     )
   }
 
@@ -58,7 +58,7 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val set = Set("1")
         |  val javaSet = se<caret>t
         |}
-      """
+      """,
     )
   }
 
@@ -69,7 +69,7 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val iter = Iterator(1)
         |  val javaIter = it<caret>er
         |}
-      """
+      """,
     )
   }
 
@@ -80,7 +80,7 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val iter = Iterable(1)
         |  val javaIter = it<caret>er
         |}
-      """
+      """,
     )
   }
 

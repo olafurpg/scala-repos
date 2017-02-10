@@ -1609,7 +1609,7 @@ object Test {
       f140,
       f141,
       f142,
-      f143
+      f143,
   )
 
   def main(args: Array[String]) {

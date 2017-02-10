@@ -44,28 +44,28 @@ object JsData extends lila.Steroids {
             "lines" -> lila.puzzle.Line.toJson(puzzle.lines),
             "enabled" -> puzzle.enabled,
             "vote" -> puzzle.vote.sum,
-            "url" -> s"$netBaseUrl${routes.Puzzle.show(puzzle.id)}"
+            "url" -> s"$netBaseUrl${routes.Puzzle.show(puzzle.id)}",
         ),
         "pref" -> Json.obj(
-            "coords" -> ctx.pref.coords
+            "coords" -> ctx.pref.coords,
         ),
         "chessground" -> Json.obj(
             "highlight" -> Json.obj(
                 "lastMove" -> ctx.pref.highlight,
-                "check" -> ctx.pref.highlight
+                "check" -> ctx.pref.highlight,
             ),
             "movable" -> Json.obj(
-                "showDests" -> ctx.pref.destination
+                "showDests" -> ctx.pref.destination,
             ),
             "draggable" -> Json.obj(
-                "showGhost" -> ctx.pref.highlight
+                "showGhost" -> ctx.pref.highlight,
             ),
             "premovable" -> Json.obj(
-                "showDests" -> ctx.pref.destination
-            )
+                "showDests" -> ctx.pref.destination,
+            ),
         ),
         "animation" -> Json.obj(
-            "duration" -> ctx.pref.animationFactor * animationDuration.toMillis
+            "duration" -> ctx.pref.animationFactor * animationDuration.toMillis,
         ),
         "mode" -> mode,
         "attempt" -> attempt.map { a =>
@@ -73,7 +73,7 @@ object JsData extends lila.Steroids {
               "userRatingDiff" -> a.userRatingDiff,
               "seconds" -> a.seconds,
               "win" -> a.win,
-              "vote" -> a.vote
+              "vote" -> a.vote,
           )
         },
         "win" -> win,
@@ -81,7 +81,7 @@ object JsData extends lila.Steroids {
         "user" -> userInfos.map { i =>
           Json.obj(
               "rating" -> i.user.perfs.puzzle.intRating,
-              "history" -> i.history.nonEmpty.option(Json.toJson(i.chart))
+              "history" -> i.history.nonEmpty.option(Json.toJson(i.chart)),
           )
         },
         "difficulty" -> ctx.isAuth.option {
@@ -89,7 +89,7 @@ object JsData extends lila.Steroids {
               "choices" -> JsArray(translatedDifficultyChoices.map {
                 case (k, v) => Json.arr(k, v)
               }),
-              "current" -> ctx.pref.puzzleDifficulty
+              "current" -> ctx.pref.puzzleDifficulty,
           )
         })
 }

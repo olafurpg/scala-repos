@@ -98,7 +98,7 @@ final class SeekApi(coll: Coll,
     coll
       .remove(BSONDocument(
               "_id" -> seekId,
-              "user.id" -> userId
+              "user.id" -> userId,
           ))
       .void >> cache.clear
 }

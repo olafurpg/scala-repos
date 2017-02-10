@@ -115,7 +115,7 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType : Manifest](
       SHtml.multiSelectObj[ListType](
           options,
           value,
-          set(_)
+          set(_),
       ) % ("tabindex" -> tabIndex.toString)
 
     SHtml.hidden(() => set(Nil)) ++

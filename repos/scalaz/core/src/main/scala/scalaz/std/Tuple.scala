@@ -710,7 +710,7 @@ private trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
     lazy val f2 = _f2
     (
         _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2)
+        _2.append(f1._2, f2._2),
     )
   }
 }
@@ -723,7 +723,7 @@ private trait Tuple3Semigroup[A1, A2, A3] extends Semigroup[(A1, A2, A3)] {
     (
         _1.append(f1._1, f2._1),
         _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3)
+        _3.append(f1._3, f2._3),
     )
   }
 }
@@ -739,7 +739,7 @@ private trait Tuple4Semigroup[A1, A2, A3, A4]
         _1.append(f1._1, f2._1),
         _2.append(f1._2, f2._2),
         _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4)
+        _4.append(f1._4, f2._4),
     )
   }
 }
@@ -757,7 +757,7 @@ private trait Tuple5Semigroup[A1, A2, A3, A4, A5]
         _2.append(f1._2, f2._2),
         _3.append(f1._3, f2._3),
         _4.append(f1._4, f2._4),
-        _5.append(f1._5, f2._5)
+        _5.append(f1._5, f2._5),
     )
   }
 }
@@ -777,7 +777,7 @@ private trait Tuple6Semigroup[A1, A2, A3, A4, A5, A6]
         _3.append(f1._3, f2._3),
         _4.append(f1._4, f2._4),
         _5.append(f1._5, f2._5),
-        _6.append(f1._6, f2._6)
+        _6.append(f1._6, f2._6),
     )
   }
 }
@@ -800,7 +800,7 @@ private trait Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7]
         _4.append(f1._4, f2._4),
         _5.append(f1._5, f2._5),
         _6.append(f1._6, f2._6),
-        _7.append(f1._7, f2._7)
+        _7.append(f1._7, f2._7),
     )
   }
 }
@@ -825,7 +825,7 @@ private trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8]
         _5.append(f1._5, f2._5),
         _6.append(f1._6, f2._6),
         _7.append(f1._7, f2._7),
-        _8.append(f1._8, f2._8)
+        _8.append(f1._8, f2._8),
     )
   }
 }

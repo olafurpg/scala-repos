@@ -76,7 +76,7 @@ trait SecureFlagSpec
     "not show that requests are not secure in the absence of X_FORWARDED_PROTO" in withServer(
         secureFlagAction) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest("GET", "/", "HTTP/1.1", Map(), "foo")
+          BasicRequest("GET", "/", "HTTP/1.1", Map(), "foo"),
       )
       responses.length must_== 1
       responses(0).body must_== Left("false")
@@ -89,7 +89,7 @@ trait SecureFlagSpec
                        "HTTP/1.1",
                        Map(X_FORWARDED_FOR -> "127.0.0.1",
                            X_FORWARDED_PROTO -> "https"),
-                       "foo")
+                       "foo"),
       )
       responses.length must_== 1
       responses(0).body must_== Left("true")
@@ -98,7 +98,7 @@ trait SecureFlagSpec
         secureFlagAction) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
           BasicRequest(
-              "GET", "/", "HTTP/1.1", Map((X_FORWARDED_PROTO, "http")), "foo")
+              "GET", "/", "HTTP/1.1", Map((X_FORWARDED_PROTO, "http")), "foo"),
       )
       responses.length must_== 1
       responses(0).body must_== Left("false")

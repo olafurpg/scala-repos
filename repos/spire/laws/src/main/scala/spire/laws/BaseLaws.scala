@@ -25,7 +25,7 @@ trait BaseLaws[A] extends Laws {
       name = "signed",
       "abs non-negative" → forAll((x: A) => x.abs.sign != Sign.Negative),
       "signum returns -1/0/1" → forAll((x: A) => x.signum.abs <= 1),
-      "signum is sign.toInt" → forAll((x: A) => x.signum == x.sign.toInt)
+      "signum is sign.toInt" → forAll((x: A) => x.signum == x.sign.toInt),
   )
 
   def metricSpace[R](implicit MSA: MetricSpace[A, R],
@@ -45,7 +45,7 @@ trait BaseLaws[A] extends Laws {
             (a1: A, a2: A) => MSA.distance(a1, a2) === MSA.distance(a2, a1)),
         "triangleInequality" → forAll((a1: A, a2: A, a3: A) =>
               (MSA.distance(a1, a2) +
-                  MSA.distance(a2, a3)) >= MSA.distance(a1, a3))
+                  MSA.distance(a2, a3)) >= MSA.distance(a1, a3)),
     )
 }
 

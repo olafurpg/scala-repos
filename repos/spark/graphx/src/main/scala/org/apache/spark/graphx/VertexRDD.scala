@@ -319,7 +319,7 @@ object VertexRDD {
       vertices: RDD[(VertexId, VD)],
       edges: EdgeRDD[_],
       defaultVal: VD,
-      mergeFunc: (VD, VD) => VD
+      mergeFunc: (VD, VD) => VD,
   ): VertexRDD[VD] = {
     val vPartitioned: RDD[(VertexId, VD)] = vertices.partitioner match {
       case Some(p) => vertices

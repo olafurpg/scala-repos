@@ -44,7 +44,7 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
         mapping(
             "message" -> text(minLength = 30, maxLength = 2000),
             Fields.gameId,
-            Fields.move
+            Fields.move,
         )(RequestSetup.apply)(RequestSetup.unapply)
           .verifying(captchaFailMessage, validateCaptcha _)) fill RequestSetup(
         message = "Hello, I would like to join the team!",
@@ -54,12 +54,12 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
   val processRequest = Form(
       tuple(
           "process" -> nonEmptyText,
-          "url" -> nonEmptyText
+          "url" -> nonEmptyText,
       ))
 
   val kick = Form(
       single(
-          "userId" -> nonEmptyText
+          "userId" -> nonEmptyText,
       ))
 
   def createWithCaptcha = withCaptcha(create)

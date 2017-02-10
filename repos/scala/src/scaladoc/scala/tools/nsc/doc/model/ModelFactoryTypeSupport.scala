@@ -92,7 +92,7 @@ trait ModelFactoryTypeSupport {
                   else
                     findExternalLink(bSym, name).getOrElse(
                         // (3) if we couldn't find neither the owner nor external URL to link to, show a tooltip with the qualified name
-                        Tooltip(name)
+                        Tooltip(name),
                     )
               }
           }

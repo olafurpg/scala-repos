@@ -51,7 +51,7 @@ class DefaultInterpreterTest extends FunSuite {
 
   test("recurse back to the dtab") {
     val dtab = Dtab.read(
-        "/foo=>/$/com.twitter.finagle.naming.testnamer;/rewritten/by/test/namer=>/$/inet/0/7070"
+        "/foo=>/$/com.twitter.finagle.naming.testnamer;/rewritten/by/test/namer=>/$/inet/0/7070",
     )
 
     assertEval(dtab, "/foo", Name.bound(Address(7070)))

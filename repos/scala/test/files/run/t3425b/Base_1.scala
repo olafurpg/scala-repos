@@ -35,7 +35,7 @@ object Gen {
     import p._
     List(
         s"type R1_$idx = $tp",
-        s"type R2_$idx = R1_$idx { val y: (${tp1.elem}) with (${tp2.elem}) }"
+        s"type R2_$idx = R1_$idx { val y: (${tp1.elem}) with (${tp2.elem}) }",
     )
   }
 
@@ -48,7 +48,7 @@ object Gen {
         mkMethodContent("f")(i =>
               s" = { val x = ${pairs(i).expr} ; x.y.reflected -> whatis(x).toString }"),
         mkMethodContent("g")(i => s"""(x: R1_$i) = x.y"""),
-        mkMethodContent("h")(i => s"""(x: R2_$i) = x.y""")
+        mkMethodContent("h")(i => s"""(x: R2_$i) = x.y"""),
     ) mkString "\n  "
 
   def fCalls = indices map ("f" + _) mkString ("\n    ", ",\n    ", "\n  ")

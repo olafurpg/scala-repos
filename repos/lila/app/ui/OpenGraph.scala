@@ -27,7 +27,7 @@ case class OpenGraph(title: String,
           "description" -> description,
           "url" -> url,
           "type" -> `type`,
-          "site_name" -> siteName
+          "site_name" -> siteName,
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
       more.map(tupledTag).mkString
   }
@@ -44,7 +44,7 @@ case class OpenGraph(title: String,
           "card" -> "summary",
           "title" -> title,
           "description" -> description,
-          "site" -> "@lichessorg"
+          "site" -> "@lichessorg",
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
       more.map(tupledTag).mkString
   }

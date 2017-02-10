@@ -135,7 +135,7 @@ private[streaming] object MasterFailureTest extends Logging {
       batchDuration: Duration,
       input: Seq[String],
       operation: DStream[String] => DStream[T],
-      expectedOutput: Seq[T]
+      expectedOutput: Seq[T],
   ): Seq[T] = {
 
     // Just making sure that the expected output does not have duplicates
@@ -194,7 +194,7 @@ private[streaming] object MasterFailureTest extends Logging {
       batchDuration: Duration,
       operation: DStream[String] => DStream[T],
       checkpointDir: Path,
-      testDir: Path
+      testDir: Path,
   ): StreamingContext = {
     // Mark that setup was called
     setupCalled = true
@@ -217,7 +217,7 @@ private[streaming] object MasterFailureTest extends Logging {
   private def runStreams[T : ClassTag](
       _ssc: StreamingContext,
       lastExpectedOutput: T,
-      maxTimeToRun: Long
+      maxTimeToRun: Long,
   ): Seq[T] = {
 
     var ssc = _ssc
@@ -291,7 +291,7 @@ private[streaming] object MasterFailureTest extends Logging {
         logInfo(
             "\n-------------------------------------------\n" +
             "   Restarting stream computation in " + sleepTime + " ms   " +
-            "\n-------------------------------------------\n"
+            "\n-------------------------------------------\n",
         )
         Thread.sleep(sleepTime)
         // Recreate the streaming context from checkpoint
@@ -364,7 +364,7 @@ private[streaming] class KillingThread(
       logInfo(
           "\n---------------------------------------\n" +
           "Killing streaming context after " + killWaitTime + " ms" +
-          "\n---------------------------------------\n"
+          "\n---------------------------------------\n",
       )
       if (ssc != null) {
         ssc.stop()

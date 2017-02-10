@@ -29,9 +29,9 @@ private[util] class BatchExecutor[In, Out](
     sizeThreshold: Int,
     timeThreshold: Duration = Duration.Top,
     sizePercentile: => Float = 1.0f,
-    f: Seq[In] => Future[Seq[Out]]
+    f: Seq[In] => Future[Seq[Out]],
 )(
-    implicit timer: Timer
+    implicit timer: Timer,
 )
     extends Function1[In, Future[Out]] { batcher =>
   import java.util.logging.Level.WARNING

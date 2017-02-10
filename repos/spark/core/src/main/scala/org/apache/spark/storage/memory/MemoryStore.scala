@@ -480,7 +480,7 @@ private[spark] class MemoryStore(conf: SparkConf,
         s"Memory use = ${Utils.bytesToString(blocksMemoryUsed)} (blocks) + " +
         s"${Utils.bytesToString(currentUnrollMemory)} (scratch space shared across " +
         s"$numTasksUnrolling tasks(s)) = ${Utils.bytesToString(memoryUsed)}. " +
-        s"Storage limit = ${Utils.bytesToString(maxMemory)}."
+        s"Storage limit = ${Utils.bytesToString(maxMemory)}.",
     )
   }
 
@@ -494,7 +494,7 @@ private[spark] class MemoryStore(conf: SparkConf,
       blockId: BlockId, finalVectorSize: Long): Unit = {
     logWarning(
         s"Not enough space to cache $blockId in memory! " +
-        s"(computed ${Utils.bytesToString(finalVectorSize)} so far)"
+        s"(computed ${Utils.bytesToString(finalVectorSize)} so far)",
     )
     logMemoryUsage()
   }

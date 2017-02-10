@@ -36,7 +36,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
   private[mapper] lazy val oneToManyFields: List[MappedOneToManyBase[Rec]] = {
     new FieldFinder[MappedOneToManyBase[Rec]](
         getSingleton,
-        net.liftweb.common.Logger(classOf[OneToMany[K, T]])
+        net.liftweb.common.Logger(classOf[OneToMany[K, T]]),
     ).accessorMethods map
     (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
   }
@@ -98,7 +98,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
               }
               ret
           },
-          foreign
+          foreign,
       )
 
   /**

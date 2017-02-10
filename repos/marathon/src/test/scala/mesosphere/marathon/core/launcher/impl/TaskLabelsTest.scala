@@ -62,7 +62,7 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
       MarathonTestHelper
         .makeBasicOffer(
             reservation = Some(TaskLabels.labelsForTask(frameworkId, taskId)),
-            role = "test"
+            role = "test",
         )
         .getResourcesList
         .asScala

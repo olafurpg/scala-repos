@@ -486,7 +486,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
 
   private val graphAttributes: Map[String, String] = Map(
       "compound" -> "true",
-      "rankdir" -> "TB"
+      "rankdir" -> "TB",
   )
 
   private val nodeAttributes = Map(
@@ -497,7 +497,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
       "width" -> "0.0",
       "height" -> "0.0",
       "fontname" -> "Source Code Pro",
-      "fontsize" -> "8.00"
+      "fontsize" -> "8.00",
   )
 
   private val edgeAttributes = Map(
@@ -505,50 +505,50 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
       "arrowsize" -> "0.7",
       "fontcolor" -> "#aaaaaa",
       "fontsize" -> "9.00",
-      "fontname" -> "Source Code Pro"
+      "fontname" -> "Source Code Pro",
   )
 
   private val defaultStyle = Map(
       "color" -> "#ababab",
       "fillcolor" -> "#e1e1e1",
       "fontcolor" -> "#7d7d7d",
-      "margin" -> "0.1,0.04"
+      "margin" -> "0.1,0.04",
   )
 
   private val implicitStyle = Map(
       "color" -> "#ababab",
       "fillcolor" -> "#e1e1e1",
-      "fontcolor" -> "#7d7d7d"
+      "fontcolor" -> "#7d7d7d",
   )
 
   private val outsideStyle = Map(
       "color" -> "#ababab",
       "fillcolor" -> "#e1e1e1",
-      "fontcolor" -> "#7d7d7d"
+      "fontcolor" -> "#7d7d7d",
   )
 
   private val traitStyle = Map(
       "color" -> "#2E6D82",
       "fillcolor" -> "#2E6D82",
-      "fontcolor" -> "#ffffff"
+      "fontcolor" -> "#ffffff",
   )
 
   private val classStyle = Map(
       "color" -> "#418565",
       "fillcolor" -> "#418565",
-      "fontcolor" -> "#ffffff"
+      "fontcolor" -> "#ffffff",
   )
 
   private val objectStyle = Map(
       "color" -> "#103A51",
       "fillcolor" -> "#103A51",
-      "fontcolor" -> "#ffffff"
+      "fontcolor" -> "#ffffff",
   )
 
   private val typeStyle = Map(
       "color" -> "#2E6D82",
       "fillcolor" -> "#2E6D82",
-      "fontcolor" -> "#ffffff"
+      "fontcolor" -> "#ffffff",
   )
 
   private def flatten(attributes: Map[String, String]) =

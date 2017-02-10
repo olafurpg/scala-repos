@@ -25,7 +25,7 @@ class OpenSum1Test extends FunSuite {
     val f: Person = new Firefighter(
         name = "Jeff",
         age = 45,
-        since = 1990
+        since = 1990,
     )
 
     val pickle = f.pickle

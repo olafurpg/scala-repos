@@ -299,7 +299,7 @@ class FileAppenderSuite
       appender: FileAppender,
       outputStream: OutputStream,
       textToAppend: Seq[String],
-      sleepTimeBetweenTexts: Long
+      sleepTimeBetweenTexts: Long,
   ): Seq[File] = {
     // send data to appender through the input stream, and wait for the data to be written
     val expectedText = textToAppend.mkString("")

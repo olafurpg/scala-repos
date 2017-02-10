@@ -41,7 +41,7 @@ import org.apache.spark.internal.Logging
   */
 private[memory] class ExecutionMemoryPool(
     lock: Object,
-    poolName: String
+    poolName: String,
 )
     extends MemoryPool(lock) with Logging {
 

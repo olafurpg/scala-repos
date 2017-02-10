@@ -47,7 +47,7 @@ private[puzzle] final class PuzzleApi(
             val p = puzzle(id)
             val fenStart = p.fen.split(' ').take(2).mkString(" ")
             puzzleColl.count(BSONDocument(
-                    "fen" -> BSONRegex(fenStart.replace("/", "\\/"), "")
+                    "fen" -> BSONRegex(fenStart.replace("/", "\\/"), ""),
                 ).some) flatMap {
               case 0 =>
                 (puzzleColl insert p) >> {
@@ -74,7 +74,7 @@ private[puzzle] final class PuzzleApi(
         .update(
             BSONDocument("_id" -> id),
             BSONDocument(
-                "$set" -> BSONDocument(Puzzle.BSONFields.vote -> Vote.disable))
+                "$set" -> BSONDocument(Puzzle.BSONFields.vote -> Vote.disable)),
         )
         .void
   }
@@ -84,7 +84,7 @@ private[puzzle] final class PuzzleApi(
     def find(puzzleId: PuzzleId, userId: String): Fu[Option[Attempt]] =
       attemptColl
         .find(BSONDocument(
-                Attempt.BSONFields.id -> Attempt.makeId(puzzleId, userId)
+                Attempt.BSONFields.id -> Attempt.makeId(puzzleId, userId),
             ))
         .one[Attempt]
 
@@ -113,7 +113,7 @@ private[puzzle] final class PuzzleApi(
 
     def hasPlayed(user: User, puzzle: Puzzle): Fu[Boolean] =
       attemptColl.count(BSONDocument(
-              Attempt.BSONFields.id -> Attempt.makeId(puzzle.id, user.id)
+              Attempt.BSONFields.id -> Attempt.makeId(puzzle.id, user.id),
           ).some) map (0 !=)
 
     def playedIds(user: User, max: Int): Fu[BSONArray] =
@@ -126,7 +126,7 @@ private[puzzle] final class PuzzleApi(
         .find(BSONDocument(Attempt.BSONFields.userId -> user.id),
               BSONDocument(
                   Attempt.BSONFields.vote -> true,
-                  Attempt.BSONFields.id -> false
+                  Attempt.BSONFields.id -> false,
               ))
         .sort(BSONDocument(Attempt.BSONFields.date -> -1))
         .cursor[BSONDocument]()

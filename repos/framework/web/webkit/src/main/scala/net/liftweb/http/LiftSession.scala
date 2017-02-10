@@ -1355,7 +1355,7 @@ class LiftSession(private[http] val _contextPath: String,
     Templates.findTopLevelTemplate(
         splits,
         S.locale,
-        needAutoSurround = S.location.isDefined && S.request.exists(!_.ajax_?)
+        needAutoSurround = S.location.isDefined && S.request.exists(!_.ajax_?),
     )
   }
 
@@ -1992,7 +1992,7 @@ class LiftSession(private[http] val _contextPath: String,
     HtmlNormalizer.normalizeHtmlAndEventHandlers(
         nodes,
         S.contextPath,
-        LiftRules.stripComments.vend
+        LiftRules.stripComments.vend,
     )
   }
 
@@ -2134,7 +2134,7 @@ class LiftSession(private[http] val _contextPath: String,
                    dataProcessorInputValue,
                    filteredElement,
                    LiftSession.this),
-                  dataAttributeProcessors
+                  dataAttributeProcessors,
               )
             case _ => Empty
           }.headOption
@@ -2556,7 +2556,7 @@ class LiftSession(private[http] val _contextPath: String,
   private[http] def findOrCreateComet[T <: LiftCometActor](
       cometName: Box[String],
       cometHtml: NodeSeq,
-      cometAttributes: Map[String, String]
+      cometAttributes: Map[String, String],
   )(implicit cometManifest: Manifest[T]): Box[T] = {
     val castClass = cometManifest.runtimeClass.asInstanceOf[Class[T]]
     val typeName = castClass.getSimpleName
@@ -2566,7 +2566,7 @@ class LiftSession(private[http] val _contextPath: String,
 
     findOrBuildComet(
         creationInfo,
-        buildAndStoreComet(buildCometByClass(castClass))
+        buildAndStoreComet(buildCometByClass(castClass)),
     )
   }
 
@@ -2580,14 +2580,14 @@ class LiftSession(private[http] val _contextPath: String,
       cometType: String,
       cometName: Box[String] = Empty,
       cometHtml: NodeSeq = NodeSeq.Empty,
-      cometAttributes: Map[String, String] = Map.empty
+      cometAttributes: Map[String, String] = Map.empty,
   ): Box[LiftCometActor] = {
     val creationInfo = CometCreationInfo(
         cometType, cometName, cometHtml, cometAttributes, this)
 
     findOrBuildComet(
         creationInfo,
-        buildAndStoreComet(buildCometByCreationInfo) _
+        buildAndStoreComet(buildCometByCreationInfo) _,
     )
   }
 
@@ -2595,7 +2595,7 @@ class LiftSession(private[http] val _contextPath: String,
   // `findOrBuildComet` overloads.
   private def findOrBuildComet[T <: LiftCometActor](
       creationInfo: CometCreationInfo,
-      newCometFn: (CometCreationInfo) => Box[T]
+      newCometFn: (CometCreationInfo) => Box[T],
   )(implicit cometManifest: Manifest[T]): Box[T] = {
     val cometInfo = CometId(creationInfo.cometType, creationInfo.cometName)
 
@@ -2660,7 +2660,7 @@ class LiftSession(private[http] val _contextPath: String,
     LiftRules.cometCreationFactory.vend.apply(creationInfo) or {
       val cometType = findType[LiftCometActor](
           creationInfo.cometType,
-          LiftRules.buildPackage("comet") ::: ("lift.app.comet" :: Nil)
+          LiftRules.buildPackage("comet") ::: ("lift.app.comet" :: Nil),
       )
 
       cometType.flatMap { cometClass =>
@@ -2710,7 +2710,7 @@ class LiftSession(private[http] val _contextPath: String,
       case fail @ Failure(_, Full(exception), _) =>
         logger.info(
             s"Failed to instantiate comet ${cometClass.getName}.",
-            exception
+            exception,
         )
 
         fail

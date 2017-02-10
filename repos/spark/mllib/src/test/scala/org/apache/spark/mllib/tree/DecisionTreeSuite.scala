@@ -324,7 +324,7 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
     val treeToNodeToIndexInfo = Map(
         (0,
          Map(
-             (topNode.id, new RandomForest.NodeIndexInfo(0, None))
+             (topNode.id, new RandomForest.NodeIndexInfo(0, None)),
          )))
     val nodeQueue = new mutable.Queue[(Int, Node)]()
     DecisionTree.findBestSplits(baggedInput,
@@ -377,7 +377,7 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
     val treeToNodeToIndexInfo = Map(
         (0,
          Map(
-             (topNode.id, new RandomForest.NodeIndexInfo(0, None))
+             (topNode.id, new RandomForest.NodeIndexInfo(0, None)),
          )))
     val nodeQueue = new mutable.Queue[(Int, Node)]()
     DecisionTree.findBestSplits(baggedInput,

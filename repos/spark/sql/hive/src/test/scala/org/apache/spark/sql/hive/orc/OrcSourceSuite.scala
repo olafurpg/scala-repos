@@ -170,12 +170,12 @@ class OrcSourceSuite extends OrcSuite {
     assertResult(
         """leaf-0 = (LESS_THAN a 10)
         |expr = leaf-0
-      """.stripMargin.trim
+      """.stripMargin.trim,
     ) {
       OrcFilters
         .createFilter(Array(
                 LessThan("a", 10),
-                StringContains("b", "prefix")
+                StringContains("b", "prefix"),
             ))
         .get
         .toString
@@ -185,7 +185,7 @@ class OrcSourceSuite extends OrcSuite {
     assertResult(
         """leaf-0 = (LESS_THAN a 10)
         |expr = leaf-0
-      """.stripMargin.trim
+      """.stripMargin.trim,
     ) {
       OrcFilters
         .createFilter(
@@ -193,8 +193,8 @@ class OrcSourceSuite extends OrcSuite {
                 LessThan("a", 10),
                 Not(And(
                         GreaterThan("a", 1),
-                        StringContains("b", "prefix")
-                    ))
+                        StringContains("b", "prefix"),
+                    )),
             ))
         .get
         .toString

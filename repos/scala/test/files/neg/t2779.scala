@@ -16,6 +16,6 @@ object M3 extends M {
 object M4 extends M {
   override def f = List(
       M3,
-      M2
+      M2,
   )
 }

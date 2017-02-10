@@ -55,19 +55,19 @@ object `package` {
     }
 
     def vfile(name: String) = withContext(s"$name =>")(
-        vfs.resolveFile(name.intern)
+        vfs.resolveFile(name.intern),
     )
     def vfile(file: File) = withContext(s"$file =>")(
-        vfs.toFileObject(file)
+        vfs.toFileObject(file),
     )
     def vres(path: String) = withContext(s"$path =>")(
-        vfs.resolveFile(("res:" + path).intern)
+        vfs.resolveFile(("res:" + path).intern),
     )
     def vjar(jar: File) = withContext(s"$jar =>")(
-        vfs.resolveFile(("jar:" + jar.getAbsolutePath).intern)
+        vfs.resolveFile(("jar:" + jar.getAbsolutePath).intern),
     )
     def vjar(jar: FileObject) = withContext(s"$jar =>")(
-        vfs.resolveFile(("jar:" + jar.getName.getURI).intern)
+        vfs.resolveFile(("jar:" + jar.getName.getURI).intern),
     )
 
     // WORKAROUND https://issues.apache.org/jira/browse/VFS-594

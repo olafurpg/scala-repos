@@ -626,7 +626,7 @@ object ALSSuite {
     * This excludes input columns to simplify some tests.
     */
   val allModelParamSettings: Map[String, Any] = Map(
-      "predictionCol" -> "myPredictionCol"
+      "predictionCol" -> "myPredictionCol",
   )
 
   /**
@@ -644,6 +644,6 @@ object ALSSuite {
         "implicitPrefs" -> true,
         "alpha" -> 0.9,
         "nonnegative" -> true,
-        "checkpointInterval" -> 20
+        "checkpointInterval" -> 20,
     )
 }

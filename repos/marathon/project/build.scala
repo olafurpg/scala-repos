@@ -20,8 +20,8 @@ object MarathonBuild extends Build {
       id = "plugin-interface",
       base = file("plugin-interface"),
       settings = baseSettings ++ asmSettings ++ formatSettings ++ scalaStyleSettings ++ publishSettings ++ Seq(
-            libraryDependencies ++= Dependencies.pluginInterface
-        )
+            libraryDependencies ++= Dependencies.pluginInterface,
+        ),
   )
 
   lazy val root: Project = Project(
@@ -35,8 +35,8 @@ object MarathonBuild extends Build {
             sourceGenerators in Compile <+= buildInfo,
             buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion),
             buildInfoPackage := "mesosphere.marathon",
-            fork in Test := true
-        )
+            fork in Test := true,
+        ),
   ).configs(IntegrationTest)
     .dependsOn(pluginInterface)
     // run mesos-simulation/test:test when running test
@@ -46,7 +46,7 @@ object MarathonBuild extends Build {
   lazy val mesosSimulation: Project = Project(
       id = "mesos-simulation",
       base = file("mesos-simulation"),
-      settings = baseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ testSettings ++ integrationTestSettings
+      settings = baseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ testSettings ++ integrationTestSettings,
   ).dependsOn(root % "compile->compile; test->test").configs(IntegrationTest)
 
   /**
@@ -69,14 +69,14 @@ object MarathonBuild extends Build {
   lazy val integrationTestSettings =
     inConfig(IntegrationTest)(Defaults.testTasks) ++ Seq(
         testOptions in IntegrationTest :=
-          Seq(formattingTestArg, Tests.Argument("-n", "integration"))
+          Seq(formattingTestArg, Tests.Argument("-n", "integration")),
     )
 
   lazy val testSettings = Seq(
       testOptions in Test :=
         Seq(formattingTestArg, Tests.Argument("-l", "integration")),
       parallelExecution in Test := false,
-      fork in Test := true
+      fork in Test := true,
   )
 
   lazy val testScalaStyle = taskKey[Unit]("testScalaStyle")
@@ -89,7 +89,7 @@ object MarathonBuild extends Build {
             .toTask("")
             .value
         },
-        (test in Test) <<= (test in Test) dependsOn testScalaStyle
+        (test in Test) <<= (test in Test) dependsOn testScalaStyle,
     )
 
   lazy val IntegrationTest = config("integration") extend Test
@@ -111,7 +111,7 @@ object MarathonBuild extends Build {
             "-Ywarn-unused-import",
             "-Xfatal-warnings",
             "-Yno-adapted-args",
-            "-Ywarn-numeric-widen"
+            "-Ywarn-numeric-widen",
         ),
         javacOptions in Compile ++= Seq("-encoding",
                                         "UTF-8",
@@ -124,9 +124,9 @@ object MarathonBuild extends Build {
         resolvers ++= Seq(
             "Mesosphere Public Repo" at "http://downloads.mesosphere.com/maven",
             "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
-            "Spray Maven Repository" at "http://repo.spray.io/"
+            "Spray Maven Repository" at "http://repo.spray.io/",
         ),
-        fork in Test := true
+        fork in Test := true,
     )
 
   lazy val asmSettings =
@@ -150,12 +150,12 @@ object MarathonBuild extends Build {
               "stax-api-1.0.1.jar",
               "commons-beanutils-core-1.8.0.jar",
               "servlet-api-2.5.jar",
-              "jsp-api-2.1.jar"
+              "jsp-api-2.1.jar",
           )
           cp filter { x =>
             exclude(x.data.getName)
           }
-        }
+        },
     )
 
   lazy val formatSettings =
@@ -175,7 +175,7 @@ object MarathonBuild extends Build {
           .setPreference(SpaceInsideBrackets, false)
           .setPreference(SpaceInsideParentheses, false)
           .setPreference(SpacesWithinPatternBinders, true)
-          .setPreference(FormatXml, true)
+          .setPreference(FormatXml, true),
       )
 
   /**
@@ -193,7 +193,7 @@ object MarathonBuild extends Build {
             setReleaseVersion,
             commitReleaseVersion,
             tagRelease,
-            pushChanges
+            pushChanges,
         ))
 
   /**
@@ -221,16 +221,16 @@ object MarathonBuild extends Build {
             reportParameter("PROJECT_VERSION", version.value)
         }
         (onLoad in Global).value
-      }
+      },
   )
 
   lazy val publishSettings =
     S3Resolver.defaults ++ Seq(
         publishTo := Some(s3resolver.value(
                 "Mesosphere Public Repo (S3)",
-                s3("downloads.mesosphere.io/maven")
+                s3("downloads.mesosphere.io/maven"),
             )),
-        SbtS3Resolver.s3credentials := new InstanceProfileCredentialsProvider()
+        SbtS3Resolver.s3credentials := new InstanceProfileCredentialsProvider(),
     )
 }
 
@@ -239,7 +239,7 @@ object Dependencies {
 
   val pluginInterface = Seq(
       playJson % "compile",
-      guava % "compile"
+      guava % "compile",
   )
 
   val excludeSlf4jLog4j12 = ExclusionRule(
@@ -281,7 +281,7 @@ object Dependencies {
       Test.diffson % "test",
       Test.scalatest % "test",
       Test.mockito % "test",
-      Test.akkaTestKit % "test"
+      Test.akkaTestKit % "test",
   ).map(_.excludeAll(excludeSlf4jLog4j12)
         .excludeAll(excludeLog4j)
         .excludeAll(excludeJCL))

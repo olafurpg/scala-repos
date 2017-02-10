@@ -30,7 +30,7 @@ private[streaming] class StateDStream[
     updateFunc: (Iterator[(K, Seq[V], Option[S])]) => Iterator[(K, S)],
     partitioner: Partitioner,
     preservePartitioning: Boolean,
-    initialRDD: Option[RDD[(K, S)]]
+    initialRDD: Option[RDD[(K, S)]],
 )
     extends DStream[(K, S)](parent.ssc) {
 

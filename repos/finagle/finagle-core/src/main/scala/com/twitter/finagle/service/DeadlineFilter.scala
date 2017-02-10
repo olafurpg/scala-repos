@@ -60,7 +60,7 @@ object DeadlineFilter {
       def make(
           _stats: param.Stats,
           _param: DeadlineFilter.Param,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ) = {
         val Param(tolerance, maxRejectPercentage) = _param
         val param.Stats(statsReceiver) = _stats
@@ -130,7 +130,7 @@ private[finagle] class DeadlineFilter[Req, Rep](
   private[this] def deadlineExceeded(
       deadline: Deadline,
       elapsed: Duration,
-      now: Time
+      now: Time,
   ) =
     s"exceeded request deadline of ${deadline.deadline - deadline.timestamp} " +
     s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."

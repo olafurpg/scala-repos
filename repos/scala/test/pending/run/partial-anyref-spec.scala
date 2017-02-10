@@ -6,7 +6,7 @@ class Fn3[
     @specialized(Int, AnyRef) -T1,
     @specialized(Double, AnyRef) -T2,
     @specialized(Float) -T3,
-    @specialized(Byte, AnyRef) +R
+    @specialized(Byte, AnyRef) +R,
 ] {
   override def toString = getClass.getName
 }

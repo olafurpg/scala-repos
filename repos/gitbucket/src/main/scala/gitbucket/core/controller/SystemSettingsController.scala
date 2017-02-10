@@ -46,7 +46,7 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
               "password" -> trim(label("SMTP Password", optional(text()))),
               "ssl" -> trim(label("Enable SSL", optional(boolean()))),
               "fromAddress" -> trim(label("FROM Address", optional(text()))),
-              "fromName" -> trim(label("FROM Name", optional(text())))
+              "fromName" -> trim(label("FROM Name", optional(text()))),
           )(Smtp.apply)),
       "ldapAuthentication" -> trim(label("LDAP", boolean())),
       "ldap" -> optionalIfNotChecked("ldapAuthentication",
@@ -84,8 +84,8 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                                                    optional(boolean()))),
                                          "keystore" -> trim(label("Keystore",
                                                                   optional(text(
-                                                                          ))))
-                                     )(Ldap.apply))
+                                                                          )))),
+                                     )(Ldap.apply)),
   )(SystemSettings.apply).verifying { settings =>
     Vector(
         if (settings.ssh && settings.baseUrl.isEmpty) {
@@ -93,12 +93,12 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         } else None,
         if (settings.ssh && settings.sshHost.isEmpty) {
           Some("sshHost" -> "SSH host is required if SSH access is enabled.")
-        } else None
+        } else None,
     ).flatten
   }
 
   private val pluginForm = mapping(
-      "pluginId" -> list(trim(label("", text())))
+      "pluginId" -> list(trim(label("", text()))),
   )(PluginForm.apply)
 
   case class PluginForm(pluginIds: List[String])
@@ -144,7 +144,7 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                 text(required, maxlength(100), uniqueMailAddress()))),
       "isAdmin" -> trim(label("User Type", boolean())),
       "url" -> trim(label("URL", optional(text(maxlength(200))))),
-      "fileId" -> trim(label("File ID", optional(text())))
+      "fileId" -> trim(label("File ID", optional(text()))),
   )(NewUserForm.apply)
 
   val editUserForm = mapping(
@@ -160,7 +160,7 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
       "fileId" -> trim(label("File ID", optional(text()))),
       "clearImage" -> trim(label("Clear image", boolean())),
       "removed" -> trim(
-          label("Disable", boolean(disableByNotYourself("userName"))))
+          label("Disable", boolean(disableByNotYourself("userName")))),
   )(EditUserForm.apply)
 
   val newGroupForm = mapping(
@@ -169,7 +169,7 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                 text(required, maxlength(100), identifier, uniqueUserName))),
       "url" -> trim(label("URL", optional(text(maxlength(200))))),
       "fileId" -> trim(label("File ID", optional(text()))),
-      "members" -> trim(label("Members", text(required, members)))
+      "members" -> trim(label("Members", text(required, members))),
   )(NewGroupForm.apply)
 
   val editGroupForm = mapping(
@@ -179,7 +179,7 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
       "fileId" -> trim(label("File ID", optional(text()))),
       "members" -> trim(label("Members", text(required, members))),
       "clearImage" -> trim(label("Clear image", boolean())),
-      "removed" -> trim(label("Disable", boolean()))
+      "removed" -> trim(label("Disable", boolean())),
   )(EditGroupForm.apply)
 
   get("/admin/system")(adminOnly {

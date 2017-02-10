@@ -21,7 +21,7 @@ class EvolutionsModule extends Module {
         bind[EvolutionsApi].to[DefaultEvolutionsApi],
         bind[ApplicationEvolutions]
           .toProvider[ApplicationEvolutionsProvider]
-          .eagerly
+          .eagerly,
       )
   }
 }

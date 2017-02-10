@@ -17,7 +17,7 @@ class TraceBenchmark extends StdBenchAnnotations {
       Some(SpanId(6L)),
       SpanId(7L),
       None,
-      Flags.apply()
+      Flags.apply(),
   )
 
   // Note that this needs to == to @OperationsPerInvocation above

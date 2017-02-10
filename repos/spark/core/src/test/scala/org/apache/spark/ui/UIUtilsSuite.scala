@@ -28,32 +28,32 @@ class UIUtilsSuite extends SparkFunSuite {
     verify(
         """test <a href="/link"> text </a>""",
         <span class="description-input">test <a href="/link"> text </a></span>,
-        "Correctly formatted text with only anchors and relative links should generate HTML"
+        "Correctly formatted text with only anchors and relative links should generate HTML",
     )
 
     verify(
         """test <a href="/link" text </a>""",
         <span class="description-input">{"""test <a href="/link" text </a>"""}</span>,
-        "Badly formatted text should make the description be treated as a streaming instead of HTML"
+        "Badly formatted text should make the description be treated as a streaming instead of HTML",
     )
 
     verify(
         """test <a href="link"> text </a>""",
         <span class="description-input">{"""test <a href="link"> text </a>"""}</span>,
-        "Non-relative links should make the description be treated as a string instead of HTML"
+        "Non-relative links should make the description be treated as a string instead of HTML",
     )
 
     verify(
         """test<a><img></img></a>""",
         <span class="description-input">{"""test<a><img></img></a>"""}</span>,
-        "Non-anchor elements should make the description be treated as a string instead of HTML"
+        "Non-anchor elements should make the description be treated as a string instead of HTML",
     )
 
     verify(
         """test <a href="/link"> text </a>""",
         <span class="description-input">test <a href="base/link"> text </a></span>,
         baseUrl = "base",
-        errorMsg = "Base URL should be prepended to html links"
+        errorMsg = "Base URL should be prepended to html links",
     )
   }
 
@@ -63,7 +63,7 @@ class UIUtilsSuite extends SparkFunSuite {
       makeProgressBar(2, 3, 0, 0, 4).head.child.filter(_.label == "div")
     val expected = Seq(
         <div class="bar bar-completed" style="width: 75.0%"></div>,
-        <div class="bar bar-running" style="width: 25.0%"></div>
+        <div class="bar bar-running" style="width: 25.0%"></div>,
     )
     assert(
         generated.sameElements(expected),

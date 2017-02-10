@@ -11,12 +11,12 @@ import std.AllInstances._
 object EndomorphicTest extends SpecLite {
 
   implicit def endoEqual[F[_], G[_ [_], _, _], A](
-      implicit F: Equal[G[F, A, A]]
+      implicit F: Equal[G[F, A, A]],
   ): Equal[Endomorphic[G[F, ?, ?], A]] =
     Equal.equalBy(_.run)
 
   implicit def endoArb[F[_], G[_ [_], _, _], A](
-      implicit F: Arbitrary[G[F, A, A]]
+      implicit F: Arbitrary[G[F, A, A]],
   ): Arbitrary[Endomorphic[G[F, ?, ?], A]] =
     Functor[Arbitrary].map(F)(Endomorphic[G[F, ?, ?], A](_))
 

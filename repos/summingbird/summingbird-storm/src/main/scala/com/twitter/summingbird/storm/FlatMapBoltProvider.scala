@@ -143,8 +143,8 @@ case class FlatMapBoltProvider(
             maxEmitPerExecute,
             keyValueShards,
             new SingleItemInjection[ExecutorInput],
-            new KeyValueInjection[ExecutorKey, ExecutorValue]
-        )(implicitly[Semigroup[InnerValue]])
+            new KeyValueInjection[ExecutorKey, ExecutorValue],
+        )(implicitly[Semigroup[InnerValue]]),
     )
   }
 
@@ -169,8 +169,8 @@ case class FlatMapBoltProvider(
             maxWaitTime,
             maxEmitPerExecute,
             new SingleItemInjection[ExecutorInput],
-            new SingleItemInjection[ExecutorOutput]
-        )
+            new SingleItemInjection[ExecutorOutput],
+        ),
     )
   }
 

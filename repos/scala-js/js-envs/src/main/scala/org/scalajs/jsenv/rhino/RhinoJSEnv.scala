@@ -37,7 +37,7 @@ import org.mozilla.javascript._
 final class RhinoJSEnv private (
     semantics: Semantics,
     withDOM: Boolean,
-    val sourceMap: Boolean
+    val sourceMap: Boolean,
 )
     extends LinkingUnitComJSEnv {
 

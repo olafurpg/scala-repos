@@ -17,7 +17,7 @@ class MapKeysTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Map(1 -> 2) ${START}map (x => x._1)$END",
         "Map(1 -> 2) map (x => x._1)",
-        "Map(1 -> 2).keys"
+        "Map(1 -> 2).keys",
     )
   }
 
@@ -25,7 +25,7 @@ class MapKeysTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Map(1 -> 2).${START}map(_._1)$END",
         "Map(1 -> 2).map(_._1)",
-        "Map(1 -> 2).keys"
+        "Map(1 -> 2).keys",
     )
   }
 
@@ -60,7 +60,7 @@ class MapValuesTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Map(1 -> 2) ${START}map (x => x._2)$END",
         "Map(1 -> 2) map (x => x._2)",
-        "Map(1 -> 2).values"
+        "Map(1 -> 2).values",
     )
   }
 
@@ -68,7 +68,7 @@ class MapValuesTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Map(1 -> 2).${START}map(_._2)$END",
         "Map(1 -> 2).map(_._2)",
-        "Map(1 -> 2).values"
+        "Map(1 -> 2).values",
     )
   }
 

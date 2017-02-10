@@ -126,7 +126,7 @@ class CommonLogFormatter extends LogFormatter {
   */
 class LoggingFilter[REQUEST <: Request](
     val log: Logger,
-    val formatter: CoreLogFormatter[REQUEST, Response]
+    val formatter: CoreLogFormatter[REQUEST, Response],
 )
     extends CoreLoggingFilter[REQUEST, Response] {
 

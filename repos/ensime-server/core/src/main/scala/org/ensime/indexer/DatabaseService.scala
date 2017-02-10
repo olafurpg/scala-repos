@@ -49,9 +49,9 @@ class DatabaseService(dir: File) extends SLF4JLogging {
     dir.mkdirs()
     Await.result(
         db.run(
-            (fileChecks.schema ++ fqnSymbols.schema).create
+            (fileChecks.schema ++ fqnSymbols.schema).create,
         ),
-        Duration.Inf
+        Duration.Inf,
     )
     log.info("... created the search database")
   }
@@ -82,14 +82,14 @@ class DatabaseService(dir: File) extends SLF4JLogging {
     db.run(
         for {
           check <- timestampsQuery(uri).result.headOption
-        } yield check.map(_.changed).getOrElse(true)
+        } yield check.map(_.changed).getOrElse(true),
     )
   }
 
   def persist(check: FileCheck, symbols: Seq[FqnSymbol])(
       implicit ec: ExecutionContext): Future[Option[Int]] =
     db.run(
-        (fileChecksCompiled += check) andThen (fqnSymbolsCompiled ++= symbols)
+        (fileChecksCompiled += check) andThen (fqnSymbolsCompiled ++= symbols),
     )
 
   private val findCompiled = Compiled { fqn: Rep[String] =>
@@ -97,7 +97,7 @@ class DatabaseService(dir: File) extends SLF4JLogging {
   }
 
   def find(fqn: String): Future[Option[FqnSymbol]] = db.run(
-      findCompiled(fqn).result.headOption
+      findCompiled(fqn).result.headOption,
   )
 
   import org.ensime.indexer.IndexService._
@@ -105,7 +105,7 @@ class DatabaseService(dir: File) extends SLF4JLogging {
       implicit ec: ExecutionContext): Future[List[FqnSymbol]] = {
     val restrict = fqns.map(_.fqn)
     db.run(
-          fqnSymbols.filter(_.fqn inSet restrict).result
+          fqnSymbols.filter(_.fqn inSet restrict).result,
       )
       .map { results =>
         val grouped = results.groupBy(_.fqn)

@@ -23,7 +23,7 @@ abstract class RefactoringEnvironment(file: String, start: Int, end: Int) {
   def performRefactoring(
       procId: Int,
       tpe: RefactorType,
-      parameters: refactoring.RefactoringParameters
+      parameters: refactoring.RefactoringParameters,
   ): Either[RefactorFailure, RefactorEffect] = {
 
     val af = AbstractFile.getFile(file)
@@ -79,7 +79,7 @@ trait RefactoringHandler { self: Analyzer =>
               new RefactorDiffEffect(
                   effect.procedureId,
                   effect.refactorType,
-                  f
+                  f,
               )
             case Left(err) => RefactorFailure(effect.procedureId, err.toString)
           }
@@ -149,7 +149,7 @@ trait RefactoringControl { self: RichCompilerControl with RefactoringImpl =>
 
   def askPrepareRefactor(
       procId: Int,
-      refactor: RefactorDesc
+      refactor: RefactorDesc,
   ): Either[RefactorFailure, RefactorEffect] = {
     askOption(prepareRefactor(procId, refactor))
       .getOrElse(Left(RefactorFailure(procId, "Refactor call failed")))
@@ -158,10 +158,10 @@ trait RefactoringControl { self: RichCompilerControl with RefactoringImpl =>
   def askExecRefactor(
       procId: Int,
       tpe: RefactorType,
-      effect: RefactorEffect
+      effect: RefactorEffect,
   ): Either[RefactorFailure, RefactorResult] = {
     askOption(execRefactor(procId, tpe, effect)).getOrElse(
-        Left(RefactorFailure(procId, "Refactor exec call failed."))
+        Left(RefactorFailure(procId, "Refactor exec call failed.")),
     ) match {
       case Right(result) =>
         // Reload all files touched by refactoring, so subsequent refactorings
@@ -260,8 +260,8 @@ trait RefactoringImpl { self: RichPresentationCompiler =>
                     refactoring.CollapseImports,
                     refactoring.SimplifyWildcards,
                     refactoring.RemoveDuplicates,
-                    refactoring.GroupImports(List("java", "scala"))
-                )
+                    refactoring.GroupImports(List("java", "scala")),
+                ),
           ))
     }.result
 
@@ -328,7 +328,7 @@ trait RefactoringImpl { self: RichPresentationCompiler =>
   protected def execRefactor(
       procId: Int,
       refactorType: RefactorType,
-      effect: RefactorEffect
+      effect: RefactorEffect,
   ): Either[RefactorFailure, RefactorResult] = {
     logger.info("Applying changes: " + effect.changes)
     writeChanges(effect.changes, charset) match {

@@ -124,7 +124,7 @@ object Expectations {
             SbtBundle(
                 "sbt.annotation.expressionMustConform", "SettingKey[String]")),
       Error("\"some string\"",
-            SbtBundle("sbt.annotation.expressionMustConform", "String"))
+            SbtBundle("sbt.annotation.expressionMustConform", "String")),
   )
 
   val sbt013 =
@@ -137,6 +137,6 @@ object Expectations {
               SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
         Error(
             "lazy val foo = project.in(file(\"foo\")).enablePlugins(sbt.plugins.JvmPlugin)",
-            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
+            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
     )
 }

@@ -72,7 +72,7 @@ object IdleConnectionFilter {
 class IdleConnectionFilter[Req, Rep](
     self: ServiceFactory[Req, Rep],
     threshold: OpenConnectionsThresholds,
-    statsReceiver: StatsReceiver = NullStatsReceiver
+    statsReceiver: StatsReceiver = NullStatsReceiver,
 )
     extends ServiceFactoryProxy[Req, Rep](self) {
   private[this] val queue =

@@ -160,7 +160,7 @@ trait IndicesSpec[M[+ _]]
           Array(CString("foo"), CString("bar")),
           Array(CLong(3), CString("")),
           Array(CLong(3), CLong(2)),
-          Array(CString("foo"), CLong(999))
+          Array(CString("foo"), CLong(999)),
       )
     }
 
@@ -181,7 +181,7 @@ trait IndicesSpec[M[+ _]]
           CLong(3),
           CLong(999),
           CString("cat"),
-          RObject(Map("cat" -> CLong(13), "dog" -> CLong(12)))
+          RObject(Map("cat" -> CLong(13), "dog" -> CLong(12))),
       )
 
       test(Array(CLong(2), CLong(2)), s2)
@@ -203,7 +203,7 @@ trait IndicesSpec[M[+ _]]
       .createFromTable(
           table,
           Array(groupkey("a")),
-          valuekey("c")
+          valuekey("c"),
       )
       .copoint
 
@@ -211,7 +211,7 @@ trait IndicesSpec[M[+ _]]
       .createFromTable(
           table,
           Array(groupkey("b")),
-          valuekey("c")
+          valuekey("c"),
       )
       .copoint
 
@@ -226,7 +226,7 @@ trait IndicesSpec[M[+ _]]
       // both disjunctions have data
       tryit(
           (index1, Seq(0), Seq(CLong(1))),
-          (index2, Seq(0), Seq(CLong(2)))
+          (index2, Seq(0), Seq(CLong(2))),
       )(
           JNum(3),
           JNum(999),
@@ -235,25 +235,25 @@ trait IndicesSpec[M[+ _]]
           JNum(13),
           JArray(JNum(1), JNum(2), JNum(3), JNum(4)),
           JArray(JNum(666)),
-          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
+          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12))),
       )
 
       // only first disjunction has data
       tryit(
           (index1, Seq(0), Seq(CLong(1))),
-          (index2, Seq(0), Seq(CLong(1234567)))
+          (index2, Seq(0), Seq(CLong(1234567))),
       )(
           JNum(3),
           JNum(999),
           JString("cat"),
           JArray(JNum(666)),
-          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
+          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12))),
       )
 
       // only second disjunction has data
       tryit(
           (index1, Seq(0), Seq(CLong(-8000))),
-          (index2, Seq(0), Seq(CLong(2)))
+          (index2, Seq(0), Seq(CLong(2))),
       )(
           JNum(3),
           JNum(999),
@@ -261,13 +261,13 @@ trait IndicesSpec[M[+ _]]
           JString("cat"),
           JNum(13),
           JArray(JNum(1), JNum(2), JNum(3), JNum(4)),
-          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
+          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12))),
       )
 
       // neither disjunction has data
       tryit(
           (index1, Seq(0), Seq(CLong(-8000))),
-          (index2, Seq(0), Seq(CLong(1234567)))
+          (index2, Seq(0), Seq(CLong(1234567))),
       )()
     }
   }

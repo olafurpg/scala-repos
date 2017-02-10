@@ -70,7 +70,7 @@ object StdType {
       "scala.Float" -> Float,
       "scala.Null" -> Null,
       "scala.Nothing" -> Nothing,
-      "scala.Singleton" -> Singleton
+      "scala.Singleton" -> Singleton,
   )
 
   val ANY = Any
@@ -98,7 +98,7 @@ object StdType {
       JAVA_LANG_INTEGER -> Int,
       JAVA_LANG_LONG -> Long,
       JAVA_LANG_FLOAT -> Float,
-      JAVA_LANG_DOUBLE -> Double
+      JAVA_LANG_DOUBLE -> Double,
   )
 
   def unboxedType(tp: ScType): ScType = {

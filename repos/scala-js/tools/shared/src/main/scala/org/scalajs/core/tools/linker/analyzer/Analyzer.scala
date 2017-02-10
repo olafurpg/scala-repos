@@ -811,7 +811,7 @@ private final class Analyzer(semantics: Semantics,
         kind = ClassKind.ModuleClass,
         superClass = Some("O"),
         interfaces = Nil,
-        methods = List(createMissingMethodInfo("init___"))
+        methods = List(createMissingMethodInfo("init___")),
     )
   }
 

@@ -65,7 +65,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
       "SPARK-4785 When called with arguments referring column fields, PMOD throws NPE") {
     checkAnswer(
         sql("SELECT PMOD(CAST(key as INT), 10) FROM src LIMIT 1"),
-        Row(8)
+        Row(8),
     )
   }
 
@@ -523,7 +523,7 @@ class PairUDF extends GenericUDF {
     ObjectInspectorFactory.getStandardStructObjectInspector(
         Arrays.asList("id", "value"),
         Arrays.asList(PrimitiveObjectInspectorFactory.javaIntObjectInspector,
-                      PrimitiveObjectInspectorFactory.javaIntObjectInspector)
+                      PrimitiveObjectInspectorFactory.javaIntObjectInspector),
     )
 
   override def evaluate(args: Array[DeferredObject]): AnyRef = {

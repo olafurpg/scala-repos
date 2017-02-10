@@ -37,7 +37,7 @@ object SqlToSlick extends App {
       addresses += (0, "Grand Central 1", "New York City"),
       people += (0, "C. Vogt", 999, 1),
       people += (0, "J. Vogt", 1001, 1),
-      people += (0, "J. Doe", 18, 2)
+      people += (0, "J. Doe", 18, 2),
   )
 
   val db = Database.forConfig("h2mem1")
@@ -47,7 +47,7 @@ object SqlToSlick extends App {
                      DBIO.seq(
                          addresses.schema.create,
                          people.schema.create,
-                         inserts
+                         inserts,
                      )),
                  Duration.Inf)
 

@@ -916,7 +916,7 @@ class BinaryLogisticRegressionSummary private[classification](
         .map {
           case Row(score: Vector, label: Double) => (score(1), label)
         },
-      100
+      100,
   )
 
   /**
@@ -1166,7 +1166,7 @@ private class LogisticCostFun(instances: RDD[Instance],
 
       instances.treeAggregate(
           new LogisticAggregator(
-              coeffs, numClasses, fitIntercept, featuresStd, featuresMean)
+              coeffs, numClasses, fitIntercept, featuresStd, featuresMean),
       )(seqOp, combOp)
     }
 

@@ -519,7 +519,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
           response.contentString = Seq(
               Trace.id.traceId.toString,
               Trace.id.spanId.toString,
-              Trace.id.parentId.toString
+              Trace.id.parentId.toString,
           ).mkString(".")
           Future.value(response)
         }

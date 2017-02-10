@@ -289,7 +289,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
             if (settings.uniqid) "%06d | ".format(id) else "",
             shortSymbolClass,
             name.decode + " in " + owner,
-            rawFlagString
+            rawFlagString,
         )
     )
 
@@ -2813,7 +2813,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         compose(
             kindString,
             if (hasMeaninglessName) owner.decodedName + idString
-            else nameString
+            else nameString,
         )
     }
 
@@ -2876,7 +2876,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     private def defStringCompose(infoString: String) = compose(
         flagString,
         keyString,
-        varianceString + nameString + infoString + flagsExplanationString
+        varianceString + nameString + infoString + flagsExplanationString,
     )
 
     /** String representation of symbol's definition.  It uses the
@@ -3293,7 +3293,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         phase.erasedTypes && this != ArrayClass || unsafeTypeParams.isEmpty
       tpeCache = newTypeRef(
           if (noTypeParams) Nil
-          else unsafeTypeParams map (_.typeConstructor)
+          else unsafeTypeParams map (_.typeConstructor),
       )
       // Avoid carrying around different types in tyconCache and tpeCache
       // for monomorphic types.

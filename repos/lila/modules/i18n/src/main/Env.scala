@@ -101,6 +101,6 @@ object Env {
         system = PlayApp.system,
         messages = PlayApp.messages,
         captcher = lila.hub.Env.current.actor.captcher,
-        appPath = PlayApp withApp (_.path.getCanonicalPath)
+        appPath = PlayApp withApp (_.path.getCanonicalPath),
     )
 }

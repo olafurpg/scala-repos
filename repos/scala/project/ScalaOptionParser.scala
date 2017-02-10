@@ -94,7 +94,7 @@ object ScalaOptionParser {
           case (k, v) => ChoiceSetting(k, v)
         } ++ scaladocStringSettingNames.map(StringSetting) ++ scaladocPathSettingNames
           .map(PathSetting) ++ scaladocMultiStringSettingNames.map(
-            MultiStringSetting)
+            MultiStringSetting),
     )
     val ScalaDocOpt = ScalacOpt | ScalaDocExtraSettings
 
@@ -332,7 +332,7 @@ object ScalaOptionParser {
                       "inline-project",
                       "inline-global"),
       "-Ystatistics" -> List(
-          "parser", "typer", "patmat", "erasure", "cleanup", "jvm")
+          "parser", "typer", "patmat", "erasure", "cleanup", "jvm"),
   )
   private def scalaVersionSettings = List("-Xmigration", "-Xsource")
 

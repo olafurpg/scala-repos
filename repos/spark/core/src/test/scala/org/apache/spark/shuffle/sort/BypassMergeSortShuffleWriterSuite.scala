@@ -71,7 +71,7 @@ class BypassMergeSortShuffleWriterSuite
     shuffleHandle = new BypassMergeSortShuffleHandle[Int, Int](
         shuffleId = 0,
         numMaps = 2,
-        dependency = dependency
+        dependency = dependency,
     )
     when(dependency.partitioner).thenReturn(new HashPartitioner(7))
     when(dependency.serializer).thenReturn(new JavaSerializer(conf))
@@ -96,7 +96,7 @@ class BypassMergeSortShuffleWriterSuite
             any[File],
             any[SerializerInstance],
             anyInt(),
-            any[ShuffleWriteMetrics]
+            any[ShuffleWriteMetrics],
         )).thenAnswer(new Answer[DiskBlockObjectWriter] {
       override def answer(
           invocation: InvocationOnMock): DiskBlockObjectWriter = {
@@ -108,7 +108,7 @@ class BypassMergeSortShuffleWriterSuite
             compressStream = identity,
             syncWrites = false,
             args(4).asInstanceOf[ShuffleWriteMetrics],
-            blockId = args(0).asInstanceOf[BlockId]
+            blockId = args(0).asInstanceOf[BlockId],
         )
       }
     })
@@ -150,7 +150,7 @@ class BypassMergeSortShuffleWriterSuite
         shuffleHandle,
         0, // MapId
         taskContext,
-        conf
+        conf,
     )
     writer.write(Iterator.empty)
     writer.stop( /* success = */ true)
@@ -174,7 +174,7 @@ class BypassMergeSortShuffleWriterSuite
         shuffleHandle,
         0, // MapId
         taskContext,
-        conf
+        conf,
     )
     writer.write(records)
     writer.stop( /* success = */ true)
@@ -208,7 +208,7 @@ class BypassMergeSortShuffleWriterSuite
         shuffleHandle,
         0, // MapId
         taskContext,
-        conf
+        conf,
     )
 
     intercept[SparkException] {
@@ -230,7 +230,7 @@ class BypassMergeSortShuffleWriterSuite
         shuffleHandle,
         0, // MapId
         taskContext,
-        conf
+        conf,
     )
     intercept[SparkException] {
       writer.write(

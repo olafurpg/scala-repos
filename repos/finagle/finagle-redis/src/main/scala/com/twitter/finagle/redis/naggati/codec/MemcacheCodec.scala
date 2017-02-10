@@ -33,7 +33,7 @@ case class MemcacheRequest(
 
 case class MemcacheResponse(
     line: String,
-    data: Option[ByteBuffer] = None
+    data: Option[ByteBuffer] = None,
 )
     extends Codec.Signalling {
   override def toString = {

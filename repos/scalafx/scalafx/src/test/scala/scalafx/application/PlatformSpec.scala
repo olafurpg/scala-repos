@@ -57,7 +57,7 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
               "get" + firstToUpper(scalaName) == javaName ||
               "set" + firstToUpper(scalaName) == javaName ||
               scalaName + "Property" == javaName
-          }
+          },
       )
 
       assert(found, "Declares equivalent of `" + jm.getName + "`")

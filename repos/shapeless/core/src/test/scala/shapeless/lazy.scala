@@ -316,17 +316,17 @@ class LazyStrictTests {
 
     illTyped(
         "lazily[U[String]]",
-        "No U\\[String]"
+        "No U\\[String]",
     )
 
     illTyped(
         "lazily[V]",
-        "could not find Lazy implicit value of type V"
+        "could not find Lazy implicit value of type V",
     )
 
     illTyped(
         "lazily[W[String, Int]]",
-        "No W\\[String, Int]"
+        "No W\\[String, Int]",
     )
   }
 }

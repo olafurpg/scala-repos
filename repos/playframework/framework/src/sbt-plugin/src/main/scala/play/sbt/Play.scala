@@ -27,7 +27,7 @@ object Play extends AutoPlugin {
     PlaySettings.defaultSettings ++ Seq(
         scalacOptions ++=
           Seq("-deprecation", "-unchecked", "-encoding", "utf8"),
-        javacOptions in Compile ++= Seq("-encoding", "utf8", "-g")
+        javacOptions in Compile ++= Seq("-encoding", "utf8", "-g"),
     )
 }
 
@@ -72,7 +72,7 @@ object PlayNettyServer extends AutoPlugin {
         } else {
           Seq("com.typesafe.play" %% "play-netty-server" % play.core.PlayVersion.current)
         }
-      }
+      },
   )
 }
 
@@ -84,6 +84,6 @@ object PlayAkkaHttpServer extends AutoPlugin {
 
   override def projectSettings = Seq(
       libraryDependencies +=
-        "com.typesafe.play" %% "play-akka-http-server-experimental" % play.core.PlayVersion.current
+        "com.typesafe.play" %% "play-akka-http-server-experimental" % play.core.PlayVersion.current,
   )
 }

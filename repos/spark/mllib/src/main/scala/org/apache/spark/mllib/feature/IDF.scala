@@ -54,7 +54,7 @@ class IDF @Since("1.2.0")(@Since("1.2.0") val minDocFreq: Int) {
       .treeAggregate(
           new IDF.DocumentFrequencyAggregator(minDocFreq = minDocFreq))(
           seqOp = (df, v) => df.add(v),
-          combOp = (df1, df2) => df1.merge(df2)
+          combOp = (df1, df2) => df1.merge(df2),
       )
       .idf()
     new IDFModel(idf)

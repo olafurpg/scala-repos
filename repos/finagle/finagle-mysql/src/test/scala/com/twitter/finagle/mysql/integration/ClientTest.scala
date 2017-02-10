@@ -13,7 +13,7 @@ case class SwimmingRecord(
     time: Float,
     name: String,
     nationality: String,
-    date: Date
+    date: Date,
 ) {
   override def toString = {
     def q(s: String) = "'" + s + "'"
@@ -63,7 +63,7 @@ object SwimmingRecord {
                      49.82F,
                      "Michael Phelps",
                      "United States",
-                     Date.valueOf("2009-07-29"))
+                     Date.valueOf("2009-07-29")),
   )
 }
 

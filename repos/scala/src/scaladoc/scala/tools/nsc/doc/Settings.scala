@@ -27,7 +27,7 @@ class Settings(
       "format",
       "Selects in which format documentation is rendered",
       List("html"),
-      "html"
+      "html",
   )
 
   /** A setting that defines the overall title of the documentation, typically the name of the library being
@@ -36,7 +36,7 @@ class Settings(
       "-doc-title",
       "title",
       "The overall name of the Scaladoc site",
-      ""
+      "",
   )
 
   /** A setting that defines the overall version number of the documentation, typically the version of the library being
@@ -45,21 +45,21 @@ class Settings(
       "-doc-version",
       "version",
       "An optional version number, to be appended to the title",
-      ""
+      "",
   )
 
   val docfooter = StringSetting(
       "-doc-footer",
       "footer",
       "A footer on every Scaladoc page, by default the EPFL/Lightbend copyright notice. Can be overridden with a custom footer.",
-      ""
+      "",
   )
 
   val docUncompilable = StringSetting(
       "-doc-no-compile",
       "path",
       "A directory containing sources which should be parsed, no more (e.g. AnyRef.scala)",
-      ""
+      "",
   )
 
   lazy val uncompilableFiles = docUncompilable.value match {
@@ -74,74 +74,74 @@ class Settings(
       "-doc-source-url",
       "url",
       s"A URL pattern used to link to the source file; the following variables are available: €{TPL_NAME}, €{TPL_OWNER} and respectively €{FILE_PATH}. For example, for `scala.collection.Seq`, the variables will be expanded to `Seq`, `scala.collection` and respectively `scala/collection/Seq` (without the backquotes). To obtain a relative path for €{FILE_PATH} instead of an absolute one, use the ${sourcepath.name} setting.",
-      ""
+      "",
   )
 
   val docExternalDoc = MultiStringSetting(
       "-doc-external-doc",
       "external-doc",
-      "comma-separated list of classpath_entry_path#doc_URL pairs describing external dependencies."
+      "comma-separated list of classpath_entry_path#doc_URL pairs describing external dependencies.",
   )
 
   val useStupidTypes = BooleanSetting(
       "-Yuse-stupid-types",
-      "Print the types of inherited members as seen from their original definition context. Hint: you don't want to do that!"
+      "Print the types of inherited members as seen from their original definition context. Hint: you don't want to do that!",
   )
 
   val docgenerator = StringSetting(
       "-doc-generator",
       "class-name",
       "The fully qualified name of a doclet class, which will be used to generate the documentation",
-      "scala.tools.nsc.doc.html.Doclet"
+      "scala.tools.nsc.doc.html.Doclet",
   )
 
   val docRootContent = PathSetting(
       "-doc-root-content",
       "The file from which the root package documentation should be imported.",
-      ""
+      "",
   )
 
   val docImplicits = BooleanSetting(
       "-implicits",
-      "Document members inherited by implicit conversions."
+      "Document members inherited by implicit conversions.",
   )
 
   val docImplicitsDebug = BooleanSetting(
       "-implicits-debug",
-      "Show debugging information for members inherited by implicit conversions."
+      "Show debugging information for members inherited by implicit conversions.",
   )
 
   val docImplicitsShowAll = BooleanSetting(
       "-implicits-show-all",
       "Show members inherited by implicit conversions that are impossible in the default scope. " +
-      "(for example conversions that require Numeric[String] to be in scope)"
+      "(for example conversions that require Numeric[String] to be in scope)",
   )
 
   val docImplicitsSoundShadowing = BooleanSetting(
       "-implicits-sound-shadowing",
       "Use a sound implicit shadowing calculation. Note: this interacts badly with usecases, so " +
-      "only use it if you haven't defined usecase for implicitly inherited members."
+      "only use it if you haven't defined usecase for implicitly inherited members.",
   )
 
   val docImplicitsHide = MultiStringSetting(
       "-implicits-hide",
       "implicit(s)",
-      "Hide the members inherited by the given comma separated, fully qualified implicit conversions. Add dot (.) to include default conversions."
+      "Hide the members inherited by the given comma separated, fully qualified implicit conversions. Add dot (.) to include default conversions.",
   )
 
   val docAuthor = BooleanSetting(
       "-author",
-      "Include authors."
+      "Include authors.",
   )
 
   val docDiagrams = BooleanSetting(
       "-diagrams",
-      "Create inheritance diagrams for classes, traits and packages."
+      "Create inheritance diagrams for classes, traits and packages.",
   )
 
   val docDiagramsDebug = BooleanSetting(
       "-diagrams-debug",
-      "Show debugging information for the diagram creation process."
+      "Show debugging information for the diagram creation process.",
   )
 
   val docDiagramsDotPath = PathSetting(
@@ -156,7 +156,7 @@ class Settings(
       "The maximum number of superclasses or subclasses to show in a diagram",
       15,
       None,
-      _ => None
+      _ => None,
   )
 
   /** The maximum number of implicit classes to show in the diagram */
@@ -165,7 +165,7 @@ class Settings(
       "The maximum number of implicitly converted classes to show in a diagram",
       10,
       None,
-      _ => None
+      _ => None,
   )
 
   val docDiagramsDotTimeout = IntSetting(
@@ -173,7 +173,7 @@ class Settings(
       "The timeout before the graphviz dot util is forcefully closed, in seconds (default: 10)",
       10,
       None,
-      _ => None
+      _ => None,
   )
 
   val docDiagramsDotRestart = IntSetting(
@@ -181,41 +181,41 @@ class Settings(
       "The number of times to restart a malfunctioning dot process before disabling diagrams (default: 5)",
       5,
       None,
-      _ => None
+      _ => None,
   )
 
   val docRawOutput = BooleanSetting(
       "-raw-output",
-      "For each html file, create another .html.raw file containing only the text. (can be used for quickly diffing two scaladoc outputs)"
+      "For each html file, create another .html.raw file containing only the text. (can be used for quickly diffing two scaladoc outputs)",
   )
 
   val docNoPrefixes = BooleanSetting(
       "-no-prefixes",
-      "Prevents generating prefixes in types, possibly creating ambiguous references, but significantly speeding up scaladoc."
+      "Prevents generating prefixes in types, possibly creating ambiguous references, but significantly speeding up scaladoc.",
   )
 
   val docNoLinkWarnings = BooleanSetting(
       "-no-link-warnings",
-      "Avoid warnings for ambiguous and incorrect links."
+      "Avoid warnings for ambiguous and incorrect links.",
   )
 
   val docSkipPackages = StringSetting(
       "-skip-packages",
       "<package1>:...:<packageN>",
       "A colon-delimited list of fully qualified package names that will be skipped from scaladoc.",
-      ""
+      "",
   )
 
   // TODO 2.13 Remove
   val docExpandAllTypes =
     BooleanSetting(
         "-expand-all-types",
-        "Expand all type aliases and abstract types into full template pages. (locally this can be done with the @template annotation)"
+        "Expand all type aliases and abstract types into full template pages. (locally this can be done with the @template annotation)",
     ) withDeprecationMessage (removalIn213)
 
   val docGroups = BooleanSetting(
       "-groups",
-      "Group similar functions together (based on the @group annotation)"
+      "Group similar functions together (based on the @group annotation)",
   )
 
   // For improved help output.
@@ -248,7 +248,7 @@ class Settings(
       docRawOutput,
       docSkipPackages,
       docExpandAllTypes,
-      docGroups
+      docGroups,
   )
   val isScaladocSpecific: String => Boolean = scaladocSpecific map (_.name)
 
@@ -345,7 +345,7 @@ class Settings(
           """^scala.Tuple.*""",
           """^scala.Product.*""",
           """^scala.Function.*""",
-          """^scala.runtime.AbstractFunction.*"""
+          """^scala.runtime.AbstractFunction.*""",
       ) map (_.r)
 
     private val notExcludedClasses = Set(
@@ -359,7 +359,7 @@ class Settings(
         "scala.Function2",
         "scala.runtime.AbstractFunction0",
         "scala.runtime.AbstractFunction1",
-        "scala.runtime.AbstractFunction2"
+        "scala.runtime.AbstractFunction2",
     )
 
     /**

@@ -31,6 +31,6 @@ object Test extends App {
     ??? match {
       case SN => ???
     }
-    import SN._
+    import SN._,
   }
 }

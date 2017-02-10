@@ -88,7 +88,7 @@ private class KillOverdueTasksActor(support: KillOverdueTasksActor.Support)
         30.seconds,
         5.seconds,
         self,
-        KillOverdueTasksActor.Check(maybeAck = None)
+        KillOverdueTasksActor.Check(maybeAck = None),
     )
   }
 

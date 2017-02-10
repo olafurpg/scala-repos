@@ -101,7 +101,7 @@ trait NingWSComponents {
       maxNumberOfRedirects = ahcWsClientConfig.maxNumberOfRedirects,
       maxRequestRetry = ahcWsClientConfig.maxRequestRetry,
       disableUrlEncoding = ahcWsClientConfig.disableUrlEncoding,
-      keepAlive = ahcWsClientConfig.keepAlive
+      keepAlive = ahcWsClientConfig.keepAlive,
   )
 
   lazy val wsApi: WSAPI = new AhcWSAPI(

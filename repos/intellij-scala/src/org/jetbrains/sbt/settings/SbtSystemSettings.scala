@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
   */
 @State(
     name = "ScalaSbtSettings",
-    storages = Array(new Storage("sbt.xml"))
+    storages = Array(new Storage("sbt.xml")),
 )
 class SbtSystemSettings(project: Project)
     extends AbstractExternalSystemSettings[

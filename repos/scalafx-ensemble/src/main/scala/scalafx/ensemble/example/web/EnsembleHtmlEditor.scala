@@ -73,7 +73,7 @@ class EnsembleHtmlEditor extends EnsembleExample {
             hgrow = Priority.Always
             vgrow = Priority.Always
             children = htmlLabel
-          }
+          },
       )
     }
   }

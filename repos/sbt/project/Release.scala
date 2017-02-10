@@ -20,10 +20,10 @@ object Release {
                     launcherRemotePath.value,
                     launcher.value,
                     sLog.value)
-      }
+      },
   )
 
   def javaVersionCheckSettings = Seq(
-      javaVersionPrefix in javaVersionCheck := Some("1.6")
+      javaVersionPrefix in javaVersionCheck := Some("1.6"),
   )
 }

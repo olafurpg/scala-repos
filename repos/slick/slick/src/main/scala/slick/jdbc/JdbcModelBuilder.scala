@@ -334,7 +334,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                     else
                       d.getOrElse(throw new SlickException(
                               s"Invalid default value $d for non-nullable column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
-                              meta.toString))
+                              meta.toString)),
               ))
         }
 
@@ -381,7 +381,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         Some(
             m.PrimaryKey(name,
                          tableBuilder.namer.qualifiedName,
-                         columns.map(tableBuilder.columnsByName))
+                         columns.map(tableBuilder.columnsByName)),
         )
   }
 
@@ -410,7 +410,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                 referencingColumns.map(
                     builders.tablesByQName(fk.pkTable).columnsByName),
                 updateRule,
-                deleteRule
+                deleteRule,
             ))
     }
   }

@@ -140,7 +140,7 @@ class MigrationTest
                       .setId(UUID.randomUUID().toString)
                       .build()),
             prefix = "task:"),
-        metrics
+        metrics,
     )
     val migration = new Migration(store,
                                   appRepo,

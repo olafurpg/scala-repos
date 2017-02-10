@@ -101,7 +101,7 @@ private[spark] class ConfigurableCombineFileRecordReader[K, V](
     extends CombineFileRecordReader[K, V](
         split.asInstanceOf[CombineFileSplit],
         context,
-        recordReaderClass
+        recordReaderClass,
     ) with Configurable {
 
   override def initNextRecordReader(): Boolean = {

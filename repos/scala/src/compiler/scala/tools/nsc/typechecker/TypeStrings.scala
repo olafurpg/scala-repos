@@ -202,7 +202,7 @@ trait TypeStrings {
 
     scalaName(
         if (enclClass == null || isAnonClass(clazz) || !enclMatch) name
-        else enclClass.getName + "." + (name stripPrefix enclPre)
+        else enclClass.getName + "." + (name stripPrefix enclPre),
     )
   }
   def anyClass(x: Any): JClass = if (x == null) null else x.getClass
@@ -254,7 +254,7 @@ trait TypeStrings {
           "scala.collection.mutable." -> "mutable.",
           "scala.collection.generic." -> "generic.",
           "java.lang." -> "jl.",
-          "scala.runtime." -> "runtime."
+          "scala.runtime." -> "runtime.",
       ) ++ (alsoStrip map (_ -> ""))
 
     transforms.foldLeft(tpe) {

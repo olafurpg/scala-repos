@@ -14,7 +14,7 @@ class AuthModule(pluginManager: PluginManager) {
     if (plugins.size > 1)
       throw new WrongConfigurationException(
           s"Only one plugin expected for ${ct.runtimeClass.getName}, but found: ${plugins
-            .map(_.getClass.getName)}"
+            .map(_.getClass.getName)}",
       )
     plugins.headOption
   }

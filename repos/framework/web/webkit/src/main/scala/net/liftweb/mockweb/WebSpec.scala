@@ -214,7 +214,7 @@ abstract class WebSpec(boot: () => Any = () => {})
                 }
               }
             }
-          }) ^ fragmentFactory.break
+          }) ^ fragmentFactory.break,
       )
     }
   }
@@ -236,7 +236,7 @@ abstract class WebSpec(boot: () => Any = () => {})
                 MockWeb.testReq(req)(expectations)
               }
             }
-          }) ^ fragmentFactory.break
+          }) ^ fragmentFactory.break,
       )
     }
   }
@@ -272,7 +272,7 @@ abstract class WebSpec(boot: () => Any = () => {})
                 }
               }
             }
-          }) ^ fragmentFactory.break
+          }) ^ fragmentFactory.break,
       )
     }
   }

@@ -35,7 +35,7 @@ class EndToEndTest extends FunSuite {
   case class MyStreamResponse(
       info: StreamResponse.Info,
       messages: Offer[Buf],
-      error: Offer[Throwable]
+      error: Offer[Throwable],
   )
       extends StreamResponse {
 

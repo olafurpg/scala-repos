@@ -91,7 +91,7 @@ private[spark] object UIWorkloadGenerator {
             1
           }.count
         }),
-        ("Job with delays", baseData.map(x => Thread.sleep(100)).count)
+        ("Job with delays", baseData.map(x => Thread.sleep(100)).count),
     )
 
     val barrier = new Semaphore(-nJobSet * jobs.size + 1)

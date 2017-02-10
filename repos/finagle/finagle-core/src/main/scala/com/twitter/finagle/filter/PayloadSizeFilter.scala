@@ -38,7 +38,7 @@ private[finagle] object PayloadSizeFilter {
 
   def module[Req, Rep](
       reqSize: Req => Int,
-      repSize: Rep => Int
+      repSize: Rep => Int,
   ): Stackable[ServiceFactory[Req, Rep]] =
     new Module1[param.Stats, ServiceFactory[Req, Rep]] {
       override def role: Role = PayloadSizeFilter.Role

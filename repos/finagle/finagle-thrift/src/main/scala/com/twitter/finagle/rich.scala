@@ -87,7 +87,7 @@ private[twitter] object ThriftUtil {
       cls: Class[_],
       protocolFactory: TProtocolFactory,
       sr: StatsReceiver,
-      responseClassifier: ResponseClassifier
+      responseClassifier: ResponseClassifier,
   ): Iface = {
     val clsName = cls.getName
 
@@ -157,7 +157,7 @@ private[twitter] object ThriftUtil {
       protocolFactory: TProtocolFactory,
       stats: StatsReceiver,
       maxThriftBufferSize: Int,
-      label: String
+      label: String,
   ): BinaryService = {
     def tryThriftFinagleService(iface: Class[_]): Option[BinaryService] =
       for {
@@ -186,11 +186,11 @@ private[twitter] object ThriftUtil {
         val newArgs = oldArgs :+ label
         def newConsCall: Option[BinaryService] =
           findConstructor(serviceCls, newParameters: _*).map(
-              cons => cons.newInstance(newArgs: _*)
+              cons => cons.newInstance(newArgs: _*),
           )
         def oldConsCall: Option[BinaryService] =
           findConstructor(serviceCls, oldParameters: _*).map(
-              cons => cons.newInstance(oldArgs: _*)
+              cons => cons.newInstance(oldArgs: _*),
           )
         newConsCall.orElse(oldConsCall)
       }).flatten
@@ -416,7 +416,7 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
     * @param label Assign a label for scoped stats.
     */
   def newServiceIface[ServiceIface](dest: String, label: String)(
-      implicit builder: ServiceIfaceBuilder[ServiceIface]
+      implicit builder: ServiceIfaceBuilder[ServiceIface],
   ): ServiceIface = {
     val thriftService = newService(dest, label)
     val statsLabel = if (label.isEmpty) defaultClientName else label
@@ -425,7 +425,7 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   }
 
   def newServiceIface[ServiceIface](dest: Name, label: String)(
-      implicit builder: ServiceIfaceBuilder[ServiceIface]
+      implicit builder: ServiceIfaceBuilder[ServiceIface],
   ): ServiceIface = {
     val thriftService = newService(dest, label)
     val statsLabel = if (label.isEmpty) defaultClientName else label
@@ -435,16 +435,16 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
 
   @deprecated("Must provide service label", "2015-10-26")
   def newServiceIface[ServiceIface](dest: String)(
-      implicit builder: ServiceIfaceBuilder[ServiceIface]
+      implicit builder: ServiceIfaceBuilder[ServiceIface],
   ): ServiceIface = newServiceIface(dest, "")
 
   @deprecated("Must provide service label", "2015-10-26")
   def newServiceIface[ServiceIface](dest: Name)(
-      implicit builder: ServiceIfaceBuilder[ServiceIface]
+      implicit builder: ServiceIfaceBuilder[ServiceIface],
   ): ServiceIface = newServiceIface(dest, "")
 
   def newMethodIface[ServiceIface, FutureIface](serviceIface: ServiceIface)(
-      implicit builder: MethodIfaceBuilder[ServiceIface, FutureIface]
+      implicit builder: MethodIfaceBuilder[ServiceIface, FutureIface],
   ): FutureIface = builder.newMethodIface(serviceIface)
 }
 

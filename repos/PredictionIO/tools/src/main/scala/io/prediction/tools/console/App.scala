@@ -458,7 +458,7 @@ object App extends Logging {
           val channelId = channels.insert(storage.Channel(
                   id = 0, // new id will be assigned
                   appid = app.id,
-                  name = newChannel
+                  name = newChannel,
               ))
           channelId.map { chanId =>
             info(s"Updated Channel meta-data.")

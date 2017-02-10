@@ -27,7 +27,7 @@ class ASTNodeSuite extends SparkFunSuite {
         ("add jar", "some \nbad\t\tfile\r\n.\njar"),
         ("ADD JAR", "@*#&@(!#@$^*!@^@#(*!@#"),
         ("SET", "foo=bar"),
-        ("SET", "foo*)(@#^*@&!#^=bar")
+        ("SET", "foo*)(@#^*@&!#^=bar"),
     )
     inputs.foreach {
       case (command, arguments) =>

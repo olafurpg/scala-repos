@@ -33,7 +33,7 @@ object TaskSerializer {
       Task.AgentInfo(
           host = required("host", opt(_.hasHost, _.getHost)),
           agentId = opt(_.hasSlaveId, _.getSlaveId).map(_.getValue),
-          attributes = proto.getAttributesList.iterator().asScala.toVector
+          attributes = proto.getAttributesList.iterator().asScala.toVector,
       )
     }
 
@@ -48,7 +48,7 @@ object TaskSerializer {
         stagedAt = Timestamp(proto.getStagedAt),
         startedAt = if (proto.hasStartedAt) Some(Timestamp(proto.getStartedAt))
           else None,
-        mesosStatus = opt(_.hasStatus, _.getStatus)
+        mesosStatus = opt(_.hasStatus, _.getStatus),
     )
 
     def networking =
@@ -67,8 +67,8 @@ object TaskSerializer {
             Task.Launched(
                 appVersion = appVersion,
                 status = taskStatus,
-                networking = networking
-            )
+                networking = networking,
+            ),
         )
       } else {
         None
@@ -79,7 +79,7 @@ object TaskSerializer {
         taskId = Task.Id(proto.getId),
         agentInfo = agentInfo,
         reservation,
-        launchedTask
+        launchedTask,
     )
   }
 
@@ -186,7 +186,7 @@ private[impl] object ReservationSerializer {
       Timeout(
           Timestamp(proto.getInitiated),
           Timestamp(proto.getDeadline),
-          reason
+          reason,
       )
     }
 

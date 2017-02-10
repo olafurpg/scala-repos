@@ -300,7 +300,7 @@ object FunctionRegistry {
       expression[NTile]("ntile"),
       expression[Rank]("rank"),
       expression[DenseRank]("dense_rank"),
-      expression[PercentRank]("percent_rank")
+      expression[PercentRank]("percent_rank"),
   )
 
   val builtin: SimpleFunctionRegistry = {

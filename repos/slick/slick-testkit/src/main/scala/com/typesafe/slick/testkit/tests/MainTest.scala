@@ -55,7 +55,7 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
         (4, "Carl", Some("Carlson")),
         (5, "Lenny", Some("Leonard")),
         (6, "Santa's Little Helper", None),
-        (7, "Snowball", None)
+        (7, "Snowball", None),
     )
 
     val p1 = db.stream(((for {

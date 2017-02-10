@@ -161,7 +161,7 @@ private[twitter] object ServerDispatcher {
       service: Service[Request, Response],
       lessor: Lessor,
       tracer: Tracer,
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   ): ServerDispatcher =
     new ServerDispatcher(
         trans, Processor andThen service, lessor, tracer, statsReceiver)
@@ -172,7 +172,7 @@ private[twitter] object ServerDispatcher {
     */
   def newRequestResponse(
       trans: Transport[Message, Message],
-      service: Service[Request, Response]
+      service: Service[Request, Response],
   ): ServerDispatcher =
     newRequestResponse(
         trans, service, Lessor.nil, NullTracer, NullStatsReceiver)
@@ -196,7 +196,7 @@ private[twitter] class ServerDispatcher(
     service: Service[Message, Message],
     lessor: Lessor, // the lessor that the dispatcher should register with in order to get leases
     tracer: Tracer,
-    statsReceiver: StatsReceiver
+    statsReceiver: StatsReceiver,
 )
     extends Closable with Lessee {
   import ServerDispatcher.State
@@ -402,7 +402,7 @@ private[finagle] object Processor
 
   private[this] def dispatch(
       tdispatch: Message.Tdispatch,
-      service: Service[Request, Response]
+      service: Service[Request, Response],
   ): Future[Message] = {
     val contextBufs = tdispatch.contexts.map(ContextsToBufs)
 
@@ -424,7 +424,7 @@ private[finagle] object Processor
 
   private[this] def dispatch(
       treq: Message.Treq,
-      service: Service[Request, Response]
+      service: Service[Request, Response],
   ): Future[Message] = {
     Trace.letIdOption(treq.traceId) {
       service(Request(Path.empty, ChannelBufferBuf.Owned(treq.req))).transform {

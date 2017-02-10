@@ -668,7 +668,7 @@ private[yarn] class YarnAllocator(driverUrl: String,
     */
   private def splitPendingAllocationsByLocality(
       hostToLocalTaskCount: Map[String, Int],
-      pendingAllocations: Seq[ContainerRequest]
+      pendingAllocations: Seq[ContainerRequest],
   ): (Seq[ContainerRequest], Seq[ContainerRequest], Seq[ContainerRequest]) = {
     val localityMatched = ArrayBuffer[ContainerRequest]()
     val localityUnMatched = ArrayBuffer[ContainerRequest]()

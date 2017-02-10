@@ -26,7 +26,7 @@ object ScalingProposition {
     // tasks that should be killed to meet constraints – pass notSentenced & consider the sentenced 'already killed'
     val killToMeetConstraints = meetConstraints(
         notSentencedAndRunningMap.values,
-        killCount - sentencedAndRunningMap.size
+        killCount - sentencedAndRunningMap.size,
     )
     // rest are tasks that are not sentenced and need not be killed to meet constraints
     val rest = notSentencedAndRunningMap -- killToMeetConstraints.map(_.taskId)

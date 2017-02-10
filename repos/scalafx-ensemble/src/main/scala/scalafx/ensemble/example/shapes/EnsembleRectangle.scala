@@ -62,7 +62,7 @@ class EnsembleRectangle extends EnsembleExample {
           Rectangle(100, 100, Color.Red),
           rectObj(Rectangle(100, 100, Color.White)),
           rectArcObj(20, 20),
-          fillArc(20, 20, Color.Blue)
+          fillArc(20, 20, Color.Blue),
       )
     }
   }

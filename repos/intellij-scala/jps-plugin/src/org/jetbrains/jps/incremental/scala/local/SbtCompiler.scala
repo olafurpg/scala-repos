@@ -80,7 +80,7 @@ class SbtCompiler(javac: JavaCompiler,
           reporter,
           order,
           skip = false,
-          incOptions
+          incOptions,
       )(logger)
 
       analysisStore.set(analysis, setup)

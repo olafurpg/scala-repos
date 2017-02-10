@@ -60,7 +60,7 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
         AssertOnQuery(q =>
                         q.exception.get.startOffset.get === q.streamProgress
                           .toCompositeOffset(Seq(inputData)),
-                      "incorrect start offset on exception")
+                      "incorrect start offset on exception"),
     )
   }
 
@@ -88,7 +88,7 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
         ExpectFailure[SparkException],
         AssertOnQuery(_.sourceStatuses(0).offset === Some(LongOffset(2))),
         AssertOnQuery(
-            _.sinkStatus.offset === Some(CompositeOffset.fill(LongOffset(1))))
+            _.sinkStatus.offset === Some(CompositeOffset.fill(LongOffset(1)))),
     )
   }
 
@@ -104,12 +104,12 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
   case class TestAwaitTermination(
       expectedBehavior: ExpectedBehavior,
       timeoutMs: Int = -1,
-      expectedReturnValue: Boolean = false
+      expectedReturnValue: Boolean = false,
   )
       extends AssertOnQuery(
           TestAwaitTermination.assertOnQueryCondition(
               expectedBehavior, timeoutMs, expectedReturnValue),
-          "Error testing awaitTermination behavior"
+          "Error testing awaitTermination behavior",
       ) {
     override def toString(): String = {
       s"TestAwaitTermination($expectedBehavior, timeoutMs = $timeoutMs, " +
@@ -131,7 +131,7 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
     def assertOnQueryCondition(
         expectedBehavior: ExpectedBehavior,
         timeoutMs: Int,
-        expectedReturnValue: Boolean
+        expectedReturnValue: Boolean,
     )(q: StreamExecution): Boolean = {
 
       def awaitTermFunc(): Unit = {

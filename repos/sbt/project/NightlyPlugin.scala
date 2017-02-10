@@ -17,7 +17,7 @@ object NightlyPlugin extends AutoPlugin {
           Seq(
               scalaCheck % Test,
               specs2 % Test,
-              junit % Test
+              junit % Test,
           )
         else Seq()
     }
@@ -30,7 +30,7 @@ object NightlyPlugin extends AutoPlugin {
       includeTestDependencies := {
         val v = scalaVersion.value
         v.startsWith("2.10.") || v.startsWith("2.11.")
-      }
+      },
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
@@ -43,6 +43,6 @@ object NightlyPlugin extends AutoPlugin {
           case sv if sv startsWith "2.12." => CrossVersion.full
         }
       },
-      resolvers += Resolver.typesafeIvyRepo("releases")
+      resolvers += Resolver.typesafeIvyRepo("releases"),
   )
 }

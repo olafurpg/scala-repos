@@ -17,7 +17,7 @@ object TemplatesBuild extends Build {
       // Order is important, load the version first, then load build.sbt which may modify it with the play.version
       // system property.
       file("../framework/version.sbt"),
-      file("./build.sbt")
+      file("./build.sbt"),
   )
 }
 
@@ -353,7 +353,7 @@ object Templates {
                 case false => throw new TemplatePublishFailed
               }
         },
-        commands += templatesCommand
+        commands += templatesCommand,
     )
 
   val templatesCommand =

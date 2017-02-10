@@ -67,7 +67,7 @@ class Reversi(jQuery: JQueryStatic, playground: JQuery) {
     jQuery("<input>",
            js.Dynamic.literal(
                `type` = "button",
-               value = "Reset"
+               value = "Reset",
            )).click(reset _)
   }
 
@@ -75,7 +75,7 @@ class Reversi(jQuery: JQueryStatic, playground: JQuery) {
     jQuery("<input>",
            js.Dynamic.literal(
                `type` = "button",
-               value = "Pass"
+               value = "Pass",
            )).click(pass _)
   }
 

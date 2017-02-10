@@ -73,7 +73,7 @@ class InteractionSuite
   test("numeric interaction") {
     val data = sqlContext
       .createDataFrame(
-          Seq((2, Vectors.dense(3.0, 4.0)), (1, Vectors.dense(1.0, 5.0)))
+          Seq((2, Vectors.dense(3.0, 4.0)), (1, Vectors.dense(1.0, 5.0))),
       )
       .toDF("a", "b")
     val groupAttr = new AttributeGroup(
@@ -89,7 +89,7 @@ class InteractionSuite
     val expected = sqlContext
       .createDataFrame(
           Seq((2, Vectors.dense(3.0, 4.0), Vectors.dense(6.0, 8.0)),
-              (1, Vectors.dense(1.0, 5.0), Vectors.dense(1.0, 5.0)))
+              (1, Vectors.dense(1.0, 5.0), Vectors.dense(1.0, 5.0))),
       )
       .toDF("a", "b", "features")
     assert(res.collect() === expected.collect())
@@ -104,7 +104,7 @@ class InteractionSuite
   test("nominal interaction") {
     val data = sqlContext
       .createDataFrame(
-          Seq((2, Vectors.dense(3.0, 4.0)), (1, Vectors.dense(1.0, 5.0)))
+          Seq((2, Vectors.dense(3.0, 4.0)), (1, Vectors.dense(1.0, 5.0))),
       )
       .toDF("a", "b")
     val groupAttr = new AttributeGroup(
@@ -122,7 +122,7 @@ class InteractionSuite
     val expected = sqlContext
       .createDataFrame(
           Seq((2, Vectors.dense(3.0, 4.0), Vectors.dense(0, 0, 0, 0, 3, 4)),
-              (1, Vectors.dense(1.0, 5.0), Vectors.dense(0, 0, 1, 5, 0, 0)))
+              (1, Vectors.dense(1.0, 5.0), Vectors.dense(0, 0, 1, 5, 0, 0))),
       )
       .toDF("a", "b", "features")
     assert(res.collect() === expected.collect())
@@ -142,7 +142,7 @@ class InteractionSuite
     val data = sqlContext
       .createDataFrame(
           Seq((2, Vectors.dense(0.0, 4.0), 1.0),
-              (1, Vectors.dense(1.0, 5.0), 10.0))
+              (1, Vectors.dense(1.0, 5.0), 10.0)),
       )
       .toDF("a", "b", "c")
     val groupAttr = new AttributeGroup(
@@ -167,7 +167,7 @@ class InteractionSuite
               (1,
                Vectors.dense(1.0, 5.0),
                10.0,
-               Vectors.dense(0, 0, 0, 0, 10, 50, 0, 0, 0)))
+               Vectors.dense(0, 0, 0, 0, 10, 50, 0, 0, 0))),
       )
       .toDF("a", "b", "c", "features")
     assert(res.collect() === expected.collect())

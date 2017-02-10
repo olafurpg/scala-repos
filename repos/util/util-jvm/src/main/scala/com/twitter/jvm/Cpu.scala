@@ -5,5 +5,5 @@ import com.twitter.app.GlobalFlag
 object numProcs
     extends GlobalFlag[Double](
         Runtime.getRuntime.availableProcessors().toDouble,
-        "number of logical cores"
+        "number of logical cores",
     )

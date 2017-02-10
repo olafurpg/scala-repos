@@ -11,7 +11,7 @@ package org.scalajs.jasminetest
 /** Dummy Exception to wrap stack traces passed to loggers */
 class JasmineTestException(
     message: String,
-    stackTrace: Array[StackTraceElement]
+    stackTrace: Array[StackTraceElement],
 )
     extends Exception(message) {
   override def getStackTrace(): Array[StackTraceElement] = stackTrace

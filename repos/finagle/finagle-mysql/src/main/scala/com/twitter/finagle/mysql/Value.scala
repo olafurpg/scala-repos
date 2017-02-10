@@ -36,7 +36,7 @@ case class RawValue(
     typ: Short,
     charset: Short,
     isBinary: Boolean,
-    bytes: Array[Byte]
+    bytes: Array[Byte],
 )
     extends Value
 
@@ -231,14 +231,14 @@ class TimestampValue(
 object TimestampValue
     extends TimestampValue(
         TimeZone.getDefault(),
-        TimeZone.getTimeZone("UTC")
+        TimeZone.getTimeZone("UTC"),
     ) {
   private[this] val log = Logger.getLogger("finagle-mysql")
 
   override def apply(ts: Timestamp): Value = {
     log.warning(
         "Injecting timezone-less `java.sql.Timestamp` with a hardcoded local timezone (%s)"
-          .format(injectionTimeZone.getID)
+          .format(injectionTimeZone.getID),
     )
     super.apply(ts)
   }
@@ -246,7 +246,7 @@ object TimestampValue
   override def unapply(v: Value): Option[Timestamp] = {
     log.warning(
         "Extracting TIMESTAMP or DATETIME row as a `java.sql.Timestamp` with a hardcoded timezone (%s)"
-          .format(extractionTimeZone.getID)
+          .format(extractionTimeZone.getID),
     )
     super.unapply(v)
   }

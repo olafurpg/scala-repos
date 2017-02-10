@@ -34,7 +34,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](
                           evG: G[A] =:= Id[A]): Bijection[X[A, C], X[B, D]] =
     bijection(
         F.bimap(_)(_to andThen evF, g.to(_)): Id[X[B, D]],
-        F.bimap(_)(_from andThen evG, g.from(_)): Id[X[A, C]]
+        F.bimap(_)(_from andThen evG, g.from(_)): Id[X[A, C]],
     )
 
   def ***[C, D](
@@ -51,7 +51,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](
       implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =
     bijection(
         (toK <=< g.toK).run,
-        (fromK >=> g.fromK).run
+        (fromK >=> g.fromK).run,
     )
 
   /** alias for `compose` */

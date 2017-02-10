@@ -14,7 +14,7 @@ import scala.util.Random
 abstract class ForwardingWarmUpFilter[Req, Rep](
     warmupPeriod: Duration,
     forwardTo: Service[Req, Rep],
-    statsReceiver: StatsReceiver = DefaultStatsReceiver
+    statsReceiver: StatsReceiver = DefaultStatsReceiver,
 )
     extends SimpleFilter[Req, Rep] {
 

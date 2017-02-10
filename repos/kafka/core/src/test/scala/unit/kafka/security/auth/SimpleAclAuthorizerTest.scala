@@ -262,7 +262,7 @@ class SimpleAclAuthorizerTest extends ZooKeeperTestHarness {
         new Resource(Cluster, Resource.WildCardResource) -> Set[Acl](
             new Acl(user2, Allow, host1, Read)),
         new Resource(Group, Resource.WildCardResource) -> acls,
-        new Resource(Group, "test-ConsumerGroup") -> acls
+        new Resource(Group, "test-ConsumerGroup") -> acls,
     )
 
     resourceToAcls foreach {

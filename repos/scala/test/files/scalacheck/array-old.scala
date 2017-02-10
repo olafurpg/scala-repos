@@ -20,7 +20,7 @@ object Test extends Properties("Array") {
       arbitrary[Array[List[String]]],
       arbitrary[Array[String]],
       arbitrary[Array[Boolean]],
-      arbitrary[Array[AnyVal]]
+      arbitrary[Array[AnyVal]],
   )
 
   // inspired by #1857 and #2352

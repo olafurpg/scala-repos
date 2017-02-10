@@ -358,7 +358,7 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
   class HashTrieMap[A, +B](
       private[collection] val bitmap: Int,
       private[collection] val elems: Array[HashMap[A, B @uV]],
-      private[collection] val size0: Int
+      private[collection] val size0: Int,
   )
       extends HashMap[A, B @uV] {
 

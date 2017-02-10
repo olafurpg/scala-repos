@@ -149,7 +149,7 @@ class NameTreeTest extends FunSuite {
         "(~|$|/foo) & (/bar|/blah) & ~ & /FOO" -> Some(Set("/bar", "/FOO")),
         "! | /ok" -> None,
         "/ok & !" -> None,
-        "~ | /ok | !" -> Some(Set("/ok"))
+        "~ | /ok | !" -> Some(Set("/ok")),
     )
 
     for ((tree, res) <- cases) {

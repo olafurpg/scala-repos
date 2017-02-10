@@ -50,7 +50,7 @@ object EnsembleTabbedPage {
           new Tab() {
             text = "Source"
             closable = false
-          }
+          },
       )
     }
 

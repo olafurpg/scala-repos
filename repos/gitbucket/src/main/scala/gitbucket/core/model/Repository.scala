@@ -49,5 +49,5 @@ case class Repository(
     originUserName: Option[String],
     originRepositoryName: Option[String],
     parentUserName: Option[String],
-    parentRepositoryName: Option[String]
+    parentRepositoryName: Option[String],
 )

@@ -72,7 +72,7 @@ object PlayForkRun extends AutoPlugin {
       playForkStarted <<= publishUrlTask,
       playForkReload <<= compileTask,
       SerializersKeys.registeredSerializers ++= Serializers.serializers.map(
-          x => RegisteredSerializer(x.serializer, x.unserializer, x.manifest))
+          x => RegisteredSerializer(x.serializer, x.unserializer, x.manifest)),
   )
 
   val allInput: Parser[String] = {
@@ -142,7 +142,7 @@ object PlayForkRun extends AutoPlugin {
         reloadKey = thisProjectRef.value.project + "/" +
           playForkReload.key.label,
         compileTimeout = playForkCompileTimeout.value.toMillis,
-        mainClass = (mainClass in (Compile, run)).value.get
+        mainClass = (mainClass in (Compile, run)).value.get,
     )
   }
 

@@ -135,7 +135,7 @@ object RetryBudget {
       ttl: Duration,
       minRetriesPerSec: Int,
       percentCanRetry: Double,
-      nowMillis: () => Long = Stopwatch.systemMillis
+      nowMillis: () => Long = Stopwatch.systemMillis,
   ): RetryBudget = {
     require(ttl.inSeconds >= 1 && ttl.inSeconds <= 60,
             s"ttl must be [1 second, 60 seconds]: $ttl")

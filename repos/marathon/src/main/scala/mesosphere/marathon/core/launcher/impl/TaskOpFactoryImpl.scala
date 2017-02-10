@@ -48,13 +48,13 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
               agentInfo = Task.AgentInfo(
                     host = offer.getHostname,
                     agentId = Some(offer.getSlaveId.getValue),
-                    attributes = offer.getAttributesList.asScala
+                    attributes = offer.getAttributesList.asScala,
                 ),
               appVersion = app.version,
               status = Task.Status(
-                    stagedAt = clock.now()
+                    stagedAt = clock.now(),
                 ),
-              networking = Task.HostPorts(ports)
+              networking = Task.HostPorts(ports),
           )
           taskOperationFactory.launch(taskInfo, task)
       }
@@ -106,8 +106,8 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
                     config.mesosRole.get.toSet,
                     reserved = true,
                     requiredLabels = TaskLabels.labelsForTask(
-                          request.frameworkId, volumeMatch.task)
-                )
+                          request.frameworkId, volumeMatch.task),
+                ),
             )
 
           matchingReservedResourcesWithoutVolumes.flatMap {
@@ -127,7 +127,7 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
             offer,
             app,
             tasks.values,
-            ResourceSelector(acceptedResourceRoles, reserved = false)
+            ResourceSelector(acceptedResourceRoles, reserved = false),
         )
         matchingResourcesForReservation.map { resourceMatch =>
           reserveAndCreateVolumes(
@@ -152,7 +152,7 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
       case (taskInfo, ports) =>
         val launch = TaskStateOp.Launch(appVersion = app.version,
                                         status = Task.Status(
-                                              stagedAt = clock.now()
+                                              stagedAt = clock.now(),
                                           ),
                                         networking = Task.HostPorts(ports))
 
@@ -184,10 +184,10 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
         agentInfo = Task.AgentInfo(
               host = offer.getHostname,
               agentId = Some(offer.getSlaveId.getValue),
-              attributes = offer.getAttributesList.asScala
+              attributes = offer.getAttributesList.asScala,
           ),
         reservation = Task.Reservation(
-              persistentVolumeIds, Task.Reservation.State.New(timeout = None))
+              persistentVolumeIds, Task.Reservation.State.New(timeout = None)),
     )
     taskOperationFactory.reserveAndCreateVolumes(
         frameworkId, task, resourceMatch.resources, localVolumes)

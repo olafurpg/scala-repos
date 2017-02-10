@@ -21,7 +21,7 @@ object Range {
         o.lt(aa, bb)
           .fold(
               new Range(a, b),
-              new Range(b, a)
+              new Range(b, a),
           )
       case (x, y) => new Range(x, y)
     }

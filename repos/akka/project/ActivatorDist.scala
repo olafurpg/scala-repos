@@ -18,7 +18,7 @@ object ActivatorDist {
 
   lazy val settings: Seq[Setting[_]] = Seq(
       activatorDistDirectory <<= crossTarget / "activator-dist",
-      activatorDist <<= activatorDistTask
+      activatorDist <<= activatorDistTask,
   )
 
   def activatorDistTask: Initialize[Task[File]] = {

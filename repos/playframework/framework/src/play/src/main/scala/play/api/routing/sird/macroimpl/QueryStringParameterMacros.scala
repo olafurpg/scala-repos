@@ -73,7 +73,7 @@ private[sird] object QueryStringParameterMacros {
         // the parameter name to it
         val call = TermName(extractorName)
         c.Expr(
-            q"_root_.play.api.routing.sird.QueryStringParameterExtractor.$call($paramName)"
+            q"_root_.play.api.routing.sird.QueryStringParameterExtractor.$call($paramName)",
         )
 
       case _ =>

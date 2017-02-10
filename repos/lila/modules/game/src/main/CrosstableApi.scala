@@ -27,7 +27,7 @@ final class CrosstableApi(coll: Coll) {
     coll
       .find(
           select(u1, u2),
-          BSONDocument("n" -> true)
+          BSONDocument("n" -> true),
       )
       .one[BSONDocument] map {
       ~_.flatMap(_.getAs[Int]("n"))
@@ -50,13 +50,13 @@ final class CrosstableApi(coll: Coll) {
                   case Some(u) if u == u2 => 10
                   case None => 5
                   case _ => 0
-                })
-            )
+                }),
+            ),
         ) ++ BSONDocument(
             "$push" -> BSONDocument(
                 Crosstable.BSONFields.results -> BSONDocument(
                     "$each" -> List(bsonResult),
-                    "$slice" -> -maxGames
+                    "$slice" -> -maxGames,
                 )))
       coll.update(select(u1, u2), bson).void
     case _ => funit
@@ -109,7 +109,7 @@ final class CrosstableApi(coll: Coll) {
                     obj.getAs[Int]("nb").fold(ct) { nb =>
                       ct.addWins(obj.getAs[String]("_id"), nb)
                     }
-                }
+                },
             )
 
           _ <- coll insert crosstable

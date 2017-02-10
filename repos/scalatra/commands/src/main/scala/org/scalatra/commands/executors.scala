@@ -45,7 +45,7 @@ object CommandExecutors extends CommandExecutors
   * @tparam S The result type of executing the command
   */
 @implicitNotFound(
-    "Couldn't find an executor for command of type ${T} and result of type ${S}. Did you import org.scalatra.commands.CommandExecutors._ ? You can also implement your own org.scalatra.CommandExecutor."
+    "Couldn't find an executor for command of type ${T} and result of type ${S}. Did you import org.scalatra.commands.CommandExecutors._ ? You can also implement your own org.scalatra.CommandExecutor.",
 )
 abstract class CommandExecutor[T <: Command, S](handler: T => S) {
   def execute(command: T): S

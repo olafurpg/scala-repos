@@ -41,7 +41,7 @@ final class Env(config: Config,
   lazy val daily = new Daily(
       puzzleColl,
       renderer,
-      system.scheduler
+      system.scheduler,
   ).apply _
 
   lazy val pngExport = PngExport(PngExecPath) _

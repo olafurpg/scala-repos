@@ -109,7 +109,7 @@ class UISeleniumSuite
           findAll(cssSelector("#stat-table th")).map(_.text).toSeq
         statTableHeaders.exists(
             _.matches(
-                "Timelines \\(Last \\d+ batches, \\d+ active, \\d+ completed\\)")
+                "Timelines \\(Last \\d+ batches, \\d+ active, \\d+ completed\\)"),
         ) should be(true)
         statTableHeaders should contain("Histograms")
 

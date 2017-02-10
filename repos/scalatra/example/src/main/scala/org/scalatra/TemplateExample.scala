@@ -178,7 +178,7 @@ class TemplateExample
   get("/flash-map/result") {
     displayPage(
         title = "Scalatra: Flash  Example",
-        content = <span>Message = { flash.getOrElse("message", "") }</span>
+        content = <span>Message = { flash.getOrElse("message", "") }</span>,
     )
   }
 

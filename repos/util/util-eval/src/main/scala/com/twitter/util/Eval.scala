@@ -101,13 +101,13 @@ class Eval(target: Option[File]) {
           Seq(
               new ClassScopedResolver(getClass),
               new FilesystemResolver(new File(".")),
-              new FilesystemResolver(new File("." + File.separator + "config"))
+              new FilesystemResolver(new File("." + File.separator + "config")),
           ) ++
           (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
                 path =>
                   new FilesystemResolver(new File(path))
-              })
-      )
+              }),
+      ),
   )
 
   // For derived classes to provide an alternate compiler message handler.

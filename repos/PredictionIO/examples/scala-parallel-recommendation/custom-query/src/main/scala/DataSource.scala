@@ -35,7 +35,7 @@ class DataSource(val dsp: DataSourceParams)
     val itemsRDD = eventsDb
       .aggregateProperties(
           appId = dsp.appId,
-          entityType = "item"
+          entityType = "item",
       )(sc)
       .flatMap {
         case (entityId, properties) ⇒

@@ -31,7 +31,7 @@ final class PhantomJettyClassLoader(
       "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$WSLogger",
       "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$ComWebSocketListener",
       "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$1",
-      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$2"
+      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$2",
   )
 
   override protected def loadClass(name: String, resolve: Boolean): Class[_] = {

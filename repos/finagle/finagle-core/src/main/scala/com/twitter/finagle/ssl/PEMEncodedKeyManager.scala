@@ -25,14 +25,14 @@ object PEMEncodedKeyManager {
   def apply(
       certificatePath: String,
       keyPath: String,
-      caCertPath: Option[String]
+      caCertPath: Option[String],
   ): Array[KeyManager] =
     makeKeystore(
         Files.readBytes(new File(certificatePath)),
         Files.readBytes(new File(keyPath)),
         caCertPath map { filename =>
           Files.readBytes(new File(filename))
-        }
+        },
     )
 
   private[this] def secret(length: Int): Array[Char] = {
@@ -48,7 +48,7 @@ object PEMEncodedKeyManager {
   private[this] def makeKeystore(
       certificate: Array[Byte],
       key: Array[Byte],
-      caCert: Option[Array[Byte]]
+      caCert: Option[Array[Byte]],
   ): Array[KeyManager] = {
 
     // Create a secure directory for the conversion
@@ -86,8 +86,8 @@ object PEMEncodedKeyManager {
             "-in",
             pemPath,
             "-out",
-            p12Path
-        )
+            p12Path,
+        ),
     )
 
     // Convert the PKCS12 file into a Java keystore
@@ -107,8 +107,8 @@ object PEMEncodedKeyManager {
             "-keypass",
             passwordStr,
             "-storepass",
-            passwordStr
-        )
+            passwordStr,
+        ),
     )
 
     // Read the resulting keystore

@@ -22,7 +22,7 @@ trait SslRequirement extends Handler with ServletApiImplicits {
           port,
           oldUri.getPath,
           oldUri.getQuery,
-          oldUri.getFragment
+          oldUri.getFragment,
       ).toString
       res.redirect(uri)
     } else {

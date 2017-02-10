@@ -355,7 +355,7 @@ object MapTest extends SpecLite {
       unions(List(
               fromList(List((5, "a"), (3, "b"))),
               fromList(List((5, "A"), (7, "C"))),
-              fromList(List((5, "A3"), (3, "B3")))
+              fromList(List((5, "A3"), (3, "B3"))),
           )) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
 
       unions(List(fromList(List(5 -> "A3", 3 -> "B3")),

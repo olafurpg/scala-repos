@@ -16,7 +16,7 @@ class ProductFormatsSpec
   val foo = Foo(13, "foo")
   val fooexpect = SexpData(
       SexpSymbol(":i") -> SexpNumber(13),
-      SexpSymbol(":s") -> SexpString("foo")
+      SexpSymbol(":s") -> SexpString("foo"),
   )
 
   "ProductFormats case classes" should "support primitive types" in {
@@ -37,7 +37,7 @@ class ProductFormatsSpec
   it should "support nested case classes" in {
     val bar = Bar(foo)
     val expect = SexpData(
-        SexpSymbol(":foo") -> fooexpect
+        SexpSymbol(":foo") -> fooexpect,
     )
 
     // (this is actually a really big deal, thank you shapeless!)
@@ -55,7 +55,7 @@ class ProductFormatsSpec
                  SexpData(
                      SexpSymbol(":thing") -> SexpString("wibble"),
                      SexpSymbol(":thong") -> SexpNumber(13),
-                     SexpSymbol(":bling") -> SexpList(SexpString("fork"))
+                     SexpSymbol(":bling") -> SexpList(SexpString("fork")),
                  ))
 
     val wobble = Wibble("wibble", 13, None)
@@ -65,13 +65,13 @@ class ProductFormatsSpec
                  SexpData(
                      SexpSymbol(":thing") -> SexpString("wibble"),
                      SexpSymbol(":thong") -> SexpNumber(13),
-                     SexpSymbol(":bling") -> SexpNil
+                     SexpSymbol(":bling") -> SexpNil,
                  ))
 
     // but tolerate missing entries
     SexpData(
         SexpSymbol(":thing") -> SexpString("wibble"),
-        SexpSymbol(":thong") -> SexpNumber(13)
+        SexpSymbol(":thong") -> SexpNumber(13),
     ).convertTo[Wibble] should ===(wobble)
   }
 
@@ -106,7 +106,7 @@ class CustomisedProductFormatsSpec
     assertFormat(Foo(13, "foo"),
                  SexpData(
                      SexpSymbol(":a-thingy-ma-bob") -> SexpNumber(13),
-                     SexpSymbol(":h-t-m-l") -> SexpString("foo")
+                     SexpSymbol(":h-t-m-l") -> SexpString("foo"),
                  ))
   }
 
@@ -115,7 +115,7 @@ class CustomisedProductFormatsSpec
     assertFormat(wobble,
                  SexpData(
                      SexpSymbol(":num") -> SexpNumber(13),
-                     SexpSymbol(":str") -> SexpNil
+                     SexpSymbol(":str") -> SexpNil,
                  ))
   }
 
@@ -123,7 +123,7 @@ class CustomisedProductFormatsSpec
     val wobble = Bar(13, None)
     assertFormat(wobble,
                  SexpData(
-                     SexpSymbol(":num") -> SexpNumber(13)
+                     SexpSymbol(":num") -> SexpNumber(13),
                  ))
   }
 }

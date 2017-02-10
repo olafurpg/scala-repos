@@ -30,7 +30,7 @@ object Sensible {
             "-Ywarn-dead-code",
             //"-Ywarn-numeric-widen", // noisy
             //"-Ywarn-value-discard", // will require a lot of work
-            "-Xfuture"
+            "-Xfuture",
         ) ++ {
           if (scalaVersion.value.startsWith("2.11"))
             Seq("-Ywarn-unused-import")
@@ -49,7 +49,7 @@ object Sensible {
             "-Werror",
             "-Xlint:-options",
             "-Xlint:-path",
-            "-Xlint:-processing"
+            "-Xlint:-processing",
         ),
         javacOptions in doc ++= Seq("-source", "1.6"),
         javaOptions :=
@@ -70,8 +70,8 @@ object Sensible {
             "org.scala-lang.modules" %% "scala-xml" % scalaModulesVersion,
             "org.scala-lang.modules" %% "scala-parser-combinators" % scalaModulesVersion,
             "org.scalamacros" %% "quasiquotes" % quasiquotesVersion,
-            "org.scalatest" %% "scalatest" % scalatestVersion
-        ) ++ logback ++ guava ++ shapeless(scalaVersion.value)
+            "org.scalatest" %% "scalatest" % scalatestVersion,
+        ) ++ logback ++ guava ++ shapeless(scalaVersion.value),
     ) ++ inConfig(Test)(testSettings) ++ scalariformSettings
 
   // TODO: scalariformSettingsWithIt generalised
@@ -87,7 +87,7 @@ object Sensible {
           outputStrategy,
           envVars,
           javaHome,
-          connectInput
+          connectInput,
       ).map { (tests, base, options, strategy, env, javaHomeDir, connectIn) =>
         val opts = ForkOptions(
             bootJars = Nil,
@@ -96,14 +96,14 @@ object Sensible {
             outputStrategy = strategy,
             runJVMOptions = options,
             workingDirectory = Some(base),
-            envVars = env
+            envVars = env,
         )
         tests.map { test =>
           Tests.Group(test.name, Seq(test), Tests.SubProcess(opts))
         }
       },
       testOptions ++= noColorIfEmacs,
-      testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit)
+      testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit),
   )
 
   val scalaModulesVersion = "1.0.4"
@@ -116,7 +116,7 @@ object Sensible {
 
   val macroParadise = Seq(
       compilerPlugin(
-          "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+          "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
   )
   def shapeless(scalaVersion: String) = {
     if (scalaVersion.startsWith("2.10.")) macroParadise
@@ -126,11 +126,11 @@ object Sensible {
       "ch.qos.logback" % "logback-classic" % "1.1.5",
       "org.slf4j" % "slf4j-api" % logbackVersion,
       "org.slf4j" % "jul-to-slf4j" % logbackVersion,
-      "org.slf4j" % "jcl-over-slf4j" % logbackVersion
+      "org.slf4j" % "jcl-over-slf4j" % logbackVersion,
   )
   val guava = Seq(
       "com.google.guava" % "guava" % guavaVersion,
-      "com.google.code.findbugs" % "jsr305" % "3.0.1" % "provided"
+      "com.google.code.findbugs" % "jsr305" % "3.0.1" % "provided",
   )
 
   // TODO: automate testLibs as part of the testSettings
@@ -140,7 +140,7 @@ object Sensible {
         "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % config,
         "org.scalacheck" %% "scalacheck" % "1.12.5" % config,
         "com.typesafe.akka" %% "akka-testkit" % akkaVersion % config,
-        "com.typesafe.akka" %% "akka-slf4j" % akkaVersion % config
+        "com.typesafe.akka" %% "akka-slf4j" % akkaVersion % config,
     ) ++ logback.map(_ % config)
 
   // e.g. YOURKIT_AGENT=/opt/yourkit/bin/linux-x86-64/libyjpagent.so

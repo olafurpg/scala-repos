@@ -66,7 +66,7 @@ trait FSLibSpecs[M[+ _]]
       Path("/foo/bar2/baz/quux2") -> Map(
           ColumnRef(CPath.Identity, CString) -> 30L),
       Path("/foo2/bar1/baz/quux1") -> Map(
-          ColumnRef(CPath.Identity, CString) -> 40L)
+          ColumnRef(CPath.Identity, CString) -> 40L),
   )
 
   val vfs = new StubVFSMetadata[M](projectionMetadata)

@@ -100,7 +100,7 @@ class ParHashMap[K, +V] private[immutable](
             val sndlength = previousRemaining - fstlength
             Seq(
                 new ParHashMapIterator(fst, fstlength),
-                new ParHashMapIterator(snd, sndlength)
+                new ParHashMapIterator(snd, sndlength),
             )
           case _ =>
             // iterator of the collision map case

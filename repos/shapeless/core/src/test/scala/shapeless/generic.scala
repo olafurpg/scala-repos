@@ -1112,16 +1112,16 @@ object Thrift {
     class Immutable(
         val a: Double,
         val b: String,
-        val _passthroughFields: scala.collection.immutable.Map[Short, Byte]
+        val _passthroughFields: scala.collection.immutable.Map[Short, Byte],
     )
         extends TProduct {
       def this(
           a: Double,
-          b: String
+          b: String,
       ) = this(
           a,
           b,
-          Map.empty
+          Map.empty,
       )
     }
   }

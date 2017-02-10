@@ -36,7 +36,7 @@ private[finagle] object SocketAddressResolver {
 
 private[finagle] class SocketAddressResolveHandler(
     resolver: SocketAddressResolver,
-    addr: InetSocketAddress
+    addr: InetSocketAddress,
 )
     extends SimpleChannelHandler {
   override def connectRequested(
@@ -54,7 +54,7 @@ private[finagle] class SocketAddressResolveHandler(
                     de.getChannel,
                     de.getFuture,
                     de.getState,
-                    resolvedSocketAddress
+                    resolvedSocketAddress,
                 )
                 SocketAddressResolveHandler. super.connectRequested(
                     ctx, resolvedEvent)

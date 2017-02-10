@@ -35,7 +35,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
             name = "test",
             active = true,
             location = "localhost",
-            executorId = "1"
+            executorId = "1",
         ))
     listenerWrapper.onReceiverStarted(receiverStarted)
     assertReceiverInfo(
@@ -47,7 +47,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
             name = "test",
             active = false,
             location = "localhost",
-            executorId = "1"
+            executorId = "1",
         ))
     listenerWrapper.onReceiverStopped(receiverStopped)
     assertReceiverInfo(
@@ -62,7 +62,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
             executorId = "1",
             lastErrorMessage = "failed",
             lastError = "failed",
-            lastErrorTime = System.currentTimeMillis()
+            lastErrorTime = System.currentTimeMillis(),
         ))
     listenerWrapper.onReceiverError(receiverError)
     assertReceiverInfo(
@@ -99,7 +99,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
                                            description = "operation2",
                                            startTime = None,
                                            endTime = None,
-                                           failureReason = None))
+                                           failureReason = None)),
         ))
     listenerWrapper.onBatchSubmitted(batchSubmitted)
     assertBatchInfo(
@@ -136,7 +136,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
                                            description = "operation2",
                                            startTime = Some(1005L),
                                            endTime = None,
-                                           failureReason = None))
+                                           failureReason = None)),
         ))
     listenerWrapper.onBatchStarted(batchStarted)
     assertBatchInfo(listener.batchStarted.batchInfo, batchStarted.batchInfo)
@@ -172,7 +172,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
                                            description = "operation2",
                                            startTime = Some(1005L),
                                            endTime = Some(1010L),
-                                           failureReason = None))
+                                           failureReason = None)),
         ))
     listenerWrapper.onBatchCompleted(batchCompleted)
     assertBatchInfo(
@@ -186,7 +186,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
             description = "operation1",
             startTime = Some(1003L),
             endTime = None,
-            failureReason = None
+            failureReason = None,
         ))
     listenerWrapper.onOutputOperationStarted(outputOperationStarted)
     assertOutputOperationInfo(
@@ -201,7 +201,7 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
             description = "operation1",
             startTime = Some(1003L),
             endTime = Some(1004L),
-            failureReason = None
+            failureReason = None,
         ))
     listenerWrapper.onOutputOperationCompleted(outputOperationCompleted)
     assertOutputOperationInfo(

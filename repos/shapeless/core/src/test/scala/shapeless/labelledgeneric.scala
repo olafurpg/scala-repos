@@ -49,7 +49,7 @@ object LabelledGenericTestsAux {
       "Erich Gamma",
       "Richard Helm",
       "Ralph Johnson",
-      "John Vlissides"
+      "John Vlissides",
   )
 
   val taplRecord =
@@ -191,7 +191,7 @@ class LabelledGenericTests {
                                               "Richard Helm",
                                               "Ralph Johnson",
                                               "John Vlissides") :: HNil,
-        values
+        values,
     )
   }
 

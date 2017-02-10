@@ -43,7 +43,7 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
                          Library.Not.typed(on.nodeType,
                                            Library.Exists
                                              .typed(
-                                               on.nodeType, Filter(rgen2, assignFreshSymbols(right), on2)))
+                                               on.nodeType, Filter(rgen2, assignFreshSymbols(right), on2))),
           ),
           Pure(ProductNode(ConstArray(Ref(bgen), nullStructFor(right.nodeType.structural.asCollectionType.elementType))))
         ), true).infer())

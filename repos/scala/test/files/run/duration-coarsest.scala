@@ -10,7 +10,7 @@ object Test extends App {
       (2000000 nanos, 2 millis),
       (48 hours, 2 days),
       (5 seconds, 5 seconds),
-      (1 second, 1 second)
+      (1 second, 1 second),
   ) foreach {
     case (x, expected) =>
       val actual = x.toCoarsest
@@ -23,7 +23,7 @@ object Test extends App {
       500 millis,
       1500 millis,
       23 hours,
-      40 days
+      40 days,
   ) foreach (x => assert(x == x.toCoarsest, x))
 
   // toCoarsest on a FiniteDuration should return a FiniteDuration

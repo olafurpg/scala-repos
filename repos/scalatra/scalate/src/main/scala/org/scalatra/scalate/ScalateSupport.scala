@@ -18,7 +18,7 @@ object ScalateSupport {
   val DefaultLayouts = Seq(
       "/WEB-INF/templates/layouts/default",
       "/WEB-INF/layouts/default",
-      "/WEB-INF/scalate/layouts/default"
+      "/WEB-INF/scalate/layouts/default",
   )
   private def setLayoutStrategy(engine: TemplateEngine) = {
     val layouts = for {
@@ -216,7 +216,7 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     List(
         "/WEB-INF/templates/views",
         "/WEB-INF/views",
-        "/WEB-INF/scalate/templates"
+        "/WEB-INF/scalate/templates",
     )
 
   /**

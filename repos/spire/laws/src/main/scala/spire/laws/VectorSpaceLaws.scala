@@ -50,7 +50,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
       name = "vector space",
       sl = _.field(V.scalar),
       vl = _.abGroup(V.additive),
-      parents = Seq(module)
+      parents = Seq(module),
   )
 
   def metricSpace(
@@ -66,7 +66,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
         "symmetric" → forAll(
             (x: V, y: V) => V.distance(x, y) === V.distance(y, x)),
         "triangle inequality" → forAll((x: V, y: V,
-            z: V) => V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z)))
+            z: V) => V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z))),
     )
 
   def normedVectorSpace(
@@ -82,13 +82,13 @@ trait VectorSpaceLaws[V, A] extends Laws {
             (v: V) =>
               // This is covered by metricSpace...
               if (v === V.zero) v.norm === Rng[A].zero
-              else v.norm > Rng[A].zero)
+              else v.norm > Rng[A].zero),
     )
 
   def linearity(f: V => A)(implicit V: Module[V, A]) = new SimpleRuleSet(
       name = "linearity",
       "homogeneity" → forAll((r: A, v: V) => f(r *: v) === r * f(v)),
-      "additivity" → forAll((v: V, w: V) => f(v + w) === f(v) + f(w))
+      "additivity" → forAll((v: V, w: V) => f(v + w) === f(v) + f(w)),
   )
 
   def innerProductSpace(
@@ -99,7 +99,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
         "symmetry" → forAll((v: V, w: V) => (v ⋅ w).abs === (w ⋅ v).abs),
         "linearity of partial inner product" → forAll((w: V) =>
               // TODO this probably requires some thought -- should `linearity` be a full `RuleSet`?
-              linearity(_ ⋅ w).all)
+              linearity(_ ⋅ w).all),
     )
 
   object SpaceProperties {
@@ -113,7 +113,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
       val sl: scalarLaws.type => scalarLaws.RuleSet,
       val vl: vectorLaws.type => vectorLaws.RuleSet,
       val parents: Seq[SpaceProperties],
-      val props: (String, Prop)*
+      val props: (String, Prop)*,
   )
       extends RuleSet {
     val bases = Seq("scalar" → sl(scalarLaws), "vector" → vl(vectorLaws))

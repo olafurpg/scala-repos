@@ -17,7 +17,7 @@ class ConvertJavaToScalaCollectionIntention
       "java.util.Iterator",
       "java.util.Collection",
       "java.util.Dictionary",
-      "java.util.Map"
+      "java.util.Map",
   )
 
   val alreadyConvertedPrefixes: Set[String] = Set("scala.collection")

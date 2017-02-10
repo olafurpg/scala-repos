@@ -47,7 +47,7 @@ class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
          |val a = new A
          |val x = 42
          |a to x - 1
-       """.stripMargin
+       """.stripMargin,
     )
   }
 }

@@ -79,7 +79,7 @@ case class Binomial(n: Int, p: Double)(implicit rand: RandBasis = Rand)
         t = 1.2 * sq * (1.0 + y * y) * exp(
             nfact - breeze.numerics.lgamma(bnl + 1.0) -
             breeze.numerics.lgamma(n - bnl + 1.0) +
-            bnl * plog + (n - bnl) * pclog
+            bnl * plog + (n - bnl) * pclog,
         )
       } while (rand.uniform.get > t)
     }

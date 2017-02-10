@@ -168,7 +168,7 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
   def socketTextStream(
       hostname: String,
       port: Int,
-      storageLevel: StorageLevel
+      storageLevel: StorageLevel,
   ): JavaReceiverInputDStream[String] = {
     ssc.socketTextStream(hostname, port, storageLevel)
   }
@@ -391,7 +391,7 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     */
   def queueStream[T](
       queue: java.util.Queue[JavaRDD[T]],
-      oneAtATime: Boolean
+      oneAtATime: Boolean,
   ): JavaInputDStream[T] = {
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
@@ -450,7 +450,7 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     */
   def union[K, V](
       first: JavaPairDStream[K, V],
-      rest: JList[JavaPairDStream[K, V]]
+      rest: JList[JavaPairDStream[K, V]],
   ): JavaPairDStream[K, V] = {
     val dstreams: Seq[DStream[(K, V)]] =
       (Seq(first) ++ rest.asScala).map(_.dstream)
@@ -471,7 +471,7 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     */
   def transform[T](
       dstreams: JList[JavaDStream[_]],
-      transformFunc: JFunction2[JList[JavaRDD[_]], Time, JavaRDD[T]]
+      transformFunc: JFunction2[JList[JavaRDD[_]], Time, JavaRDD[T]],
   ): JavaDStream[T] = {
     implicit val cmt: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
@@ -494,7 +494,7 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     */
   def transformToPair[K, V](
       dstreams: JList[JavaDStream[_]],
-      transformFunc: JFunction2[JList[JavaRDD[_]], Time, JavaPairRDD[K, V]]
+      transformFunc: JFunction2[JList[JavaRDD[_]], Time, JavaPairRDD[K, V]],
   ): JavaPairDStream[K, V] = {
     implicit val cmk: ClassTag[K] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[K]]
@@ -626,7 +626,7 @@ object JavaStreamingContext {
     */
   def getOrCreate(
       checkpointPath: String,
-      creatingFunc: JFunction0[JavaStreamingContext]
+      creatingFunc: JFunction0[JavaStreamingContext],
   ): JavaStreamingContext = {
     val ssc = StreamingContext.getOrCreate(checkpointPath,
                                            () =>
@@ -650,7 +650,7 @@ object JavaStreamingContext {
   def getOrCreate(
       checkpointPath: String,
       creatingFunc: JFunction0[JavaStreamingContext],
-      hadoopConf: Configuration
+      hadoopConf: Configuration,
   ): JavaStreamingContext = {
     val ssc = StreamingContext.getOrCreate(checkpointPath,
                                            () =>
@@ -678,7 +678,7 @@ object JavaStreamingContext {
       checkpointPath: String,
       creatingFunc: JFunction0[JavaStreamingContext],
       hadoopConf: Configuration,
-      createOnError: Boolean
+      createOnError: Boolean,
   ): JavaStreamingContext = {
     val ssc = StreamingContext.getOrCreate(checkpointPath,
                                            () =>

@@ -78,7 +78,7 @@ private[prediction] object ExampleFormConnector extends FormConnector {
         Some(
             ("ip" -> data.get("context[ip]")) ~
             ("prop1" -> data.get("context[prop1]").map(_.toDouble)) ~
-            ("prop2" -> data.get("context[prop2]"))
+            ("prop2" -> data.get("context[prop2]")),
         )
       } else {
         None

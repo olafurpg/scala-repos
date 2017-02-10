@@ -60,7 +60,7 @@ class EnsembleStackPane extends EnsembleExample {
               image = new Image(this.getClass.getResourceAsStream(
                       "/scalafx/ensemble/images/icon-48x48.png"))
             }
-          }
+          },
       )
     }
   }

@@ -45,7 +45,7 @@ trait TypeKinds extends SubComponent {
         IntClass -> IntKind,
         LongClass -> LongKind,
         FloatClass -> FloatKind,
-        DoubleClass -> DoubleKind
+        DoubleClass -> DoubleKind,
     )
   }
 
@@ -214,8 +214,8 @@ trait TypeKinds extends SubComponent {
               norm,
               t.getClass,
               norm.getClass,
-              t.isInstanceOf[TypeRef]
-          )
+              t.isInstanceOf[TypeRef],
+          ),
       )
   }
 

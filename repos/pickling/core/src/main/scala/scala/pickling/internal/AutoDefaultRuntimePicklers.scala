@@ -37,7 +37,7 @@ trait RuntimePicklerRegistryHelper extends PicklerRegistry {
         "scala.Tuple2$mcZJ$sp",
         "scala.Tuple2$mcZD$sp",
         "scala.Tuple2$mcZC$sp",
-        "scala.Tuple2$mcZZ$sp"
+        "scala.Tuple2$mcZZ$sp",
     )
 
     for (tpe <- tpes) {

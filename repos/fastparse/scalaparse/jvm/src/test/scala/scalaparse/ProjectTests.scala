@@ -46,7 +46,7 @@ object ProjectTests extends TestSuite {
     'test - {
       val testSource = scala.io.Source
         .fromInputStream(
-            getClass.getResourceAsStream("/scalaparse/Test.scala")
+            getClass.getResourceAsStream("/scalaparse/Test.scala"),
         )
         .mkString
       TestUtil.check(testSource)
@@ -80,8 +80,8 @@ object ProjectTests extends TestSuite {
               "target/repos/sbt/main/settings/src/main/scala/sbt/std/InputWrapper.scala",
               // uses a package called `macro`
               "target/repos/sbt/sbt/src/sbt-test/source-dependencies/inherited-macros",
-              "target/repos/sbt/sbt/src/sbt-test/source-dependencies/macro"
-          ).exists(x.startsWith)
+              "target/repos/sbt/sbt/src/sbt-test/source-dependencies/macro",
+          ).exists(x.startsWith),
     )
     "non/cats" - checkRepo()
     "twitter/finagle" - checkRepo()
@@ -104,8 +104,8 @@ object ProjectTests extends TestSuite {
     "ornicar/lila" - checkRepo(
         x =>
           !Seq(
-              "target/repos/lila/modules/lobby/src/main/SocketHandler.scala"
-          ).exists(x.startsWith)
+              "target/repos/lila/modules/lobby/src/main/SocketHandler.scala",
+          ).exists(x.startsWith),
     )
     "precog/platform" - checkRepo()
     "twitter/util" - checkRepo()
@@ -117,8 +117,8 @@ object ProjectTests extends TestSuite {
           !Seq(
               // Unicode escapes in weird places
               "target/repos/scalatest/common-test/src/main/scala/org/scalatest/OperatorNames.scala",
-              "target/repos/scalatest/scalatest-test/src/test/scala/org/scalatest/OperatorNames.scala"
-          ).exists(x.startsWith)
+              "target/repos/scalatest/scalatest-test/src/test/scala/org/scalatest/OperatorNames.scala",
+          ).exists(x.startsWith),
     )
     "macroid/macroid" - checkRepo()
     // annoyingly uses trailing .s all over the place, needing dozens of
@@ -150,8 +150,8 @@ object ProjectTests extends TestSuite {
               // Not sure why this is failing but it's new, and earlier version of Scalaparse fail too
               "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Entity.scala",
               "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/HtmlPage.scala",
-              "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Template.scala"
-          ).exists(x.startsWith)
+              "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Template.scala",
+          ).exists(x.startsWith),
     )
   }
 }

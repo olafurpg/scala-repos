@@ -73,7 +73,7 @@ abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase {
         |  sum += i
         |  i += 1
         |}
-        |sum""" -> "15"
+        |sum""" -> "15",
     )
   }
 }

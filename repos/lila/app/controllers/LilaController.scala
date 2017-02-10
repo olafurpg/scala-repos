@@ -45,7 +45,7 @@ private[controllers] trait LilaController
 
   protected def NoCache(res: Result): Result = res.withHeaders(
       CACHE_CONTROL -> "no-cache, no-store, must-revalidate",
-      EXPIRES -> "0"
+      EXPIRES -> "0",
   )
 
   protected def Socket[A : FrameFormatter](
@@ -183,9 +183,9 @@ private[controllers] trait LilaController
             api = _ =>
                 fuccess {
                 Forbidden(jsonError(
-                        s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
+                        s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games",
                     )) as JSON
-            }
+            },
         )
       }
     }
@@ -199,9 +199,9 @@ private[controllers] trait LilaController
             api = _ =>
                 fuccess {
                 Forbidden(jsonError(
-                        s"You are already playing ${current.opponent}"
+                        s"You are already playing ${current.opponent}",
                     )) as JSON
-            }
+            },
         )
       }
     }
@@ -242,7 +242,7 @@ private[controllers] trait LilaController
       err: Form[A] => Fu[B])(op: A => Fu[Result])(implicit req: Request[_]) =
     form.bindFromRequest.fold(
         form => err(form) map { BadRequest(_) },
-        data => op(data)
+        data => op(data),
     )
 
   protected def FuRedirect(fua: Fu[Call]) = fua map { Redirect(_) }
@@ -288,7 +288,7 @@ private[controllers] trait LilaController
   def notFound(implicit ctx: Context): Fu[Result] = negotiate(
       html = if (HTTPRequest isSynchronousHttp ctx.req) Main notFound ctx.req
         else fuccess(Results.NotFound("Resource not found")),
-      api = _ => notFoundJson("Resource not found")
+      api = _ => notFoundJson("Resource not found"),
   )
 
   def notFoundJson(msg: String = "Not found"): Fu[Result] = fuccess {
@@ -319,7 +319,7 @@ private[controllers] trait LilaController
           Redirect(routes.Auth.signup) withCookies LilaCookie.session(
               Env.security.api.AccessUri, req.uri)
         },
-        api = _ => unauthorizedApiResult.fuccess
+        api = _ => unauthorizedApiResult.fuccess,
     )
 
   protected val unauthorizedApiResult = Unauthorized(

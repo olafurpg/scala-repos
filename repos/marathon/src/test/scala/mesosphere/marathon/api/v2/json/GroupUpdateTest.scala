@@ -17,7 +17,7 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
             GroupUpdate("test".toPath,
                         Set.empty[AppDefinition],
                         Set(
-                            GroupUpdate.empty("foo".toPath)
+                            GroupUpdate.empty("foo".toPath),
                         )),
             GroupUpdate(
                 "apps".toPath,
@@ -25,8 +25,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
                                   Some("foo"),
                                   dependencies = Set("d1".toPath,
                                                      "../test/foo".toPath,
-                                                     "/test".toPath)))
-            )
+                                                     "/test".toPath))),
+            ),
         ))
     val timestamp = Timestamp.now()
 
@@ -58,7 +58,7 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
               Group(
                   "/test".toPath,
                   apps = Set(AppDefinition("/test/bla".toPath, Some("foo")))),
-              Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
+              Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath))),
           ))
     val update = GroupUpdate(
         PathId.empty,
@@ -67,7 +67,7 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
             GroupUpdate(
                 "test".toPath,
                 Set.empty[AppDefinition],
-                Set(GroupUpdate.empty("foo".toPath))
+                Set(GroupUpdate.empty("foo".toPath)),
             ),
             GroupUpdate(
                 "apps".toPath,
@@ -75,9 +75,9 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
                                   Some("foo"),
                                   dependencies = Set("d1".toPath,
                                                      "../test/foo".toPath,
-                                                     "/test".toPath)))
-            )
-        )
+                                                     "/test".toPath))),
+            ),
+        ),
     )
     val timestamp = Timestamp.now()
 
@@ -113,8 +113,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
                   Set(AppDefinition("/test/group1/app1".toPath, Some("foo")))),
               Group(
                   "/test/group2".toPath,
-                  Set(AppDefinition("/test/group2/app2".toPath, Some("foo"))))
-          )
+                  Set(AppDefinition("/test/group2/app2".toPath, Some("foo")))),
+          ),
     )
 
     When("A group update is applied")
@@ -131,9 +131,9 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
                 Set(GroupUpdate(
                         "/test/group3/sub1".toPath,
                         Set(AppDefinition("/test/group3/sub1/app4".toPath,
-                                          Some("foo")))))
-            )
-        )
+                                          Some("foo"))))),
+            ),
+        ),
     )
 
     val timestamp = Timestamp.now()
@@ -179,8 +179,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
                 Set(AppDefinition("test-app1".toPath, Some("foo")),
                     AppDefinition("test-app2".toPath,
                                   Some("foo"),
-                                  dependencies = Set("test-app1".toPath)))
-            )
+                                  dependencies = Set("test-app1".toPath))),
+            ),
         ))
 
     When("The update is performed")

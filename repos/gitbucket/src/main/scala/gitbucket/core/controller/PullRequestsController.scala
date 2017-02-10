@@ -48,11 +48,11 @@ trait PullRequestsControllerBase extends ControllerBase {
       "commitIdTo" -> trim(text(required, maxlength(40))),
       "assignedUserName" -> trim(optional(text())),
       "milestoneId" -> trim(optional(number())),
-      "labelNames" -> trim(optional(text()))
+      "labelNames" -> trim(optional(text())),
   )(PullRequestForm.apply)
 
   val mergeForm = mapping(
-      "message" -> trim(label("Message", text(required)))
+      "message" -> trim(label("Message", text(required))),
   )(MergeForm.apply)
 
   case class PullRequestForm(
@@ -67,7 +67,7 @@ trait PullRequestsControllerBase extends ControllerBase {
       commitIdTo: String,
       assignedUserName: Option[String],
       milestoneId: Option[Int],
-      labelNames: Option[String]
+      labelNames: Option[String],
   )
 
   case class MergeForm(message: String)
@@ -419,7 +419,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                   Git.open(
                       getRepositoryDir(originUserName, originRepositoryName)),
                   Git.open(getRepositoryDir(forkedRepository.owner,
-                                            forkedRepository.name))
+                                            forkedRepository.name)),
               ) {
                 (oldGit, newGit) =>
                   val newBranch = headBranch.getOrElse(JGitUtil
@@ -488,7 +488,7 @@ trait PullRequestsControllerBase extends ControllerBase {
           Git.open(
               getRepositoryDir(originRepository.owner, originRepository.name)),
           Git.open(
-              getRepositoryDir(forkedRepository.owner, forkedRepository.name))
+              getRepositoryDir(forkedRepository.owner, forkedRepository.name)),
       ) {
         case (oldGit, newGit) =>
           val (oldId, newId) =
@@ -558,7 +558,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                            Nil else List(originRepository.owner))).sorted,
                     getMilestones(originRepository.owner,
                                   originRepository.name),
-                    getLabels(originRepository.owner, originRepository.name)
+                    getLabels(originRepository.owner, originRepository.name),
                 )
               }
             case (oldId, newId) =>
@@ -595,7 +595,7 @@ trait PullRequestsControllerBase extends ControllerBase {
           Git.open(
               getRepositoryDir(originRepository.owner, originRepository.name)),
           Git.open(
-              getRepositoryDir(forkedRepository.owner, forkedRepository.name))
+              getRepositoryDir(forkedRepository.owner, forkedRepository.name)),
       ) {
         case (oldGit, newGit) =>
           val originBranch = JGitUtil
@@ -728,7 +728,7 @@ trait PullRequestsControllerBase extends ControllerBase {
       requestCommitId: String): (Seq[Seq[CommitInfo]], Seq[DiffInfo]) =
     using(
         Git.open(getRepositoryDir(userName, repositoryName)),
-        Git.open(getRepositoryDir(requestUserName, requestRepositoryName))
+        Git.open(getRepositoryDir(requestUserName, requestRepositoryName)),
     ) { (oldGit, newGit) =>
       val oldId = oldGit.getRepository.resolve(branch)
       val newId = newGit.getRepository.resolve(requestCommitId)

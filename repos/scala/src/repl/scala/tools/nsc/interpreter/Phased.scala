@@ -106,7 +106,7 @@ trait Phased {
         Cleanup,
         Delambdafy,
         Jvm,
-        Terminal
+        Terminal,
     )
     lazy val nameMap =
       all.map(x => x.name -> x).toMap withDefaultValue NoPhaseName

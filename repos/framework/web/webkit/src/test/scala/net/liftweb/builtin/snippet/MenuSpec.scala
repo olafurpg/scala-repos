@@ -42,7 +42,7 @@ object MenuSpec extends Specification {
         sitemap.Menu.param[Param]("foobiz",
                                   "foobiz",
                                   s => Full(Param(s)),
-                                  p => p.s) / "foo" / "biz" / *
+                                  p => p.s) / "foo" / "biz" / *,
     )
 
     f(siteMap)

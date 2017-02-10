@@ -51,7 +51,7 @@ class Use extends ScalaMatchingTask {
           getDirectoryScanner(sourceDir.get).getIncludedFiles,
           sourceDir.get,
           compiler.settings.d,
-          mapper
+          mapper,
       ) map (new File(sourceDir.get, _))
     if (includedFiles.length > 0)
       try {

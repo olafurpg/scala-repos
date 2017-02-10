@@ -44,9 +44,9 @@ object Rule {
   def apply(
       category: Category,
       shortName: String,
-      desc: String
+      desc: String,
   )(
-      fn: => Seq[Issue]
+      fn: => Seq[Issue],
   ): Rule = {
     val _cat = category
     new Rule {

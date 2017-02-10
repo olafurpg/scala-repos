@@ -320,7 +320,7 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
         new InetSocketAddress(InetAddress.getLoopbackAddress, 2222),
         new InetSocketAddress(InetAddress.getLoopbackAddress, 80),
         Seq(Unauthenticated),
-        pipeline
+        pipeline,
     )
 
     assert(pipeline.get("socketAddressResolver") == null)
@@ -333,7 +333,7 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
         InetSocketAddress.createUnresolved("meow.meow", 2222),
         new InetSocketAddress(InetAddress.getLoopbackAddress, 80),
         Seq(Unauthenticated),
-        pipeline
+        pipeline,
     )
     assert(pipeline
           .get("socketAddressResolver")

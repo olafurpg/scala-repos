@@ -138,7 +138,7 @@ object ExtractCssSelectorExamples extends App {
 
   if (args.length < 2) {
     Console.err.println(
-        "Expected two arguments: the base directory of generated HTML and the base directory of the Lift project."
+        "Expected two arguments: the base directory of generated HTML and the base directory of the Lift project.",
     )
   } else {
     val examples = for {

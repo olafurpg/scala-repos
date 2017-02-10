@@ -11,7 +11,7 @@ class LSMRTest extends FunSuite {
   test("simple dense solve") {
     val matrix = DenseMatrix(
         (1.0, 3.0, 4.0),
-        (2.0, 0.0, 6.0)
+        (2.0, 0.0, 6.0),
     )
     val b = DenseVector(1.0, 3.0)
     val lsmrSolved = LSMR.solve(matrix, b)
@@ -23,7 +23,7 @@ class LSMRTest extends FunSuite {
   test("regularized solve") {
     val matrix = DenseMatrix(
         (1.0, 3.0, 4.0),
-        (2.0, 0.0, 6.0)
+        (2.0, 0.0, 6.0),
     )
     val b = DenseVector(1.0, 3.0)
     // checked against original implementation
@@ -38,7 +38,7 @@ class LSMRTest extends FunSuite {
   test("regularized solve, 2.0") {
     val matrix = DenseMatrix(
         (1.0, 3.0, 4.0),
-        (2.0, 0.0, 6.0)
+        (2.0, 0.0, 6.0),
     )
     val b = DenseVector(1.0, 3.0)
     val bfgsSolved = lbfgsSolve(matrix, b, 2.0)

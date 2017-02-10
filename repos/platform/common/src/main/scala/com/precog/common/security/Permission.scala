@@ -174,7 +174,7 @@ object Permission {
       JObject(
           "accessType" -> accessType(p).serialize,
           "path" -> p.path.serialize,
-          "ownerAccountIds" -> ownerAccountIds(p).serialize
+          "ownerAccountIds" -> ownerAccountIds(p).serialize,
       )
     }
   }

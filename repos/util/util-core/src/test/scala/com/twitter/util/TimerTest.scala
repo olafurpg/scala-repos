@@ -310,7 +310,7 @@ class TimerTest
 
   private def mockTimerLocalPropagation(
       timer: MockTimer,
-      localValue: Int
+      localValue: Int,
   ): Int = {
     Time.withCurrentTimeFrozen { tc =>
       val timerLocal = new AtomicInteger(0)

@@ -77,11 +77,11 @@ class AppRepositoryTest extends MarathonSpec {
     val appDef2 = AppDefinition("app2".toPath)
     val appDef1Old = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(1)))
+              Timestamp(appDef1.version.toDateTime.minusDays(1))),
     )
     val appDef2Old = appDef2.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef2.version.toDateTime.minusDays(1)))
+              Timestamp(appDef2.version.toDateTime.minusDays(1))),
     )
     val allApps = Seq(appDef1, appDef2, appDef1Old, appDef2Old)
 
@@ -109,15 +109,15 @@ class AppRepositoryTest extends MarathonSpec {
     val appDef1 = AppDefinition("app1".toRootPath)
     val version1 = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(1)))
+              Timestamp(appDef1.version.toDateTime.minusDays(1))),
     )
     val version2 = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(2)))
+              Timestamp(appDef1.version.toDateTime.minusDays(2))),
     )
     val version3 = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(3)))
+              Timestamp(appDef1.version.toDateTime.minusDays(3))),
     )
     val appDef2 = AppDefinition("app2".toRootPath)
     val allApps = Seq(appDef1, version1, version2, version3, appDef2)
@@ -142,15 +142,15 @@ class AppRepositoryTest extends MarathonSpec {
     val appDef1 = AppDefinition("app1".toRootPath)
     val version1 = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(1)))
+              Timestamp(appDef1.version.toDateTime.minusDays(1))),
     )
     val version2 = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(2)))
+              Timestamp(appDef1.version.toDateTime.minusDays(2))),
     )
     val version3 = appDef1.copy(
         versionInfo = AppDefinition.VersionInfo.forNewConfig(
-              Timestamp(appDef1.version.toDateTime.minusDays(3)))
+              Timestamp(appDef1.version.toDateTime.minusDays(3))),
     )
     val appDef2 = AppDefinition("app2".toRootPath)
     val allApps = Seq(appDef1, version1, version2, version3, appDef2)

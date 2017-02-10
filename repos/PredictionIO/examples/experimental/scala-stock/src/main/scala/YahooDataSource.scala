@@ -331,7 +331,7 @@ object YahooDataSource {
       val appId: Int, // Ignore appId in DataSourceParams
       val entityType: String,
       val startTime: Option[DateTime] = None,
-      val untilTime: Option[DateTime] = None
+      val untilTime: Option[DateTime] = None,
   )
       extends BaseParams
 
@@ -349,7 +349,7 @@ object YahooDataSource {
     */
   case class Intermediate(
       val ticker: String = "",
-      val dailyMap: Map[DateTime, Daily] = Map[DateTime, Daily]()
+      val dailyMap: Map[DateTime, Daily] = Map[DateTime, Daily](),
   )
       extends Serializable {
     override def toString(): String =
@@ -438,7 +438,7 @@ object YahooDataSourceRun {
                  algorithmClassMapOpt = Some(
                        Map(
                            //"" -> classOf[MomentumStrategy]
-                           "" -> classOf[RegressionStrategy]
+                           "" -> classOf[RegressionStrategy],
                        )),
                  //algorithmParamsList = Seq(("", momentumParams)),
                  algorithmParamsList = Seq(

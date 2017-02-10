@@ -85,25 +85,25 @@ sealed abstract class InputInstances {
       override def length[A](fa: Input[A]): Int = fa.fold(
           empty = 0,
           el = _ => 1,
-          eof = 0
+          eof = 0,
       )
       def point[A](a: => A): Input[A] = elInput(a)
       def traverseImpl[G[_]: Applicative, A, B](fa: Input[A])(
           f: A => G[B]): G[Input[B]] = fa.fold(
           empty = Applicative[G].point(emptyInput[B]),
           el = x => Applicative[G].map(f(x))(b => elInput(b)),
-          eof = Applicative[G].point(eofInput[B])
+          eof = Applicative[G].point(eofInput[B]),
       )
       override def foldRight[A, B](
           fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
           empty = z,
           el = a => f(a, z),
-          eof = z
+          eof = z,
       )
       def plus[A](a: Input[A], b: => Input[A]): Input[A] = a.fold(
           empty = b,
           el = _ => a,
-          eof = b
+          eof = b,
       )
       def bind[A, B](fa: Input[A])(f: A => Input[B]): Input[B] =
         fa flatMap (a => f(a))
@@ -116,15 +116,15 @@ sealed abstract class InputInstances {
           empty = a2.fold(
                 empty = emptyInput,
                 el = elInput,
-                eof = eofInput
+                eof = eofInput,
             ),
           el = xa =>
               a2.fold(
                   empty = elInput(xa),
                   el = ya => elInput(A.append(xa, ya)),
-                  eof = eofInput
+                  eof = eofInput,
             ),
-          eof = eofInput
+          eof = eofInput,
       )
     }
 
@@ -133,7 +133,7 @@ sealed abstract class InputInstances {
       def equal(a1: Input[A], a2: Input[A]): Boolean = a1.fold(
           empty = a2.isEmpty,
           el = a => a2.exists(z => A.equal(a, z)),
-          eof = a2.isEof
+          eof = a2.isEof,
       )
     }
 
@@ -142,7 +142,7 @@ sealed abstract class InputInstances {
       override def shows(f: Input[A]) = f.fold(
           empty = "empty-input",
           el = a => "el-input(" + A.shows(a) + ")",
-          eof = "eof-input"
+          eof = "eof-input",
       )
     }
 }

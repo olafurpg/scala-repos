@@ -66,7 +66,7 @@ object Query {
     List(
         (0, "0 seconds"),
         (30, "30 seconds"),
-        (45, "45 seconds")
+        (45, "45 seconds"),
     ) ::: options(List(60 * 1,
                        60 * 2,
                        60 * 3,

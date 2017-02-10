@@ -131,7 +131,7 @@ abstract class TailCalls extends Transform {
           "Creating new `this` during tailcalls\n  method: %s\n  current class: %s"
             .format(
               method.ownerChain.mkString(" -> "),
-              currentClass.ownerChain.mkString(" -> ")
+              currentClass.ownerChain.mkString(" -> "),
           )
         logResult(msg)(
             method.newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
@@ -338,7 +338,7 @@ abstract class TailCalls extends Transform {
                       LabelDef(newCtx.label,
                                newThis :: vpSyms,
                                mkAttributedCastHack(
-                                   newRHS, newCtx.label.tpe.resultType))
+                                   newRHS, newCtx.label.tpe.resultType)),
                   ))
             } else {
               if (newCtx.isMandatory && (newCtx containsRecursiveCall newRHS))

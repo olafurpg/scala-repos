@@ -37,7 +37,7 @@ object WhitespaceApi {
                       cfg.logDepth,
                       mergeTrace(
                           cfg.traceIndex, traceParsers0, f.traceParsers),
-                      cut | cut0
+                      cut | cut0,
                   )
                 case Mutable.Success(value2, index2, traceParsers2, cut2) =>
                   val (newIndex, newCut) =
@@ -50,7 +50,7 @@ object WhitespaceApi {
                       ev.apply(value0, value2),
                       newIndex,
                       mergeTrace(cfg.traceIndex, traceParsers0, traceParsers2),
-                      newCut
+                      newCut,
                   )
               }
           }

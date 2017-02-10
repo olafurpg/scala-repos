@@ -65,7 +65,7 @@ class RichPresentationCompilerSpec
                              "class  /*2*/A { ",
                              "   class  /*2.1*/X {} ",
                              "   object /*2.2*/X {} ",
-                             "}"
+                             "}",
                          ))
       cc.askReloadFile(file)
       cc.askLoadedTyped(file)
@@ -229,7 +229,7 @@ class RichPresentationCompilerSpec
         sig: Option[String],
         expectedLocalName: String,
         expectedName: String,
-        expectedDeclAs: DeclaredAs
+        expectedDeclAs: DeclaredAs,
     ) = {
       val symOpt = cc.askSymbolByName(fqn, member, sig)
       symOpt shouldBe defined
@@ -322,7 +322,7 @@ class RichPresentationCompilerSpec
                            "class A { ",
                            "   class  X {}",
                            "   object X {}",
-                           "}"
+                           "}",
                        ))
     cc.askReloadFile(file)
     cc.askLoadedTyped(file)
@@ -400,7 +400,7 @@ class RichPresentationCompilerSpec
   it should "get completions on member with no prefix" in withPosInCompiledSource(
       "package com.example",
       "object A { def aMethod(a: Int) = a }",
-      "object B { val x = A.@@ "
+      "object B { val x = A.@@ ",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "aMethod" }
@@ -408,7 +408,7 @@ class RichPresentationCompilerSpec
 
   it should "not try to complete the declaration containing point" in withPosInCompiledSource(
       "package com.example",
-      "object Ab@@c {}"
+      "object Ab@@c {}",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAll(result.completions) { _.name should not be "Abc" }
@@ -417,7 +417,7 @@ class RichPresentationCompilerSpec
   it should "get completions on a member with a prefix" in withPosInCompiledSource(
       "package com.example",
       "object A { def aMethod(a: Int) = a }",
-      "object B { val x = A.aMeth@@ }"
+      "object B { val x = A.aMeth@@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "aMethod" }
@@ -426,7 +426,7 @@ class RichPresentationCompilerSpec
   it should "get completions on an object name" in withPosInCompiledSource(
       "package com.example",
       "object Abc { def aMethod(a: Int) = a }",
-      "object B { val x = Ab@@ }"
+      "object B { val x = Ab@@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "Abc" }
@@ -435,7 +435,7 @@ class RichPresentationCompilerSpec
   it should "get members for infix method call" in withPosInCompiledSource(
       "package com.example",
       "object Abc { def aMethod(a: Int) = a }",
-      "object B { val x = Abc aM@@ }"
+      "object B { val x = Abc aM@@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "aMethod" }
@@ -444,7 +444,7 @@ class RichPresentationCompilerSpec
   it should "get members for infix method call without prefix" in withPosInCompiledSource(
       "package com.example",
       "object Abc { def aMethod(a: Int) = a }",
-      "object B { val x = Abc @@ }"
+      "object B { val x = Abc @@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "aMethod" }
@@ -452,7 +452,7 @@ class RichPresentationCompilerSpec
 
   it should "complete multi-character infix operator" in withPosInCompiledSource(
       "package com.example",
-      "object B { val l = Nil; val ll = l +@@ }"
+      "object B { val l = Nil; val ll = l +@@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "++" }
@@ -460,7 +460,7 @@ class RichPresentationCompilerSpec
 
   it should "complete top level import" in withPosInCompiledSource(
       "package com.example",
-      "import ja@@"
+      "import ja@@",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "java" }
@@ -468,7 +468,7 @@ class RichPresentationCompilerSpec
 
   it should "complete sub-import" in withPosInCompiledSource(
       "package com.example",
-      "import java.ut@@"
+      "import java.ut@@",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "util" }
@@ -476,7 +476,7 @@ class RichPresentationCompilerSpec
 
   it should "complete multi-import" in withPosInCompiledSource(
       "package com.example",
-      "import java.util.{ V@@ }"
+      "import java.util.{ V@@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "Vector" }
@@ -485,7 +485,7 @@ class RichPresentationCompilerSpec
   it should "complete new construction" in withPosInCompiledSource(
       "package com.example",
       "import java.util.Vector",
-      "object A { def main { new V@@ } }"
+      "object A { def main { new V@@ } }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { x =>
@@ -496,7 +496,7 @@ class RichPresentationCompilerSpec
 
   it should "complete symbol in logical op" in withPosInCompiledSource(
       "package com.example",
-      "object A { val apple = true; true || app@@ }"
+      "object A { val apple = true; true || app@@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     assert(result.completions.exists(_.name == "apple"))
@@ -504,7 +504,7 @@ class RichPresentationCompilerSpec
 
   it should "complete infix method of Set." in withPosInCompiledSource(
       "package com.example",
-      "object A { val t = Set[String](\"a\", \"b\"); t @@ }"
+      "object A { val t = Set[String](\"a\", \"b\"); t @@ }",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "seq" }
@@ -515,7 +515,7 @@ class RichPresentationCompilerSpec
   it should "complete interpolated variables in strings" in withPosInCompiledSource(
       "package com.example",
       "object Abc { def aMethod(a: Int) = a }",
-      s"""object B { val x = s"hello there, $${Abc.aMe@@}"}"""
+      s"""object B { val x = s"hello there, $${Abc.aMe@@}"}""",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     forAtLeast(1, result.completions) { _.name shouldBe "aMethod" }
@@ -524,7 +524,7 @@ class RichPresentationCompilerSpec
   it should "not attempt to complete symbols in strings" in withPosInCompiledSource(
       "package com.example",
       "object Abc { def aMethod(a: Int) = a }",
-      "object B { val x = \"hello there Ab@@\"}"
+      "object B { val x = \"hello there Ab@@\"}",
   ) { (p, cc) =>
     val result = cc.completionsAt(p, 10, caseSens = false)
     result.completions shouldBe empty
@@ -536,7 +536,7 @@ class RichPresentationCompilerSpec
       "def banana(p: List[String]): List[String] = p",
       "def pineapple: List[String] = List(\"spiky\")",
       "}",
-      "object Main { def main { val my@@A = new A() }}"
+      "object Main { def main { val my@@A = new A() }}",
   ) { (p, cc) =>
     val info = cc.askInspectTypeAt(p).get
     val sup = info.supers.find(sup => sup.tpe.name == "A").get;
@@ -568,7 +568,7 @@ class RichPresentationCompilerSpec
   it should "show classes without visible members in the inspector" in withPosInCompiledSource(
       "package com.example",
       "trait bidon { }",
-      "case class pi@@po extends bidon { }"
+      "case class pi@@po extends bidon { }",
   ) { (p, cc) =>
     val info = cc.askInspectTypeAt(p)
     val supers = info.map(_.supers).getOrElse(List())
@@ -591,7 +591,7 @@ class RichPresentationCompilerSpec
         "2.1" -> Some("java.io.Bits$"),
         "2.2" -> Some("java.io.File$"),
         "2.3" -> Some("java.io.File$"),
-        "3.0" -> None
+        "3.0" -> None,
     )
 
     import ReallyRichPresentationCompilerFixture._
@@ -633,7 +633,7 @@ class RichPresentationCompilerSpec
                                  "   val /*5.3*/C = 2",
                                  "   class /*5.4*/D {}",
                                  "   object /*5.5*/E {}",
-                                 "}"
+                                 "}",
                              ),
                              write = true)
       val usesFile = srcFile(config,
@@ -657,7 +657,7 @@ class RichPresentationCompilerSpec
                                  "   val x_5_3 = pkg.C/*5.3*/",
                                  "   val x_5_4 = new pkg.D/*5.4*/",
                                  "   val x_5_5 = pkg.E/*5.5*/",
-                                 "}"
+                                 "}",
                              ))
 
       def test(label: String, cc: RichPresentationCompiler) = {
@@ -701,7 +701,7 @@ class RichPresentationCompilerSpec
       compileScala(
           List(defsFile.path),
           config.subprojects.head.targetDirs.head,
-          cc.settings.classpath.value
+          cc.settings.classpath.value,
       )
 
       cc.search.refreshResolver()
@@ -731,7 +731,7 @@ class RichPresentationCompilerSpec
           "5.2",
           "5.3",
           "5.4",
-          "5.5"
+          "5.5",
       ).foreach(test(_, cc))
   }
 }
@@ -774,7 +774,7 @@ trait ReallyRichPresentationCompilerFixture {
 
   // conveniences for accessing the fixtures
   final def withPresCompiler(
-      testCode: (EnsimeConfig, RichPresentationCompiler) => Any
+      testCode: (EnsimeConfig, RichPresentationCompiler) => Any,
   ): Any =
     withRichPresentationCompiler { (_, c, cc) =>
       testCode(c, cc)

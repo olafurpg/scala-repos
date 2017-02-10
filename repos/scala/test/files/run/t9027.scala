@@ -8,7 +8,7 @@ object Test extends App {
       q"""<a/>
       <b/>
       <c/>
-      println("hello, world.")"""
+      println("hello, world.")""",
   )
   trees foreach println
 }

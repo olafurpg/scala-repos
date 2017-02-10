@@ -103,7 +103,7 @@ trait SingleMarathonIntegrationTest
             "--reconciliation_initial_delay",
             "600000",
             "--min_revive_offers_interval",
-            "100"
+            "100",
         ) ++ extraMarathonParameters
       startMarathon(config.marathonBasePort, parameters: _*)
 
@@ -217,7 +217,7 @@ trait SingleMarathonIntegrationTest
                             image = s"""marathon-buildbase:${sys.env.getOrElse(
                         "BUILD_ID", "test")}""",
                             network = Some(
-                                  Protos.ContainerInfo.DockerInfo.Network.HOST)
+                                  Protos.ContainerInfo.DockerInfo.Network.HOST),
                         )),
                   volumes = collection.immutable.Seq(
                         new DockerVolume(hostPath = env.getOrElse(
@@ -238,16 +238,16 @@ trait SingleMarathonIntegrationTest
                         new DockerVolume(
                             hostPath = s"""$targetDirs/project""",
                             containerPath = "/marathon/project/target",
-                            mode = Protos.Volume.Mode.RO)
-                    )
-              )
+                            mode = Protos.Volume.Mode.RO),
+                    ),
+              ),
           ),
         instances = instances,
         cpus = 0.5,
         mem = 128.0,
         healthChecks = if (withHealth) appProxyHealthChecks
           else Set.empty[HealthCheck],
-        dependencies = dependencies
+        dependencies = dependencies,
     )
   }
 
@@ -267,7 +267,7 @@ trait SingleMarathonIntegrationTest
         mem = 128.0,
         healthChecks = if (withHealth) appProxyHealthChecks
           else Set.empty[HealthCheck],
-        dependencies = dependencies
+        dependencies = dependencies,
     )
   }
 
@@ -343,7 +343,7 @@ trait SingleMarathonIntegrationTest
             "Waiting for blank slate Mesos...\n \"used_resources\": " +
             Json.prettyPrint(Json.toJson(agent.usedResources)) +
             "\n \"reserved_resources\": " +
-            Json.prettyPrint(Json.toJson(agent.reservedResourcesByRole))
+            Json.prettyPrint(Json.toJson(agent.reservedResourcesByRole)),
         )
       }
       empty

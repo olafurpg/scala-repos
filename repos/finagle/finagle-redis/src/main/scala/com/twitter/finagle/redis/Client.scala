@@ -181,7 +181,7 @@ object TransactionalClient {
   * Connects to a single Redis host supporting transactions
   */
 private[redis] class ConnectedTransactionalClient(
-    serviceFactory: ServiceFactory[Command, Reply]
+    serviceFactory: ServiceFactory[Command, Reply],
 )
     extends Client(serviceFactory.toService) with TransactionalClient {
 

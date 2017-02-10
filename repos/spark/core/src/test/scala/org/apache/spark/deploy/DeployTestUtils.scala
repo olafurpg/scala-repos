@@ -49,7 +49,7 @@ private[deploy] object DeployTestUtils {
       Map(("K1", "V1"), ("K2", "V2")),
       Seq("cp1", "cp2"),
       Seq("lp1", "lp2"),
-      Seq("-Dfoo")
+      Seq("-Dfoo"),
   )
 
   def createDriverDesc(): DriverDescription =

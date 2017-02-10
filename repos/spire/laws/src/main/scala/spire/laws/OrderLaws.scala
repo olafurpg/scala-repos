@@ -31,19 +31,19 @@ trait OrderLaws[A] extends Laws {
           (x: A, y: A, z: A) => (x <= y && y <= z) imp (x <= z)),
       "gteqv" → forAll((x: A, y: A) => (x <= y) === (y >= x)),
       "lt" → forAll((x: A, y: A) => (x < y) === (x <= y && x =!= y)),
-      "gt" → forAll((x: A, y: A) => (x < y) === (y > x))
+      "gt" → forAll((x: A, y: A) => (x < y) === (y > x)),
   )
 
   def order(implicit A: Order[A]) = new OrderProperties(
       name = "order",
       parent = Some(partialOrder),
-      "totality" → forAll((x: A, y: A) => x <= y || y <= x)
+      "totality" → forAll((x: A, y: A) => x <= y || y <= x),
   )
 
   class OrderProperties(
       name: String,
       parent: Option[OrderProperties],
-      props: (String, Prop)*
+      props: (String, Prop)*,
   )
       extends DefaultRuleSet(name, parent, props: _*)
 }

@@ -165,7 +165,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   "allow escaping arbitrary characters when serializing" in {
     JsonAST.render(
         JString("aaabbb"),
-        JsonAST.RenderSettings(0, Set('c'))
+        JsonAST.RenderSettings(0, Set('c')),
     ) must not be matching("a".r)
   }
 
@@ -174,7 +174,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
 
     val rendered = JsonAST.render(
         JString(allCharacters),
-        JsonAST.RenderSettings.compact
+        JsonAST.RenderSettings.compact,
     )
 
     "[\u0000-\u0019]".r.pattern.matcher(rendered).find() must beFalse
@@ -185,7 +185,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
 
     val rendered = JsonAST.render(
         JString(allCharacters),
-        JsonAST.RenderSettings.compactJs
+        JsonAST.RenderSettings.compactJs,
     )
 
     "[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]".r.pattern
@@ -206,12 +206,12 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
             "beta",
             JObject(
                 JField("alpha", JString("bacon")) :: JField(
-                    "charlie", JString("i'm a masseuse")) :: Nil
-            )) :: Nil
+                    "charlie", JString("i'm a masseuse")) :: Nil,
+            )) :: Nil,
     )
 
     subject \\ "alpha" must_== JObject(
-        JField("alpha", JString("apple")) :: JField("alpha", JString("bacon")) :: Nil
+        JField("alpha", JString("apple")) :: JField("alpha", JString("bacon")) :: Nil,
     )
     subject \\ "charlie" must_==
       JObject(List(JField("charlie", JString("i'm a masseuse"))))

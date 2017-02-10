@@ -18,7 +18,7 @@ class SbtModuleEditorProvider extends ModuleConfigurationEditorProvider {
             new DefaultModuleConfigurationEditorFactoryImpl()
               .createOutputEditor(state),
             new ClasspathEditor(state),
-            new SbtModuleSettingsEditor(state)
+            new SbtModuleSettingsEditor(state),
         )
       case _ =>
         ModuleConfigurationEditor.EMPTY

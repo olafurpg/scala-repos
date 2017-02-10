@@ -92,7 +92,7 @@ private[twitter] object Message {
   private object Init {
     def encode(
         version: Short,
-        headers: Seq[(ChannelBuffer, ChannelBuffer)]
+        headers: Seq[(ChannelBuffer, ChannelBuffer)],
     ): ChannelBuffer = {
       var size = 2 // 2 bytes for version
       var iter = headers.iterator
@@ -636,7 +636,7 @@ private[twitter] object Message {
           m.typ,
           (m.tag >> 16 & 0xff).toByte,
           (m.tag >> 8 & 0xff).toByte,
-          (m.tag & 0xff).toByte
+          (m.tag & 0xff).toByte,
       )
 
       ChannelBuffers.wrappedBuffer(ChannelBuffers.wrappedBuffer(head), m.buf)

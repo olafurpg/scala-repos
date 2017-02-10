@@ -85,7 +85,7 @@ private[forum] final class CategApi(env: Env) {
               lastPostId = lastPost ?? (_.id),
               nbTopicsTroll = topicsTroll.size,
               nbPostsTroll = nbPostsTroll,
-              lastPostIdTroll = lastPostTroll ?? (_.id)
+              lastPostIdTroll = lastPostTroll ?? (_.id),
           ))
     } yield ()
 

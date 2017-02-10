@@ -123,7 +123,7 @@ case class DefaultPool[Req, Rep](
     bufferSize: Int = 0,
     idleTime: Duration = Duration.Top,
     maxWaiters: Int = Int.MaxValue,
-    timer: Timer = DefaultTimer.twitter
+    timer: Timer = DefaultTimer.twitter,
 )
     extends (StatsReceiver => Transformer[Req, Rep]) {
   def apply(statsReceiver: StatsReceiver) =

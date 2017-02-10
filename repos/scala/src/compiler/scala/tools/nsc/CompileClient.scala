@@ -56,7 +56,7 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
       case _ =>
         echo(
             if (shutdown) "[No compilation server running.]"
-            else "Compilation failed."
+            else "Compilation failed.",
         )
         shutdown
     }

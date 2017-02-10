@@ -295,7 +295,7 @@ trait Slice { source =>
               })
             case CUndefined =>
               sys.error("Cannot define a constant undefined value")
-          }
+          },
       )
     }
   }

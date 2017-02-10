@@ -7,12 +7,12 @@ object Build extends Build {
   lazy val root: Project = Project(
       "root",
       file("."),
-      aggregate = Seq(sub)
+      aggregate = Seq(sub),
   )
 
   lazy val sub: Project = Project(
       "sub",
       file("sub"),
-      dependencies = Seq(root)
+      dependencies = Seq(root),
   )
 }

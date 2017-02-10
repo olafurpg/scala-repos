@@ -40,7 +40,7 @@ private[streaming] class RawInputDStream[T : ClassTag](
     _ssc: StreamingContext,
     host: String,
     port: Int,
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
 )
     extends ReceiverInputDStream[T](_ssc) with Logging {
 

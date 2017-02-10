@@ -309,7 +309,7 @@ trait Pattern {
     private def optimizeWith(f: Expr[T] => Expr[T]): Expr[T] = {
       f(
           mapArgs(EndoFunction[Expr[_]](
-                  a => a match { case x: Expr[T] => x.optimizeWith(f) }
+                  a => a match { case x: Expr[T] => x.optimizeWith(f) },
               )))
     }
 
@@ -445,7 +445,7 @@ trait Pattern {
       Div(
           Sub(Mul(left.derivative(v), right),
               Mul(left, right.derivative(v))),
-          Sqr(right)
+          Sqr(right),
       )
 
     def eval(f: Any => Any) = num.div(left.eval(f), right.eval(f))

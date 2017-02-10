@@ -42,7 +42,7 @@ object PairingRepo {
       .find(
           selectTour(tourId) ++ BSONDocument(
               "u" -> BSONDocument("$in" -> userIds)),
-          BSONDocument("_id" -> false, "u" -> true)
+          BSONDocument("_id" -> false, "u" -> true),
       )
       .sort(recentSort)
       .cursor[BSONDocument]()
@@ -59,7 +59,7 @@ object PairingRepo {
     coll
       .find(
           selectTourUser(tourId, userId),
-          BSONDocument("_id" -> false, "u" -> true)
+          BSONDocument("_id" -> false, "u" -> true),
       )
       .cursor[BSONDocument]()
       .collect[List]()
@@ -74,7 +74,7 @@ object PairingRepo {
     coll
       .find(
           selectTourUser(tourId, userId),
-          BSONDocument("_id" -> true)
+          BSONDocument("_id" -> true),
       )
       .sort(recentSort)
       .cursor[BSONDocument]()
@@ -87,7 +87,7 @@ object PairingRepo {
       tourId: String, userId: String, nb: Int): Fu[Option[Pairing]] =
     (nb > 0) ?? coll
       .find(
-          selectTourUser(tourId, userId)
+          selectTourUser(tourId, userId),
       )
       .sort(chronoSort)
       .skip(nb - 1)
@@ -108,7 +108,7 @@ object PairingRepo {
                  List(
                      Project(BSONDocument("u" -> true, "_id" -> false)),
                      Unwind("u"),
-                     GroupField("u")("nb" -> SumValue(1))
+                     GroupField("u")("nb" -> SumValue(1)),
                  ))
       .map {
         _.documents.flatMap { doc =>
@@ -135,7 +135,7 @@ object PairingRepo {
       tourId: String, userId: String): Fu[Pairings] =
     coll
       .find(
-          selectTourUser(tourId, userId) ++ selectFinished
+          selectTourUser(tourId, userId) ++ selectFinished,
       )
       .sort(chronoSort)
       .cursor[Pairing]()

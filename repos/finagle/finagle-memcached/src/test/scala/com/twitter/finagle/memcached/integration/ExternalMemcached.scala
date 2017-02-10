@@ -26,7 +26,7 @@ private[memcached] object InternalMemcached {
     try {
       val server = new InProcessMemcached(
           address.getOrElse(
-              new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+              new InetSocketAddress(InetAddress.getLoopbackAddress, 0)),
       )
       Some(
           new TestMemcachedServer {
@@ -64,7 +64,7 @@ private[memcached] object ExternalMemcached { self =>
 
     takenPorts += address
       .getOrElse(
-          new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
+          new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
       )
       .getPort
     address

@@ -65,7 +65,7 @@ object ProjectTests extends TestSuite {
   val tests = TestSuite {
     "dropbox/changes" - check()
     "django/django" - check(
-        ignored = Seq("tests/i18n/test_compilation.py")
+        ignored = Seq("tests/i18n/test_compilation.py"),
     )
     "mitsuhiko/flask" - check()
     "zulip/zulip" - check()

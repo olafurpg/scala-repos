@@ -55,7 +55,7 @@ object FreeTListOption {
               Gen
                 .choose(0, 2)
                 .flatMap(
-                    Gen.listOfN(_, freeTListOptionArb[A].arbitrary.map(_.f)))
+                    Gen.listOfN(_, freeTListOptionArb[A].arbitrary.map(_.f))),
             )
           .map(FreeTListOption.apply))
 
@@ -78,7 +78,7 @@ object FreeTTest extends SpecLite {
          Functor[Arbitrary]
            .map(Arbitrary(g))(
                FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x))
-           .arbitrary)
+           .arbitrary),
       )
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
@@ -99,7 +99,7 @@ object FreeTTest extends SpecLite {
       val expected = Applicative[FreeTListOption].point(())
       val result =
         (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
-            (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+            (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u)),
         )
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
@@ -109,7 +109,7 @@ object FreeTTest extends SpecLite {
       val expected = Applicative[FreeTListOption].point(())
       val result = (0 until 50000).foldLeft(
           ().point[FreeTListOption].flatMap(u => u.point[FreeTListOption]))(
-          (fu, i) => fu.map(u => u)
+          (fu, i) => fu.map(u => u),
       )
 
       Equal[FreeTListOption[Unit]].equal(expected, result)

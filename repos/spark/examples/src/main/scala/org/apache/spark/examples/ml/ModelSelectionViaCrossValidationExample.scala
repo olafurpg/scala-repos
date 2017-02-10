@@ -54,7 +54,7 @@ object ModelSelectionViaCrossValidationExample {
               (8L, "e spark program", 1.0),
               (9L, "a e c l", 0.0),
               (10L, "spark compile", 1.0),
-              (11L, "hadoop software", 0.0)
+              (11L, "hadoop software", 0.0),
           ))
       .toDF("id", "text", "label")
 
@@ -95,7 +95,7 @@ object ModelSelectionViaCrossValidationExample {
               (4L, "spark i j k"),
               (5L, "l m n"),
               (6L, "mapreduce spark"),
-              (7L, "apache hadoop")
+              (7L, "apache hadoop"),
           ))
       .toDF("id", "text")
 

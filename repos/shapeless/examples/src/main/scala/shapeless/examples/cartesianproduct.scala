@@ -72,7 +72,7 @@ object CartesianProductExample extends App {
         XT <: HList,
         Y <: HList,
         Out1 <: HList,
-        Out2 <: HList
+        Out2 <: HList,
     ](implicit mapper: ApplyMapper[HF, XH, Y, Out1],
       lift: LiftA2[HF, XT, Y, Out2],
       prepend: Prepend[Out1, Out2]) =

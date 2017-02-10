@@ -160,7 +160,7 @@ object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
                        "ProducerRequestMetrics",
                        "ProducerRequestRateAndTimeMs"),
         new MetricName(
-            "kafka.producer", "ProducerRequestMetrics", "ProducerRequestSize")
+            "kafka.producer", "ProducerRequestMetrics", "ProducerRequestSize"),
     )
 
   private val producerMetricNameList: immutable.List[MetricName] = immutable
@@ -187,7 +187,7 @@ object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
           "kafka.producer", "ProducerRequestMetrics", "ProducerRequestSize"),
       new MetricName("kafka.producer",
                      "ProducerRequestMetrics",
-                     "ProducerRequestThrottleRateAndTimeMs")
+                     "ProducerRequestThrottleRateAndTimeMs"),
   )
 
   private def toMBeanName(

@@ -22,7 +22,7 @@ private[message] final class DataForm(security: MessageSecurity) {
               }
           }),
             "subject" -> text(minLength = 3, maxLength = 100),
-            "text" -> text(minLength = 3, maxLength = 8000)
+            "text" -> text(minLength = 3, maxLength = 8000),
         )({
       case (username, subject, text) =>
         ThreadData(user = fetchUser(username) err "Unknown username " +
@@ -34,7 +34,7 @@ private[message] final class DataForm(security: MessageSecurity) {
   def post =
     Form(
         single(
-            "text" -> text(minLength = 3)
+            "text" -> text(minLength = 3),
         ))
 
   private def fetchUser(username: String) =

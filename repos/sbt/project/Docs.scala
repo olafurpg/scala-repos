@@ -21,7 +21,7 @@ object Docs {
       git.remoteRepo := "git@github.com:sbt/sbt.github.com.git",
       localRepoDirectory,
       ghkeys.synchLocal <<= synchLocalImpl,
-      GitKeys.gitBranch in ghkeys.updatedRepository := Some("master")
+      GitKeys.gitBranch in ghkeys.updatedRepository := Some("master"),
   )
 
   def localRepoDirectory = ghkeys.repository := {
@@ -33,7 +33,7 @@ object Docs {
 
   def siteIncludeSxr(prefix: String) =
     Seq(
-        mappings in sxr <<= sxr.map(dir => Path.allSubpaths(dir).toSeq)
+        mappings in sxr <<= sxr.map(dir => Path.allSubpaths(dir).toSeq),
     ) ++ site.addMappingsToSiteDir(mappings in sxr, prefix)
 
   def synchLocalImpl =

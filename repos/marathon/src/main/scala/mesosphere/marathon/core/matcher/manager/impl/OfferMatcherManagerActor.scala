@@ -71,7 +71,7 @@ private[manager] object OfferMatcherManagerActor {
 
       copy(
           offer = leftOverOffer,
-          ops = added ++ ops
+          ops = added ++ ops,
       )
     }
   }
@@ -99,7 +99,7 @@ private[impl] class OfferMatcherManagerActor private (
         receiveSetLaunchTokens,
         receiveChangingMatchers,
         receiveProcessOffer,
-        receiveMatchedTasks
+        receiveMatchedTasks,
     ).reduceLeft(_.orElse[Any, Unit](_))
   }
 

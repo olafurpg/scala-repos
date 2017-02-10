@@ -152,7 +152,7 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
         (10, -9),
         (10, -11),
         (0, 1),
-        (0, -1)
+        (0, -1),
     ).map {
       case (x, y) =>
         if (x == 0) {

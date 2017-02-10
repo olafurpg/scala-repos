@@ -50,7 +50,7 @@ private[streaming] case class RegisterReceiver(
     typ: String,
     host: String,
     executorId: String,
-    receiverEndpoint: RpcEndpointRef
+    receiverEndpoint: RpcEndpointRef,
 )
     extends ReceiverTrackerMessage
 private[streaming] case class AddBlock(receivedBlockInfo: ReceivedBlockInfo)
@@ -116,7 +116,7 @@ private[streaming] class ReceiverTracker(
       receiverInputStreamIds,
       ssc.scheduler.clock,
       ssc.isCheckpointPresent,
-      Option(ssc.checkpointDir)
+      Option(ssc.checkpointDir),
   )
   private val listenerBus = ssc.scheduler.listenerBus
 
@@ -251,7 +251,7 @@ private[streaming] class ReceiverTracker(
       host: String,
       executorId: String,
       receiverEndpoint: RpcEndpointRef,
-      senderAddress: RpcAddress
+      senderAddress: RpcAddress,
   ): Boolean = {
     if (!receiverInputStreamIds.contains(streamId)) {
       throw new SparkException(

@@ -176,7 +176,7 @@ private[ui] class ThriftServerSessionPage(parent: ThriftServerTab)
                     formatDate(session.startTimestamp),
                     formatDate(session.finishTimestamp),
                     formatDurationOption(Some(session.totalTime)),
-                    session.totalExecution.toString
+                    session.totalExecution.toString,
               ))
           .toSeq
         val headerRow = Seq("User",

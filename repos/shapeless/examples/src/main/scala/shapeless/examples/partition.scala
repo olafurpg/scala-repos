@@ -103,7 +103,7 @@ object ADTPartitionExample extends App {
       Pear(2, "red"),
       Pear(3, "green"),
       Apple(4, 6),
-      Pear(5, "purple")
+      Pear(5, "purple"),
   )
 
   // The expected partition.

@@ -145,7 +145,7 @@ class ClientRegistryTest
           "high" -> "2147483647",
           "low" -> "0",
           "idleTime" -> "Duration.Top",
-          "maxWaiters" -> "2147483647"
+          "maxWaiters" -> "2147483647",
       ).map { case (key, value) => Entry(prefix :+ key, value) }
 
       expected.foreach { entry =>
@@ -200,7 +200,7 @@ class ClientRegistryTest
         Set(
             Entry(Seq("client", "fancy", "foo", "/$/fail", "name", "p1"),
                   "999"),
-            Entry(Seq("client", "fancy", "foo", "/$/fail", "head", "p2"), "1")
+            Entry(Seq("client", "fancy", "foo", "/$/fail", "head", "p2"), "1"),
         )
       }
       assert(GlobalRegistry.get.toSet == expected)

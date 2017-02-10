@@ -312,7 +312,7 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                         isInStableCodeReference = ref
                             .isInstanceOf[ScStableCodeReferenceElement],
                         isInSimpleString = inString,
-                        isInInterpolatedString = inInterpolatedString
+                        isInInterpolatedString = inInterpolatedString,
                     )
                   val decorator =
                     castDecorator(runtimeQualifierType.canonicalText)
@@ -342,7 +342,7 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
   override def advertise(parameters: CompletionParameters): String = {
     if (!parameters.getOriginalFile.isInstanceOf[ScalaFile]) return null
     val messages = Array[String](
-        null
+        null,
     )
     messages apply (new Random).nextInt(messages.length)
   }

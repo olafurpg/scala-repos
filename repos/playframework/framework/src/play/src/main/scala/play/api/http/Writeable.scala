@@ -14,7 +14,7 @@ import scala.annotation._
   * @tparam A the content type
   */
 @implicitNotFound(
-    "Cannot write an instance of ${A} to HTTP response. Try to define a Writeable[${A}]"
+    "Cannot write an instance of ${A} to HTTP response. Try to define a Writeable[${A}]",
 )
 class Writeable[-A](
     val transform: A => ByteString, val contentType: Option[String]) {

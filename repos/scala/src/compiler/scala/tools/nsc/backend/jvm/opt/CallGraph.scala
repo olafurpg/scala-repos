@@ -193,7 +193,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                 callsitePosition = callsitePositions.getOrElse(call,
                                                                NoPosition),
                 annotatedInline = inlineAnnotatedCallsites(call),
-                annotatedNoInline = noInlineAnnotatedCallsites(call)
+                annotatedNoInline = noInlineAnnotatedCallsites(call),
             )
 
           case LambdaMetaFactoryCall(

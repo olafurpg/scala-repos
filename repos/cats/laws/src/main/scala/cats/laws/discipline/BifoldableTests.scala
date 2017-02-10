@@ -17,7 +17,7 @@ trait BifoldableTests[F[_, _]] extends Laws {
         "bifoldLeft consistent with bifoldMap" -> forAll(
             laws.bifoldLeftConsistentWithBifoldMap[A, B, C] _),
         "bifoldRight consistent with bifoldMap" -> forAll(
-            laws.bifoldRightConsistentWithBifoldMap[A, B, C] _)
+            laws.bifoldRightConsistentWithBifoldMap[A, B, C] _),
     )
 }
 

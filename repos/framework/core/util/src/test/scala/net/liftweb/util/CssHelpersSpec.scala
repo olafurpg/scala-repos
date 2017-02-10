@@ -72,7 +72,7 @@ class CssHelpersSpec extends Specification {
           |  background: url(prefix/boom);
           |  background-image: url('prefix/boom?bam,"sloop#shap%20bap');
           |  image-set: url("prefix/boom.com/magic?bam,'sloop#bam%21bap")
-          |}""".stripMargin('|')
+          |}""".stripMargin('|'),
       )
     }
 

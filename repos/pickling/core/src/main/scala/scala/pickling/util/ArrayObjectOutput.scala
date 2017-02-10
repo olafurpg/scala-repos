@@ -68,7 +68,7 @@ case class GenObjectOutput(
     val shortArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
     val arrByteArrBuf: ArrayBuffer[Array[Byte]] = new ArrayBuffer[Array[Byte]],
     val anyRefArrBuf: ArrayBuffer[Any] = new ArrayBuffer[Any],
-    val stringArrBuf: ArrayBuffer[String] = new ArrayBuffer[String]
+    val stringArrBuf: ArrayBuffer[String] = new ArrayBuffer[String],
 )
     extends ObjectOutput {
   def toInput: ObjectInput =

@@ -120,6 +120,6 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
         Gen.frequency[Int => Int](
             (1, Gen.const((x: Int) => x)),
             (1, Gen.const((x: Int) => x + 1)),
-            (3, A.arbitrary.map(a => (_: Int) => a))
+            (3, A.arbitrary.map(a => (_: Int) => a)),
         ))
 }

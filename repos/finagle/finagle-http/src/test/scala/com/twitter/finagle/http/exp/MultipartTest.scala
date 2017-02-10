@@ -36,7 +36,7 @@ class MultipartTest extends FunSuite {
         req.multipart == Some(
             Multipart(Map(
                           "abc" -> Seq("foo", "bar"),
-                          "def" -> Seq("123")
+                          "def" -> Seq("123"),
                       ),
                       Map.empty[String, Seq[Multipart.FileUpload]])))
   }

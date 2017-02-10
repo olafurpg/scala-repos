@@ -33,7 +33,7 @@ private[kafka] class KafkaRDDPartition(
     val fromOffset: Long,
     val untilOffset: Long,
     val host: String,
-    val port: Int
+    val port: Int,
 )
     extends Partition {
 

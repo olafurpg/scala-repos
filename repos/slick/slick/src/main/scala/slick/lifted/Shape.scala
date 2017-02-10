@@ -303,14 +303,14 @@ class CaseClassShape[P <: Product,
 class ProductClassShape[E <: Product, C <: Product](
     val shapes: Seq[Shape[_, _, _, _]],
     mapLifted: Seq[Any] => C,
-    mapPlain: Seq[Any] => E
+    mapPlain: Seq[Any] => E,
 )(implicit classTag: ClassTag[E])
     extends MappedScalaProductShape[
         FlatShapeLevel,
         Product,
         C,
         E,
-        C
+        C,
     ] {
   override def toMapped(v: Any) =
     mapPlain(v.asInstanceOf[Product].productIterator.toSeq)

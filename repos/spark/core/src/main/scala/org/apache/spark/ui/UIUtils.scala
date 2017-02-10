@@ -101,7 +101,7 @@ private[spark] object UIUtils extends Logging {
           hour -> s"$minuteString $secondString",
           day -> s"$hourString $minuteString $secondString",
           week -> s"$dayString $hourString $minuteString",
-          year -> s"$weekString $dayString $hourString"
+          year -> s"$weekString $dayString $hourString",
       ).foreach {
         case (durationLimit, durationString) =>
           if (ms < durationLimit) {

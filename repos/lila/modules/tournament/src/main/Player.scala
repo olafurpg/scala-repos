@@ -42,6 +42,6 @@ private[tournament] object Player {
         tourId = tourId,
         userId = user.id,
         rating = perfLens(user.perfs).intRating,
-        provisional = perfLens(user.perfs).provisional
+        provisional = perfLens(user.perfs).provisional,
     ).recomputeMagicScore
 }

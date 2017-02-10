@@ -173,7 +173,7 @@ class BinaryClassificationMetricsSuite
             (0.6, 1.0),
             (0.8, 1.0),
             (1.0, 1.0),
-            (1.0, 1.0)
+            (1.0, 1.0),
         ) == originalROC)
 
     val numBins = 4
@@ -192,7 +192,7 @@ class BinaryClassificationMetricsSuite
             (0.6, 0.75),
             (0.8, 1.0),
             (1.0, 1.0),
-            (1.0, 1.0)
+            (1.0, 1.0),
         ) == downsampledROC)
   }
 }

@@ -104,7 +104,7 @@ trait RichCompilerControl
       symbolMemberByName(
           typeFullName,
           memberName,
-          signatureString
+          signatureString,
       ).flatMap(docSignature(_, None))
     }.flatten
 
@@ -134,7 +134,7 @@ trait RichCompilerControl
           members,
           firstName,
           matchEntire = true,
-          caseSens = true
+          caseSens = true,
       ).map { _.sym }
       val restOfPath = nameSegs.drop(1).mkString(".")
       val syms = roots.flatMap { symbolByName(restOfPath, _) }
@@ -209,14 +209,14 @@ trait RichCompilerControl
   def askSymbolDesignationsInRegion(
       p: RangePosition, tpes: List[SourceSymbol]): SymbolDesignations =
     askOption(
-        new SemanticHighlighting(this).symbolDesignationsInRegion(p, tpes)
+        new SemanticHighlighting(this).symbolDesignationsInRegion(p, tpes),
     ).getOrElse(SymbolDesignations(new File("."), List.empty))
 
   def askImplicitInfoInRegion(p: Position): ImplicitInfos =
     ImplicitInfos(
         askOption(
-            new ImplicitAnalyzer(this).implicitDetails(p)
-        ).getOrElse(List.empty)
+            new ImplicitAnalyzer(this).implicitDetails(p),
+        ).getOrElse(List.empty),
     )
 
   def askNotifyWhenReady(): Unit = ask(setNotifyWhenReady)
@@ -239,19 +239,19 @@ trait RichCompilerControl
     case SourceFileInfo(f, None, None) =>
       new BatchSourceFile(
           new PlainFile(f.getPath),
-          f.readString()(charset).toCharArray
+          f.readString()(charset).toCharArray,
       )
 
     case SourceFileInfo(f, Some(contents), None) =>
       new BatchSourceFile(
           new PlainFile(f.getPath),
-          contents.toCharArray
+          contents.toCharArray,
       )
 
     case SourceFileInfo(f, None, Some(contentsIn)) =>
       new BatchSourceFile(
           new PlainFile(f.getPath),
-          contentsIn.readString()(charset).toCharArray
+          contentsIn.readString()(charset).toCharArray,
       )
   }
 
@@ -268,9 +268,9 @@ class RichPresentationCompiler(
     val richReporter: Reporter,
     val parent: ActorRef,
     val indexer: ActorRef,
-    val search: SearchService
+    val search: SearchService,
 )(
-    implicit val vfs: EnsimeVFS
+    implicit val vfs: EnsimeVFS,
 )
     extends Global(settings, richReporter) with ModelBuilders
     with RichCompilerControl with RefactoringImpl with Completion with Helpers
@@ -339,7 +339,7 @@ class RichPresentationCompiler(
             sym.tpe,
             sym.isPublic,
             inherited,
-            viaView
+            viaView,
         )
         members(sym) = m
       } catch {
@@ -384,7 +384,7 @@ class RichPresentationCompiler(
     new TypeInspectInfo(
         TypeInfo(tpe, PosNeededAvail),
         prepareSortedInterfaceInfo(
-            typePublicMembers(tpe.asInstanceOf[Type]), parents)
+            typePublicMembers(tpe.asInstanceOf[Type]), parents),
     )
   }
 
@@ -397,7 +397,7 @@ class RichPresentationCompiler(
           val preparedMembers = prepareSortedInterfaceInfo(members, parents)
           new TypeInspectInfo(
               TypeInfo(tpe, PosNeededAvail),
-              preparedMembers
+              preparedMembers,
           )
       })
       .orElse {
@@ -443,7 +443,7 @@ class RichPresentationCompiler(
   protected def symbolMemberByName(
       fqn: String,
       memberName: Option[String],
-      signatureString: Option[String]
+      signatureString: Option[String],
   ): Option[Symbol] = {
     symbolByName(fqn).flatMap { owner =>
       memberName.flatMap { rawName =>
@@ -556,7 +556,7 @@ class RichPresentationCompiler(
                     p.source,
                     p.point,
                     p.point,
-                    p.point
+                    p.point,
                 )
             }
           }

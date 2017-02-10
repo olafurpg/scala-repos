@@ -34,7 +34,7 @@ object IvyConsole {
         resolvers ++= repos.reverse,
         unmanagedJars in Compile ++= Attributed blankSeq unmanaged.reverse,
         logLevel in Global := Level.Warn,
-        showSuccess in Global := false
+        showSuccess in Global := false,
     )
     val append = Load.transformSettings(Load.projectScope(currentRef),
                                         currentRef.build,

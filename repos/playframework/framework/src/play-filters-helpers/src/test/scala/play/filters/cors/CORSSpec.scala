@@ -33,7 +33,7 @@ object CORSFilterSpec extends CORSCommonSpec {
             }
           case _ => Action(Results.Ok)
         }),
-            bind[HttpFilters].to[Filters]
+            bind[HttpFilters].to[Filters],
         ))(_ => block)
   }
 
@@ -78,7 +78,7 @@ object CORSWithCSRFSpec extends CORSCommonSpec {
             }
           case _ => CSRFCheck(Action(Results.Ok))
         }),
-            bind[HttpFilters].to(filters)
+            bind[HttpFilters].to(filters),
         ))(block)
   }
 
@@ -90,7 +90,7 @@ object CORSWithCSRFSpec extends CORSCommonSpec {
       .withHeaders(
           ORIGIN -> "http://localhost",
           CONTENT_TYPE -> ContentTypes.FORM,
-          COOKIE -> "foo=bar"
+          COOKIE -> "foo=bar",
       )
       .withBody("foo=1&bar=2")
 
@@ -189,7 +189,7 @@ trait CORSCommonSpec extends PlaySpecification {
 
   def fakeRequest(method: String = "GET", path: String = "/") =
     FakeRequest(method, path).withHeaders(
-        HOST -> "www.example.com"
+        HOST -> "www.example.com",
     )
 
   def commonTests = {
@@ -205,7 +205,7 @@ trait CORSCommonSpec extends PlaySpecification {
       "with a port number" in withApplication() {
         val result = route(FakeRequest().withHeaders(
                 ORIGIN -> "http://www.example.com:9000",
-                HOST -> "www.example.com:9000"
+                HOST -> "www.example.com:9000",
             )).get
 
         status(result) must_== OK
@@ -214,7 +214,7 @@ trait CORSCommonSpec extends PlaySpecification {
       "without a port number" in withApplication() {
         val result = route(FakeRequest().withHeaders(
                 ORIGIN -> "http://www.example.com",
-                HOST -> "www.example.com"
+                HOST -> "www.example.com",
             )).get
 
         status(result) must_== OK
@@ -226,7 +226,7 @@ trait CORSCommonSpec extends PlaySpecification {
       val result = route(
           fakeRequest().withHeaders(
               ORIGIN -> "http://www.example.com",
-              HOST -> "example.com"
+              HOST -> "example.com",
           )).get
 
       status(result) must_== OK
@@ -238,7 +238,7 @@ trait CORSCommonSpec extends PlaySpecification {
       val result = route(
           fakeRequest().withHeaders(
               ORIGIN -> "http://www.example.com:9000",
-              HOST -> "www.example.com:9001"
+              HOST -> "www.example.com:9001",
           )).get
 
       status(result) must_== OK
@@ -250,7 +250,7 @@ trait CORSCommonSpec extends PlaySpecification {
       val result = route(
           fakeRequest().withHeaders(
               ORIGIN -> "https://www.example.com:9000",
-              HOST -> "www.example.com:9000"
+              HOST -> "www.example.com:9000",
           )).get
 
       status(result) must_== OK

@@ -47,14 +47,14 @@ trait DefaultFiltersSpec extends FiltersSpec {
     val app = new BuiltInComponentsFromContext(
         ApplicationLoader.createContext(
             environment = Environment.simple(),
-            initialSettings = settings
+            initialSettings = settings,
         )) {
       lazy val router = testRouter
       override lazy val httpFilters: Seq[EssentialFilter] = makeFilters(
           materializer)
       override lazy val httpErrorHandler = errorHandler.getOrElse(
           new DefaultHttpErrorHandler(
-              environment, configuration, sourceMapper, Some(router))
+              environment, configuration, sourceMapper, Some(router)),
       )
     }.application
 
@@ -103,7 +103,7 @@ trait GlobalFiltersSpec extends FiltersSpec {
       .configure(settings)
       .overrides(
           bind[Router].toInstance(testRouter),
-          bind[HttpRequestHandler].to[GlobalSettingsHttpRequestHandler]
+          bind[HttpRequestHandler].to[GlobalSettingsHttpRequestHandler],
       )
       .global(
           new WithFilters(filters: _*) {
@@ -111,7 +111,7 @@ trait GlobalFiltersSpec extends FiltersSpec {
               errorHandler.fold(super.onHandlerNotFound(request))(
                   _.onClientError(request, 404, ""))
             }
-          }
+          },
       )
       .build()
 

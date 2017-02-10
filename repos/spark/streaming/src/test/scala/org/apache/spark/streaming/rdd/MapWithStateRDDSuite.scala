@@ -89,7 +89,7 @@ class MapWithStateRDDSuite
         removeTimedoutData: Boolean = false,
         expectedOutput: Iterable[Int] = None,
         expectedTimingOutStates: Iterable[Int] = None,
-        expectedRemovedStates: Iterable[Int] = None
+        expectedRemovedStates: Iterable[Int] = None,
     ): Unit = {
       val initialStateMap = new OpenHashMapBasedStateMap[String, Int]()
       initStates.foreach { s =>
@@ -424,7 +424,7 @@ class MapWithStateRDDSuite
           (time: Time,
           key: Int, value: Option[Int], state: State[Int]) => None,
           Time(10),
-          None
+          None,
       )
     }
 
@@ -455,7 +455,7 @@ class MapWithStateRDDSuite
       currentTime: Long,
       expectedStates: Set[(K, S, Int)],
       expectedMappedData: Set[T],
-      doFullScan: Boolean = false
+      doFullScan: Boolean = false,
   ): MapWithStateRDD[K, V, S, T] = {
 
     val partitionedNewDataRDD =

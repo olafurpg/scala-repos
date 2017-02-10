@@ -98,7 +98,7 @@ object ClassName {
 
 case class MemberName(
     owner: ClassName,
-    name: String
+    name: String,
 )
     extends FullyQualifiedName {
   def contains(o: FullyQualifiedName) = this == o
@@ -131,17 +131,17 @@ case class RawClassfile(
     deprecated: Boolean,
     fields: Queue[RawField],
     methods: Queue[RawMethod],
-    source: RawSource
+    source: RawSource,
 )
 
 case class RawSource(
     filename: Option[String],
-    line: Option[Int]
+    line: Option[Int],
 )
 
 case class RawType(
     fqn: String,
-    access: Access
+    access: Access,
 ) {
   def fqnString = ClassName.cleanupPackage(fqn)
 }
@@ -150,7 +150,7 @@ case class RawField(
     name: MemberName,
     clazz: ClassName,
     generics: Option[String],
-    access: Access
+    access: Access,
 )
 
 case class RawMethod(
@@ -158,5 +158,5 @@ case class RawMethod(
     access: Access,
     descriptor: Descriptor,
     generics: Option[String],
-    line: Option[Int]
+    line: Option[Int],
 )

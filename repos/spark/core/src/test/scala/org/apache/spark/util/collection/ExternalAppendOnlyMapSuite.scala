@@ -173,7 +173,7 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
             (2, Seq[Int](6)),
             (3, Seq[Int](7)),
             (4, Seq[Int](nullInt)),
-            (nullInt, Seq[Int](nullInt, 8))
+            (nullInt, Seq[Int](nullInt, 8)),
         ))
 
     sc.stop()

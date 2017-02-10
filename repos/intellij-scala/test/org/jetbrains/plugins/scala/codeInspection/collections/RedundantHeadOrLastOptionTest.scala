@@ -13,7 +13,7 @@ class RedundantHeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Some(1).${START}headOption$END",
         "Some(1).headOption",
-        "Some(1)"
+        "Some(1)",
     )
   }
 
@@ -21,7 +21,7 @@ class RedundantHeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Option(1).${START}headOption$END",
         "Option(1).headOption",
-        "Option(1)"
+        "Option(1)",
     )
   }
 
@@ -29,7 +29,7 @@ class RedundantHeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"None.${START}headOption$END",
         "None.headOption",
-        "None"
+        "None",
     )
   }
 
@@ -37,7 +37,7 @@ class RedundantHeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1).find(_ => true).${START}headOption$END",
         "Seq(1).find(_ => true).headOption",
-        "Seq(1).find(_ => true)"
+        "Seq(1).find(_ => true)",
     )
   }
 
@@ -45,7 +45,7 @@ class RedundantHeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Option(1)$START headOption$END",
         "Option(1) headOption",
-        "Option(1)"
+        "Option(1)",
     )
   }
 }
@@ -60,7 +60,7 @@ class RedundantLastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Some(1).${START}lastOption$END",
         "Some(1).lastOption",
-        "Some(1)"
+        "Some(1)",
     )
   }
 
@@ -68,7 +68,7 @@ class RedundantLastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Option(1).${START}lastOption$END",
         "Option(1).lastOption",
-        "Option(1)"
+        "Option(1)",
     )
   }
 
@@ -76,7 +76,7 @@ class RedundantLastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"None.${START}lastOption$END",
         "None.lastOption",
-        "None"
+        "None",
     )
   }
 
@@ -84,7 +84,7 @@ class RedundantLastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Seq(1).find(_ => true).${START}lastOption$END",
         "Seq(1).find(_ => true).lastOption",
-        "Seq(1).find(_ => true)"
+        "Seq(1).find(_ => true)",
     )
   }
 
@@ -92,7 +92,7 @@ class RedundantLastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"Option(1)$START lastOption$END",
         "Option(1) lastOption",
-        "Option(1)"
+        "Option(1)",
     )
   }
 }

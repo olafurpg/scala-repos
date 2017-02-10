@@ -65,8 +65,8 @@ class ResidentTaskIntegrationTest
               cmd = Some(s"""test -e $containerPath/data"""),
               // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
               // probably related to our recycling of the task ID (but unconfirmed)
-              backoff = Some(300.milliseconds)
-          )
+              backoff = Some(300.milliseconds),
+          ),
       )
       .code shouldBe 200
     // we do not wait for the deployment to finish here to get the task events
@@ -148,8 +148,8 @@ class ResidentTaskIntegrationTest
             instances = 5,
             // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
             // probably related to our recycling of the task ID (but unconfirmed)
-            backoffDuration = 300.milliseconds
-        )
+            backoffDuration = 300.milliseconds,
+        ),
     )
 
     When("we restart the app")
@@ -173,8 +173,8 @@ class ResidentTaskIntegrationTest
             instances = 5,
             // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
             // probably related to our recycling of the task ID (but unconfirmed)
-            backoffDuration = 300.milliseconds
-        )
+            backoffDuration = 300.milliseconds,
+        ),
     )
 
     When("we change the config")
@@ -256,7 +256,7 @@ class ResidentTaskIntegrationTest
       val persistentVolume: Volume = PersistentVolume(
           containerPath = containerPath,
           persistent = PersistentVolumeInfo(size = persistentVolumeSize),
-          mode = Mesos.Volume.Mode.RW
+          mode = Mesos.Volume.Mode.RW,
       )
 
       val app = AppDefinition(
@@ -265,12 +265,12 @@ class ResidentTaskIntegrationTest
           residency = Some(
                 Residency(
                     Residency.defaultRelaunchEscalationTimeoutSeconds,
-                    Residency.defaultTaskLostBehaviour
+                    Residency.defaultTaskLostBehaviour,
                 )),
           container = Some(
                 Container(
                     `type` = Mesos.ContainerInfo.Type.MESOS,
-                    volumes = Seq(persistentVolume)
+                    volumes = Seq(persistentVolume),
                 )),
           cmd = Some(cmd),
           executor = "",
@@ -280,7 +280,7 @@ class ResidentTaskIntegrationTest
           disk = disk,
           portDefinitions = portDefinitions,
           backoff = backoffDuration,
-          upgradeStrategy = UpgradeStrategy(0.5, 0.0)
+          upgradeStrategy = UpgradeStrategy(0.5, 0.0),
       )
 
       app

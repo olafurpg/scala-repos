@@ -19,7 +19,7 @@ final class DetectLanguage(url: String, key: String) {
     WS.url(url)
       .post(Map(
               "key" -> Seq(key),
-              "q" -> Seq(message take messageMaxLength)
+              "q" -> Seq(message take messageMaxLength),
           )) map { response =>
       (response.json \ "data" \ "detections").asOpt[List[Detection]] match {
         case None =>

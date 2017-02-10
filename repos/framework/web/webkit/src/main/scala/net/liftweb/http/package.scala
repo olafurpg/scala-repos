@@ -36,7 +36,7 @@ package object http {
   implicit def asyncResolvableTransform[ResolvableType, ResolvedType](
       implicit asyncResolveProvider: CanResolveAsync[
           ResolvableType, ResolvedType],
-      innerTransform: CanBind[ResolvedType]
+      innerTransform: CanBind[ResolvedType],
   ) = {
     new CanBind[ResolvableType] {
       def apply(resolvable: => ResolvableType)(ns: NodeSeq): Seq[NodeSeq] = {
@@ -51,7 +51,7 @@ package object http {
               (resolved: ResolvedType) =>
                 {
               AsyncRenderComet.completeAsyncRender(
-                  Replace(placeholderId, innerTransform(resolved)(ns).flatten)
+                  Replace(placeholderId, innerTransform(resolved)(ns).flatten),
               )
           })
 

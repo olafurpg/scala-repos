@@ -26,7 +26,7 @@ object Preset {
                                       PerfType.Blitz,
                                       PerfType.Classical,
                                       PerfType.Correspondence)),
-                          Filter(D.Color, List(chess.White))
+                          Filter(D.Color, List(chess.White)),
                       ))),
       Preset(
           "How often do I punish blunders made by my opponent during each game phase?",
@@ -36,13 +36,13 @@ object Preset {
                       M.RatingDiff,
                       List(
                           Filter(D.MyCastling,
-                                 List(Castling.Queenside, Castling.None))
+                                 List(Castling.Queenside, Castling.None)),
                       ))),
       Preset("When I trade queens, how do games end?",
              Question(D.Perf,
                       M.Result,
                       List(
-                          Filter(D.QueenTrade, List(QueenTrade.Yes))
+                          Filter(D.QueenTrade, List(QueenTrade.Yes)),
                       ))),
       Preset("What is the average rating of my opponents across each variant?",
              Question(D.Perf, M.OpponentRating, Nil)),
@@ -50,7 +50,7 @@ object Preset {
              Question(D.PieceRole,
                       M.MeanCpl,
                       List(
-                          Filter(D.Phase, List(Phase.Opening))
-                      )))
+                          Filter(D.Phase, List(Phase.Opening)),
+                      ))),
   )
 }

@@ -24,7 +24,7 @@ object Test {
       R(-10, 10, inclusive = false),
       R(-10, -5, 2, inclusive = false),
       R(-10, 0, 2, inclusive = false),
-      R(-10, 10, 2, inclusive = false)
+      R(-10, 10, 2, inclusive = false),
   )
 
   def ranges =

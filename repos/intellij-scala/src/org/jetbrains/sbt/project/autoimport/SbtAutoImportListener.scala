@@ -35,7 +35,7 @@ class SbtAutoImportListener(project: Project) extends VirtualFileAdapter {
           ExternalSystemUtil.refreshProjects(
               new ImportSpecBuilder(project, SbtProjectSystem.Id)
                 .forceWhenUptodate()
-                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC),
             )
       })
     }

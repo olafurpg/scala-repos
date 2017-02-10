@@ -35,14 +35,14 @@ private[lease] trait ByteCounter {
 // It might be simpler to just make it an exponential moving average.
 private[lease] class WindowedByteCounter private[lease](
     val info: JvmInfo,
-    ctx: Context
+    ctx: Context,
 )
     extends Thread("WindowedByteClock") with ByteCounter with Closable {
 
   import WindowedByteCounter._
 
   def this(
-      info: JvmInfo
+      info: JvmInfo,
   ) = this(info, new Context(0))
 
   /*

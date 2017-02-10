@@ -46,7 +46,7 @@ object SpinnersDemo extends JFXApp {
       Spinner.StyleClassArrowsOnLeftVertical,
       Spinner.StyleClassArrowsOnLeftHorizontal,
       Spinner.StyleClassSplitArrowsVertical,
-      Spinner.StyleClassSplitArrowsHorizontal
+      Spinner.StyleClassSplitArrowsHorizontal,
   )
 
   val intSpinners = for (s <- styles) yield
@@ -74,7 +74,7 @@ object SpinnersDemo extends JFXApp {
         children = Seq(
             new HBox(30, intSpinners: _*),
             new HBox(30, doubleSpinners: _*),
-            new HBox(30, stringSpinners: _*)
+            new HBox(30, stringSpinners: _*),
         )
         padding = Insets(24)
       }

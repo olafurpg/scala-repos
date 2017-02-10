@@ -324,7 +324,7 @@ abstract class Storm(options: Map[String, Options],
             getOrElse(stormDag, node, IncludeSuccessHandler.default),
             new KeyValueInjection[Int,
                                   CMap[ExecutorKeyType, ExecutorValueType]],
-            new SingleItemInjection[ExecutorOutputType])
+            new SingleItemInjection[ExecutorOutputType]),
     )
 
     val parallelism =
@@ -333,7 +333,7 @@ abstract class Storm(options: Map[String, Options],
       .setBolt(
           nodeName,
           sinkBolt,
-          parallelism
+          parallelism,
       )
       .addConfigurations(tickConfig)
     val dependenciesNames = stormDag.dependenciesOf(node).collect {

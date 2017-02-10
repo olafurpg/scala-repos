@@ -145,7 +145,7 @@ trait CheckpointState[T] extends WaitingState[Interval[Timestamp]] {
       extends RunningState[Interval[Timestamp]] {
     private def setStopped() = require(
         isRunning.compareAndSet(true, false),
-        "Concurrent modification of HDFSState!"
+        "Concurrent modification of HDFSState!",
     )
 
     /**

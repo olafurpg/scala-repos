@@ -90,7 +90,7 @@ object ClipboardTester extends JFXApp {
               onAction = handle {
                 Clipboard.systemClipboard.content = ClipboardContent(
                     DataFormat.Files -> Seq(new File("c:/tmp")).asJava,
-                    DataFormat.PlainText -> "Hello Clipboard!"
+                    DataFormat.PlainText -> "Hello Clipboard!",
                 )
               }
             },
@@ -109,10 +109,10 @@ object ClipboardTester extends JFXApp {
               onAction = handle {
                 Clipboard.systemClipboard.content = ClipboardContent(
                     DataFormat.PlainText -> "Some text",
-                    DataFormat.Html -> "<b>Some</b> text"
+                    DataFormat.Html -> "<b>Some</b> text",
                 )
               }
-            }
+            },
         )
       }
     }

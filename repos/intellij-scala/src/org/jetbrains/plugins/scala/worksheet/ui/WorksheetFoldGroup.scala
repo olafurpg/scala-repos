@@ -104,7 +104,7 @@ class WorksheetFoldGroup(
                       trueStart.toInt,
                       spaces.toInt,
                       WorksheetFoldGroup.this,
-                      lsLength.toInt
+                      lsLength.toInt,
                   )
 
                   region.setExpanded(expanded.length == 4)

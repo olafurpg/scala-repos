@@ -43,7 +43,7 @@ object InputTask {
                   case Left(msg) =>
                     val indented = msg.lines.map("   " + _).mkString("\n")
                     sys.error(s"Invalid programmatic input:\n$indented")
-              }))
+              })),
     )
   }
 

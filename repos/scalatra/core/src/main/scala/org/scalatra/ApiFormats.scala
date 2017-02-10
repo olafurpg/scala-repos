@@ -48,7 +48,7 @@ trait ApiFormats extends ScalatraBase {
             "txt" -> "text/plain",
             "xhtml" -> "application/xhtml+xml",
             "xml" -> "application/xml",
-            "xslt" -> "application/xslt+xml"
+            "xslt" -> "application/xslt+xml",
         ).asJava).asScala
 
   /**
@@ -75,7 +75,7 @@ trait ApiFormats extends ScalatraBase {
             "text/javascript" -> "json",
             "text/plain" -> "txt",
             "text/css" -> "css",
-            "video/x-flv" -> "flv"
+            "video/x-flv" -> "flv",
         ).asJava).asScala
 
   protected def addMimeMapping(mime: String, extension: String) {

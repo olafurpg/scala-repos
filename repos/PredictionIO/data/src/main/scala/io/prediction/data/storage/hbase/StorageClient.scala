@@ -30,7 +30,7 @@ import grizzled.slf4j.Logging
 case class HBClient(
     val conf: Configuration,
     val connection: HConnection,
-    val admin: HBaseAdmin
+    val admin: HBaseAdmin,
 )
 
 class StorageClient(val config: StorageClientConfig)
@@ -76,7 +76,7 @@ class StorageClient(val config: StorageClientConfig)
   val client = HBClient(
       conf = conf,
       connection = connection,
-      admin = new HBaseAdmin(connection)
+      admin = new HBaseAdmin(connection),
   )
 
   override val prefix = "HB"

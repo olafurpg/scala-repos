@@ -82,7 +82,7 @@ class EnsembleArc extends EnsembleExample {
           stroke = Color.Coral
           strokeWidth = 3
           `type` = ArcType.Open
-        }
+        },
     )
   }
 }

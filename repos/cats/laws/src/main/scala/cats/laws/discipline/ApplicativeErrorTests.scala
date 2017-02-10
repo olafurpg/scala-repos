@@ -51,7 +51,7 @@ trait ApplicativeErrorTests[F[_], E] extends ApplicativeTests[F] {
           "applicativeError recover consistent with recoverWith" -> forAll(
               laws.recoverConsistentWithRecoverWith[A] _),
           "applicativeError attempt consistent with attemptT" -> forAll(
-              laws.attemptConsistentWithAttemptT[A] _)
+              laws.attemptConsistentWithAttemptT[A] _),
       )
     }
   }

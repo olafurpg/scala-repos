@@ -179,7 +179,7 @@ trait TreeAndTypeAnalysis extends Debugging {
                 sym.sealedDescendants.toList sortBy (_.sealedSortName) filterNot
                 (x =>
                       x.isSealed && x.isAbstractClass &&
-                      !isPrimitiveValueClass(x))
+                      !isPrimitiveValueClass(x)),
             )
 
             List(

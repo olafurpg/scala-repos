@@ -217,7 +217,7 @@ class DataFrameWindowSuite extends QueryTest with SharedSQLContext {
                             .partitionBy("value")
                             .orderBy("key")
                             .rangeBetween(-1, 0))
-                      .as("avg_key3")
+                      .as("avg_key3"),
                   ),
                 Seq(Row(3, null, 3.0d, 4.0d, 3.0d),
                     Row(5, false, 4.0d, 5.0d, 5.0d),

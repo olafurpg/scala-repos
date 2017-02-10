@@ -38,7 +38,7 @@ final class PgnDump(
                              dateFormat.print(game.createdAt),
                              player(game.whitePlayer, wu),
                              player(game.blackPlayer, bu),
-                             game.id
+                             game.id,
                          ),
                          "_")
   }
@@ -100,10 +100,10 @@ final class PgnDump(
                 case Cheat => "Rules infraction"
                 case UnknownFinish => "Unknown"
               }
-            })
+            }),
         ) ::: customStartPosition(game.variant).??(List(
                 Tag(_.FEN, initialFen | "?"),
-                Tag("SetUp", "1")
+                Tag("SetUp", "1"),
             ))
     }
 

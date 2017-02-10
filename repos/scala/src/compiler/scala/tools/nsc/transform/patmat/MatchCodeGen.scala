@@ -236,7 +236,7 @@ trait MatchCodeGen extends Interface {
         // val (prologue, cases) = stats span (s => !s.isInstanceOf[LabelDef])
         Block(
             scrutDef ++ caseDefs ++ catchAllDef,
-            LabelDef(matchEnd, List(matchRes), REF(matchRes))
+            LabelDef(matchEnd, List(matchRes), REF(matchRes)),
         )
       }
 
@@ -266,8 +266,8 @@ trait MatchCodeGen extends Interface {
               // must be isEmpty and get as we don't control the target of the call (prev is an extractor call)
               ifThenElseZero(
                   NOT(prevSym DOT vpmName.isEmpty),
-                  Substitution(b, prevSym DOT vpmName.get)(next)
-              )
+                  Substitution(b, prevSym DOT vpmName.get)(next),
+              ),
           )
         }
 
@@ -301,7 +301,7 @@ trait MatchCodeGen extends Interface {
                          BLOCK(
                              condSym === mkTRUE,
                              nextBinder === res,
-                             next
+                             next,
                          ))
       }
     }

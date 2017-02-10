@@ -22,7 +22,7 @@ import com.zaxxer.hikari.{HikariDataSource, HikariConfig}
 class HikariCPModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-        bind[ConnectionPool].to[HikariCPConnectionPool]
+        bind[ConnectionPool].to[HikariCPConnectionPool],
     )
   }
 }

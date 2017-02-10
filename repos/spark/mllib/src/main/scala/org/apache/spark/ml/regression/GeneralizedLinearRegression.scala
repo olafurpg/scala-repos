@@ -312,7 +312,7 @@ object GeneralizedLinearRegression
       Poisson -> Sqrt,
       Gamma -> Inverse,
       Gamma -> Identity,
-      Gamma -> Log
+      Gamma -> Log,
   )
 
   /** Set of family names that GeneralizedLinearRegression supports. */

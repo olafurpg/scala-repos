@@ -50,12 +50,12 @@ object SybClassExamples {
                  Employee(Person("Ralf", "Amsterdam"), Salary(8000)),
                  List(
                      Employee(Person("Joost", "Amsterdam"), Salary(1000)),
-                     Employee(Person("Marlow", "Cambridge"), Salary(2000))
+                     Employee(Person("Marlow", "Cambridge"), Salary(2000)),
                  )),
             Dept("Strategy",
                  Employee(Person("Blair", "London"), Salary(100000)),
-                 List())
-        )
+                 List()),
+        ),
     )
 
     // Compute a new company structure with all salaries increased by 10%
@@ -70,12 +70,12 @@ object SybClassExamples {
                  Employee(Person("Ralf", "Amsterdam"), Salary(8800)),
                  List(
                      Employee(Person("Joost", "Amsterdam"), Salary(1100)),
-                     Employee(Person("Marlow", "Cambridge"), Salary(2200))
+                     Employee(Person("Marlow", "Cambridge"), Salary(2200)),
                  )),
             Dept("Strategy",
                  Employee(Person("Blair", "London"), Salary(110000)),
-                 List())
-        )
+                 List()),
+        ),
     )
 
     assert(afterRaise == expected)
@@ -92,15 +92,15 @@ object SybClassExamples {
                 Leaf(1),
                 Node(
                     Leaf(2),
-                    Leaf(3)
-                )
+                    Leaf(3),
+                ),
             ),
-            Leaf(4)
+            Leaf(4),
         ),
         Node(
             Leaf(5),
-            Leaf(6)
-        )
+            Leaf(6),
+        ),
     )
 
     object inc extends ->((i: Int) => i + 1)
@@ -113,15 +113,15 @@ object SybClassExamples {
                 Leaf(2),
                 Node(
                     Leaf(3),
-                    Leaf(4)
-                )
+                    Leaf(4),
+                ),
             ),
-            Leaf(5)
+            Leaf(5),
         ),
         Node(
             Leaf(6),
-            Leaf(7)
-        )
+            Leaf(7),
+        ),
     )
 
     assert(expected == result)

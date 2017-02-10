@@ -15,7 +15,7 @@ object ReaderWriterStateTTest extends SpecLite {
           Gen.const(RWST[Option, Int, Int, Int, Int](
                   (r: Int, s: Int) => Some((r, r, r)))),
           Gen.const(RWST[Option, Int, Int, Int, Int](
-                  (r: Int, s: Int) => Some((s, s, s))))
+                  (r: Int, s: Int) => Some((s, s, s)))),
       ))
   implicit val RWSOptIntIntArb = Arbitrary(Gen
         .oneOf[RWSOptInt[Int => Int]](
@@ -29,7 +29,7 @@ object ReaderWriterStateTTest extends SpecLite {
           Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) =>
                     Some((s, x => s, s)))),
           Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) =>
-                    Some((s, x => x, s))))
+                    Some((s, x => x, s)))),
       ))
 
   implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]] {

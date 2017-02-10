@@ -28,7 +28,7 @@ object Scaladoc extends AutoPlugin {
         Seq(
             scalacOptions in Compile <++=
               (version, baseDirectory in ThisBuild) map scaladocOptions,
-            autoAPIMappings := CliOptions.scaladocAutoAPI.get
+            autoAPIMappings := CliOptions.scaladocAutoAPI.get,
         )) ++ Seq(validateDiagrams in Compile := true) ++ CliOptions.scaladocDiagramsEnabled
       .ifTrue(doc in Compile := {
       val docs = (doc in Compile).value
@@ -92,7 +92,7 @@ object ScaladocNoVerificationOfDiagrams extends AutoPlugin {
   override def requires = Scaladoc
 
   override lazy val projectSettings = Seq(
-      Scaladoc.validateDiagrams in Compile := false
+      Scaladoc.validateDiagrams in Compile := false,
   )
 }
 
@@ -116,7 +116,7 @@ object UnidocRoot extends AutoPlugin {
             // FIXME: see #18056
             sources in (JavaUnidoc, unidoc) ~=
             (_.filterNot(_.getPath.contains(
-                        "Access$minusControl$minusAllow$minusOrigin")))
+                        "Access$minusControl$minusAllow$minusOrigin"))),
         ))
     .getOrElse(Nil)
 
@@ -132,7 +132,7 @@ object UnidocRoot extends AutoPlugin {
         Seq(
             unidocProjectFilter in ScalaUnidoc := docProjectFilter,
             unidocProjectFilter in JavaUnidoc := docProjectFilter,
-            apiMappings in ScalaUnidoc := (apiMappings in (Compile, doc)).value
+            apiMappings in ScalaUnidoc := (apiMappings in (Compile, doc)).value,
         ))
   }
 
@@ -165,8 +165,8 @@ object Unidoc extends AutoPlugin {
             // FIXME: see #18056
             sources in (Genjavadoc, doc) ~=
             (_.filterNot(_.getPath.contains(
-                        "Access$minusControl$minusAllow$minusOrigin")))
-        )
+                        "Access$minusControl$minusAllow$minusOrigin"))),
+        ),
     )
     .getOrElse(Seq.empty)
 }

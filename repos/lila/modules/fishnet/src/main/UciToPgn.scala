@@ -52,7 +52,7 @@ private object UciToPgn {
       case ((infos, errs), info) =>
         uciToPgn(info.ply, info.variation).fold(
             err => (info.dropVariation :: infos, LilaException(err) :: errs),
-            pgn => (info.copy(variation = pgn) :: infos, errs)
+            pgn => (info.copy(variation = pgn) :: infos, errs),
         )
     } match {
       case (infos, errors) => analysis.copy(infos = infos.reverse) -> errors

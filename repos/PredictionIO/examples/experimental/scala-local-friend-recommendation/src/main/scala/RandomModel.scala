@@ -1,6 +1,6 @@
 package io.prediction.examples.friendrecommendation
 
 class RandomModel(
-    val randomThreshold: Double
+    val randomThreshold: Double,
 )
     extends Serializable

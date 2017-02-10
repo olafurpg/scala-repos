@@ -13,7 +13,7 @@ case class FilterConfig(variant: List[chess.variant.Variant],
         variant map (_.id),
         mode map (_.id),
         speed map (_.id),
-        ratingRange.toString
+        ratingRange.toString,
     ).some
 
   def render =
@@ -54,7 +54,7 @@ object FilterConfig {
         variant = v map chess.variant.Variant.apply flatten,
         mode = m map Mode.apply flatten,
         speed = s map Speed.apply flatten,
-        ratingRange = RatingRange orDefault e
+        ratingRange = RatingRange orDefault e,
     ).nonEmpty
 
   import reactivemongo.bson._

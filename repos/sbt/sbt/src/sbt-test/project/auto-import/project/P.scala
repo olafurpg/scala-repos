@@ -19,7 +19,7 @@ package name.example {
         checkName <<= Keys.name map { n =>
           assert(n == "Demo",
                  "Expected name to be 'Demo', but it was '" + n + "'")
-        }
+        },
     )
   }
 }

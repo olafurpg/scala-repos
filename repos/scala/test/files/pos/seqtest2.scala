@@ -7,6 +7,6 @@ object test {
         b match {
           case List(1, 2, 3) => true;
           case _ => false;
-        }
+        },
     )
 }

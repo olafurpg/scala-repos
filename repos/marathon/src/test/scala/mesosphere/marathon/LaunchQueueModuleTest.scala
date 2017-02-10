@@ -209,7 +209,7 @@ class LaunchQueueModuleTest
         maybeOfferReviver = None,
         appRepository,
         taskTracker,
-        taskOpFactory
+        taskOpFactory,
     )
   }
 

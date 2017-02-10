@@ -45,7 +45,7 @@ object RetryPolicy {
   case class Exponential(
       base: Duration,
       factor: Double = 2.0,
-      maximum: Duration = 30.seconds
+      maximum: Duration = 30.seconds,
   )(implicit timer: Timer)
       extends RetryPolicy {
     require(base > 0.seconds)

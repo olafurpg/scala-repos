@@ -189,7 +189,7 @@ object ContentFactory {
                         message = t.getClass.getName + ": " + t.getMessage,
                         t)
               }
-            }
+            },
         )
       }
       // Load source through webview

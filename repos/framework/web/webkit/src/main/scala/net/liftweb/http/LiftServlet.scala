@@ -255,7 +255,7 @@ class LiftServlet extends Loggable {
         Full(
             session
               .map(_.checkRedirect(req.createNotFound))
-              .getOrElse(req.createNotFound)
+              .getOrElse(req.createNotFound),
           )
       }
     }
@@ -438,7 +438,7 @@ class LiftServlet extends Loggable {
       CheckAuth,
       SessionLossCheck,
       StatelessResponse,
-      StatefulResponse
+      StatefulResponse,
   )
 
   /**
@@ -610,7 +610,7 @@ class LiftServlet extends Loggable {
                                            ajaxPathPart.length - 1),
                     36),
                 Integer.parseInt(
-                    ajaxPathPart.substring(ajaxPathPart.length - 1), 36))
+                    ajaxPathPart.substring(ajaxPathPart.length - 1), 36)),
         )
       else None
     }
@@ -1089,7 +1089,7 @@ class LiftServlet extends Loggable {
     response.addHeaders(
         LiftRules.supplementalHeaders.vend.map {
           case (name, value) => HTTPParam(name, value)
-        }
+        },
     )
 
     liftResp match {

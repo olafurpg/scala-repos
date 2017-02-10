@@ -90,7 +90,7 @@ private[round] final class Round(gameId: String,
           messenger.system(
               pov.game,
               (_.untranslated(
-                  s"${pov.color.name.capitalize} is going berserk!"
+                  s"${pov.color.name.capitalize} is going berserk!",
               )))
           GameRepo.save(progress) >> GameRepo.goBerserk(pov) inject progress.events
         }
@@ -186,7 +186,7 @@ private[round] final class Round(gameId: String,
           messenger.system(pov.game,
                            (_.untranslated(
                                "%s + %d seconds".format(
-                                   !pov.color, moretimeDuration.toSeconds)
+                                   !pov.color, moretimeDuration.toSeconds),
                            )))
           GameRepo save progress inject progress.events
         }

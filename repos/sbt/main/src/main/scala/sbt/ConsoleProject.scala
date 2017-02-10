@@ -50,7 +50,7 @@ object ConsoleProject {
         unit.classpath,
         options,
         initCommands,
-        cleanupCommands
+        cleanupCommands,
     )(Some(unit.loader), bindings)
   }
 

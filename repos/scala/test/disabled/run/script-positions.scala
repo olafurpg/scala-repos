@@ -53,7 +53,7 @@ object Test {
 
   val tests: List[(String, String)] = List(
       test1 -> output1,
-      test2 -> output2
+      test2 -> output2,
   )
   // def lines(s: String) = s split """\r\n|\r|\n""" toList
   def lines(s: String) = s split "\\n" toList
@@ -75,7 +75,7 @@ object Test {
       assert(
           success,
           "Output doesn't match expected:\n" + "Expected:\n" + expected +
-          "Actual:\n" + out.mkString("\n")
+          "Actual:\n" + out.mkString("\n"),
       )
     }
   }

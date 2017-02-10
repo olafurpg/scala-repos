@@ -103,19 +103,19 @@ sealed abstract class Xor[+A, +B] extends Product with Serializable {
   def compare[AA >: A, BB >: B](that: AA Xor BB)(
       implicit AA: Order[AA], BB: Order[BB]): Int = fold(
       a => that.fold(AA.compare(a, _), _ => -1),
-      b => that.fold(_ => 1, BB.compare(b, _))
+      b => that.fold(_ => 1, BB.compare(b, _)),
   )
 
   def partialCompare[AA >: A, BB >: B](that: AA Xor BB)(
       implicit AA: PartialOrder[AA], BB: PartialOrder[BB]): Double = fold(
       a => that.fold(AA.partialCompare(a, _), _ => -1),
-      b => that.fold(_ => 1, BB.partialCompare(b, _))
+      b => that.fold(_ => 1, BB.partialCompare(b, _)),
   )
 
   def ===[AA >: A, BB >: B](that: AA Xor BB)(
       implicit AA: Eq[AA], BB: Eq[BB]): Boolean = fold(
       a => that.fold(AA.eqv(a, _), _ => false),
-      b => that.fold(_ => false, BB.eqv(b, _))
+      b => that.fold(_ => false, BB.eqv(b, _)),
   )
 
   def traverse[F[_], AA >: A, D](f: B => F[D])(
@@ -148,7 +148,7 @@ sealed abstract class Xor[+A, +B] extends Product with Serializable {
   def show[AA >: A, BB >: B](implicit AA: Show[AA], BB: Show[BB]): String =
     fold(
         a => s"Xor.Left(${AA.show(a)})",
-        b => s"Xor.Right(${BB.show(b)})"
+        b => s"Xor.Right(${BB.show(b)})",
     )
 }
 

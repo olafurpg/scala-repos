@@ -50,7 +50,7 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
 
   val characters = ObservableBuffer[Person](
       new Person("Peggy", "Sue"),
-      new Person("Rocky", "Raccoon")
+      new Person("Rocky", "Raccoon"),
   )
 
   characters += new Person("Rocky", "Raccoon")
@@ -90,7 +90,7 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
             _.value.lastName
           }
           prefWidth = 180
-        }
+        },
     )
   }
 
@@ -122,7 +122,7 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
         children = Seq(
             tableView,
             scrollToButton,
-            snapshotButton
+            snapshotButton,
         )
       }
     }

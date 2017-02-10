@@ -16,7 +16,7 @@ class HeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val seq = Seq(0); ${START}if (seq.size != 0) Some(seq.head) else None$END",
         "val seq = Seq(0); if (seq.size != 0) Some(seq.head) else None",
-        "val seq = Seq(0); seq.headOption"
+        "val seq = Seq(0); seq.headOption",
     )
   }
 
@@ -24,7 +24,7 @@ class HeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val seq = Seq(0); ${START}if (seq.nonEmpty) Some(seq.head) else None$END",
         "val seq = Seq(0); if (seq.nonEmpty) Some(seq.head) else None",
-        "val seq = Seq(0); seq.headOption"
+        "val seq = Seq(0); seq.headOption",
     )
   }
 
@@ -41,7 +41,7 @@ class HeadOptionTest extends OperationsOnCollectionInspectionTest {
         |else
         |  Some(seq.head)""".stripMargin,
         """val seq = Seq(0)
-        |seq.headOption""".stripMargin
+        |seq.headOption""".stripMargin,
     )
   }
 
@@ -49,7 +49,7 @@ class HeadOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val seq = Seq(0); seq.${START}lift(0)$END",
         "val seq = Seq(0); seq.lift(0)",
-        "val seq = Seq(0); seq.headOption"
+        "val seq = Seq(0); seq.headOption",
     )
   }
 }
@@ -65,7 +65,7 @@ class LastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val seq = Seq(0); ${START}if (seq.size != 0) Some(seq.last) else None$END",
         "val seq = Seq(0); if (seq.size != 0) Some(seq.last) else None",
-        "val seq = Seq(0); seq.lastOption"
+        "val seq = Seq(0); seq.lastOption",
     )
   }
 
@@ -73,7 +73,7 @@ class LastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val seq = Seq(0); ${START}if (seq.nonEmpty) Some(seq.last) else None$END",
         "val seq = Seq(0); if (seq.nonEmpty) Some(seq.last) else None",
-        "val seq = Seq(0); seq.lastOption"
+        "val seq = Seq(0); seq.lastOption",
     )
   }
 
@@ -90,7 +90,7 @@ class LastOptionTest extends OperationsOnCollectionInspectionTest {
         |else
         |  Some(seq.last)""".stripMargin,
         """val seq = Seq(0)
-        |seq.lastOption""".stripMargin
+        |seq.lastOption""".stripMargin,
     )
   }
 
@@ -98,7 +98,7 @@ class LastOptionTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val seq = Seq(0); seq.${START}lift(seq.size - 1)$END",
         "val seq = Seq(0); seq.lift(seq.size - 1)",
-        "val seq = Seq(0); seq.lastOption"
+        "val seq = Seq(0); seq.lastOption",
     )
   }
 }

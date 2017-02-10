@@ -303,7 +303,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             currentTime,
             pageSize = taskPageSize,
             sortColumn = taskSortColumn,
-            desc = taskSortDesc
+            desc = taskSortDesc,
         )
         (_taskTable, _taskTable.table(page))
       } catch {
@@ -1056,7 +1056,7 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
                 shuffleReadSortable,
                 s"$shuffleReadReadable / $shuffleReadRecords",
                 shuffleReadRemoteSortable,
-                shuffleReadRemoteReadable
+                shuffleReadRemoteReadable,
             ))
       } else {
         None
@@ -1069,7 +1069,7 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
                 writeTimeSortable,
                 writeTimeReadable,
                 shuffleWriteSortable,
-                s"$shuffleWriteReadable / $shuffleWriteRecords"
+                s"$shuffleWriteReadable / $shuffleWriteRecords",
             ))
       } else {
         None
@@ -1082,7 +1082,7 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
                 memoryBytesSpilledSortable,
                 memoryBytesSpilledReadable,
                 diskBytesSpilledSortable,
-                diskBytesSpilledReadable
+                diskBytesSpilledReadable,
             ))
       } else {
         None

@@ -18,7 +18,7 @@ class RequestBuilderTest extends FunSuite {
   val FORM0 = Seq(
       "k1" -> "v1",
       "k2" -> "v2",
-      "k3" -> "v3"
+      "k3" -> "v3",
   )
 
   val MULTIPART0 = """--Boundary

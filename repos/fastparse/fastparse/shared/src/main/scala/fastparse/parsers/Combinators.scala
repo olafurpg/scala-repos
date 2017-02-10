@@ -26,7 +26,7 @@ object Combinators {
               cfg.input.substring(index, index0),
               index0,
               traceParsers0,
-              cut0
+              cut0,
           )
         case f: Mutable.Failure => f
       }
@@ -115,7 +115,7 @@ object Combinators {
                 stack.reverse,
                 f.input,
                 index,
-                Failure.formatParser(f.lastParser, f.input, f.index)
+                Failure.formatParser(f.lastParser, f.input, f.index),
             )
             s"Failure($trace${if (f.cut) ", cut" else ""})"
         }
@@ -262,7 +262,7 @@ object Combinators {
                     cfg.logDepth,
                     traceParsers = mergeTrace(
                           cfg.traceIndex, f.traceParsers, traceParsers),
-                    cut = c.cut | f.cut | rCut
+                    cut = c.cut | f.cut | rCut,
                 )
               case Mutable.Success(value0, index0, traceParsers0, cut0) =>
                 rec(
@@ -270,7 +270,7 @@ object Combinators {
                     index0,
                     c.cut | cut0 | rCut,
                     vIndex + 1,
-                    traceParsers0 | traceParsers
+                    traceParsers0 | traceParsers,
                 )
             }
           }
@@ -334,7 +334,7 @@ object Combinators {
               index,
               cfg.logDepth,
               traceParsers = mergeTrace(cfg.traceIndex, Set(p1), Set.empty),
-              cut = f.cut
+              cut = f.cut,
           )
         case Mutable.Success(value0, index0, traceParsers0, cut0) =>
           //          if (cut) println("CUT! " + this + ":" + s1.index)
@@ -346,7 +346,7 @@ object Combinators {
                   cfg.logDepth,
                   traceParsers = mergeTrace(
                         cfg.traceIndex, traceParsers0, f.traceParsers),
-                  cut = cut | f.cut | cut0
+                  cut = cut | f.cut | cut0,
               )
             case Mutable.Success(value1, index1, traceParsers1, cut1) =>
               success(
@@ -354,7 +354,7 @@ object Combinators {
                   ev(value0, value1),
                   index1,
                   mergeTrace(cfg.traceIndex, traceParsers1, traceParsers0),
-                  cut1 | cut0 | cut
+                  cut1 | cut0 | cut,
               )
           }
       }
@@ -459,7 +459,7 @@ object Combinators {
       val things = Seq(
           if (min == 0) None else Some(min),
           if (delimiter == Pass) None else Some("sep = " + delimiter),
-          if (max == Int.MaxValue) None else Some("max = " + max)
+          if (max == Int.MaxValue) None else Some("max = " + max),
       ).flatten.mkString(", ")
       if (things.isEmpty) opWrap(p) + ".rep"
       else s"${opWrap(p)}.rep($things)"
@@ -495,7 +495,7 @@ object Combinators {
             case f: Mutable.Failure =>
               rec(
                   parserIndex + 1,
-                  mergeTrace(cfg.traceIndex, f.traceParsers, traceParsers)
+                  mergeTrace(cfg.traceIndex, f.traceParsers, traceParsers),
               )
           }
       }

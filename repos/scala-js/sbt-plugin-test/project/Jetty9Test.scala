@@ -40,7 +40,7 @@ object Jetty9Test {
           }
         });
       });
-      """
+      """,
       )
 
       val runner = jsEnv.comRunner(code)

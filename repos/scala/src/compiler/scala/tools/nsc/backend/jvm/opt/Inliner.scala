@@ -201,7 +201,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
                        annotatedInline = annotatedInline,
                        annotatedNoInline = annotatedNoInline,
                        samParamTypes = staticCallSamParamTypes,
-                       calleeInfoWarning = infoWarning))
+                       calleeInfoWarning = infoWarning)),
       )
       callGraph.addCallsite(staticCallsite)
     }
@@ -570,7 +570,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
           callsiteClass = callsiteClass,
           argInfos = argInfos,
           callsiteStackHeight = callsiteStackHeight +
-            originalCallsite.callsiteStackHeight
+            originalCallsite.callsiteStackHeight,
       )
       originalCallsite.inlinedClones += ClonedCallsite(newCallsite, callsite)
       callGraph.addCallsite(newCallsite)

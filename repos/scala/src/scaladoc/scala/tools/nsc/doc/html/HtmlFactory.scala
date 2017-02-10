@@ -71,7 +71,7 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
       "type_diagram.png",
       "ownderbg2.gif",
       "ownerbg.gif",
-      "ownerbg2.gif"
+      "ownerbg2.gif",
   )
 
   /** Generates the Scaladoc site for a model into the site root.

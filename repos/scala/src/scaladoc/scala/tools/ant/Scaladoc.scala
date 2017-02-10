@@ -597,7 +597,7 @@ class Scaladoc extends ScalaMatchingTask {
           log(
               "Documenting " + list.length + " source file" +
               (if (list.length > 1) "s" else "") +
-              (" to " + getDestination.toString)
+              (" to " + getDestination.toString),
           )
         else log("No files selected for documentation", Project.MSG_VERBOSE)
 

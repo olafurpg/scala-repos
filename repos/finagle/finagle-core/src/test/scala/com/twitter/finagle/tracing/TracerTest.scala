@@ -13,31 +13,31 @@ class TracerTest extends FunSuite {
     }
     val id = TraceId(None, None, SpanId(0L), None)
     assert(BroadcastTracer(
-               Seq(TestTracer(None), TestTracer(None), TestTracer(None))
+               Seq(TestTracer(None), TestTracer(None), TestTracer(None)),
            ).sampleTrace(id) == None,
            "If all None returns None")
 
     assert(BroadcastTracer(
-               Seq(TestTracer(Some(true)), TestTracer(None), TestTracer(None))
+               Seq(TestTracer(Some(true)), TestTracer(None), TestTracer(None)),
            ).sampleTrace(id) == Some(true),
            "If one Some(true) returns Some(true)")
 
     assert(BroadcastTracer(
                Seq(TestTracer(Some(true)),
                    TestTracer(Some(false)),
-                   TestTracer(None))
+                   TestTracer(None)),
            ).sampleTrace(id) == Some(true),
            "If one Some(true) returns Some(true)")
 
     assert(BroadcastTracer(
-               Seq(TestTracer(None), TestTracer(Some(false)), TestTracer(None))
+               Seq(TestTracer(None), TestTracer(Some(false)), TestTracer(None)),
            ).sampleTrace(id) == None,
            "If one Some(false) returns None")
 
     assert(BroadcastTracer(
                Seq(TestTracer(Some(false)),
                    TestTracer(Some(false)),
-                   TestTracer(Some(false)))
+                   TestTracer(Some(false))),
            ).sampleTrace(id) == Some(false),
            "If all Some(false) returns Some(false)")
   }

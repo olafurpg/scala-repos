@@ -37,6 +37,6 @@ object Classfiles {
       CONSTANT_FIELDREF -> "Field",
       CONSTANT_METHODREF -> "Method",
       CONSTANT_INTFMETHODREF -> "InterfaceMethod",
-      CONSTANT_NAMEANDTYPE -> "NameAndType"
+      CONSTANT_NAMEANDTYPE -> "NameAndType",
   )
 }

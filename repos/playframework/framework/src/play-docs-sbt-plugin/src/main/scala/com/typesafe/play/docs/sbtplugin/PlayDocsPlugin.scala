@@ -140,8 +140,8 @@ object PlayDocsPlugin extends AutoPlugin {
       libraryDependencies ++= Seq(
           "com.typesafe.play" %% docsName.value % PlayVersion.current,
           "com.typesafe.play" % s"${docsName.value}_${docsJarScalaBinaryVersion.value}" % docsVersion.value % "docs" notTransitive
-          ()
-      )
+          (),
+      ),
   )
 
   def docsReportSettings = Seq(
@@ -153,7 +153,7 @@ object PlayDocsPlugin extends AutoPlugin {
       translationCodeSamplesReport <<=
         PlayDocsValidation.translationCodeSamplesReportTask,
       cachedTranslationCodeSamplesReport <<=
-        PlayDocsValidation.cachedTranslationCodeSamplesReportTask
+        PlayDocsValidation.cachedTranslationCodeSamplesReportTask,
   )
 
   def docsTestSettings =
@@ -170,7 +170,7 @@ object PlayDocsPlugin extends AutoPlugin {
         scalaTwirlSourceManaged := target.value / "twirl" / "scala",
         managedSourceDirectories in Test ++= Seq(
             javaTwirlSourceManaged.value,
-            scalaTwirlSourceManaged.value
+            scalaTwirlSourceManaged.value,
         ),
         // Need to ensure that templates in the Java docs get Java imports, and in the Scala docs get Scala imports
         sourceGenerators in Test <+= (javaManualSourceDirectories,
@@ -241,7 +241,7 @@ object PlayDocsPlugin extends AutoPlugin {
         testOptions in Test +=
           Tests.Argument(TestFrameworks.JUnit,
                          "-v",
-                         "--ignore-runners=org.specs2.runner.JUnitRunner")
+                         "--ignore-runners=org.specs2.runner.JUnitRunner"),
     )
 
   val docsJarFileSetting: Def.Initialize[Task[Option[File]]] = Def.task {

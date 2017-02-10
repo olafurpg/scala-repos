@@ -48,7 +48,7 @@ class Analyzer(
     indexer: ActorRef,
     search: SearchService,
     implicit val config: EnsimeConfig,
-    implicit val vfs: EnsimeVFS
+    implicit val vfs: EnsimeVFS,
 )
     extends Actor with Stash with ActorLogging with RefactoringHandler {
 
@@ -108,7 +108,7 @@ class Analyzer(
       reporter,
       self,
       indexer,
-      search
+      search,
   )
 
   protected def restartCompiler(keepLoaded: Boolean): Unit = {
@@ -339,9 +339,9 @@ object Analyzer {
   def apply(
       broadcaster: ActorRef,
       indexer: ActorRef,
-      search: SearchService
+      search: SearchService,
   )(
       implicit config: EnsimeConfig,
-      vfs: EnsimeVFS
+      vfs: EnsimeVFS,
   ) = Props(new Analyzer(broadcaster, indexer, search, config, vfs))
 }

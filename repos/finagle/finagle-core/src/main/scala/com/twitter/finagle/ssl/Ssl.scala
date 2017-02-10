@@ -28,7 +28,7 @@ object Ssl {
       keyPath: String,
       caCertPath: String,
       ciphers: String,
-      nextProtos: String
+      nextProtos: String,
   ): Engine = {
     val nativeInstance = OpenSSL.server(
         certificatePath,
@@ -36,7 +36,7 @@ object Ssl {
         caCertPath,
         ciphers,
         nextProtos,
-        cacheContexts
+        cacheContexts,
     )
 
     nativeInstance.getOrElse {
@@ -49,7 +49,7 @@ object Ssl {
           certificatePath,
           keyPath,
           if (caCertPath == null) None else Some(caCertPath),
-          cacheContexts
+          cacheContexts,
       )
 
       require(jsseInstance.isDefined, "Could not create an SSLEngine")

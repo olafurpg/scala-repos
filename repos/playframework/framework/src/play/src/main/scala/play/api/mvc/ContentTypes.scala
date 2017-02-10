@@ -341,7 +341,7 @@ trait BodyParsers {
     def text(maxLength: Int): BodyParser[String] = when(
         _.contentType.exists(_.equalsIgnoreCase("text/plain")),
         tolerantText(maxLength),
-        createBadResult("Expecting text/plain body", UNSUPPORTED_MEDIA_TYPE)
+        createBadResult("Expecting text/plain body", UNSUPPORTED_MEDIA_TYPE),
     )
 
     /**
@@ -408,7 +408,7 @@ trait BodyParsers {
               m.equalsIgnoreCase("application/json")),
         tolerantJson(maxLength),
         createBadResult("Expecting text/json or application/json body",
-                        UNSUPPORTED_MEDIA_TYPE)
+                        UNSUPPORTED_MEDIA_TYPE),
     )
 
     /**
@@ -511,7 +511,7 @@ trait BodyParsers {
                   // to RFC 2616, we use that.
                   case mt if mt.mediaType == "text" => "iso-8859-1"
                   // Otherwise, there should be no default, it will be detected by the XML parser.
-                }
+                },
             )
             .foreach { charset =>
               inputSource.setEncoding(charset)
@@ -536,7 +536,7 @@ trait BodyParsers {
           ApplicationXmlMatcher.pattern.matcher(tl).matches()
         },
         tolerantXml(maxLength),
-        createBadResult("Expecting xml body", UNSUPPORTED_MEDIA_TYPE)
+        createBadResult("Expecting xml body", UNSUPPORTED_MEDIA_TYPE),
     )
 
     /**
@@ -605,7 +605,7 @@ trait BodyParsers {
             .exists(_.equalsIgnoreCase("application/x-www-form-urlencoded")),
           tolerantFormUrlEncoded(maxLength),
           createBadResult("Expecting application/x-www-form-urlencoded body",
-                          UNSUPPORTED_MEDIA_TYPE)
+                          UNSUPPORTED_MEDIA_TYPE),
       )
 
     /**
@@ -833,7 +833,7 @@ trait BodyParsers {
             maxLength,
             Accumulator(
                 Sink.fold[ByteString, ByteString](ByteString.empty)((state,
-                    bs) => state ++ bs)
+                    bs) => state ++ bs),
             ) mapFuture { bytes =>
               try {
                 Future.successful(Right(parser(request, bytes)))

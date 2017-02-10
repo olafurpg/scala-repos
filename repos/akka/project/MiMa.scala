@@ -16,7 +16,7 @@ object MiMa extends AutoPlugin {
   override val projectSettings = Seq(
       mimaBackwardIssueFilters ++= mimaIgnoredProblems,
       mimaPreviousArtifacts := akkaPreviousArtifacts(
-          name.value, organization.value, scalaBinaryVersion.value)
+          name.value, organization.value, scalaBinaryVersion.value),
   )
 
   def akkaPreviousArtifacts(projectName: String,
@@ -32,7 +32,7 @@ object MiMa extends AutoPlugin {
           "akka-cluster-metrics",
           "akka-persistence",
           "akka-distributed-data-experimental",
-          "akka-persistence-query-experimental"
+          "akka-persistence-query-experimental",
       )
       val akka242NewArtifacts = Seq(
           "akka-stream",
@@ -42,7 +42,7 @@ object MiMa extends AutoPlugin {
           "akka-http-testkit",
           "akka-http-jackson-experimental",
           "akka-http-spray-json-experimental",
-          "akka-http-xml-experimental"
+          "akka-http-xml-experimental",
       )
       scalaBinaryVersion match {
         case "2.11"
@@ -1015,7 +1015,7 @@ object MiMa extends AutoPlugin {
             "akka.cluster.protobuf.ClusterMessageSerializer"),
         // #13584 change in internal actor
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-            "akka.cluster.ClusterCoreDaemon.akka$cluster$ClusterCoreDaemon$$isJoiningToUp$1")
+            "akka.cluster.ClusterCoreDaemon.akka$cluster$ClusterCoreDaemon$$isJoiningToUp$1"),
     )
 
     Map(
@@ -1036,7 +1036,7 @@ object MiMa extends AutoPlugin {
             // #18722 internal changes to actor
             FilterAnyProblem("akka.cluster.sharding.DDataShardCoordinator"),
             // #18328 optimize VersionVector for size 1
-            FilterAnyProblem("akka.cluster.ddata.VersionVector")
+            FilterAnyProblem("akka.cluster.ddata.VersionVector"),
         ),
         "2.4.1" -> Seq(
             // #19008
@@ -1074,7 +1074,7 @@ object MiMa extends AutoPlugin {
                 "akka.pattern.PipeToSupport.pipeCompletionStage"),
             ProblemFilters
               .exclude[MissingMethodProblem](
-                "akka.pattern.FutureTimeoutSupport.afterCompletionStage")
+                "akka.pattern.FutureTimeoutSupport.afterCompletionStage"),
         ),
         "2.4.2" -> Seq(
             FilterAnyProblemStartingWith("akka.stream.impl.VirtualProcessor"),
@@ -1250,8 +1250,8 @@ object MiMa extends AutoPlugin {
             ProblemFilters.exclude[DirectAbstractMethodProblem](
                 "akka.persistence.Eventsourced#ProcessingState.onWriteMessageComplete"),
             ProblemFilters.exclude[ReversedAbstractMethodProblem](
-                "akka.persistence.Eventsourced#ProcessingState.onWriteMessageComplete")
-        )
+                "akka.persistence.Eventsourced#ProcessingState.onWriteMessageComplete"),
+        ),
     )
   }
 }

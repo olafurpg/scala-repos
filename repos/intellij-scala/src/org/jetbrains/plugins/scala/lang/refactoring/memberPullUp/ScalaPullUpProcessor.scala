@@ -170,7 +170,7 @@ class ScalaPullUpProcessor(project: Project,
             Option(copy.findFirstChildByType(ScalaTokenTypes.tASSIGN)),
             Option(copy.findFirstChildByType(ScalaTokenTypes.tUPPER_BOUND)),
             Option(copy.findFirstChildByType(ScalaTokenTypes.tLOWER_BOUND)),
-            Option(copy.aliasedTypeElement)
+            Option(copy.aliasedTypeElement),
         ).flatten.foreach(_.delete())
         Seq(copy.getText)
       case _ =>

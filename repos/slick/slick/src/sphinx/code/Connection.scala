@@ -122,7 +122,7 @@ object Connection extends App {
 
       val rollbackAction = (coffees ++= Seq(
               ("Cold_Drip", new SerialBlob(Array[Byte](101))),
-              ("Dutch_Coffee", new SerialBlob(Array[Byte](49)))
+              ("Dutch_Coffee", new SerialBlob(Array[Byte](49))),
           )).flatMap { _ =>
         DBIO.failed(new Exception("Roll it back"))
       }.transactionally

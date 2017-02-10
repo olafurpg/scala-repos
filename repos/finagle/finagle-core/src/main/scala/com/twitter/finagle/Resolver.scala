@@ -97,7 +97,7 @@ object InetResolver {
 
 private[finagle] class InetResolver(
     unscopedStatsReceiver: StatsReceiver,
-    pollIntervalOpt: Option[Duration]
+    pollIntervalOpt: Option[Duration],
 )
     extends Resolver {
   import InetSocketAddressUtil._
@@ -240,7 +240,7 @@ object FixedInetResolver {
   */
 private[finagle] class FixedInetResolver(
     statsReceiver: StatsReceiver,
-    resolveOverride: Option[String => Future[Seq[InetAddress]]]
+    resolveOverride: Option[String => Future[Seq[InetAddress]]],
 )
     extends InetResolver(statsReceiver, None) {
 

@@ -249,7 +249,7 @@ class JavaUrlConnectionRequestForwarder @Inject()(
       leaderConnection.addRequestProperty(HEADER_VIA, viaValue)
       val forwardedFor = Seq(
           Option(request.getHeader(HEADER_FORWARDED_FOR)),
-          Option(request.getRemoteAddr)
+          Option(request.getRemoteAddr),
       ).flatten.mkString(",")
       leaderConnection.addRequestProperty(HEADER_FORWARDED_FOR, forwardedFor)
     }

@@ -113,7 +113,7 @@ object ScalaFX_Controls_02 extends JFXApp {
     children = List(
         okButton2,
         koButton1,
-        label
+        label,
     )
   }
 
@@ -135,7 +135,7 @@ object ScalaFX_Controls_02 extends JFXApp {
     spacing = 25
     children = List(
         okButton3,
-        koButton2
+        koButton2,
     )
   }
 
@@ -146,7 +146,7 @@ object ScalaFX_Controls_02 extends JFXApp {
     children = List(
         okButton1,
         hBox1,
-        hBox2
+        hBox2,
     )
   }
   stage = new PrimaryStage {

@@ -139,12 +139,12 @@ class UserDefinedTypeSuite
   test("UDTs with JSON") {
     val data = Seq(
         "{\"id\":1,\"vec\":[1.1,2.2,3.3,4.4]}",
-        "{\"id\":2,\"vec\":[2.25,4.5,8.75]}"
+        "{\"id\":2,\"vec\":[2.25,4.5,8.75]}",
     )
     val schema = StructType(
         Seq(
             StructField("id", IntegerType, false),
-            StructField("vec", new MyDenseVectorUDT, false)
+            StructField("vec", new MyDenseVectorUDT, false),
         ))
 
     val stringRDD = sparkContext.parallelize(data)
@@ -152,7 +152,7 @@ class UserDefinedTypeSuite
     checkAnswer(
         jsonRDD,
         Row(1, new MyDenseVector(Array(1.1, 2.2, 3.3, 4.4))) :: Row(
-            2, new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
+            2, new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil,
     )
   }
 

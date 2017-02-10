@@ -57,7 +57,7 @@ class DenseMatrixTest
         (0, 1, 2, 3, 4, 5),
         (3, 4, 5, 6, 7, 8),
         (3, 4, 5, 6, 7, 8),
-        (5, 4, 5, 9, 7, 8)
+        (5, 4, 5, 9, 7, 8),
     )
 
     val sbig1 = mbig(::, 0 to 2 by 2)
@@ -66,7 +66,7 @@ class DenseMatrixTest
             (0, 2),
             (3, 5),
             (3, 5),
-            (5, 5)
+            (5, 5),
         ))
 
     // slice columns

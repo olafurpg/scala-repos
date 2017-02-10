@@ -38,7 +38,7 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
             bind[Router].to(Router.from {
           case _ => Action(result)
         }),
-            bind[HttpFilters].to[Filters]
+            bind[HttpFilters].to[Filters],
         ))(_ => block)
   }
 

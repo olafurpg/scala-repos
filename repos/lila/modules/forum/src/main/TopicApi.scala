@@ -83,7 +83,7 @@ private[forum] final class TopicApi(
     Paginator(
         adapter = new Adapter[Topic](
               selector = TopicRepo(troll) byCategQuery categ,
-              sort = Seq($sort.updatedDesc)
+              sort = Seq($sort.updatedDesc),
           ) mapFuture { topic =>
           $find.byId[Post](topic lastPostId troll) map { post =>
             TopicView(categ, topic, post, env.postApi lastPageOf topic, troll)
@@ -126,7 +126,7 @@ private[forum] final class TopicApi(
               nbPostsTroll = nbPostsTroll,
               lastPostIdTroll = lastPostTroll ?? (_.id),
               updatedAtTroll = lastPostTroll.fold(topic.updatedAtTroll)(
-                    _.createdAt)
+                    _.createdAt),
           ))
     } yield ()
 

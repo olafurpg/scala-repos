@@ -133,7 +133,7 @@ class ZipperTests {
   val dept = Dept(
       Employee("Agamemnon", 5000),
       Employee("Menelaus", 3000) :: Employee("Achilles", 2000) :: Employee(
-          "Odysseus", 2000) :: HNil
+          "Odysseus", 2000) :: HNil,
   )
 
   @Test

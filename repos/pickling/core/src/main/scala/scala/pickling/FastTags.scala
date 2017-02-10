@@ -130,7 +130,7 @@ object FastTypeTag {
         Short,
         Byte,
         Unit,
-        Boolean
+        Boolean,
     )
     // TODO - create array primitives out of the above seq
     val arrayPrimitives = Seq(
@@ -142,7 +142,7 @@ object FastTypeTag {
         ArrayShort,
         ArrayByte,
         ArrayUnit,
-        ArrayBoolean
+        ArrayBoolean,
     )
     (primitives ++ arrayPrimitives).map(_.key).toSet
   }
@@ -231,7 +231,7 @@ object FastTypeTag {
       classOf[Array[Long]] -> FastTypeTag.ArrayLong,
       classOf[Array[Boolean]] -> FastTypeTag.ArrayBoolean,
       classOf[Array[Float]] -> FastTypeTag.ArrayFloat,
-      classOf[Array[Double]] -> FastTypeTag.ArrayDouble
+      classOf[Array[Double]] -> FastTypeTag.ArrayDouble,
   )
 
   def mkRawArrayTypeAndKey(

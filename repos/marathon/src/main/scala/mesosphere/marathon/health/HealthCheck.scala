@@ -64,7 +64,7 @@ case class HealthCheck(
         interval = proto.getIntervalSeconds.seconds,
         maxConsecutiveFailures = proto.getMaxConsecutiveFailures,
         ignoreHttp1xx = proto.getIgnoreHttp1Xx,
-        port = if (proto.hasPort) Some(proto.getPort) else None
+        port = if (proto.hasPort) Some(proto.getPort) else None,
     )
 
   def mergeFromProto(bytes: Array[Byte]): HealthCheck =
@@ -76,7 +76,7 @@ case class HealthCheck(
       case Protocol.COMMAND =>
         assert(
             command.isDefined,
-            "A command is required when using the COMMAND health check protocol."
+            "A command is required when using the COMMAND health check protocol.",
         )
         MesosProtos.HealthCheck.newBuilder.setCommand(this.command.get.toProto)
 

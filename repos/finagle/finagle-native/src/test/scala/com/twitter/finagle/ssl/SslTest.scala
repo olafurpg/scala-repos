@@ -20,7 +20,7 @@ class SslTest extends FunSuite {
       "setupCA.sh",
       "makecert.sh",
       "openssl-intermediate.conf",
-      "openssl-root.conf"
+      "openssl-root.conf",
   )
 
   // before we run any tests, construct the chain
@@ -35,7 +35,7 @@ class SslTest extends FunSuite {
             certChainInput.setupCAPath,
             certChainInput.makeCertPath,
             certChainInput.openSSLIntConfPath,
-            certChainInput.openSSLRootConfPath
+            certChainInput.openSSLRootConfPath,
         ), // command
         null, // null == inherit the environment of the current process
         certChainInput.setupCADirPath.toFile // working dir
@@ -58,7 +58,7 @@ class SslTest extends FunSuite {
       "test.example.com.cert",
       "test.example.com.key",
       "cacert.pem",
-      certChainInput.setupCADirPath.toString
+      certChainInput.setupCADirPath.toString,
   )
 
   // now let's run some tests
@@ -175,7 +175,7 @@ class SslTest extends FunSuite {
         certChain.rootCertOnlyPath, // cacert.pem
         "-verify",
         "9",
-        "-showcerts"
+        "-showcerts",
     )
 
     try {
@@ -210,7 +210,7 @@ class CertChainInput(
     setupCAFilename: String,
     makeCertFilename: String,
     openSSLIntConfFilename: String,
-    openSSLRootConfFilename: String
+    openSSLRootConfFilename: String,
 ) {
   val setupCADirPath: Path = Files.createTempDirectory(setupCADirName)
   def writeResourceToDir(
@@ -243,7 +243,7 @@ class CertChainOutput(
     certFilename: String,
     keyFilename: String,
     rootCertOnlyFilename: String,
-    setupCADirPath: String
+    setupCADirPath: String,
 ) {
   val validChainFile = new File(setupCADirPath, validChainFilename)
   val validChainPath = validChainFile.getAbsolutePath

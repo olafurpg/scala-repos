@@ -162,7 +162,7 @@ class KafkaServer(val config: KafkaConfig,
       "BrokerState",
       new Gauge[Int] {
         def value = brokerState.currentState
-      }
+      },
   )
 
   newGauge(
@@ -171,7 +171,7 @@ class KafkaServer(val config: KafkaConfig,
         def value = {
           com.yammer.metrics.Metrics.defaultRegistry().allMetrics().size()
         }
-      }
+      },
   )
 
   /**
@@ -398,7 +398,7 @@ class KafkaServer(val config: KafkaConfig,
             ChannelBuilders.create(config.interBrokerSecurityProtocol,
                                    Mode.CLIENT,
                                    LoginType.SERVER,
-                                   config.values)
+                                   config.values),
         )
         new NetworkClient(selector,
                           metadataUpdater,

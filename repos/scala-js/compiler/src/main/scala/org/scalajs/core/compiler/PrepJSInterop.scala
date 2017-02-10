@@ -350,7 +350,7 @@ abstract class PrepJSInterop
           val newTree = atPos(tree.pos) {
             Apply(
                 Select(super.transform(trg), newTermName("applyDynamic")),
-                List(Literal(Constant("x")))
+                List(Literal(Constant("x"))),
             )
           }
           typer.typed(newTree, Mode.FUNmode, tree.tpe)
@@ -361,7 +361,7 @@ abstract class PrepJSInterop
           val newTree = atPos(tree.pos) {
             Apply(
                 Select(super.transform(trg), newTermName("selectDynamic")),
-                List(Literal(Constant("x")))
+                List(Literal(Constant("x"))),
             )
           }
           typer.typed(newTree, Mode.FUNmode, tree.tpe)

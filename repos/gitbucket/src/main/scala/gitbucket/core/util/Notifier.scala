@@ -84,7 +84,7 @@ class Mailer(private val smtp: Smtp) extends Notifier {
                     enableWikiLink = false,
                     enableRefsLink = true,
                     enableAnchor = false,
-                    enableLineBreaks = false
+                    enableLineBreaks = false,
                 ))) {
           case (subject, msg) =>
             recipients(issue) { to =>

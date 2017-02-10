@@ -65,7 +65,7 @@ class ZKStore(
     val zk = zkEntity(entity)
     val version = zk.version.getOrElse(
         throw new StoreCommandFailedException(
-            s"Can not store entity $entity, since there is no version!")
+            s"Can not store entity $entity, since there is no version!"),
     )
     zk.node
       .setData(zk.data.toProto(compressionConf).toByteArray, version)

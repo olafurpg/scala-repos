@@ -490,7 +490,7 @@ class SchedulerActions(appRepository: AppRepository,
         for (unknownAppId <- tasksByApp.allAppIdsWithTasks -- appIds) {
           log.warn(
               s"App $unknownAppId exists in TaskTracker, but not App store. " +
-              "The app was likely terminated. Will now expunge."
+              "The app was likely terminated. Will now expunge.",
           )
           for (orphanTask <- tasksByApp.marathonAppTasks(unknownAppId)) {
             log.info(s"Killing task ${orphanTask.getId}")

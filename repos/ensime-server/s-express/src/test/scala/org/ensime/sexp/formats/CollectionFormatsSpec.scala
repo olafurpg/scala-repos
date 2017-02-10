@@ -141,8 +141,8 @@ class CollectionFormatsSpec
             SexpSymbol(":end"),
             SexpNumber(100),
             SexpSymbol(":step"),
-            SexpNumber(1)
-        )
+            SexpNumber(1),
+        ),
     )
 
     assertFormat(
@@ -153,8 +153,8 @@ class CollectionFormatsSpec
             SexpSymbol(":end"),
             SexpNumber(100),
             SexpSymbol(":step"),
-            SexpNumber(2)
-        )
+            SexpNumber(2),
+        ),
     )
   }
 
@@ -167,8 +167,8 @@ class CollectionFormatsSpec
             SexpSymbol(":start") -> SexpNumber(-100),
             SexpSymbol(":end") -> SexpNumber(100),
             SexpSymbol(":step") -> SexpNumber(1.5),
-            SexpSymbol(":inclusive") -> SexpSymbol("t")
-        )
+            SexpSymbol(":inclusive") -> SexpSymbol("t"),
+        ),
     )
 
     assertFormat(
@@ -177,8 +177,8 @@ class CollectionFormatsSpec
             SexpSymbol(":start") -> SexpNumber(-100),
             SexpSymbol(":end") -> SexpNumber(100),
             SexpSymbol(":step") -> SexpNumber(1.5),
-            SexpSymbol(":inclusive") -> SexpNil
-        )
+            SexpSymbol(":inclusive") -> SexpNil,
+        ),
     )
   }
 }

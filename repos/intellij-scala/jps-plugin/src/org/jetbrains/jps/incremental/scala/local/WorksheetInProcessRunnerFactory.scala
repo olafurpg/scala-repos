@@ -129,7 +129,7 @@ class WorksheetInProcessRunnerFactory {
               cleanStackTrace(
                   e,
                   arguments.compilationData.sources.headOption.orNull.getName,
-                  className + "$" + className
+                  className + "$" + className,
               ).printStackTrace(new PrintStream(myOut, false))
             case e: Exception =>
               client trace e

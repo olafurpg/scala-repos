@@ -64,7 +64,7 @@ class EnsembleCubicCurve extends EnsembleExample {
           stroke = Color.DarkOrange
           fill = Color.White
           strokeWidth = 5d
-        }
+        },
     )
   }
 }

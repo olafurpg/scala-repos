@@ -87,7 +87,7 @@ trait Reshape { self: Reifier =>
       tree.attachments.get[analyzer.MacroExpansionAttachment] match {
         case Some(analyzer.MacroExpansionAttachment(original, _)) =>
           def mkImplicitly(tp: Type) = atPos(tree.pos)(
-              gen.mkNullaryCall(Predef_implicitly, List(tp))
+              gen.mkNullaryCall(Predef_implicitly, List(tp)),
           )
           val sym = original.symbol
           original match {

@@ -31,7 +31,7 @@ object OutOfRetriesException extends Exception
 case class ReadMessage(
     bytes: Buf,
     ack: Offer[Unit],
-    abort: Offer[Unit] = Offer.const(Unit)
+    abort: Offer[Unit] = Offer.const(Unit),
 )
 
 /**
@@ -104,7 +104,7 @@ abstract class ReadHandle {
           },
           closeReq.recv { _ =>
             loop(nwait, true)
-          }
+          },
       )
     }
 
@@ -128,7 +128,7 @@ object ReadHandle {
   def apply(
       _messages: Offer[ReadMessage],
       _error: Offer[Throwable],
-      closeOf: Offer[Unit]
+      closeOf: Offer[Unit],
   ): ReadHandle = new ReadHandle {
     val messages = _messages
     val error = _error
@@ -141,7 +141,7 @@ object ReadHandle {
   def fromOffers(
       messages: Offer[ReadMessage],
       error: Offer[Throwable],
-      closeOf: Offer[Unit]
+      closeOf: Offer[Unit],
   ): ReadHandle = ReadHandle(messages, error, closeOf)
 
   /**
@@ -262,7 +262,7 @@ trait Client {
   def readReliably(
       queueName: String,
       timer: Timer,
-      retryBackoffs: => Stream[Duration]
+      retryBackoffs: => Stream[Duration],
   ): ReadHandle = {
     val error = new Broker[Throwable]
     val messages = new Broker[ReadMessage]
@@ -289,7 +289,7 @@ trait Client {
                 case _ =>
                   error ! OutOfRetriesException
               }
-            }
+            },
         )
         .sync()
     }
@@ -396,7 +396,7 @@ abstract protected[kestrel] class ClientBase[
                           },
                           abort.recv { id =>
                             recv(service, abortCommand(id))
-                          }
+                          },
                       )
                       .sync()
                   case Return(None) =>
@@ -415,7 +415,7 @@ abstract protected[kestrel] class ClientBase[
               case Throw(t) =>
                 service.close()
                 error ! t
-            }
+            },
         )
         .sync()
     }
@@ -437,7 +437,7 @@ abstract protected[kestrel] class ClientBase[
   private[this] def write(
       queueName: String,
       offer: Offer[Buf],
-      closed: Promise[Throwable]
+      closed: Promise[Throwable],
   ) {
     offer.sync().foreach { item =>
       set(queueName, item).unit respond {

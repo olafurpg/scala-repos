@@ -17,7 +17,7 @@ object DiscoveryInfo {
 
   def fromProto(proto: Protos.DiscoveryInfo): DiscoveryInfo = {
     DiscoveryInfo(
-        proto.getPortsList.asScala.map(Port.fromProto).toList
+        proto.getPortsList.asScala.map(Port.fromProto).toList,
     )
   }
 
@@ -41,7 +41,7 @@ object DiscoveryInfo {
       Port(
           number = proto.getNumber,
           name = proto.getName,
-          protocol = proto.getProtocol
+          protocol = proto.getProtocol,
       )
     }
   }

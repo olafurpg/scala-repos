@@ -24,6 +24,6 @@ object B extends Build {
       unmanagedJars in Compile <++= scalaInstance map (_.allJars.toSeq),
       publishArtifact in packageSrc := false,
       publishArtifact in packageDoc := false,
-      publishMavenStyle := false
+      publishMavenStyle := false,
   )
 }

@@ -41,7 +41,7 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
             gen = new File(getProject.getBasePath + "/gen"),
             libs = new File(getProject.getBasePath + "/libs"),
             isLibrary = true,
-            proguardConfig = proguardConfig
+            proguardConfig = proguardConfig,
         )
       }
     }.build.toDataNode

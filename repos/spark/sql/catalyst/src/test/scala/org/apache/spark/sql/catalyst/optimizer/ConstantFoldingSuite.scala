@@ -60,7 +60,7 @@ class ConstantFoldingSuite extends PlanTest {
       .where(Literal(1) === Literal(1) && Literal(2) > Literal(3) ||
           Literal(3) > Literal(2))
       .groupBy(
-          Literal(2) * Literal(3) - Literal(6) / (Literal(4) - Literal(2))
+          Literal(2) * Literal(3) - Literal(6) / (Literal(4) - Literal(2)),
       )(Literal(9) / Literal(3) as Symbol("9/3"))
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -176,7 +176,7 @@ class ConstantFoldingSuite extends PlanTest {
           Substring("abc", Literal.create(null, IntegerType), 1) as 'c17,
           Substring("abc", 0, Literal.create(null, IntegerType)) as 'c18,
           Contains(Literal.create(null, StringType), "abc") as 'c19,
-          Contains("abc", Literal.create(null, StringType)) as 'c20
+          Contains("abc", Literal.create(null, StringType)) as 'c20,
       )
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -202,7 +202,7 @@ class ConstantFoldingSuite extends PlanTest {
           Literal.create(null, StringType) as 'c17,
           Literal.create(null, StringType) as 'c18,
           Literal.create(null, BooleanType) as 'c19,
-          Literal.create(null, BooleanType) as 'c20
+          Literal.create(null, BooleanType) as 'c20,
       )
       .analyze
 

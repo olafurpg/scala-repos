@@ -1053,6 +1053,6 @@ object LogisticRegressionSuite {
         "fitIntercept" -> true,
         "tol" -> 0.8,
         "standardization" -> false,
-        "threshold" -> 0.6
+        "threshold" -> 0.6,
     )
 }

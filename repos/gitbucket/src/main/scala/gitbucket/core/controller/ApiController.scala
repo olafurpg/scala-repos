@@ -69,7 +69,7 @@ trait ApiControllerBase extends ControllerBase {
         } else {
           ApiError(
               "A repository with this name already exists on this account",
-              Some("https://developer.github.com/v3/repos/#create")
+              Some("https://developer.github.com/v3/repos/#create"),
           )
         }
       }
@@ -99,7 +99,7 @@ trait ApiControllerBase extends ControllerBase {
         } else {
           ApiError(
               "A repository with this name already exists for this group",
-              Some("https://developer.github.com/v3/repos/#create")
+              Some("https://developer.github.com/v3/repos/#create"),
           )
         }
       }
@@ -229,7 +229,7 @@ trait ApiControllerBase extends ControllerBase {
           // TODO ApiError should support errors field to enhance compatibility of GitHub API
           UnprocessableEntity(ApiError(
                   "Validation Failed",
-                  Some("https://developer.github.com/v3/issues/labels/#create-a-label")
+                  Some("https://developer.github.com/v3/issues/labels/#create-a-label"),
               ))
         }
       }

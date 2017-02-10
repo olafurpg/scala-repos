@@ -412,7 +412,7 @@ trait ContextErrors { self: Analyzer =>
           withAddendum(qual.pos)(
               if (name == nme.CONSTRUCTOR)
                 s"$target does not have a constructor"
-              else s"$nameString is not a member of $targetStr$addendum"
+              else s"$nameString is not a member of $targetStr$addendum",
           )
         }
         issueNormalTypeError(sel, errMsg)
@@ -866,7 +866,7 @@ trait ContextErrors { self: Analyzer =>
             else None,
             if (isBug)
               Some("Note: this may be due to a bug in the compiler involving wildcards in package objects")
-            else None
+            else None,
         )
         val addendum = addendums.flatten match {
           case Nil => ""

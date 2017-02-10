@@ -44,7 +44,7 @@ class HandshakeTest
             {
             clientNegotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     val server = Handshake.server(
@@ -55,7 +55,7 @@ class HandshakeTest
             {
             serverNegotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     // ensure negotiation is complete
@@ -85,7 +85,7 @@ class HandshakeTest
         negotiate = (_, trans) =>
             {
             trans.map(enc, dec)
-        }
+        },
     )
 
     assert(client.localAddress == local)
@@ -99,7 +99,7 @@ class HandshakeTest
         negotiate = (_, trans) =>
             {
             trans.map(enc, dec)
-        }
+        },
     )
 
     assert(server.localAddress == local)
@@ -117,7 +117,7 @@ class HandshakeTest
             {
             throw clientExc
             trans.map(enc, dec)
-        }
+        },
     )
 
     val serverExc = new Exception("boom!")
@@ -129,7 +129,7 @@ class HandshakeTest
             {
             throw serverExc
             trans.map(enc, dec)
-        }
+        },
     )
 
     assert(intercept[Exception] {
@@ -159,7 +159,7 @@ class HandshakeTest
             {
             negotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     val f = client.write(Message.Tping(2))
@@ -184,7 +184,7 @@ class HandshakeTest
             {
             negotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     val f = client.write(Message.Tping(2))
@@ -218,7 +218,7 @@ class HandshakeTest
             {
             negotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     val f = client.write(Message.Tping(2))
@@ -248,7 +248,7 @@ class HandshakeTest
             {
             negotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     clientToServer.offer(enc(Message.Tinit(1, version, Seq.empty)))
@@ -274,7 +274,7 @@ class HandshakeTest
             {
             clientNegotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     val server = Handshake.server(
@@ -285,7 +285,7 @@ class HandshakeTest
             {
             serverNegotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     val f0 = intercept[Failure] {
@@ -320,7 +320,7 @@ class HandshakeTest
             {
             negotiated = true
             trans.map(enc, dec)
-        }
+        },
     )
 
     clientToServer.offer(enc(Message.Tping(1)))

@@ -54,7 +54,7 @@ class StressTest {
 
   def makechef = new Chef(
       VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-      VersionedSegmentFormat(Map(1 -> V1SegmentFormat))
+      VersionedSegmentFormat(Map(1 -> V1SegmentFormat)),
   )
 
   val chefs = (1 to 4).map { _ =>

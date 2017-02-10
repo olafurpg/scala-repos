@@ -46,7 +46,7 @@ package httpfilters {
 
   class Filters @Inject()(
       gzip: GzipFilter,
-      log: LoggingFilter
+      log: LoggingFilter,
   )
       extends HttpFilters {
 

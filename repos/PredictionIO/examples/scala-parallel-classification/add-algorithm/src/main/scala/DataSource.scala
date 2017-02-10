@@ -40,7 +40,7 @@ class DataSource(val dsp: DataSourceParams)
                          Vectors.dense(Array(
                                  properties.get[Double]("attr0"),
                                  properties.get[Double]("attr1"),
-                                 properties.get[Double]("attr2")
+                                 properties.get[Double]("attr2"),
                              )))
           } catch {
             case e: Exception => {
@@ -56,6 +56,6 @@ class DataSource(val dsp: DataSourceParams)
 }
 
 class TrainingData(
-    val labeledPoints: RDD[LabeledPoint]
+    val labeledPoints: RDD[LabeledPoint],
 )
     extends Serializable

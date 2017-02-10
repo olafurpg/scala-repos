@@ -19,5 +19,5 @@ trait GroupMemberComponent { self: Profile =>
 case class GroupMember(
     groupName: String,
     userName: String,
-    isManager: Boolean
+    isManager: Boolean,
 )

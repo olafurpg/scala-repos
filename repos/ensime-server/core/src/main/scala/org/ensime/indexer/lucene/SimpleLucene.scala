@@ -59,7 +59,7 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
   }
   private val analyzer = new PerFieldAnalyzerWrapper(
       new LowercaseAnalyzer,
-      analyzers.asJava
+      analyzers.asJava,
   )
   private val config = new IndexWriterConfig(LuceneVersion, analyzer)
   //  config.setRAMBufferSizeMB(512)

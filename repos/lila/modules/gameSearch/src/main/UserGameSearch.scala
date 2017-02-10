@@ -13,8 +13,8 @@ final class UserGameSearch(
                       _ => SearchData(SearchPlayer(a = user.id.some)),
                       data =>
                         data.copy(
-                            players = data.players.copy(a = user.id.some)
-                      )
+                            players = data.players.copy(a = user.id.some),
+                      ),
                   )
                   .query,
               page = page)

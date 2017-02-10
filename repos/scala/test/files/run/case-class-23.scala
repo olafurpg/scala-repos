@@ -21,7 +21,7 @@ case class TwentyThree(
     _20: Int,
     _21: Int,
     _22: Int,
-    _23: Int
+    _23: Int,
 )
 
 object Test extends App {

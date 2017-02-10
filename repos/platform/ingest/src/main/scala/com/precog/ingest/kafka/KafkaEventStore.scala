@@ -128,7 +128,7 @@ class LocalKafkaEventStore(
     val toSend = event.fold(
         ingest => encodeAll(List(event), Vector.empty),
         archive => right(List(codec.toMessage(archive))),
-        storeFile => encodeAll(List(event), Vector.empty)
+        storeFile => encodeAll(List(event), Vector.empty),
     )
 
     toSend traverse { kafkaMessages =>

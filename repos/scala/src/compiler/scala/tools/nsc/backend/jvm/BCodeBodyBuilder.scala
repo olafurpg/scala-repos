@@ -260,7 +260,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         coercionTo(code)
       } else
         abort(
-            s"Primitive operation not handled yet: ${sym.fullName}(${fun.symbol.simpleName}) at: ${tree.pos}"
+            s"Primitive operation not handled yet: ${sym.fullName}(${fun.symbol.simpleName}) at: ${tree.pos}",
         )
     }
 
@@ -512,7 +512,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
               asm.Opcodes.GETSTATIC,
               ownerName,
               fieldName,
-              fieldDesc
+              fieldDesc,
           )
 
         case _ => abort(s"Unknown constant value: $const")
@@ -1173,7 +1173,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
               asm.Opcodes.PUTSTATIC,
               thisName,
               strMODULE_INSTANCE_FIELD,
-              "L" + thisName + ";"
+              "L" + thisName + ";",
           )
         }
       }

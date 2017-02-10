@@ -116,7 +116,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         immutable.Map(
             topicAndPartition -> OffsetAndMetadata(
                 offset = 100L,
-                metadata = "some metadata"
+                metadata = "some metadata",
             )))
     val commitResponse1 = simpleConsumer.commitOffsets(commitRequest1)
 
@@ -168,7 +168,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                 offset = 43L, metadata = "metadata two"),
             TopicAndPartition(topic3, 0) -> OffsetAndMetadata(
                 offset = 44L, metadata = "metadata three"),
-            TopicAndPartition(topic2, 1) -> OffsetAndMetadata(offset = 45L)
+            TopicAndPartition(topic2, 1) -> OffsetAndMetadata(offset = 45L),
         ))
     val commitResponse = simpleConsumer.commitOffsets(commitRequest)
     assertEquals(
@@ -308,7 +308,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
             topicAndPartition -> OffsetAndMetadata(
                 offset = 42L,
                 metadata = random.nextString(
-                      server.config.offsetMetadataMaxSize)
+                      server.config.offsetMetadataMaxSize),
             )))
     val commitResponse = simpleConsumer.commitOffsets(commitRequest)
 
@@ -321,7 +321,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
             topicAndPartition -> OffsetAndMetadata(
                 offset = 42L,
                 metadata = random.nextString(
-                      server.config.offsetMetadataMaxSize + 1)
+                      server.config.offsetMetadataMaxSize + 1),
             )))
     val commitResponse1 = simpleConsumer.commitOffsets(commitRequest1)
 
@@ -345,7 +345,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         groupId = group,
         requestInfo = immutable.Map(
               topicPartition -> OffsetAndMetadata(1L, "metadata")),
-        versionId = 0
+        versionId = 0,
     )
     assertEquals(Errors.NONE.code,
                  simpleConsumer
@@ -378,7 +378,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         groupId = group,
         requestInfo = immutable.Map(
               topicPartition -> OffsetAndMetadata(2L, "metadata", -1L)),
-        versionId = 1
+        versionId = 1,
     )
     assertEquals(Errors.NONE.code,
                  simpleConsumer
@@ -404,7 +404,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                                                   "metadata",
                                                   SystemTime.milliseconds -
                                                   2 * 24 * 60 * 60 * 1000L)),
-        versionId = 1
+        versionId = 1,
     )
     assertEquals(Errors.NONE.code,
                  simpleConsumer
@@ -428,7 +428,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         requestInfo = immutable.Map(
               topicPartition -> OffsetAndMetadata(4L, "metadata", -1L)),
         versionId = 2,
-        retentionMs = 1000 * 60 * 60L
+        retentionMs = 1000 * 60 * 60L,
     )
     assertEquals(Errors.NONE.code,
                  simpleConsumer
@@ -453,7 +453,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
               TopicAndPartition(topic, 0) -> OffsetAndMetadata(
                   5L, "metadata", -1L)),
         versionId = 2,
-        retentionMs = 0L
+        retentionMs = 0L,
     )
     assertEquals(Errors.NONE.code,
                  simpleConsumer
@@ -484,7 +484,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         group,
         immutable.Map(
             TopicAndPartition(topic1, 0) -> OffsetAndMetadata(offset = 42L),
-            TopicAndPartition(topic2, 0) -> OffsetAndMetadata(offset = 42L)
+            TopicAndPartition(topic2, 0) -> OffsetAndMetadata(offset = 42L),
         ))
     val commitResponse = simpleConsumer.commitOffsets(commitRequest)
 

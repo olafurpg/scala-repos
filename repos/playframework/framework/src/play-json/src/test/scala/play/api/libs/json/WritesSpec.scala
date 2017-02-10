@@ -23,7 +23,7 @@ object WritesSpec extends org.specs2.mutable.Specification {
       Writes.LocalDateTimeNumberWrites
         .writes(LocalDateTime.ofInstant(
                 Instant.ofEpochMilli(1234567890L),
-                ZoneOffset.UTC
+                ZoneOffset.UTC,
             ))
         .aka("written date") must_== JsNumber(BigDecimal valueOf 1234567890L)
     }
@@ -71,7 +71,7 @@ object WritesSpec extends org.specs2.mutable.Specification {
       Writes.ZonedDateTimeNumberWrites
         .writes(ZonedDateTime.ofInstant(
                 Instant.ofEpochMilli(1234567890L),
-                ZoneOffset.UTC
+                ZoneOffset.UTC,
             ))
         .aka("written date") must_== JsNumber(BigDecimal valueOf 1234567890L)
     }

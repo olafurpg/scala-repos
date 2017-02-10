@@ -50,7 +50,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
     */
   def implicitTree(reqType: Tree, baseType: Tree) = TypeApply(
       ImplicitlyTree,
-      List(AppliedTypeTree(baseType, List(reqType)))
+      List(AppliedTypeTree(baseType, List(reqType))),
   )
 
   //Some commonly used trees that are created on demand
@@ -97,7 +97,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
             AppliedTypeTree(
                 Select(Select(Ident(termNames.ROOTPKG), TermName("scala")),
                        TypeName("Tuple" + resultTypes.size)),
-                resultTypeTrees.toList
+                resultTypeTrees.toList,
             ),
             GetResultTypeTree)
       case n =>
@@ -116,7 +116,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
         Apply(
             TypeApply(
                 Select(GetResultTree, TermName("apply")),
-                List(rtypeTree)
+                List(rtypeTree),
             ),
             List(
                 Function(
@@ -142,12 +142,12 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                                       Apply(<<,
                                             List(Ident(TermName("gr" + i)))))),
                               Apply(Select(prev, TermName("$colon$colon")),
-                                    List(Ident(TermName("pv" + i))))
+                                    List(Ident(TermName("pv" + i)))),
                           )
-                        }
-                    )
-                )
-            )
+                        },
+                    ),
+                ),
+            ),
         )
     }
   }
@@ -198,9 +198,9 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                     Select(
                         implicitTree(TypeTree(param.actualType),
                                      SetParameterTypeTree),
-                        TermName("applied")
+                        TermName("applied"),
                     ),
-                    List(param.tree)
+                    List(param.tree),
                 )
               }
             }
@@ -221,7 +221,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                           ValDef(Modifiers(Flag.PARAM),
                                  TermName("pp"),
                                  TypeTree(),
-                                 EmptyTree)
+                                 EmptyTree),
                       ),
                       Block(
                           remaining.toList map
@@ -229,12 +229,12 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                                 Apply(
                                     Select(sp.tree, TermName("apply")),
                                     List(Ident(TermName("u")),
-                                         Ident(TermName("pp")))
+                                         Ident(TermName("pp"))),
                               )),
-                          Literal(Constant(()))
-                      )
-                  )
-              )
+                          Literal(Constant(())),
+                      ),
+                  ),
+              ),
           )
       (fuse(queryString.result()), pconv)
     }

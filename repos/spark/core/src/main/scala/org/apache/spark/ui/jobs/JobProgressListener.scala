@@ -111,7 +111,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
         "activeStages" -> activeStages.size,
         "activeJobs" -> activeJobs.size,
         "poolToActiveStages" -> poolToActiveStages.values.map(_.size).sum,
-        "stageIdToActiveJobIds" -> stageIdToActiveJobIds.values.map(_.size).sum
+        "stageIdToActiveJobIds" -> stageIdToActiveJobIds.values.map(_.size).sum,
     )
   }
 
@@ -123,7 +123,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
         "failedJobs" -> failedJobs.size,
         "completedStages" -> completedStages.size,
         "skippedStages" -> skippedStages.size,
-        "failedStages" -> failedStages.size
+        "failedStages" -> failedStages.size,
     )
   }
 
@@ -136,7 +136,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
         "stageIdToStageInfo" -> stageIdToInfo.size,
         "jobGroupToJobIds" -> jobGroupToJobIds.values.map(_.size).sum,
         // Since jobGroupToJobIds is map of sets, check that we don't leak keys with empty values:
-        "jobGroupToJobIds keySet" -> jobGroupToJobIds.keys.size
+        "jobGroupToJobIds keySet" -> jobGroupToJobIds.keys.size,
     )
   }
 

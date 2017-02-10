@@ -110,7 +110,7 @@ private[ui] object BatchUIData {
         batchInfo.submissionTime,
         batchInfo.processingStartTime,
         batchInfo.processingEndTime,
-        outputOperations
+        outputOperations,
     )
   }
 }
@@ -134,7 +134,7 @@ private[ui] object OutputOperationUIData {
         outputOperationInfo.description,
         outputOperationInfo.startTime,
         outputOperationInfo.endTime,
-        outputOperationInfo.failureReason
+        outputOperationInfo.failureReason,
     )
   }
 }

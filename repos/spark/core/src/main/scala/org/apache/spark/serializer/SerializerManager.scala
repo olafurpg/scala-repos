@@ -39,7 +39,7 @@ private[spark] class SerializerManager(
         ClassTag.Int,
         ClassTag.Long,
         ClassTag.Null,
-        ClassTag.Short
+        ClassTag.Short,
     )
     val arrayClassTags = primitiveClassTags.map(_.wrap)
     primitiveClassTags ++ arrayClassTags

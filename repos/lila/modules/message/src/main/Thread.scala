@@ -50,7 +50,7 @@ case class Thread(id: String,
   def nonEmptyName = (name.trim.some filter (_.nonEmpty)) | "No subject"
 
   def deleteFor(user: User) = copy(
-      visibleByUserIds = visibleByUserIds filter (user.id !=)
+      visibleByUserIds = visibleByUserIds filter (user.id !=),
   )
 
   def hasPostsWrittenBy(userId: String) =
@@ -74,7 +74,7 @@ object Thread {
            posts = List(
                  Post.make(
                      text = text,
-                     isByCreator = true
+                     isByCreator = true,
                  )),
            creatorId = creatorId,
            invitedId = invitedId,
@@ -90,7 +90,7 @@ object Thread {
           (__.json update (readDate('createdAt) andThen readDate('updatedAt))) andThen Json
             .reads[Thread],
           Json.writes[Thread] andThen
-          (__.json update (writeDate('createdAt) andThen writeDate('updatedAt)))
+          (__.json update (writeDate('createdAt) andThen writeDate('updatedAt))),
       )
     }
 }

@@ -1482,7 +1482,7 @@ private[http] class XmlOrJsCmd(
         (commands, catchHandler) =>
           JsCmds.Run(
               "try{" + commands.toJsCmd + "}catch(e){" + catchHandler.toJsCmd +
-              "}"
+              "}",
           )
       }
 

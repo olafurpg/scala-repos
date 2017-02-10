@@ -40,7 +40,7 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
               Row(3, 3.0),
               Row(5, 1.0),
               Row(6, 6.0),
-              Row(null, null)
+              Row(null, null),
           )),
       new StructType().add("a", IntegerType).add("b", DoubleType))
 
@@ -56,7 +56,7 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
               Row(4, 1.0),
               Row(5, 3.0),
               Row(7, 7.0),
-              Row(null, null)
+              Row(null, null),
           )),
       new StructType().add("c", IntegerType).add("d", DoubleType))
 
@@ -196,8 +196,8 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
           (2, 1.0, 2, 3.0),
           (3, 3.0, null, null),
           (5, 1.0, 5, 3.0),
-          (6, 6.0, null, null)
-      )
+          (6, 6.0, null, null),
+      ),
   )
 
   testOuterJoin(
@@ -218,8 +218,8 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
           (null, null, 3, 2.0),
           (null, null, 4, 1.0),
           (5, 1.0, 5, 3.0),
-          (null, null, 7, 7.0)
-      )
+          (null, null, 7, 7.0),
+      ),
   )
 
   testOuterJoin(
@@ -245,8 +245,8 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
           (null, null, 4, 1.0),
           (null, null, 7, 7.0),
           (null, null, null, null),
-          (null, null, null, null)
-      )
+          (null, null, null, null),
+      ),
   )
 
   // --- Both inputs empty ------------------------------------------------------------------------
@@ -257,7 +257,7 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
       right.filter("false"),
       LeftOuter,
       condition,
-      Seq.empty
+      Seq.empty,
   )
 
   testOuterJoin(
@@ -266,7 +266,7 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
       right.filter("false"),
       RightOuter,
       condition,
-      Seq.empty
+      Seq.empty,
   )
 
   testOuterJoin(
@@ -275,6 +275,6 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
       right.filter("false"),
       FullOuter,
       condition,
-      Seq.empty
+      Seq.empty,
   )
 }

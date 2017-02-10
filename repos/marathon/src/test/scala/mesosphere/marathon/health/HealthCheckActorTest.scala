@@ -25,7 +25,7 @@ class HealthCheckActorTest
   override lazy implicit val system: ActorSystem = ActorSystem(
       name = "system",
       defaultExecutionContext = Some(
-            CallerThreadExecutionContext.callerThreadExecutionContext)
+            CallerThreadExecutionContext.callerThreadExecutionContext),
   )
 
   // regression test for #934
@@ -59,8 +59,8 @@ class HealthCheckActorTest
                 latch.countDown()
                 new TestActors.EchoActor
               }
-            }
-        )
+            },
+        ),
     )
 
     actor.underlyingActor.dispatchJobs()
@@ -96,8 +96,8 @@ class HealthCheckActorTest
                                  scheduler,
                                  healthCheck,
                                  tracker,
-                                 system.eventStream)
-        )
+                                 system.eventStream),
+        ),
     )
 
     actor.underlyingActor.checkConsecutiveFailures(

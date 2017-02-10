@@ -20,7 +20,7 @@ import scala.reflect.ClassTag
   * Json serializer: write an implicit to define a serializer for any type
   */
 @implicitNotFound(
-    "No Json serializer found for type ${A}. Try to implement an implicit Writes or Format for this type."
+    "No Json serializer found for type ${A}. Try to implement an implicit Writes or Format for this type.",
 )
 trait Writes[-A] {
 
@@ -45,7 +45,7 @@ trait Writes[-A] {
 }
 
 @implicitNotFound(
-    "No Json serializer as JsObject found for type ${A}. Try to implement an implicit OWrites or OFormat for this type."
+    "No Json serializer as JsObject found for type ${A}. Try to implement an implicit OWrites or OFormat for this type.",
 )
 trait OWrites[-A] extends Writes[A] {
   def writes(o: A): JsObject

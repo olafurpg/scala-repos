@@ -70,7 +70,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     List(
         sstring("", theRest),
         sstring("\nAdditional debug settings:", debugs),
-        sstring("\nDeprecated settings:", deprecateds)
+        sstring("\nDeprecated settings:", deprecateds),
     ).flatten mkString "\n"
   }
 
@@ -81,7 +81,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       List(
           Some(shortUsage),
           Some(explainAdvanced) filter (_ => shouldExplain),
-          Some(label + " options include:")
+          Some(label + " options include:"),
       ).flatten mkString "\n"
 
     prefix + createUsageMsg(cond)

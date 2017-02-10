@@ -183,7 +183,7 @@ object StringContext {
             val ok = """[\b, \t, \n, \f, \r, \\, \", \']"""
             if (index == str.length - 1) "at terminal"
             else s"'\\${str(index + 1)}' not one of $ok at"
-          } index $index in "$str". Use \\\\ for literal \\."""
+          } index $index in "$str". Use \\\\ for literal \\.""",
       )
 
   /** Expands standard Scala escape sequences in a string.

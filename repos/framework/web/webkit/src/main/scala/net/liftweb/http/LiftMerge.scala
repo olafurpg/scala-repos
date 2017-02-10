@@ -185,7 +185,7 @@ private[http] trait LiftMerge { self: LiftSession =>
 
                 normalized.copy(
                     normalizedElement.copy(child = normalizedChildren.nodes),
-                    js = normalized.js & normalizedChildren.js
+                    js = normalized.js & normalizedChildren.js,
                 )
 
               case other =>

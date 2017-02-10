@@ -44,7 +44,7 @@ case class MongoScheduleStorageSettings(
     tasks: String = "tasks",
     deletedTasks: String = "tasks_deleted",
     reports: String = "reports",
-    timeout: Long = 10000
+    timeout: Long = 10000,
 )
 
 object MongoScheduleStorageSettings {
@@ -58,7 +58,7 @@ object MongoScheduleStorage {
         config[String]("mongo.tasks", "tasks"),
         config[String]("mongo.tasks_deleted", "tasks_deleted"),
         config[String]("mongo.reports", "reports"),
-        config[Long]("mongo.query_timeout", 10000)
+        config[Long]("mongo.query_timeout", 10000),
     )
 
     val mongo = RealMongo(config.detach("mongo"))

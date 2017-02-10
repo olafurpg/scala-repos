@@ -23,7 +23,7 @@ import scala.concurrent.duration.FiniteDuration
 class BoneCPModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-        bind[ConnectionPool].to[BoneConnectionPool]
+        bind[ConnectionPool].to[BoneConnectionPool],
     )
   }
 }

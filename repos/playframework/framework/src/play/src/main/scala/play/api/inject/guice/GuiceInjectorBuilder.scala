@@ -163,7 +163,7 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
             bind[PlayInjector].to[GuiceInjector],
             // Java API injector is bound here so that it's available in both
             // the default application loader and the Java Guice builders
-            bind[play.inject.Injector].to[play.inject.DelegateInjector]
+            bind[play.inject.Injector].to[play.inject.DelegateInjector],
         ),
         binderOptions)
     val enabledModules = modules.map(_.disable(disabled))
@@ -253,7 +253,7 @@ final class GuiceInjectorBuilder(
         overrides,
         disabled,
         binderOptions,
-        eagerly
+        eagerly,
     ) {
 
   // extra constructor for creating from Java
@@ -309,7 +309,7 @@ object GuiceableModule extends GuiceableModuleConversions {
     case unknown =>
       throw new PlayException(
           "Unknown module type",
-          s"Module [$unknown] is not a Play module or a Guice module"
+          s"Module [$unknown] is not a Play module or a Guice module",
       )
   }
 

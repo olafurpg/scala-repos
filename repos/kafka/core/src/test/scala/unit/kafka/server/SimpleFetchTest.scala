@@ -93,14 +93,14 @@ class SimpleFetchTest {
       .expect(log.read(0, fetchSize, Some(partitionHW)))
       .andReturn(new FetchDataInfo(
               new LogOffsetMetadata(0L, 0L, 0),
-              new ByteBufferMessageSet(messagesToHW)
+              new ByteBufferMessageSet(messagesToHW),
           ))
       .anyTimes()
     EasyMock
       .expect(log.read(0, fetchSize, None))
       .andReturn(new FetchDataInfo(
               new LogOffsetMetadata(0L, 0L, 0),
-              new ByteBufferMessageSet(messagesToLEO)
+              new ByteBufferMessageSet(messagesToLEO),
           ))
       .anyTimes()
     EasyMock.replay(log)

@@ -27,8 +27,8 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
             "list" -> JsArray(
                 users map { u =>
                   jsonView(u) ++ Json.obj("url" -> makeUrl(s"@/${u.username}"))
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -64,12 +64,12 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
                                       "win" -> u.count.win,
                                       "winH" -> u.count.winH,
                                       "bookmark" -> bookmarkApi.countByUser(u),
-                                      "me" -> nbGamesWithMe)
+                                      "me" -> nbGamesWithMe),
               ) ++ ctx.isAuth.??(Json.obj(
                       "followable" -> followable,
                       "following" -> relation.contains(true),
                       "blocking" -> relation.contains(false),
-                      "followsYou" -> isFollowed
+                      "followsYou" -> isFollowed,
                   ))
             }.noNull
         } map (_.some)

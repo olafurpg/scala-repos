@@ -61,7 +61,7 @@ trait PathServiceCombinators
         val metadata = AboutMetadata(
             PathPatternMetadata(prefix),
             DescriptionMetadata(
-                "The portion of the URL path following this prefix will be treated as a path in the Precog virtual filesystem.")
+                "The portion of the URL path following this prefix will be treated as a path in the Precog virtual filesystem."),
         )
       }
     }

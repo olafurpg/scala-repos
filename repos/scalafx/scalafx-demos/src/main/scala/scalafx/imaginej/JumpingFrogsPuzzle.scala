@@ -342,7 +342,7 @@ class View(position: FrogShape => Int, val frogShapes: List[FrogShape]) {
             },
                 at(2 * length * TIME s) {
               frogShape.centerX -> next(frogShapeCenterX, length * STONE_STEP)
-            }
+            },
             )).play()
     }
 

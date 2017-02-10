@@ -99,7 +99,7 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
           valueSchema,
           inputData,
           pageSize = 16 * 1024 * 1024,
-          spill
+          spill,
       )
     }
   }
@@ -218,7 +218,7 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
         schema,
         inputData,
         pageSize,
-        spill = true
+        spill = true,
     )
   }
 }

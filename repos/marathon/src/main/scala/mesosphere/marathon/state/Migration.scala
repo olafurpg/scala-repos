@@ -60,7 +60,7 @@ class Migration @Inject()(store: PersistentStore,
             throw new MigrationFailedException(
                 "while migrating storage to 0.16", e)
         }
-      }
+      },
   )
 
   def applyMigrationSteps(from: StorageVersion): Future[List[StorageVersion]] = {
@@ -77,7 +77,7 @@ class Migration @Inject()(store: PersistentStore,
           resultsFuture.flatMap { res =>
             log.info(
                 s"Migration for storage: ${from.str} to current: ${current.str}: " +
-                s"apply change for version: ${migrateVersion.str} "
+                s"apply change for version: ${migrateVersion.str} ",
             )
             change.apply().map(_ => res :+ migrateVersion)
           }
@@ -442,7 +442,7 @@ object StorageVersions {
         StorageVersions(
             major.toInt,
             minor.toInt,
-            patch.toInt
+            patch.toInt,
         )
     }
   }

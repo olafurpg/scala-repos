@@ -76,7 +76,7 @@ final class ModApi(logApi: ModlogApi,
         .fold(
           firewall unblockIps spy.ipStrings,
           (spy.ipStrings map firewall.blockIp).sequenceFu >>
-          (SecurityStore disconnect user.id)
+          (SecurityStore disconnect user.id),
       ) void
     }
   }

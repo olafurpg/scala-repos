@@ -19,7 +19,7 @@ class DateTest extends Specification {
   "date conversion" should {
     "js to bson" in {
       val doc = JsObjectWriter.write(Json.obj(
-              "ca" -> $gt($date(date))
+              "ca" -> $gt($date(date)),
           ))
       doc.getAsTry[BSONDocument]("ca") flatMap { gt =>
         gt.getAsTry[BSONDateTime]("$gt")

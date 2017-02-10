@@ -80,7 +80,7 @@ class DistributedQueryingTest {
                                   tData
                                     .flatMap(t => uData.map(u => (t, u)))
                                     .toSet,
-                                  d.toSet))
+                                  d.toSet)),
                     )),
               Duration.Inf)
         }

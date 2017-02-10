@@ -152,7 +152,7 @@ abstract class ControllerBase
                       defining(request.getQueryString) { queryString =>
                 request.getRequestURI.substring(request.getContextPath.length) +
                 (if (queryString != null) "?" + queryString else "")
-              }
+              },
                   )))
         }
       }
@@ -250,7 +250,7 @@ trait AccountManagementControllerBase extends ControllerBase {
               session.getAndRemove(Keys.Session.Upload(fileId)).get)
         FileUtils.moveFile(
             new java.io.File(getTemporaryDir(session.getId), fileId),
-            new java.io.File(getUserUploadDir(userName), filename)
+            new java.io.File(getUserUploadDir(userName), filename),
         )
         updateAvatarImage(userName, Some(filename))
       }

@@ -139,7 +139,7 @@ class SecurityHeadersFilter @Inject()(config: SecurityHeadersConfig)
         config.contentTypeOptions.map(X_CONTENT_TYPE_OPTIONS_HEADER -> _),
         config.permittedCrossDomainPolicies.map(
             X_PERMITTED_CROSS_DOMAIN_POLICIES_HEADER -> _),
-        config.contentSecurityPolicy.map(CONTENT_SECURITY_POLICY_HEADER -> _)
+        config.contentSecurityPolicy.map(CONTENT_SECURITY_POLICY_HEADER -> _),
     ).flatten
 
   /**
@@ -166,7 +166,7 @@ class SecurityHeadersConfigProvider @Inject()(configuration: Configuration)
 class SecurityHeadersModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = Seq(
       bind[SecurityHeadersConfig].toProvider[SecurityHeadersConfigProvider],
-      bind[SecurityHeadersFilter].toSelf
+      bind[SecurityHeadersFilter].toSelf,
   )
 }
 

@@ -237,7 +237,7 @@ class TableScanSuite extends DataSourceTest with SharedSQLContext {
                                            ArrayType(DateType),
                                            true) :: Nil),
                     true) :: Nil),
-            true) :: Nil
+            true) :: Nil,
     )
 
     assert(expectedSchema == caseInsensitiveContext
@@ -267,7 +267,7 @@ class TableScanSuite extends DataSourceTest with SharedSQLContext {
           | mapFieldComplex,
           | structFieldSimple,
           | structFieldComplex FROM tableWithSchema""".stripMargin),
-        tableWithSchemaExpected
+        tableWithSchemaExpected,
     )
   }
 

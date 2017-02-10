@@ -87,7 +87,7 @@ object coproduct {
       }
 
     implicit def coproductAtN[H, T <: Coproduct, N <: Nat](
-        implicit att: At[T, N]
+        implicit att: At[T, N],
     ): Aux[H :+: T, Succ[N], att.A] = new At[H :+: T, Succ[N]] {
       type A = att.A
 
@@ -129,7 +129,7 @@ object coproduct {
 
     implicit def coproductPartition_Match[
         H, T <: Coproduct, TPrefix <: Coproduct, TSuffix <: Coproduct](
-        implicit partition: Aux[T, H, TPrefix, TSuffix]
+        implicit partition: Aux[T, H, TPrefix, TSuffix],
     ): Aux[H :+: T, H, H :+: TPrefix, TSuffix] = new Partition[H :+: T, H] {
       type Prefix = H :+: TPrefix
       type Suffix = TSuffix
@@ -147,7 +147,7 @@ object coproduct {
     implicit def coproductPartition_NonMatch[
         H, T <: Coproduct, TPrefix <: Coproduct, TSuffix <: Coproduct, U](
         implicit partition: Aux[T, U, TPrefix, TSuffix],
-        e: U =:!= H
+        e: U =:!= H,
     ): Aux[H :+: T, U, TPrefix, H :+: TSuffix] = new Partition[H :+: T, U] {
       type Prefix = TPrefix
       type Suffix = H :+: TSuffix
@@ -177,7 +177,7 @@ object coproduct {
 
     implicit def coproductFilter[
         C <: Coproduct, U, CPrefix <: Coproduct, CSuffix <: Coproduct](
-        implicit partition: Partition.Aux[C, U, CPrefix, CSuffix]
+        implicit partition: Partition.Aux[C, U, CPrefix, CSuffix],
     ): Aux[C, U, CPrefix] = new Filter[C, U] {
       type A = CPrefix
 
@@ -201,7 +201,7 @@ object coproduct {
 
     implicit def coproductFilterNot[
         C <: Coproduct, U, CPrefix <: Coproduct, CSuffix <: Coproduct](
-        implicit partition: Partition.Aux[C, U, CPrefix, CSuffix]
+        implicit partition: Partition.Aux[C, U, CPrefix, CSuffix],
     ): Aux[C, U, CSuffix] = new FilterNot[C, U] {
       type A = CSuffix
 
@@ -337,7 +337,7 @@ object coproduct {
         H, T <: Coproduct, F <: Poly, OutH <: Coproduct, OutT <: Coproduct](
         implicit fh: Case1.Aux[F, H, OutH],
         ft: FlatMap.Aux[T, F, OutT],
-        extendBy: ExtendBy[OutH, OutT]
+        extendBy: ExtendBy[OutH, OutT],
     ): Aux[H :+: T, F, extendBy.Out] = new FlatMap[H :+: T, F] {
       type Out = extendBy.Out
 
@@ -685,7 +685,7 @@ object coproduct {
 
     implicit def extendBy[L <: Coproduct, R <: Coproduct, Out0 <: Coproduct](
         implicit extendLeftBy: ExtendLeftBy.Aux[L, R, Out0],
-        extendRightBy: ExtendRightBy.Aux[L, R, Out0]
+        extendRightBy: ExtendRightBy.Aux[L, R, Out0],
     ): ExtendBy.Aux[L, R, Out0] = new ExtendBy[L, R] {
       type Out = Out0
 
@@ -708,7 +708,7 @@ object coproduct {
     implicit def extendLeftByCoproduct[
         L <: Coproduct, R <: Coproduct, RevL <: Coproduct](
         implicit reverseL: Reverse.Aux[L, RevL],
-        impl: Impl[RevL, R]
+        impl: Impl[RevL, R],
     ): Aux[L, R, impl.Out] = new ExtendLeftBy[L, R] {
       type Out = impl.Out
 
@@ -731,7 +731,7 @@ object coproduct {
 
       implicit def extendLeftByCoproductImpl[
           H, T <: Coproduct, R <: Coproduct](
-          implicit extendLeftBy: Impl[T, H :+: R]
+          implicit extendLeftBy: Impl[T, H :+: R],
       ): Aux[H :+: T, R, extendLeftBy.Out] = new Impl[H :+: T, R] {
         type Out = extendLeftBy.Out
 
@@ -761,7 +761,7 @@ object coproduct {
     implicit def extendRightByCoproduct[
         L <: Coproduct, H, LH <: Coproduct, T <: Coproduct](
         implicit extendRight: ExtendRight.Aux[L, H, LH],
-        extendRightBy: ExtendRightBy[LH, T]
+        extendRightBy: ExtendRightBy[LH, T],
     ): Aux[L, H :+: T, extendRightBy.Out] = new ExtendRightBy[L, H :+: T] {
       type Out = extendRightBy.Out
 
@@ -846,7 +846,7 @@ object coproduct {
         Size <: Nat,
         NModSize <: Nat,
         Before <: Coproduct,
-        After <: Coproduct
+        After <: Coproduct,
     ](implicit length: Length.Aux[C, Size],
       mod: nat.Mod.Aux[N, Size, NModSize],
       split: Split.Aux[C, NModSize, Before, After],
@@ -895,7 +895,7 @@ object coproduct {
         N <: Nat,
         Size <: Nat,
         NModSize <: Succ[_],
-        Size_Diff_NModSize <: Nat
+        Size_Diff_NModSize <: Nat,
     ](implicit length: Length.Aux[C, Size],
       mod: nat.Mod.Aux[N, Size, NModSize],
       diff: nat.Diff.Aux[Size, NModSize, Size_Diff_NModSize],
@@ -916,7 +916,7 @@ object coproduct {
         N <: Nat,
         Size <: Nat,
         NModSize <: Nat,
-        Size_Diff_NModSize <: Nat
+        Size_Diff_NModSize <: Nat,
     ](implicit length: Length.Aux[C, Size],
       mod: nat.Mod.Aux[N, Size, NModSize],
       diff: nat.Diff.Aux[Size, NModSize, Size_Diff_NModSize],
@@ -1264,7 +1264,7 @@ object coproduct {
     implicit def initLastCoproduct[
         C <: Coproduct, ReverseC <: Coproduct, H, T <: Coproduct](
         implicit reverse: Reverse.Aux[C, ReverseC],
-        isCCons: IsCCons.Aux[ReverseC, H, T]
+        isCCons: IsCCons.Aux[ReverseC, H, T],
     ): Aux[C, T, H] = new InitLast[C] {
       type I = T
       type L = H

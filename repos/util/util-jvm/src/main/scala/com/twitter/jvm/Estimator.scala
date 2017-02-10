@@ -45,12 +45,12 @@ class Kalman(N: Int) {
 
   private[this] def mvar = variance(
       if (n < N) mbuf take n.toInt
-      else mbuf
+      else mbuf,
   )
 
   private[this] def evar = variance(
       if (n < N) ebuf take n.toInt
-      else ebuf
+      else ebuf,
   )
 
   def estimate = est

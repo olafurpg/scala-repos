@@ -170,7 +170,7 @@ object HtmlHelpersSpec
       val xml = Group(
           <boom id="thing" />
           <hello id="thing" />
-          <bye id="thing" />
+          <bye id="thing" />,
       )
 
       val uniqued = NodeSeq.seqToNodeSeq(ensureUniqueId(xml).flatten)
@@ -178,7 +178,7 @@ object HtmlHelpersSpec
       uniqued must ==/(
           <boom id="thing" />
         <hello />
-        <bye />
+        <bye />,
       )
     }
 
@@ -213,7 +213,7 @@ object HtmlHelpersSpec
       val xml = Group(
           <boom id="thing" />
           <hello id="thing" />
-          <bye id="thing" />
+          <bye id="thing" />,
       )
 
       val uniqued = NodeSeq.seqToNodeSeq(deepEnsureUniqueId(xml).flatten)
@@ -221,7 +221,7 @@ object HtmlHelpersSpec
       uniqued must ==/(
           <boom id="thing" />
         <hello />
-        <bye />
+        <bye />,
       )
     }
 
@@ -245,7 +245,7 @@ object HtmlHelpersSpec
               <other />
             </bye>
           </boom>
-        </wrapper>
+        </wrapper>,
       )
     }
   }
@@ -283,7 +283,7 @@ object HtmlHelpersSpec
       val xml = Group(
           <boom id="thing" />
           <hello id="thing" />
-          <bye id="thing" />
+          <bye id="thing" />,
       )
 
       val uniqued =
@@ -292,7 +292,7 @@ object HtmlHelpersSpec
       uniqued must ==/(
           <boom id="other-thinger" />
         <hello id="thing" />
-        <bye id="thing" />
+        <bye id="thing" />,
       )
     }
   }

@@ -59,10 +59,10 @@ object RatingFest {
                       "bullet",
                       "blitz",
                       "classical",
-                      "correspondence"
+                      "correspondence",
                   ).map { name =>
                 s"perfs.$name" -> BSONBoolean(true)
-              }
+              },
               )),
           multi = true)
       _ = log("Gathering cheater IDs")

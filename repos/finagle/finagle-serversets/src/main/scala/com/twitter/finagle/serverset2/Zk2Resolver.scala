@@ -99,7 +99,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
             ZkSession(retryStream,
                       hosts,
                       sessionTimeout = sessionTimeout,
-                      statsReceiver)
+                      statsReceiver),
       )
       new ServiceDiscoverer(varZkSession,
                             statsReceiver.scope(statsOf(hosts)),
@@ -111,7 +111,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
       statsReceiver.addGauge("session_cache_size") {
         discoverers.snap.size.toFloat
       },
-      statsReceiver.addGauge("observed_serversets") { nsets.get() }
+      statsReceiver.addGauge("observed_serversets") { nsets.get() },
   )
 
   private[this] def mkDiscoverer(hosts: String) = {

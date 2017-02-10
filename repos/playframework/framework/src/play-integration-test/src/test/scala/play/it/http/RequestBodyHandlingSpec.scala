@@ -47,7 +47,7 @@ trait RequestBodyHandlingSpec
                          Map("Content-Length" -> body.length.toString),
                          body),
             // Second request ensures that Play switches back to its normal handler
-            BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
+            BasicRequest("GET", "/", "HTTP/1.1", Map(), ""),
         )
       responses.length must_== 2
       responses(0).status must_== 200
@@ -70,7 +70,7 @@ trait RequestBodyHandlingSpec
                          Map("Content-Length" -> body.length.toString),
                          body),
             // Second request ensures that Play switches back to its normal handler
-            BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
+            BasicRequest("GET", "/", "HTTP/1.1", Map(), ""),
         )
       responses.length must_== 2
       responses(0).status must_== 200

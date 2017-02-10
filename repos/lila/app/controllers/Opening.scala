@@ -72,7 +72,7 @@ object Opening extends LilaController {
   private val attemptForm = Form(
       mapping(
           "found" -> number,
-          "failed" -> number
+          "failed" -> number,
       )(Tuple2.apply)(Tuple2.unapply))
 
   def attempt(id: OpeningModel.ID) = OpenBody { implicit ctx =>
@@ -111,7 +111,7 @@ object Opening extends LilaController {
                   }
                 case None => makeData(opening, none, false, none, win.some)
               }
-          }
+          },
       )
     }
   }

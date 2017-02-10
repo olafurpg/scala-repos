@@ -125,8 +125,8 @@ package scalaguide.forms.scalaforms {
         //#form-single-value
         val singleForm = Form(
             single(
-                "email" -> email
-            )
+                "email" -> email,
+            ),
         )
 
         val emailValue = singleForm.bind(Map("email" -> "bob@example.com")).get
@@ -198,8 +198,8 @@ package scalaguide.forms.scalaforms {
       val userForm = Form(
           mapping(
               "name" -> text,
-              "age" -> number
-          )(UserData.apply)(UserData.unapply)
+              "age" -> number,
+          )(UserData.apply)(UserData.unapply),
       )
       //#userForm-define
 
@@ -229,7 +229,7 @@ package scalaguide.forms.scalaforms {
                 val newUser = models.User(userData.name, userData.age)
                 val id = models.User.create(newUser)
                 Redirect(routes.Application.home(id))
-            }
+            },
         )
       //#userForm-handling-failure
       }
@@ -278,9 +278,9 @@ package scalaguide.forms.scalaforms {
           mapping(
               "name" -> text,
               "age" -> number,
-              "accept" -> checked("Please accept the terms and conditions")
+              "accept" -> checked("Please accept the terms and conditions"),
           )((name, age, _) => UserData(name, age))(
-              (user: UserData) => Some(user.name, user.age, false))
+              (user: UserData) => Some(user.name, user.age, false)),
       )
       //#userForm-verify
 
@@ -294,8 +294,8 @@ package scalaguide.forms.scalaforms {
       val userFormConstraints = Form(
           mapping(
               "name" -> text.verifying(nonEmpty),
-              "age" -> number.verifying(min(0), max(100))
-          )(UserData.apply)(UserData.unapply)
+              "age" -> number.verifying(min(0), max(100)),
+          )(UserData.apply)(UserData.unapply),
       )
       //#userForm-constraints
 
@@ -309,8 +309,8 @@ package scalaguide.forms.scalaforms {
       val userFormConstraints2 = Form(
           mapping(
               "name" -> nonEmptyText,
-              "age" -> number(min = 0, max = 100)
-          )(UserData.apply)(UserData.unapply)
+              "age" -> number(min = 0, max = 100),
+          )(UserData.apply)(UserData.unapply),
       )
       //#userForm-constraints-2
 
@@ -335,13 +335,13 @@ package scalaguide.forms.scalaforms {
       val userFormConstraintsAdHoc = Form(
           mapping(
               "name" -> text,
-              "age" -> number
+              "age" -> number,
           )(UserData.apply)(UserData.unapply) verifying
           ("Failed form constraints!", fields =>
                 fields match {
                   case userData =>
                     validate(userData.name, userData.age).isDefined
-              })
+              }),
       )
       //#userForm-constraints-ad-hoc
 
@@ -357,9 +357,9 @@ package scalaguide.forms.scalaforms {
               "name" -> text,
               "address" -> mapping(
                   "street" -> text,
-                  "city" -> text
-              )(AddressData.apply)(AddressData.unapply)
-          )(UserAddressData.apply)(UserAddressData.unapply)
+                  "city" -> text,
+              )(AddressData.apply)(AddressData.unapply),
+          )(UserAddressData.apply)(UserAddressData.unapply),
       )
       //#userForm-nested
 
@@ -375,8 +375,8 @@ package scalaguide.forms.scalaforms {
       val userFormRepeated = Form(
           mapping(
               "name" -> text,
-              "emails" -> list(email)
-          )(UserListData.apply)(UserListData.unapply)
+              "emails" -> list(email),
+          )(UserListData.apply)(UserListData.unapply),
       )
       //#userForm-repeated
 
@@ -393,8 +393,8 @@ package scalaguide.forms.scalaforms {
       val userFormOptional = Form(
           mapping(
               "name" -> text,
-              "email" -> optional(email)
-          )(UserOptionalData.apply)(UserOptionalData.unapply)
+              "email" -> optional(email),
+          )(UserOptionalData.apply)(UserOptionalData.unapply),
       )
       //#userForm-optional
 
@@ -412,8 +412,8 @@ package scalaguide.forms.scalaforms {
           mapping(
               "id" -> ignored(23L),
               "name" -> text,
-              "email" -> optional(email)
-          )(UserStaticData.apply)(UserStaticData.unapply)
+              "email" -> optional(email),
+          )(UserStaticData.apply)(UserStaticData.unapply),
       )
       //#userForm-static-value
 
@@ -428,7 +428,7 @@ package scalaguide.forms.scalaforms {
       val userFormTuple = Form(
           tuple(
               "name" -> text,
-              "age" -> number
+              "age" -> number,
           ) // tuples come with built-in apply/unapply
       )
       // #userForm-tuple
@@ -456,11 +456,11 @@ package scalaguide.forms.scalaforms {
                       "phones" -> list(
                           text verifying pattern(
                               """[0-9.+]+""".r,
-                              error = "A valid phone number is required")
-                      )
-                  )(ContactInformation.apply)(ContactInformation.unapply)
-              )
-          )(Contact.apply)(Contact.unapply)
+                              error = "A valid phone number is required"),
+                      ),
+                  )(ContactInformation.apply)(ContactInformation.unapply),
+              ),
+          )(Contact.apply)(Contact.unapply),
       )
       // #contact-form
 
@@ -474,19 +474,19 @@ package scalaguide.forms.scalaforms {
                   ContactInformation(
                       "Personal",
                       Some("fakecontact@gmail.com"),
-                      List("01.23.45.67.89", "98.76.54.32.10")
+                      List("01.23.45.67.89", "98.76.54.32.10"),
                   ),
                   ContactInformation(
                       "Professional",
                       Some("fakecontact@company.com"),
-                      List("01.23.45.67.89")
+                      List("01.23.45.67.89"),
                   ),
                   ContactInformation(
                       "Previous",
                       Some("fakecontact@oldcompany.com"),
-                      List()
-                  )
-              )
+                      List(),
+                  ),
+              ),
         )
         Ok(views.html.contact.form(contactForm.fill(existingContact)))
       }
@@ -504,7 +504,7 @@ package scalaguide.forms.scalaforms {
                 val contactId = Contact.save(contact)
                 Redirect(routes.Application.showContact(contactId))
                   .flashing("success" -> "Contact saved!")
-            }
+            },
         )
       }
       // #contact-save

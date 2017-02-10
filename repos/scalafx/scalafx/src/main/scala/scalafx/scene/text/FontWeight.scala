@@ -79,7 +79,7 @@ object FontWeight
       SemiBold,
       Bold,
       ExtraBold,
-      Black
+      Black,
   )
 
   /** Returns FontWeight by its name. */

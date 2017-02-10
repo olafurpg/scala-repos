@@ -112,7 +112,7 @@ object ResourceUtil {
               .setSet(MesosProtos.Value.Set
                     .newBuilder()
                     .addAllItem(resultSet.asJava))
-              .build()
+              .build(),
           )
       else None
     }

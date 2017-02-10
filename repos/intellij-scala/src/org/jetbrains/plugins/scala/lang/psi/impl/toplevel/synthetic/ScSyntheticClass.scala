@@ -388,7 +388,7 @@ object Boolean {
  	def box(x: Boolean): java.lang.Boolean = throw new Error()
  	def unbox(x: Object): Boolean = throw new Error()
 }
-"""
+""",
     )
 
     registerObject(
@@ -401,7 +401,7 @@ object Byte {
   def MinValue = java.lang.Byte.MIN_VALUE
  	def MaxValue = java.lang.Byte.MAX_VALUE
 }
-"""
+""",
     )
 
     registerObject(
@@ -414,7 +414,7 @@ object Char {
  	def MinValue = java.lang.Character.MIN_VALUE
  	def MaxValue = java.lang.Character.MAX_VALUE
 }
-"""
+""",
     )
 
     registerObject(
@@ -435,7 +435,7 @@ object Double {
  	def PositiveInfinity = java.lang.Double.POSITIVE_INFINITY
  	def NegativeInfinity = java.lang.Double.NEGATIVE_INFINITY
 }
-"""
+""",
     )
 
     registerObject(
@@ -456,7 +456,7 @@ object Float {
  	def PositiveInfinity = java.lang.Float.POSITIVE_INFINITY
  	def NegativeInfinity = java.lang.Float.NEGATIVE_INFINITY
 }
-"""
+""",
     )
 
     registerObject(
@@ -469,7 +469,7 @@ object Int {
  	def MinValue = java.lang.Integer.MIN_VALUE
  	def MaxValue = java.lang.Integer.MAX_VALUE
 }
-"""
+""",
     )
 
     registerObject(
@@ -482,7 +482,7 @@ object Long {
  	def MinValue = java.lang.Long.MIN_VALUE
  	def MaxValue = java.lang.Long.MAX_VALUE
 }
-"""
+""",
     )
 
     registerObject(
@@ -495,7 +495,7 @@ object Short {
  	def MinValue = java.lang.Short.MIN_VALUE
  	def MaxValue = java.lang.Short.MAX_VALUE
 }
-"""
+""",
     )
 
     registerObject(
@@ -503,7 +503,7 @@ object Short {
 package scala
 
 object Unit
-"""
+""",
     )
 
     classesInitialized = true

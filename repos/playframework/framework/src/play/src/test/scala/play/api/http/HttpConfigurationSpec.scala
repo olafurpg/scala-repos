@@ -29,7 +29,7 @@ object HttpConfigurationSpec extends Specification {
           "play.http.session.domain" -> "playframework.com",
           "play.http.flash.cookieName" -> "PLAY_FLASH",
           "play.http.flash.secure" -> "true",
-          "play.http.flash.httpOnly" -> "true"
+          "play.http.flash.httpOnly" -> "true",
       )
     }
 

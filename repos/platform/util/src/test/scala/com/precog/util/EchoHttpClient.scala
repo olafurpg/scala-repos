@@ -83,7 +83,7 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
       "http://options" -> (options(_)),
       "http://misbehave" -> (misbehave(_)),
       "http://empty" -> (empty(_)),
-      "http://server-error" -> (serverError(_))
+      "http://server-error" -> (serverError(_)),
   )
 
   final class HttpClient(baseUrl: String) extends HttpClientLike {

@@ -98,7 +98,7 @@ class RandomForestClassifierSuite
         LabeledPoint(0.0, Vectors.dense(1.0, 0.0, 0.0, 3.0, 1.0)),
         LabeledPoint(1.0, Vectors.dense(0.0, 1.0, 1.0, 1.0, 2.0)),
         LabeledPoint(0.0, Vectors.dense(2.0, 0.0, 0.0, 6.0, 3.0)),
-        LabeledPoint(2.0, Vectors.dense(0.0, 2.0, 1.0, 3.0, 2.0))
+        LabeledPoint(2.0, Vectors.dense(0.0, 2.0, 1.0, 3.0, 2.0)),
     )
     val rdd = sc.parallelize(arr)
     val categoricalFeatures = Map(0 -> 3, 2 -> 2, 4 -> 4)

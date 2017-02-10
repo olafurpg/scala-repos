@@ -22,7 +22,7 @@ case class WebHook(
     userName: String,
     repositoryName: String,
     url: String,
-    token: Option[String]
+    token: Option[String],
 )
 
 object WebHook {

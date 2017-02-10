@@ -115,7 +115,7 @@ object Multipart {
                   },
                           parts.collect {
                     case bad: BadPart => bad
-                  }
+                  },
                       )))
             }
         }

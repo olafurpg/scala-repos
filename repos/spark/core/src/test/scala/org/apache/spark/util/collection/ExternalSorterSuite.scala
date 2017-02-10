@@ -273,7 +273,7 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
         (1 to size).iterator.map(i => (i.toString, i.toString)) ++ Iterator(
             (null.asInstanceOf[String], "1"),
             ("1", null.asInstanceOf[String]),
-            (null.asInstanceOf[String], null.asInstanceOf[String])
+            (null.asInstanceOf[String], null.asInstanceOf[String]),
         ))
     assert(sorter.numSpills > 0, "sorter did not spill")
     val it = sorter.iterator

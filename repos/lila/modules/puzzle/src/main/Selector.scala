@@ -69,8 +69,8 @@ private[puzzle] final class Selector(puzzleColl: Coll,
               Puzzle.BSONFields.id -> BSONDocument("$nin" -> ids),
               Puzzle.BSONFields.rating -> BSONDocument(
                   "$gt" -> BSONInteger(rating - tolerance + decay),
-                  "$lt" -> BSONInteger(rating + tolerance + decay)
-              )
+                  "$lt" -> BSONInteger(rating + tolerance + decay),
+              ),
           ))
       .sort(BSONDocument(Puzzle.BSONFields.voteSum -> -1))
       .one[Puzzle] flatMap {

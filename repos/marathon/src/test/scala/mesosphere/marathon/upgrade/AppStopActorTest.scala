@@ -47,8 +47,8 @@ class AppStopActorTest
                 taskTracker,
                 system.eventStream,
                 app,
-                promise
-            ))
+                promise,
+            )),
     )
     watch(ref)
 
@@ -56,9 +56,9 @@ class AppStopActorTest
         Props(
             new HistoryActor(
                 system.eventStream,
-                taskFailureRepository
-            )
-        )
+                taskFailureRepository,
+            ),
+        ),
     )
 
     val statusUpdateEventA = MesosStatusUpdateEvent(
@@ -70,7 +70,7 @@ class AppStopActorTest
         host = "",
         ipAddresses = Nil,
         ports = Nil,
-        version = app.version.toString
+        version = app.version.toString,
     )
 
     val statusUpdateEventB = MesosStatusUpdateEvent(
@@ -82,7 +82,7 @@ class AppStopActorTest
         host = "",
         ipAddresses = Nil,
         ports = Nil,
-        version = app.version.toString
+        version = app.version.toString,
     )
 
     val Some(taskFailureA) =
@@ -123,8 +123,8 @@ class AppStopActorTest
                 taskTracker,
                 system.eventStream,
                 app,
-                promise
-            ))
+                promise,
+            )),
     )
     watch(ref)
 
@@ -149,8 +149,8 @@ class AppStopActorTest
                 taskTracker,
                 system.eventStream,
                 app,
-                promise
-            ))
+                promise,
+            )),
     )
     watch(ref)
 
@@ -181,8 +181,8 @@ class AppStopActorTest
             taskTracker,
             system.eventStream,
             app,
-            promise
-        )
+            promise,
+        ),
     )
     watch(ref)
 

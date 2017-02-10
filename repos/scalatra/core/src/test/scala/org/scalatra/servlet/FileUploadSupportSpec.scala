@@ -103,7 +103,7 @@ class FileUploadSupportMaxSizeTestServlet
   configureMultipartHandling(
       MultipartConfig(
           maxFileSize = Some(1024),
-          fileSizeThreshold = Some(1024 * 1024 * 1024)
+          fileSizeThreshold = Some(1024 * 1024 * 1024),
       ))
 
   error {
@@ -130,12 +130,12 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
         "text" -> new File(
             "core/src/test/resources/org/scalatra/servlet/lorem_ipsum.txt"),
         "binary" -> new File(
-            "core/src/test/resources/org/scalatra/servlet/smiley.png")
+            "core/src/test/resources/org/scalatra/servlet/smiley.png"),
     )
 
     val headers = Map(
         "X-Header" -> "I'm a header",
-        "X-Header2" -> "I'm another header"
+        "X-Header2" -> "I'm another header",
     )
 
     post("/upload?qsparam1=three&qsparam2=four", params, files, headers) {

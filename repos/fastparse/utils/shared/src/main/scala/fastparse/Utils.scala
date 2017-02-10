@@ -76,7 +76,7 @@ object Utils {
         'c',
         'd',
         'e',
-        'f'
+        'f',
     )
     def hex2Int(hex: String): Int = {
       var res = 0
@@ -176,7 +176,7 @@ object Utils {
                 offset + 1,
                 next,
                 if (next.word) offset
-                else currentRes
+                else currentRes,
             )
         }
       }

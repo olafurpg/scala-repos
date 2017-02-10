@@ -20,7 +20,7 @@ object A extends AutoPlugin {
   override def requires = bN
   override def trigger = allRequirements
   override def projectSettings = Seq(
-      check := {}
+      check := {},
   )
 }
 

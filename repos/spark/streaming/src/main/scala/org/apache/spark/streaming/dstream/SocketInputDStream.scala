@@ -35,7 +35,7 @@ private[streaming] class SocketInputDStream[T : ClassTag](
     host: String,
     port: Int,
     bytesToObjects: InputStream => Iterator[T],
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
 )
     extends ReceiverInputDStream[T](_ssc) {
 
@@ -48,7 +48,7 @@ private[streaming] class SocketReceiver[T : ClassTag](
     host: String,
     port: Int,
     bytesToObjects: InputStream => Iterator[T],
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
 )
     extends Receiver[T](storageLevel) with Logging {
 

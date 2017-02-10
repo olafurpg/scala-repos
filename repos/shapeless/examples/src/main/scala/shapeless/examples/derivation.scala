@@ -79,8 +79,8 @@ object TypeClassesDemo {
                     Ctor("otherGrandchild"),
                     ExtIndirectADTRec("blah", Option(Ctor("wibble"))),
                     RefMutual(Some(RefADT(Ctor("mutual")))),
-                    Show2Dep(23)
-                ))
+                    Show2Dep(23),
+                )),
         ))
 
     val out = adt.show

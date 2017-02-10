@@ -26,7 +26,7 @@ private[debugger] object BytecodeUtil {
       lstore_0 -> lload_0,
       lstore_1 -> lload_1,
       lstore_2 -> lload_2,
-      lstore_3 -> lload_3
+      lstore_3 -> lload_3,
   )
 
   val oneByteLoadCodes = oneByteCodes.values.toSet
@@ -37,7 +37,7 @@ private[debugger] object BytecodeUtil {
       astore -> aload,
       dstore -> dload,
       fstore -> fload,
-      lstore -> lload
+      lstore -> lload,
   )
 
   val twoBytesLoadCodes = twoBytesCodes.values.toSet

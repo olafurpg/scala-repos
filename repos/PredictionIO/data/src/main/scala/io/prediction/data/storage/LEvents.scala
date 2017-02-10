@@ -110,7 +110,7 @@ trait LEvents {
   def futureGet(
       eventId: String,
       appId: Int,
-      channelId: Option[Int]
+      channelId: Option[Int],
   )(implicit ec: ExecutionContext): Future[Option[Event]]
 
   /** :: DeveloperApi ::
@@ -135,7 +135,7 @@ trait LEvents {
   def futureDelete(
       eventId: String,
       appId: Int,
-      channelId: Option[Int]
+      channelId: Option[Int],
   )(implicit ec: ExecutionContext): Future[Boolean]
 
   /** :: DeveloperApi ::
@@ -175,7 +175,7 @@ trait LEvents {
       targetEntityType: Option[Option[String]] = None,
       targetEntityId: Option[Option[String]] = None,
       limit: Option[Int] = None,
-      reversed: Option[Boolean] = None
+      reversed: Option[Boolean] = None,
   )(implicit ec: ExecutionContext): Future[Iterator[Event]]
 
   /** Aggregate properties of entities based on these special events:
@@ -205,7 +205,7 @@ trait LEvents {
         startTime = startTime,
         untilTime = untilTime,
         entityType = Some(entityType),
-        eventNames = Some(LEventAggregator.eventNames)
+        eventNames = Some(LEventAggregator.eventNames),
     ).map { eventIt =>
       val dm = LEventAggregator.aggregateProperties(eventIt)
       if (required.isDefined) {
@@ -250,7 +250,7 @@ trait LEvents {
         untilTime = untilTime,
         entityType = Some(entityType),
         entityId = Some(entityId),
-        eventNames = Some(LEventAggregator.eventNames)
+        eventNames = Some(LEventAggregator.eventNames),
     ).map { eventIt =>
       LEventAggregator.aggregatePropertiesSingle(eventIt)
     }

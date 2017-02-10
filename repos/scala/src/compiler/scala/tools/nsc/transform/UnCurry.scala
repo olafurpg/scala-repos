@@ -152,7 +152,7 @@ abstract class UnCurry
         Throw(
             nonLocalReturnExceptionType(expr.tpe.widen),
             Ident(nonLocalReturnKey(meth)),
-            expr
+            expr,
         )
       }
 
@@ -283,7 +283,7 @@ abstract class UnCurry
                 _ =>
                   typedFunPos(
                       gen.mkForwarder(gen.mkAttributedRef(liftedMethod.symbol),
-                                      funParams :: Nil)
+                                      funParams :: Nil),
                 ))
             typedFunPos(Block(liftedMethod, super.transform(newFun)))
           }
@@ -449,7 +449,7 @@ abstract class UnCurry
         tree.changeOwner(currentOwner -> sym)
         localTyper.typedPos(tree.pos)(Block(
                 List(DefDef(sym, ListOfNil, tree)),
-                Apply(Ident(sym), Nil)
+                Apply(Ident(sym), Nil),
             ))
       }
 
@@ -661,7 +661,7 @@ abstract class UnCurry
                   atPos(newRhs.pos)(
                       nonLocalReturnTry(literalRhsIfConst, k, ddSym))
                 case None => literalRhsIfConst
-              }
+              },
           )
           addJavaVarargsForwarders(dd, flatdd)
 
@@ -860,7 +860,7 @@ abstract class UnCurry
         //   instead of  def foo[T](a: Int, b: Array[T]) ===> def foo[T](a: Int, b: Object)
         arrayType(
             if (arg.typeSymbol.isTypeParameterOrSkolem) ObjectTpe
-            else arg
+            else arg,
         )
       }
 
@@ -904,7 +904,7 @@ abstract class UnCurry
                   gen.mkCast(
                       gen.mkWrapArray(Ident(argsym),
                                       elementType(ArrayClass, argsym.tpe)),
-                      seqType(elementType(SeqClass, fp.tpe))
+                      seqType(elementType(SeqClass, fp.tpe)),
                   ))
         }
         val seqargs = map2(locals, forwParams) {

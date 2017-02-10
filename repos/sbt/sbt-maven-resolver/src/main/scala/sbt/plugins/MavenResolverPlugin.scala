@@ -9,6 +9,6 @@ object MavenResolverPlugin extends AutoPlugin {
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
       updateOptions := updateOptions.value.withResolverConverter(
-          MavenResolverConverter.converter)
+          MavenResolverConverter.converter),
   )
 }

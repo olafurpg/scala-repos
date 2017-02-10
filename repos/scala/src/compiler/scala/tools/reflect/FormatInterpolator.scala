@@ -205,12 +205,12 @@ abstract class FormatInterpolator {
               Select(Select(Select(scalaPackage, TermName("collection")),
                             TermName("immutable")),
                      TypeName("StringOps"))),
-          termNames.CONSTRUCTOR
+          termNames.CONSTRUCTOR,
       )
       val expr = Apply(
           Select(Apply(newStringOps, List(Literal(Constant(format)))),
                  TermName("format")),
-          ids.toList
+          ids.toList,
       )
       val p = c.macroApplication.pos
       Block(evals.toList, atPos(p.focus)(expr)) setPos p.makeTransparent

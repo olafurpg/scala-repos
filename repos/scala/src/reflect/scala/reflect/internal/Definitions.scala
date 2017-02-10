@@ -66,7 +66,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         tpnme.Int -> 12,
         tpnme.Long -> 24,
         tpnme.Float -> 48,
-        tpnme.Double -> 96
+        tpnme.Double -> 96,
     )
 
     private val nameToTag = Map[Name, Char](
@@ -78,7 +78,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         tpnme.Float -> FLOAT_TAG,
         tpnme.Double -> DOUBLE_TAG,
         tpnme.Boolean -> BOOL_TAG,
-        tpnme.Unit -> VOID_TAG
+        tpnme.Unit -> VOID_TAG,
     )
 
     private[Definitions] def catastrophicFailure() =
@@ -168,7 +168,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         IntClass,
         LongClass,
         FloatClass,
-        DoubleClass
+        DoubleClass,
     )
     def ScalaPrimitiveValueClasses: List[ClassSymbol] = ScalaValueClasses
 
@@ -1210,7 +1210,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
         existentialAbstraction(
             eparams,
-            ClassType((eparams.head setInfo TypeBounds.upper(upperBound)).tpe)
+            ClassType((eparams.head setInfo TypeBounds.upper(upperBound)).tpe),
         )
       }
     }
@@ -1515,7 +1515,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       // res27: Boolean = true
       //
       enteringPhaseNotLaterThan(erasurePhase)(
-          owner.info.nonPrivateMember(name)
+          owner.info.nonPrivateMember(name),
       )
 
     /** Using getDecl rather than getMember may avoid issues with
@@ -1586,7 +1586,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         AnyValClass,
         NullClass,
         NothingClass,
-        SingletonClass
+        SingletonClass,
     )
 
     /** Lists core methods that don't have underlying bytecode, but are synthesized on-the-fly in every reflection universe */
@@ -1608,13 +1608,13 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         Object_synchronized,
         Object_isInstanceOf,
         Object_asInstanceOf,
-        String_+
+        String_+,
     )
 
     /** Lists core classes that do have underlying bytecode, but are adjusted on-the-fly in every reflection universe */
     lazy val hijackedCoreClasses = List(
         ComparableClass,
-        JavaSerializableClass
+        JavaSerializableClass,
     )
 
     /** Lists symbols that are synthesized or hijacked by the compiler.
@@ -1764,7 +1764,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       lazy val TagMaterializers = Map[Symbol, Symbol](
           ClassTagClass -> materializeClassTag,
           WeakTypeTagClass -> materializeWeakTypeTag,
-          TypeTagClass -> materializeTypeTag
+          TypeTagClass -> materializeTypeTag,
       )
       lazy val TagSymbols = TagMaterializers.keySet
       lazy val Predef_conforms =

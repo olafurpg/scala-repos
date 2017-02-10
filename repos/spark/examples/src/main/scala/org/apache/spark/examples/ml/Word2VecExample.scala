@@ -36,7 +36,7 @@ object Word2VecExample {
       .createDataFrame(Seq(
               "Hi I heard about Spark".split(" "),
               "I wish Java could use case classes".split(" "),
-              "Logistic regression models are neat".split(" ")
+              "Logistic regression models are neat".split(" "),
           ).map(Tuple1.apply))
       .toDF("text")
 

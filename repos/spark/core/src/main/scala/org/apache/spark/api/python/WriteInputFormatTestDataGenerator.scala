@@ -165,7 +165,7 @@ object WriteInputFormatTestDataGenerator {
     val data = Seq(
         (1, Array()),
         (2, Array(3.0, 4.0, 5.0)),
-        (3, Array(4.0, 5.0, 6.0))
+        (3, Array(4.0, 5.0, 6.0)),
     )
     sc.parallelize(data, numSlices = 2)
       .map {
@@ -183,7 +183,7 @@ object WriteInputFormatTestDataGenerator {
         (2, Map(1.0 -> "cc")),
         (3, Map(2.0 -> "dd")),
         (2, Map(1.0 -> "aa")),
-        (1, Map(3.0 -> "bb"))
+        (1, Map(3.0 -> "bb")),
     )
     sc.parallelize(mapData, numSlices = 2)
       .map {
@@ -203,7 +203,7 @@ object WriteInputFormatTestDataGenerator {
         ("2", TestWritable("test2", 2, 2.3)),
         ("3", TestWritable("test3", 3, 3.1)),
         ("5", TestWritable("test56", 5, 5.5)),
-        ("4", TestWritable("test4", 4, 4.2))
+        ("4", TestWritable("test4", 4, 4.2)),
     )
     val rdd = sc.parallelize(testClass, numSlices = 2).map {
       case (k, v) => (new Text(k), v)

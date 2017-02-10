@@ -38,7 +38,7 @@ private[akkahttp] class ModelConversion(
     (
         convertRequestHeader(
             requestId, remoteAddress, secureProtocol, request),
-        convertRequestBody(request)
+        convertRequestBody(request),
     )
   }
 
@@ -145,7 +145,7 @@ private[akkahttp] class ModelConversion(
         status = result.header.status,
         headers = convertedHeaders.misc ++ closeHeader,
         entity = entity,
-        protocol = protocol
+        protocol = protocol,
     )
   }
 

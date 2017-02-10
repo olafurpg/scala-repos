@@ -401,9 +401,9 @@ object Storage extends Logging {
                 "type" -> cm.sourceType,
                 "config" -> cm.config.properties
                   .map(t => s"${t._1} -> ${t._2}")
-                  .mkString(", ")
+                  .mkString(", "),
               )
           }.getOrElse(Map.empty)
-      }
+      },
   )
 }

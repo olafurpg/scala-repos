@@ -106,7 +106,7 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
             .andThen(a)
             .cleanUp(eo => if (eo.isEmpty) Commit else Rollback)(
                 DBIO.sameThreadExecutionContext)
-            .asInstanceOf[DBIOAction[R, S, E with Effect.Transactional]]
+            .asInstanceOf[DBIOAction[R, S, E with Effect.Transactional]],
         )
 
     /** Run this Action with the specified transaction isolation level. This should be used around

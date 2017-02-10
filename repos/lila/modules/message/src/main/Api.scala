@@ -21,10 +21,10 @@ final class Api(unreadCache: UnreadCache,
   def inbox(me: User, page: Int): Fu[Paginator[Thread]] = Paginator(
       adapter = new Adapter(
             selector = ThreadRepo visibleByUserQuery me.id,
-            sort = Seq(ThreadRepo.recentSort)
+            sort = Seq(ThreadRepo.recentSort),
         ),
       currentPage = page,
-      maxPerPage = maxPerPage
+      maxPerPage = maxPerPage,
   )
 
   def preview(userId: String): Fu[List[Thread]] = unreadCache(userId) flatMap {

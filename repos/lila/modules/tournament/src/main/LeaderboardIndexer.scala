@@ -42,7 +42,7 @@ private final class LeaderboardIndexer(
           documents = entries
               .map(BSONHandlers.leaderboardEntryHandler.write)
               .toStream,
-          ordered = false
+          ordered = false,
       )
       .void
 

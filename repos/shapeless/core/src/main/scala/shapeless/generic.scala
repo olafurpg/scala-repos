@@ -695,7 +695,7 @@ trait CaseClassMacros extends ReprTypes {
     val typerContext = typer.context
     typerContext.isAccessible(
         sym.asInstanceOf[global.Symbol],
-        pre.asInstanceOf[global.Type]
+        pre.asInstanceOf[global.Type],
     )
   }
   def isAccessible(tpe: Type): Boolean =

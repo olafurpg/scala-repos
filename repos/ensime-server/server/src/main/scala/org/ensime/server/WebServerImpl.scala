@@ -12,12 +12,12 @@ import scala.concurrent.Future
 
 class WebServerImpl(
     project: ActorRef,
-    broadcaster: ActorRef
+    broadcaster: ActorRef,
 )(
     implicit val config: EnsimeConfig,
     val system: ActorSystem,
     val mat: Materializer,
-    val timeout: Timeout
+    val timeout: Timeout,
 )
     extends WebServer with DocJarReading {
   import system.dispatcher

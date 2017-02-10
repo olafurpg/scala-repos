@@ -79,7 +79,7 @@ object Transporter {
     implicit val param = Stack.Param(
         SocksProxy(
             SocksProxyFlags.socksProxy,
-            SocksProxyFlags.socksUsernameAndPassword
+            SocksProxyFlags.socksUsernameAndPassword,
         ))
   }
 

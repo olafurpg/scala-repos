@@ -17,7 +17,7 @@ object TestPlugin extends AutoPlugin {
   override def projectSettings = Seq(
       savedReporter := new CollectingReporter,
       compilerReporter in (Compile, compile) := savedReporter.value,
-      problems := savedReporter.value.problems
+      problems := savedReporter.value.problems,
   )
 }
 

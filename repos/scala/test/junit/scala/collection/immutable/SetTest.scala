@@ -60,7 +60,7 @@ class SetTest {
         SortedSet.empty[Int],
         SortedSet(5),
         SortedSet(1, 2, 3, 5, 4),
-        SortedMap(1 -> "cod", 2 -> "herring").keySet
+        SortedMap(1 -> "cod", 2 -> "herring").keySet,
     )
     sortedsets.foreach { set =>
       val seta = any(set)

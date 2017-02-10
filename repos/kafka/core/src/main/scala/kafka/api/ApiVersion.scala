@@ -49,7 +49,7 @@ object ApiVersion {
       "0.8.2" -> KAFKA_0_8_2,
       "0.9.0" -> KAFKA_0_9_0,
       "0.10.0-IV0" -> KAFKA_0_10_0_IV0,
-      "0.10.0" -> KAFKA_0_10_0_IV0
+      "0.10.0" -> KAFKA_0_10_0_IV0,
   )
 
   private val versionPattern = "\\.".r

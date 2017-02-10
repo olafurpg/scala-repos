@@ -138,7 +138,7 @@ object TestGraphs {
   def singleStepInScala[T, K, V : Monoid](source: TraversableOnce[T])(
       fn: T => TraversableOnce[(K, V)]): Map[K, V] =
     MapAlgebra.sumByKey(
-        source.flatMap(fn)
+        source.flatMap(fn),
     )
 
   def singleStepJob[P <: Platform[P], T, K, V : Monoid](
@@ -150,7 +150,7 @@ object TestGraphs {
       source: TraversableOnce[T1])(
       fnA: T1 => Option[T2], fnB: T2 => TraversableOnce[(K, V)]): Map[K, V] =
     MapAlgebra.sumByKey(
-        source.flatMap(fnA(_).iterator).flatMap(fnB)
+        source.flatMap(fnA(_).iterator).flatMap(fnB),
     )
 
   def twinStepOptionMapFlatMapJob[P <: Platform[P], T1, T2, K, V : Monoid](
@@ -167,7 +167,7 @@ object TestGraphs {
           .flatMap(fnA)
           .flatMap { x =>
             fnB(x._1).map((_, x._2))
-          }
+          },
       )
 
   def singleStepMapKeysJob[P <: Platform[P], T, K1, K2, V : Monoid](
@@ -186,7 +186,7 @@ object TestGraphs {
           .flatMap(preJoinFn)
           .flatMap { case (k, v) => List((k, v), (k, v)) }
           .map { case (k, v) => (k, (v, service(k))) }
-          .flatMap(postJoinFn)
+          .flatMap(postJoinFn),
       )
 
   def repeatedTupleLeftJoinJob[P <: Platform[P], T, U, JoinedU, K, V : Monoid](
@@ -213,7 +213,7 @@ object TestGraphs {
         source
           .flatMap(preJoinFn)
           .map { case (k, v) => (k, (v, service(k))) }
-          .flatMap(postJoinFn)
+          .flatMap(postJoinFn),
       )
 
   def leftJoinJob[P <: Platform[P], T, U, JoinedU, K, V : Monoid](
@@ -243,7 +243,7 @@ object TestGraphs {
               postJoinFn(v).map { v =>
                 (k, v)
               }
-          }
+          },
       )
 
   def leftJoinJobWithFlatMapValues[
@@ -715,7 +715,7 @@ class TestGraphs[P <: Platform[P],
           items
             .flatMap(preJoinFn)
             .map { case (k, u) => (k, (u, serviceFn(k))) }
-            .flatMap(postJoinFn)
+            .flatMap(postJoinFn),
         )
       .forall {
         case (k, v) =>

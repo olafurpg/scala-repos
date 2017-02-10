@@ -69,7 +69,7 @@ class ScAssignStmtImpl(node: ASTNode)
               .asInstanceOf[ScReferenceExpression]
               .setupResolveFunctions(
                   () => resolveAssignment.toArray,
-                  () => shapeResolveAssignment.toArray
+                  () => shapeResolveAssignment.toArray,
               )
             Some(call)
           case _ => None

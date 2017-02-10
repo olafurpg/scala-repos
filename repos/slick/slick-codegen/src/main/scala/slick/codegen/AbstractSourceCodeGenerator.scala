@@ -75,7 +75,7 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
                 c.default
                   .map(v => s"${c.name}: ${c.exposedType} = $v")
                   .getOrElse(
-                      s"${c.name}: ${c.exposedType}"
+                      s"${c.name}: ${c.exposedType}",
                 ))
           .mkString(", ")
         if (classEnabled) {

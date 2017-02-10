@@ -309,7 +309,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
         ".map...",
         "i => i % 2 == 0",
         ".foreach...",
-        "println"
+        "println",
     )
   }
 
@@ -328,7 +328,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
   def testPartialFunctionArg(): Unit = {
     checkStopResumeSeveralTimes(Breakpoint(5, null), Breakpoint(6, null))(
         "case Some(i) =>",
-        "false"
+        "false",
     )
   }
 
@@ -345,7 +345,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
 
   def testLikeDefaultArgName(): Unit = {
     checkStopResumeSeveralTimes(Breakpoint(3, null))(
-        "\"stop here\""
+        "\"stop here\"",
     )
   }
 }

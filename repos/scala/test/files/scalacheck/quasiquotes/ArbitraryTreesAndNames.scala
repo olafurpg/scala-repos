@@ -42,7 +42,7 @@ trait ArbitraryTreesAndNames {
       CONTRAVARIANT,
       DEFAULTPARAM,
       PRESUPER,
-      DEFAULTINIT
+      DEFAULTINIT,
   )
 
   def genModifiers = for (flagset <- genFlagSet) yield Modifiers(flagset)

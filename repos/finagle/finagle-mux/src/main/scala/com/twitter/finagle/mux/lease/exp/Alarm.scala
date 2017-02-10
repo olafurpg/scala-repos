@@ -64,7 +64,7 @@ private[lease] class DurationAlarm(dur: Duration) extends Alarm {
 }
 
 private[lease] class GenerationAlarm(
-    ctr: ByteCounter
+    ctr: ByteCounter,
 )
     extends PredicateAlarm({
       val generation = ctr.info.generation()

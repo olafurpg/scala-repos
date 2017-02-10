@@ -29,7 +29,7 @@ trait ThriftTest { self: FunSuite =>
   case class ThriftTestDefinition(
       label: String,
       clientIdOpt: Option[ClientId],
-      testFunction: ((Iface, BufferingTracer) => Unit)
+      testFunction: ((Iface, BufferingTracer) => Unit),
   )
 
   private val thriftTests = mutable.ListBuffer[ThriftTestDefinition]()
@@ -41,14 +41,14 @@ trait ThriftTest { self: FunSuite =>
     */
   def testThrift(
       label: String,
-      clientIdOpt: Option[ClientId] = None
+      clientIdOpt: Option[ClientId] = None,
   )(theTest: (Iface, BufferingTracer) => Unit) {
     thriftTests += ThriftTestDefinition(label, clientIdOpt, theTest)
   }
 
   def skipTestThrift(
       label: String,
-      clientIdOpt: Option[ClientId] = None
+      clientIdOpt: Option[ClientId] = None,
   )(theTest: (Iface, BufferingTracer) => Unit) {
     () // noop
   }
@@ -140,12 +140,12 @@ trait ThriftTest { self: FunSuite =>
 
   private val clients = Map[String, NewClient](
       "builder" -> newBuilderClient,
-      "api" -> newAPIClient
+      "api" -> newAPIClient,
   )
 
   private val servers = Map[String, NewServer](
       "builder" -> newBuilderServer,
-      "api" -> newAPIServer
+      "api" -> newAPIServer,
   )
 
   /** Invoke this in your test to run all defined thrift tests */

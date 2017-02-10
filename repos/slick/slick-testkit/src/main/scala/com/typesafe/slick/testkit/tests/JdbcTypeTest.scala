@@ -58,7 +58,7 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
           .map(_.map {
             case (id, data) => (id, data.map(_.mkString).getOrElse(""))
           }.toSet)
-          .map(_ shouldBe Set((1, "67"), (2, "")))
+          .map(_ shouldBe Set((1, "67"), (2, ""))),
       )
   }
 
@@ -115,7 +115,7 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
         ts.to[Set]
           .result
           .map(_ shouldBe Set((1, Serialized(List(1, 2, 3))),
-                              (2, Serialized(List(4, 5)))))
+                              (2, Serialized(List(4, 5))))),
       ).transactionally
   }
 
@@ -150,7 +150,7 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
           .map(_.id)
           .result
           .headOption
-          .map(_ shouldBe None)
+          .map(_ shouldBe None),
       )
   }
 

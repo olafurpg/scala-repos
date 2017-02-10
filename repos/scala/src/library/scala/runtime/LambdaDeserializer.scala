@@ -105,7 +105,7 @@ object LambdaDeserializer {
           /* flags                  = */ flags.asInstanceOf[AnyRef],
           /* markerInterfaceCount   = */ 1.asInstanceOf[AnyRef],
           /* markerInterfaces[0]    = */ markerInterface,
-          /* bridgeCount            = */ 0.asInstanceOf[AnyRef]
+          /* bridgeCount            = */ 0.asInstanceOf[AnyRef],
       )
     }
 

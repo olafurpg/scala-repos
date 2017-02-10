@@ -14,7 +14,7 @@ object FailureTests extends TestSuite {
         |import import
       """.stripMargin,
         expected = """ThisPath | IdPath""",
-        found = "import"
+        found = "import",
     )
 
     * - checkNeg(
@@ -28,7 +28,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """BacktickId | PlainId | Generator | Assign""",
-        found = "} yield x"
+        found = "} yield x",
     )
     * - checkNeg(
         """object O{
@@ -36,7 +36,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "," | ")" """,
-        found = "B)"
+        found = "B)",
     )
     * - checkNeg(
         """object O{
@@ -45,12 +45,12 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda""",
-        found = ""
+        found = "",
     )
     * - checkNeg(
         "import scala.util.{Failure, Success + 1}",
         expected = """ "," | "}" """,
-        found = "+ 1}"
+        found = "+ 1}",
     )
     * - checkNeg(
         """
@@ -61,7 +61,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = "](input: S"
+        found = "](input: S",
     )
     * - checkNeg(
         """
@@ -71,7 +71,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "," | ")" """,
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """
@@ -82,7 +82,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" | `case`""",
-        found = "1\n"
+        found = "1\n",
     )
     * - checkNeg(
         """package scalatex
@@ -91,7 +91,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """NamedType ~ Refinement.? | Refinement | ")" """,
-        found = "1)"
+        found = "1)",
     )
     * - checkNeg(
         """
@@ -104,7 +104,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """`this` | Id""",
-        found = "."
+        found = ".",
     )
     * - checkNeg(
         """
@@ -113,7 +113,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = "10"
+        found = "10",
     )
     * - checkNeg(
         """
@@ -124,7 +124,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | End """,
-        found = "o w{"
+        found = "o w{",
     )
     * - checkNeg(
         """
@@ -133,7 +133,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "LocalMod | AccessMod | `override` | Dcl | TraitDef | ClsDef | ObjDef",
-        found = "applyM"
+        found = "applyM",
     )
     * - checkNeg(
         """
@@ -147,7 +147,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "NamedType ~ Refinement.? | Refinement",
-        found = "= {"
+        found = "= {",
     )
     * - checkNeg(
         """
@@ -158,7 +158,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ BacktickId | PlainId""",
-        found = "1 extends"
+        found = "1 extends",
     )
     * - checkNeg(
         """
@@ -170,7 +170,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | End """,
-        found = "_"
+        found = "_",
     )
     * - checkNeg(
         """
@@ -181,7 +181,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "XmlPattern | Thingy | PatLiteral | TupleEx | Extractor | VarId",
-        found = "=> 0"
+        found = "=> 0",
     )
     * - checkNeg(
         """
@@ -198,7 +198,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ "{" """,
-        found = "case 0 =>"
+        found = "case 0 =>",
     )
     * - checkNeg(
         """
@@ -208,7 +208,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = ")"
+        found = ")",
     )
     * - checkNeg(
         """
@@ -217,7 +217,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "," | ")" """,
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """
@@ -226,7 +226,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda",
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """
@@ -236,7 +236,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = ""
+        found = "",
     )
     * - checkNeg(
         """/*
@@ -245,7 +245,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ "*/" """,
-        found = ""
+        found = "",
     )
     * - checkNeg(
         """/*/*
@@ -254,7 +254,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ "*/" """,
-        found = ""
+        found = "",
     )
     * - checkNeg(
         """
@@ -266,7 +266,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda",
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """
@@ -275,7 +275,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda",
-        found = "catch {"
+        found = "catch {",
     )
     * - checkNeg(
         """
@@ -284,7 +284,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "|" | `=>` | `⇒`""",
-        found = "= fail"
+        found = "= fail",
     )
     * - checkNeg(
         """
@@ -295,7 +295,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """XmlPattern | Thingy | PatLiteral | TupleEx | Extractor | VarId""",
-        found = "val b = e"
+        found = "val b = e",
     )
     * - checkNeg(
         """
@@ -306,7 +306,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "," | ")" """,
-        found = "=> z"
+        found = "=> z",
     )
     * - checkNeg(
         """object K{
@@ -318,7 +318,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "NamedType ~ Refinement.? | Refinement",
-        found = "val c"
+        found = "val c",
     )
     * - checkNeg(
         """
@@ -327,7 +327,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ")" """,
-        found = "def apply"
+        found = "def apply",
     )
     * - checkNeg(
         """
@@ -336,7 +336,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = ".c"
+        found = ".c",
     )
     * - checkNeg(
         """
@@ -347,7 +347,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "_* | AscriptionType | Annot.rep(1, sep = WL)",
-        found = ")\n}"
+        found = ")\n}",
     )
     * - checkNeg(
         """
@@ -356,7 +356,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ NamedType ~ Refinement.? | Refinement | "]" """,
-        found = ")"
+        found = ")",
     )
     * - checkNeg(
         """
@@ -365,7 +365,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "," | "]" """,
-        found = ")"
+        found = ")",
     )
     * - checkNeg(
         """
@@ -376,7 +376,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "case" """,
-        found = "stats :+ e"
+        found = "stats :+ e",
     )
 
     * - checkNeg(
@@ -386,7 +386,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = " \";\" | Newline.rep(1) | Pkg | Import | Tmpl | End ",
-        found = "val trueA"
+        found = "val trueA",
     )
     * - checkNeg(
         """
@@ -395,7 +395,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = "null cow"
+        found = "null cow",
     )
     * - checkNeg(
         """
@@ -404,7 +404,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = "_+ = 1"
+        found = "_+ = 1",
     )
     * - checkNeg(
         """
@@ -414,7 +414,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """Binding ~ InfixPattern | InfixPattern | VarId""",
-        found = "= 2"
+        found = "= 2",
     )
     * - checkNeg(
         """
@@ -425,7 +425,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """XmlPattern | Thingy | PatLiteral | TupleEx | Extractor | VarId""",
-        found = "=> 1"
+        found = "=> 1",
     )
     * - checkNeg(
         """
@@ -436,7 +436,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "|" | `=>` | `⇒`""",
-        found = "case"
+        found = "case",
     )
     * - checkNeg(
         """trait Basic{
@@ -444,7 +444,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = ".b"
+        found = ".b",
     )
     * - checkNeg(
         """
@@ -454,7 +454,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda | ")" """,
-        found = "=> }"
+        found = "=> }",
     )
     * - checkNeg(
         """
@@ -462,7 +462,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """ "@" | BacktickId | PlainId | ")" """,
-        found = "["
+        found = "[",
     )
     * - checkNeg(
         """
@@ -471,7 +471,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "@" | LocalMod | AccessMod | `override` | Dcl | TraitDef | ClsDef | ObjDef """,
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """class C
@@ -479,7 +479,7 @@ object FailureTests extends TestSuite {
         |;
       """.stripMargin,
         expected = """ "." | "{" """,
-        found = ";"
+        found = ";",
     )
 
     * - checkNeg(
@@ -490,7 +490,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """TupleType | TypeId ~ ("." ~ `type`).? | `_`""",
-        found = "12\n}"
+        found = "12\n}",
     )
 
     * - checkNeg(
@@ -499,7 +499,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """BacktickId | PlainId | "with" | ";" | Newline.rep(1) | "}" | `case`""",
-        found = "= }"
+        found = "= }",
     )
     * - checkNeg(
         """object O{
@@ -507,7 +507,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = "NamedType ~ Refinement.? | Refinement",
-        found = "10)"
+        found = "10)",
     )
     * - checkNeg(
         """object GenJSCode{
@@ -516,7 +516,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """`this` | Id""",
-        found = "()"
+        found = "()",
     )
     * - checkNeg(
         """object GenJSCode{
@@ -525,7 +525,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """BacktickId | PlainId""",
-        found = "this"
+        found = "this",
     )
     * - checkNeg(
         """object GenJSCode{
@@ -534,7 +534,7 @@ object FailureTests extends TestSuite {
         |
       """.stripMargin,
         expected = """`this` | Id""",
-        found = "()"
+        found = "()",
     )
     * - checkNeg(
         """object K{
@@ -542,7 +542,7 @@ object FailureTests extends TestSuite {
           |}
         """.stripMargin,
         expected = "LocalMod | AccessMod | `override` | Dcl | TraitDef | ClsDef | ObjDef",
-        found = "O\n"
+        found = "O\n",
     )
     * - checkNeg(
         """object O{
@@ -552,7 +552,7 @@ object FailureTests extends TestSuite {
           |}
         """.stripMargin,
         expected = """ "(" """,
-        found = "eqeq"
+        found = "eqeq",
     )
     * - checkNeg(
         """
@@ -565,7 +565,7 @@ object FailureTests extends TestSuite {
           |}
         """.stripMargin,
         expected = """ "," | ")" """,
-        found = "=> x)"
+        found = "=> x)",
     )
     * - checkNeg(
         """
@@ -577,7 +577,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """BacktickId | PlainId | Generator | Assign""",
-        found = "} yield"
+        found = "} yield",
     )
     * - checkNeg(
         """
@@ -589,7 +589,7 @@ object FailureTests extends TestSuite {
         |}
       """.stripMargin,
         expected = """ "." | "}" """,
-        found = "{\n"
+        found = "{\n",
     )
     * - checkNeg(
         """
@@ -603,7 +603,7 @@ object FailureTests extends TestSuite {
           |}
         """.stripMargin,
         expected = "If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda",
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """
@@ -613,7 +613,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = "NamedType ~ Refinement.? | Refinement",
-        found = "]) = 1"
+        found = "]) = 1",
     )
     * - checkNeg(
         """
@@ -623,7 +623,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = "If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda",
-        found = ")\n"
+        found = ")\n",
     )
     * - checkNeg(
         """object Traversers {
@@ -634,7 +634,7 @@ object FailureTests extends TestSuite {
           |}
         """.stripMargin,
         expected = """ ";" | Newline.rep(1) | "}" """,
-        found = "case for"
+        found = "case for",
     )
     * - checkNeg(
         """object Utils {
@@ -643,7 +643,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """CharIn("btnfr'\\\"]") | OctalEscape | UnicodeEscape""",
-        found = "q"
+        found = "q",
     )
     * - checkNeg(
         """object Utils {
@@ -654,7 +654,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """ "\"" | StringChars | Interp | LiteralSlash | Escape | NonStringEnd """,
-        found = "\n"
+        found = "\n",
     )
     val tq = "\"\"\""
     * - checkNeg(
@@ -667,7 +667,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
-        found = ""
+        found = "",
     )
     * - checkNeg(
         """
@@ -677,7 +677,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = "Char | Symbol",
-        found = "'\n"
+        found = "'\n",
     )
 
     // These two guys pass in Scalac, but I'm not gonna support it
@@ -689,7 +689,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """BacktickId | PlainId""",
-        found = ")"
+        found = ")",
     )
     * - checkNeg(
         s"""
@@ -698,7 +698,7 @@ object FailureTests extends TestSuite {
            |}
         """.stripMargin,
         expected = """BacktickId | PlainId""",
-        found = ".toString"
+        found = ".toString",
     )
     * - checkNeg(
         s"""
@@ -707,7 +707,7 @@ object FailureTests extends TestSuite {
            |}
         """.stripMargin,
         expected = "Binding ~ InfixPattern | InfixPattern | VarId",
-        found = "= 1"
+        found = "= 1",
     )
     * - checkNeg(
         s"""
@@ -716,77 +716,77 @@ object FailureTests extends TestSuite {
          |}
         """.stripMargin,
         expected = "TypePattern | BindPattern",
-        found = ") = 1"
+        found = ") = 1",
     )
     * - checkNeg(
         s"""
          |object X{ val (_:) = 1 }
         """.stripMargin,
         expected = "NamedType ~ Refinement.? | Refinement",
-        found = ") = 1"
+        found = ") = 1",
     )
     * - checkNeg(
         s"""
          |import x.{y=>}
         """.stripMargin,
         expected = """Id | `_`""",
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         s"""
          |import x.y,
         """.stripMargin,
         expected = "ThisPath | IdPath",
-        found = ""
+        found = "",
     )
     * - checkNeg(
         s"""
          |object X{type T = A with}
         """.stripMargin,
         expected = """TupleType | TypeId ~ ("." ~ `type`).? | `_`""",
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         s"""
          |object X{def f(x: Int, ) = 1}
         """.stripMargin,
         expected = """ "@" | BacktickId | PlainId""",
-        found = ") = 1"
+        found = ") = 1",
     )
     * - checkNeg(
         s"""
          |object X{val x = (1, 2,)}
         """.stripMargin,
         expected = """If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda""",
-        found = ")"
+        found = ")",
     )
     * - checkNeg(
         s"""
          |object X{f[A,]}
         """.stripMargin,
         expected = """NamedType ~ Refinement.? | Refinement""",
-        found = "]"
+        found = "]",
     )
     * - checkNeg(
         s"""
          |object X{def f[T <% A <%] = 1}
         """.stripMargin,
         expected = """NamedType ~ Refinement.? | Refinement""",
-        found = "]"
+        found = "]",
     )
     * - checkNeg(
         s"""
          |object X{def f[T, B,] = 1}
         """.stripMargin,
         expected = """ "@" | Id | `_` """,
-        found = "]"
+        found = "]",
     )
     * - checkNeg(
         s"""
          |object X{type T = F forSome }}
         """.stripMargin,
         expected = """ "{" """,
-        found = "}}"
+        found = "}}",
     )
 
     * - checkNeg(
@@ -794,35 +794,35 @@ object FailureTests extends TestSuite {
          |object X{def f(x: Int =) = 1}
         """.stripMargin,
         expected = """If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda""",
-        found = ") = 1"
+        found = ") = 1",
     )
     * - checkNeg(
         s"""
          |object X{type T = Int#}
         """.stripMargin,
         expected = """BacktickId | PlainId""",
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         s"""
          |object X{type T = }
         """.stripMargin,
         expected = """NamedType ~ Refinement.? | Refinement""",
-        found = "}\n"
+        found = "}\n",
     )
     * - checkNeg(
         s"""
          |object X{type T[,] = A }
         """.stripMargin,
         expected = """ "@" | Id | `_` """,
-        found = ",]"
+        found = ",]",
     )
     * - checkNeg(
         s"""
          |object X{type T <: }
         """.stripMargin,
         expected = """NamedType ~ Refinement.? | Refinement""",
-        found = "}\n"
+        found = "}\n",
     )
     * - checkNeg(
         """
@@ -832,7 +832,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """ "," | "]" """,
-        found = "@f"
+        found = "@f",
     )
     * - checkNeg(
         """
@@ -842,7 +842,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """ ")" """,
-        found = "}"
+        found = "}",
     )
     * - checkNeg(
         """
@@ -852,7 +852,7 @@ object FailureTests extends TestSuite {
           |
         """.stripMargin,
         expected = """ "@" | Id | `_`""",
-        found = "["
+        found = "[",
     )
 
     * - checkNeg(
@@ -860,7 +860,7 @@ object FailureTests extends TestSuite {
           |object System {
           |  $tq """".stripMargin,
         expected = """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
-        found = ""
+        found = "",
     )
   }
 }

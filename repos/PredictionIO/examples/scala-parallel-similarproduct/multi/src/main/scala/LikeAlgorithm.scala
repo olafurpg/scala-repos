@@ -95,7 +95,7 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
     new ALSModel(
         productFeatures = m.productFeatures,
         itemStringIntMap = itemStringIntMap,
-        items = items
+        items = items,
     )
   }
 }

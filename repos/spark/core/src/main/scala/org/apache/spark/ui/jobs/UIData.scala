@@ -67,7 +67,7 @@ private[spark] object UIData {
       var completedStageIndices: mutable.HashSet[Int] = new mutable.HashSet[
             Int](),
       var numSkippedStages: Int = 0,
-      var numFailedStages: Int = 0
+      var numFailedStages: Int = 0,
   )
 
   class StageUIData {

@@ -28,7 +28,7 @@ class NodeJSEnv private (
     nodejsPath: String,
     addArgs: Seq[String],
     addEnv: Map[String, String],
-    val sourceMap: Boolean
+    val sourceMap: Boolean,
 )
     extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
 
@@ -173,7 +173,7 @@ class NodeJSEnv private (
           }
         }
       }).call(this);
-      """
+      """,
     )
 
     def send(msg: String): Unit = {
@@ -262,8 +262,8 @@ class NodeJSEnv private (
             try {
               require('source-map-support').install();
             } catch (e) {}
-            """
-            )
+            """,
+            ),
         ) else Seq()
     }
 
@@ -298,8 +298,8 @@ class NodeJSEnv private (
             };
             console.log = newLog;
           })();
-          """
-        )
+          """,
+        ),
     )
 
     /** File(s) to define `__ScalaJSEnv`. Defines `exitFunction`.
@@ -311,8 +311,8 @@ class NodeJSEnv private (
           __ScalaJSEnv = {
             exitFunction: function(status) { process.exit(status); }
           };
-          """
-        )
+          """,
+        ),
     )
 
     /** Concatenates results from [[installSourceMap]], [[fixPercentConsole]] and
@@ -332,7 +332,7 @@ class NodeJSEnv private (
         val fname = dep.lib.name
         libCache.materialize(dep.lib)
         new MemVirtualJSFile(s"require-$fname").withContent(
-            s"""$varname = require("${escapeJS(fname)}");"""
+            s"""$varname = require("${escapeJS(fname)}");""",
         )
       }
     }
@@ -365,7 +365,7 @@ class NodeJSEnv private (
 
       sys.env ++ Seq(
           "NODE_MODULE_CONTEXTS" -> "0",
-          "NODE_PATH" -> nodePath
+          "NODE_PATH" -> nodePath,
       ) ++ additionalEnv
     }
   }

@@ -95,7 +95,7 @@ private[sql] class SessionState(ctx: SQLContext) {
         Batch("Subquery", Once, PlanSubqueries(SessionState.this)),
         Batch("Add exchange", Once, EnsureRequirements(conf)),
         Batch("Whole stage codegen", Once, CollapseCodegenStages(conf)),
-        Batch("Reuse duplicated exchanges", Once, ReuseExchange(conf))
+        Batch("Reuse duplicated exchanges", Once, ReuseExchange(conf)),
     )
   }
 

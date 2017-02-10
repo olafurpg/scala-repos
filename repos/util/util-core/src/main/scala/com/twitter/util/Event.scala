@@ -131,7 +131,7 @@ trait Event[+T] { self =>
           }),
           other.register(s.comap { u =>
             Right(u)
-          })
+          }),
       )
     }
 

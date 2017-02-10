@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
   * @param underlyingF The future should be satisfied when the underlying factory is ready
   */
 class DelayedFactory[Req, Rep](
-    underlyingF: Future[ServiceFactory[Req, Rep]]
+    underlyingF: Future[ServiceFactory[Req, Rep]],
 )
     extends ServiceFactory[Req, Rep] {
   private[this] def wrapped(): Future[ServiceFactory[Req, Rep]] =
@@ -32,7 +32,7 @@ class DelayedFactory[Req, Rep](
   }
 
   private[this] def safelyInterruptible(
-      f: Future[ServiceFactory[Req, Rep]]
+      f: Future[ServiceFactory[Req, Rep]],
   ): Future[ServiceFactory[Req, Rep]] = {
     val p = Promise.attached(f)
     p setInterruptHandler {
@@ -80,7 +80,7 @@ object DelayedFactory {
     * underlying completes.  Upon completion, it swaps and is just backed by the underlying.
     */
   def swapOnComplete[Req, Rep](
-      underlying: Future[ServiceFactory[Req, Rep]]
+      underlying: Future[ServiceFactory[Req, Rep]],
   ): ServiceFactory[Req, Rep] = {
     val delayed = new DelayedFactory(underlying)
 

@@ -166,7 +166,7 @@ abstract class AbstractTestRunConfiguration(
           workDir
         } else {
           provideDefaultWorkingDir
-        }
+        },
     )
 
     setTestName(configuration.getTestName)

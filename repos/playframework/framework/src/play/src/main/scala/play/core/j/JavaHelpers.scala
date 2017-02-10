@@ -94,7 +94,7 @@ trait JavaHelpers {
         new JRequestImpl(req),
         req.session.data.asJava,
         req.flash.data.asJava,
-        req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava
+        req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava,
     )
   }
 

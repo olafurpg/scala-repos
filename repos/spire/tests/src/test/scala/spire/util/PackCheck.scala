@@ -61,7 +61,7 @@ class PackCheck
           longToByte(n)(4),
           longToByte(n)(5),
           longToByte(n)(6),
-          longToByte(n)(7)
+          longToByte(n)(7),
       )
 
       val i = 0
@@ -73,7 +73,7 @@ class PackCheck
           longToByte(n)(i + 4),
           longToByte(n)(i + 5),
           longToByte(n)(i + 6),
-          longToByte(n)(i + 7)
+          longToByte(n)(i + 7),
       )
 
       val n1 = Pack.longFromBytes(bs0)

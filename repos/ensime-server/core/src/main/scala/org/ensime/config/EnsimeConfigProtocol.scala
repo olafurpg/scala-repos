@@ -39,7 +39,7 @@ object EnsimeConfigProtocol {
     else javaHome.tree.filter(_.getName == "rt.jar").toList
 
   def validated(c: EnsimeConfig): EnsimeConfig = c.copy(
-      subprojects = c.subprojects.map(validated)
+      subprojects = c.subprojects.map(validated),
   )
 
   /*
@@ -62,7 +62,7 @@ object EnsimeConfigProtocol {
             targets = m.targetDirs,
             testTarget = None,
             testTargets = m.testTargetDirs,
-            sourceRoots = m.sourceRoots
+            sourceRoots = m.sourceRoots,
         ))
   }
 }

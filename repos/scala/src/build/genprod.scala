@@ -212,7 +212,7 @@ class Function(val i: Int) extends Group("Function") with Arity {
   def longCurry = ((xdefs, targs).zipped.map(_ + ": " + _) drop 1).mkString(
     "(x1: T1) => ((",
     ", ",
-    ") => self.apply%s).curried".format(commaXs)
+    ") => self.apply%s).curried".format(commaXs),
   )
 
   // f(x1,x2,x3,x4,x5,x6)  == (f.curried)(x1)(x2)(x3)(x4)(x5)(x6)
@@ -241,7 +241,7 @@ class Function(val i: Int) extends Group("Function") with Arity {
 
     curryComment +
     "\n  @annotation.unspecialized def curried: %s => R = {\n    %s\n  }\n".format(
-      targs mkString " => ", body
+      targs mkString " => ", body,
     )
   }
 

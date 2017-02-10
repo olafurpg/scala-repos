@@ -63,7 +63,7 @@ class ScalaJSRunner(testFile: File,
   override def extraJavaOptions = {
     super.extraJavaOptions ++ Seq(
         s"-Dscalajs.partest.optMode=${options.optMode.id}",
-        s"-Dscalajs.partest.compliantSems=${compliantSems.mkString(",")}"
+        s"-Dscalajs.partest.compliantSems=${compliantSems.mkString(",")}",
     )
   }
 }
@@ -176,7 +176,7 @@ class ScalaJSSBTRunner(
     javacCmd: File,
     scalacArgs: Array[String],
     val options: ScalaJSPartestOptions,
-    val scalaVersion: String
+    val scalaVersion: String,
 )
     extends SBTRunner(
         partestFingerprint,
@@ -186,7 +186,7 @@ class ScalaJSSBTRunner(
         testClassLoader,
         javaCmd,
         javacCmd,
-        scalacArgs
+        scalacArgs,
     ) with ScalaJSSuiteRunner {
 
   // The test root for partest is read out through the system properties,

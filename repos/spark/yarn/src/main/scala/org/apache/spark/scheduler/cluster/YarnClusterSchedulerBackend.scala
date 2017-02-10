@@ -49,7 +49,7 @@ private[spark] class YarnClusterSchedulerBackend(
       // lookup appropriate http scheme for container log urls
       val yarnHttpPolicy = yarnConf.get(
           YarnConfiguration.YARN_HTTP_POLICY_KEY,
-          YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
+          YarnConfiguration.YARN_HTTP_POLICY_DEFAULT,
       )
       val user = Utils.getCurrentUserName()
       val httpScheme =

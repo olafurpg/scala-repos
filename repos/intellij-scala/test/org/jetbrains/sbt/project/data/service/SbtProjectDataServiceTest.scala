@@ -67,7 +67,7 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
         "-deprecation",
         "-target",
         "1.8",
-        "-Werror"
+        "-Werror",
     )
     importProjectData(generateProject(Seq.empty, None, options, ""))
 

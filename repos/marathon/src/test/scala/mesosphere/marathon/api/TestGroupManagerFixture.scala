@@ -32,7 +32,7 @@ class TestGroupManagerFixture extends Mockito with MarathonActorSupport {
       system,
       s"serializeGroupUpdates${actorId.incrementAndGet()}",
       maxParallel = 1,
-      maxQueued = 10
+      maxQueued = 10,
   )
 
   config.zkTimeoutDuration returns 1.seconds
@@ -45,6 +45,6 @@ class TestGroupManagerFixture extends Mockito with MarathonActorSupport {
       appRepo = appRepository,
       storage = provider,
       config = config,
-      eventBus = eventBus
+      eventBus = eventBus,
   )
 }

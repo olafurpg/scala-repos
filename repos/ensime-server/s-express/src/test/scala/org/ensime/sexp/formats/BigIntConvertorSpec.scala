@@ -15,7 +15,7 @@ class BigIntConvertorSpec extends EnsimeSpec {
       BitSet(1) -> BigInt(2),
       BitSet(64) -> BigInt("18446744073709551616"),
       BitSet(0, 64) -> BigInt("18446744073709551617"),
-      BitSet(1, 64) -> BigInt("18446744073709551618")
+      BitSet(1, 64) -> BigInt("18446744073709551618"),
   )
 
   "BigIntConvertor" should "convert basic BigSet to BitInt" in {

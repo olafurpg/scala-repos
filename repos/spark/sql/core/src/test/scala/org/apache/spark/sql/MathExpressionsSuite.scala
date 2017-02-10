@@ -48,17 +48,17 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
       c: Column => Column, f: T => U): Unit = {
     checkAnswer(
         doubleData.select(c('a)),
-        (1 to 10).map(n => Row(f((n * 0.2 - 1).asInstanceOf[T])))
+        (1 to 10).map(n => Row(f((n * 0.2 - 1).asInstanceOf[T]))),
     )
 
     checkAnswer(
         doubleData.select(c('b)),
-        (1 to 10).map(n => Row(f((-n * 0.2 + 1).asInstanceOf[T])))
+        (1 to 10).map(n => Row(f((-n * 0.2 + 1).asInstanceOf[T]))),
     )
 
     checkAnswer(
         doubleData.select(c(lit(null))),
-        (1 to 10).map(_ => Row(null))
+        (1 to 10).map(_ => Row(null)),
     )
   }
 
@@ -66,19 +66,19 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
       c: Column => Column, f: Double => Double): Unit = {
     checkAnswer(
         nnDoubleData.select(c('a)),
-        (1 to 10).map(n => Row(f(n * 0.1)))
+        (1 to 10).map(n => Row(f(n * 0.1))),
     )
 
     if (f(-1) === math.log1p(-1)) {
       checkAnswer(
           nnDoubleData.select(c('b)),
-          (1 to 9).map(n => Row(f(n * -0.1))) :+ Row(null)
+          (1 to 9).map(n => Row(f(n * -0.1))) :+ Row(null),
       )
     }
 
     checkAnswer(
         nnDoubleData.select(c(lit(null))),
-        (1 to 10).map(_ => Row(null))
+        (1 to 10).map(_ => Row(null)),
     )
   }
 
@@ -90,7 +90,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         nnDoubleData
           .collect()
           .toSeq
-          .map(r => Row(f(r.getDouble(0), r.getDouble(0))))
+          .map(r => Row(f(r.getDouble(0), r.getDouble(0)))),
       )
 
     checkAnswer(
@@ -98,24 +98,24 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         nnDoubleData
           .collect()
           .toSeq
-          .map(r => Row(f(r.getDouble(0), r.getDouble(1))))
+          .map(r => Row(f(r.getDouble(0), r.getDouble(1)))),
       )
 
     checkAnswer(
         nnDoubleData.select(d('a, 2.0)),
-        nnDoubleData.collect().toSeq.map(r => Row(f(r.getDouble(0), 2.0)))
+        nnDoubleData.collect().toSeq.map(r => Row(f(r.getDouble(0), 2.0))),
     )
 
     checkAnswer(
         nnDoubleData.select(d('a, -0.5)),
-        nnDoubleData.collect().toSeq.map(r => Row(f(r.getDouble(0), -0.5)))
+        nnDoubleData.collect().toSeq.map(r => Row(f(r.getDouble(0), -0.5))),
     )
 
     val nonNull = nullDoubles.collect().toSeq.filter(r => r.get(0) != null)
 
     checkAnswer(
         nullDoubles.select(c('a, 'a)).orderBy('a.asc),
-        Row(null) +: nonNull.map(r => Row(f(r.getDouble(0), r.getDouble(0))))
+        Row(null) +: nonNull.map(r => Row(f(r.getDouble(0), r.getDouble(0)))),
     )
   }
 
@@ -161,7 +161,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         sql("SELECT degrees(0), degrees(1), degrees(1.5)"),
         Seq((1, 2))
           .toDF()
-          .select(toDegrees(lit(0)), toDegrees(lit(1)), toDegrees(lit(1.5)))
+          .select(toDegrees(lit(0)), toDegrees(lit(1)), toDegrees(lit(1.5))),
       )
   }
 
@@ -171,7 +171,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         sql("SELECT radians(0), radians(1), radians(1.5)"),
         Seq((1, 2))
           .toDF()
-          .select(toRadians(lit(0)), toRadians(lit(1)), toRadians(lit(1.5)))
+          .select(toRadians(lit(0)), toRadians(lit(1)), toRadians(lit(1.5))),
       )
   }
 
@@ -205,11 +205,11 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     val df = (0 to 5).map(i => (i, i)).toDF("a", "b")
     checkAnswer(
         df.select(factorial('a)),
-        Seq(Row(1), Row(1), Row(2), Row(6), Row(24), Row(120))
+        Seq(Row(1), Row(1), Row(2), Row(6), Row(24), Row(120)),
     )
     checkAnswer(
         df.selectExpr("factorial(a)"),
-        Seq(Row(1), Row(1), Row(2), Row(6), Row(24), Row(120))
+        Seq(Row(1), Row(1), Row(2), Row(6), Row(24), Row(120)),
     )
   }
 
@@ -221,7 +221,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     val df = Seq(5, 55, 555).map(Tuple1(_)).toDF("a")
     checkAnswer(
         df.select(round('a), round('a, -1), round('a, -2)),
-        Seq(Row(5, 10, 0), Row(55, 60, 100), Row(555, 560, 600))
+        Seq(Row(5, 10, 0), Row(55, 60, 100), Row(555, 560, 600)),
     )
 
     val pi = "3.1415"
@@ -235,7 +235,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                 BigDecimal(3),
                 BigDecimal("3.1"),
                 BigDecimal("3.14"),
-                BigDecimal("3.142")))
+                BigDecimal("3.142"))),
     )
   }
 
@@ -258,7 +258,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(
         sql("SELECT pow(1, 2), power(2, 1)"),
-        Seq((1, 2)).toDF().select(pow(lit(1), lit(2)), pow(lit(2), lit(1)))
+        Seq((1, 2)).toDF().select(pow(lit(1), lit(2)), pow(lit(2), lit(1))),
     )
   }
 
@@ -303,7 +303,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         sql("SELECT ln(0), ln(1), ln(1.5)"),
         Seq((1, 2))
           .toDF()
-          .select(logarithm(lit(0)), logarithm(lit(1)), logarithm(lit(1.5)))
+          .select(logarithm(lit(0)), logarithm(lit(1)), logarithm(lit(1.5))),
       )
   }
 
@@ -395,14 +395,14 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(
         sql("select abs(0), abs(-1), abs(123), abs(-9223372036854775807), abs(9223372036854775807)"),
-        Row(0, 1, 123, 9223372036854775807L, 9223372036854775807L)
+        Row(0, 1, 123, 9223372036854775807L, 9223372036854775807L),
     )
 
     checkAnswer(
         sql("select abs(0.0), abs(-3.14159265), abs(3.14159265)"),
         Row(BigDecimal("0.0"),
             BigDecimal("3.14159265"),
-            BigDecimal("3.14159265"))
+            BigDecimal("3.14159265")),
     )
   }
 

@@ -239,7 +239,7 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
         extractorReturnsBoolean: Boolean,
         val checkedLength: Option[Int],
         val prevBinder: Symbol,
-        val ignoredSubPatBinders: Set[Symbol]
+        val ignoredSubPatBinders: Set[Symbol],
     )
         extends FunTreeMaker with PreserveSubPatBinders {
 
@@ -267,7 +267,7 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
             if (extractorReturnsBoolean)
               casegen.flatMapCond(
                   extractor, CODE.UNIT, nextBinder, condAndNext)
-            else casegen.flatMap(extractor, nextBinder, condAndNext)
+            else casegen.flatMap(extractor, nextBinder, condAndNext),
         )
       }
 
@@ -302,7 +302,7 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
         val subPatRefs: List[Tree],
         val mutableBinders: List[Symbol],
         binderKnownNonNull: Boolean,
-        val ignoredSubPatBinders: Set[Symbol]
+        val ignoredSubPatBinders: Set[Symbol],
     )
         extends FunTreeMaker with PreserveSubPatBinders {
 
@@ -528,7 +528,7 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
                          else
                            addOuterTest(
                                if (isExpectedReferenceType) mkNullTest
-                               else mkTypeTest
+                               else mkTypeTest,
                            ))
 
         // true when called to type-test the argument to an extractor

@@ -606,7 +606,7 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
           name -> JArray(
               value
                 .map(v => JInt(children.indexOf(v.asInstanceOf[TreeNode[_]])))
-                .toList
+                .toList,
             )
         case (name, value) => name -> parseToJson(value)
       }

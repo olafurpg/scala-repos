@@ -44,7 +44,7 @@ class EnsemblePieChart extends EnsembleExample {
         PieChart.Data("IBM", 12),
         PieChart.Data("HP", 25),
         PieChart.Data("Dell", 22),
-        PieChart.Data("Apple", 30)
+        PieChart.Data("Apple", 30),
     )
     clockwise = false
   }

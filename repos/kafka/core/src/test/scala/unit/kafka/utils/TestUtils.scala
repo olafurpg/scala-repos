@@ -541,7 +541,7 @@ object TestUtils extends Logging {
     val defaultProps = Map(
         ProducerConfig.RETRY_BACKOFF_MS_CONFIG -> "100",
         ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG -> "200",
-        ProducerConfig.LINGER_MS_CONFIG -> lingerMs.toString
+        ProducerConfig.LINGER_MS_CONFIG -> lingerMs.toString,
     )
 
     defaultProps.foreach {
@@ -1109,7 +1109,7 @@ object TestUtils extends Logging {
     val producer = createNewProducer(
         TestUtils.getBrokerListStrFromServers(servers),
         retries = 5,
-        requestTimeoutMs = 2000
+        requestTimeoutMs = 2000,
     )
 
     val values = (0 until numMessages).map(x => s"test-$x")
@@ -1130,7 +1130,7 @@ object TestUtils extends Logging {
     val producer = createNewProducer(
         TestUtils.getBrokerListStrFromServers(servers),
         retries = 5,
-        requestTimeoutMs = 2000
+        requestTimeoutMs = 2000,
     )
     producer
       .send(new ProducerRecord(topic, topic.getBytes, message.getBytes))

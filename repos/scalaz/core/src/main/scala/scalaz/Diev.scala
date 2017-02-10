@@ -155,7 +155,7 @@ trait DievImplementation {
                 adjacentAfterResult
                   .map(_ + 1)
                   .orElse(after)
-                  .getOrElse(intervals.size)
+                  .getOrElse(intervals.size),
               )
           }
         case (earlyBound @ Between(before, after), Coincidence(endPosition)) =>
@@ -169,7 +169,7 @@ trait DievImplementation {
                        .map(intervals(_)._1)
                        .getOrElse(correctedInterval._1),
                      intervals(endPosition)._2.max(correctedInterval._2))),
-                endPosition + 1
+                endPosition + 1,
             )
           }
         //(Between(None,Some(0)),Between(Some(0),Some(1)))
@@ -191,7 +191,7 @@ trait DievImplementation {
                 adjacentAfterResult
                   .map(_ + 1)
                   .orElse(otherAfter)
-                  .getOrElse(intervals.size)
+                  .getOrElse(intervals.size),
               )
           }
       }

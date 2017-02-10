@@ -1023,7 +1023,7 @@ trait ValAndDefPrintTests {
                  Nil,
                  Nil :: Nil,
                  EmptyTree,
-                 Literal(Constant(())))
+                 Literal(Constant(()))),
       )
     }(sm"""
     |{

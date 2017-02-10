@@ -48,7 +48,7 @@ class EnsembleToggleButton extends EnsembleExample {
           {
             toggleLabel.text = "You selected : " +
             newValue.asInstanceOf[JfxToggleBtn].getText
-        }
+        },
     )
   }
 
@@ -75,7 +75,7 @@ class EnsembleToggleButton extends EnsembleExample {
               toggleGroup = tog
             })
           },
-          toggleLabel
+          toggleLabel,
       )
     }
   }

@@ -30,7 +30,7 @@ class ImportPanelConverterProvider
         "importMembersUsingUnderScore",
         "importShortestPathForAmbiguousReferences",
         "importsWithPrefix",
-        "sortImports"
+        "sortImports",
     )
 
     def getElements: Seq[Element] = {

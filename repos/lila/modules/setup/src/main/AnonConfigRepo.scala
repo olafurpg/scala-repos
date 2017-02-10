@@ -43,7 +43,7 @@ private[setup] object AnonConfigRepo {
       anonConfigTube.coll
         .find(
             BSONDocument("_id" -> sid),
-            BSONDocument("filter" -> true)
+            BSONDocument("filter" -> true),
         )
         .one[BSONDocument] map {
         _ flatMap (_.getAs[FilterConfig]("filter"))

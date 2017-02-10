@@ -77,14 +77,14 @@ object Test {
     List(
         manifest[T] <:< manifest[Any],
         manifest[T] <:< manifest[AnyRef],
-        !(manifest[T] <:< manifest[AnyVal])
+        !(manifest[T] <:< manifest[AnyVal]),
     ) foreach (assert(_, "assertAnyRef"))
 
   def assertAnyVal[T : Manifest] =
     List(
         manifest[T] <:< manifest[Any],
         !(manifest[T] <:< manifest[AnyRef]),
-        manifest[T] <:< manifest[AnyVal]
+        manifest[T] <:< manifest[AnyVal],
     ) foreach (assert(_, "assertAnyVal"))
 
   def assertSameType[T : Manifest, U : Manifest] =
@@ -99,7 +99,7 @@ object Test {
   def testVariancesVia[T : Manifest, U : Manifest] = assert(
       typeCompare[T, U] == SUB &&
       showsCovariance[T, U, List] && showsInvariance[T, U, Set],
-      "testVariancesVia"
+      "testVariancesVia",
   )
 
   def runAllTests = {

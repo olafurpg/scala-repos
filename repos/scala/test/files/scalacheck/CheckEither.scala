@@ -235,7 +235,7 @@ object Test extends Properties("Either") {
       ("prop_Either_joinLeft", prop_Either_joinLeft),
       ("prop_Either_joinRight", prop_Either_joinRight),
       ("prop_Either_reduce", prop_Either_reduce),
-      ("prop_Either_cond", prop_Either_cond)
+      ("prop_Either_cond", prop_Either_cond),
   )
 
   for ((label, prop) <- tests) {

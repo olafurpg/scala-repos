@@ -1005,7 +1005,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
         override def answer = capturedArgument.getValue.apply(
             Map(new TopicPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME,
                                    groupPartitionId) -> new PartitionResponse(
-                    Errors.NONE.code, 0L, Record.NO_TIMESTAMP))
+                    Errors.NONE.code, 0L, Record.NO_TIMESTAMP)),
         )
       })
     EasyMock
@@ -1108,7 +1108,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
         override def answer = capturedArgument.getValue.apply(
             Map(new TopicPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME,
                                    groupPartitionId) -> new PartitionResponse(
-                    Errors.NONE.code, 0L, Record.NO_TIMESTAMP))
+                    Errors.NONE.code, 0L, Record.NO_TIMESTAMP)),
         )
       })
     EasyMock

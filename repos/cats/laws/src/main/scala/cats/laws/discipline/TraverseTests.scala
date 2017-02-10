@@ -40,7 +40,7 @@ trait TraverseTests[F[_]] extends FunctorTests[F] with FoldableTests[F] {
               laws.traverseSequentialComposition[A, B, C, X, Y] _),
           "traverse parallel composition" -> forAll(
               laws.traverseParallelComposition[A, B, X, Y] _),
-          "traverse derive foldMap" -> forAll(laws.foldMapDerived[A, M] _)
+          "traverse derive foldMap" -> forAll(laws.foldMapDerived[A, M] _),
       )
     }
   }

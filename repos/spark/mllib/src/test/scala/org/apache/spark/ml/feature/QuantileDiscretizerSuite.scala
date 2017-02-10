@@ -75,7 +75,7 @@ class QuantileDiscretizerSuite
                             1,
                             Double.PositiveInfinity),
         Array(0.0, 1.0) -> Array(
-            Double.NegativeInfinity, 0, 1, Double.PositiveInfinity)
+            Double.NegativeInfinity, 0, 1, Double.PositiveInfinity),
     )
     for ((ori, res) <- splitTestPoints) {
       assert(QuantileDiscretizer.getSplits(ori) === res,

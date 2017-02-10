@@ -81,7 +81,7 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
             LabeledPoint(11, Vectors.dense(2, 2, 3, 4)),
             LabeledPoint(-6, Vectors.dense(6, 4, 2, 1)),
             LabeledPoint(9, Vectors.dense(1, 2, 6, 4)),
-            LabeledPoint(-4, Vectors.dense(6, 3, 2, 2))
+            LabeledPoint(-4, Vectors.dense(6, 3, 2, 2)),
         ))
     val gbt = new GBTRegressor().setMaxDepth(2).setMaxIter(2)
     val model = gbt.fit(df)

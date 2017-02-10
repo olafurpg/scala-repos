@@ -94,7 +94,7 @@ abstract class AsyncBase[I, O, S, D, RC](maxWaitingFutures: MaxWaitingFutures,
           logger.debug(
               "Exceeded maxWaitingFutures({}), put {} futures",
               maxWaitingFutures.get,
-              iterSize
+              iterSize,
           )
         }
     }

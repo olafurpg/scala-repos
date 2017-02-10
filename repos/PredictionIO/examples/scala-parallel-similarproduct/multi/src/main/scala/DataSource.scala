@@ -28,7 +28,7 @@ class DataSource(val dsp: DataSourceParams)
     val usersRDD: RDD[(String, User)] = eventsDb
       .aggregateProperties(
           appId = dsp.appId,
-          entityType = "user"
+          entityType = "user",
       )(sc)
       .map {
         case (entityId, properties) =>
@@ -48,7 +48,7 @@ class DataSource(val dsp: DataSourceParams)
     val itemsRDD: RDD[(String, Item)] = eventsDb
       .aggregateProperties(
           appId = dsp.appId,
-          entityType = "item"
+          entityType = "item",
       )(sc)
       .map {
         case (entityId, properties) =>

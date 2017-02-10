@@ -66,8 +66,8 @@ object FormSpec extends Specification {
               "k19" -> of[String],
               "k20" -> of[String],
               "k21" -> of[String],
-              "k22" -> of[String]
-          )
+              "k22" -> of[String],
+          ),
       )
 
       form
@@ -94,7 +94,7 @@ object FormSpec extends Specification {
                 "k19" -> "v19",
                 "k20" -> "v20",
                 "k21" -> "v21",
-                "k22" -> "v22"
+                "k22" -> "v22",
             ))
         .fold(_ => "errors", t => t._21) must_== "v21"
     }
@@ -197,7 +197,7 @@ object FormSpec extends Specification {
                 if (s.isEmpty) true
                 else
                   throw new AssertionError(
-                      "Validation was run when it wasn't meant to"))
+                      "Validation was run when it wasn't meant to")),
       )
       failingValidatorForm.fill("foo").errors must beEmpty
     }
@@ -330,15 +330,15 @@ object FormSpec extends Specification {
     val itemForm = Form[Items](
         mapping(
             "seq" -> seq(
-                mapping("text" -> nonEmptyText)(Item)(Item.unapply)
-            )
-        )(Items)(Items.unapply)
+                mapping("text" -> nonEmptyText)(Item)(Item.unapply),
+            ),
+        )(Items)(Items.unapply),
     )
 
     val filled = itemForm.fillAndValidate(Items(Seq(Item(""))))
     val result = filled.fold(
         errors => false,
-        success => true
+        success => true,
     )
 
     result should beFalse
@@ -380,22 +380,22 @@ object ScalaForms {
   val userForm = Form(
       mapping(
           "name" -> of[String].verifying(nonEmpty),
-          "age" -> of[Int].verifying(min(0), max(100))
-      )(User.apply)(User.unapply)
+          "age" -> of[Int].verifying(min(0), max(100)),
+      )(User.apply)(User.unapply),
   )
 
   val loginForm = Form(
       tuple(
           "email" -> of[String],
-          "password" -> of[Int]
-      )
+          "password" -> of[Int],
+      ),
   )
 
   val defaultValuesForm = Form(
       tuple(
           "pos" -> default(number, 42),
-          "name" -> default(text, "default text")
-      )
+          "name" -> default(text, "default text"),
+      ),
   )
 
   val helloForm = Form(
@@ -417,22 +417,22 @@ object ScalaForms {
           "11" -> optional(text),
           "12" -> optional(text),
           "13" -> optional(text),
-          "14" -> optional(text)
-      )
+          "14" -> optional(text),
+      ),
   )
 
   val repeatedForm = Form(
       tuple(
           "name" -> nonEmptyText,
-          "emails" -> list(nonEmptyText)
-      )
+          "emails" -> list(nonEmptyText),
+      ),
   )
 
   val repeatedFormWithSet = Form(
       tuple(
           "name" -> nonEmptyText,
-          "emails" -> set(nonEmptyText)
-      )
+          "emails" -> set(nonEmptyText),
+      ),
   )
 
   val form = Form(
@@ -440,14 +440,14 @@ object ScalaForms {
         .verifying("first.digit",
                    s => (s.headOption map { _ == '3' }) getOrElse false)
         .transform[Int](Integer.parseInt _, _.toString)
-        .verifying("number.42", _ < 42)
+        .verifying("number.42", _ < 42),
     )
 
   val emailForm = Form(
       tuple(
           "email" -> email,
-          "name" -> of[String]
-      )
+          "name" -> of[String],
+      ),
   )
 
   val longNumberForm = Form("longNumber" -> longNumber(10, 42))

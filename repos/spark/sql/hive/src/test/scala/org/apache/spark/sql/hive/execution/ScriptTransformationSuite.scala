@@ -40,12 +40,12 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
       outputSerdeProps = Seq.empty,
       recordReaderClass = None,
       recordWriterClass = None,
-      schemaLess = false
+      schemaLess = false,
   )
 
   private val serdeIOSchema = noSerdeIOSchema.copy(
       inputSerdeClass = Some(classOf[LazySimpleSerDe].getCanonicalName),
-      outputSerdeClass = Some(classOf[LazySimpleSerDe].getCanonicalName)
+      outputSerdeClass = Some(classOf[LazySimpleSerDe].getCanonicalName),
   )
 
   test("cat without SerDe") {
@@ -57,7 +57,7 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                       script = "cat",
                       output = Seq(AttributeReference("a", StringType)()),
                       child = child,
-                      ioschema = noSerdeIOSchema
+                      ioschema = noSerdeIOSchema,
                   )(hiveContext),
                 rowsDf.collect())
   }
@@ -71,7 +71,7 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                       script = "cat",
                       output = Seq(AttributeReference("a", StringType)()),
                       child = child,
-                      ioschema = serdeIOSchema
+                      ioschema = serdeIOSchema,
                   )(hiveContext),
                 rowsDf.collect())
   }
@@ -87,7 +87,7 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                         script = "cat",
                         output = Seq(AttributeReference("a", StringType)()),
                         child = ExceptionInjectingOperator(child),
-                        ioschema = noSerdeIOSchema
+                        ioschema = noSerdeIOSchema,
                     )(hiveContext),
                   rowsDf.collect())
     }
@@ -105,7 +105,7 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                         script = "cat",
                         output = Seq(AttributeReference("a", StringType)()),
                         child = ExceptionInjectingOperator(child),
-                        ioschema = serdeIOSchema
+                        ioschema = serdeIOSchema,
                     )(hiveContext),
                   rowsDf.collect())
     }

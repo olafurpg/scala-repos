@@ -26,7 +26,7 @@ object GlobalPlugin {
         globalPluginUpdate := gp.updateReport,
         // TODO: these shouldn't be required (but are): the project* settings above should take care of this
         injectInternalClasspath(Runtime, gp.internalClasspath),
-        injectInternalClasspath(Compile, gp.internalClasspath)
+        injectInternalClasspath(Compile, gp.internalClasspath),
     )
   private[this] def injectInternalClasspath(
       config: Configuration, cp: Seq[Attributed[File]]): Setting[_] =
@@ -101,7 +101,7 @@ object GlobalPlugin {
               Keys.baseDirectory("Loading global plugins from " + _),
             name := "global-plugin",
             sbtPlugin := true,
-            version := "0.0"
+            version := "0.0",
         ))
 }
 final case class GlobalPluginData(

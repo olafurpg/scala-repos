@@ -88,7 +88,7 @@ class InteractiveStatusDisplay extends TopComponentDisplayable {
         (for (i <- 0 to steps) yield
           new RotatedIcon(icon1, step * i)).toArray[Icon],
         icon2,
-        ICON_CYCLE_LENGTH
+        ICON_CYCLE_LENGTH,
     )
     i.resume()
     i

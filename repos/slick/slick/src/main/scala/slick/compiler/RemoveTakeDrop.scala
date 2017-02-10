@@ -48,7 +48,7 @@ class RemoveTakeDrop(
             Library.And.typed[Boolean](
                 Library.>.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), d),
                 Library.<=.typed[Boolean](Select(Ref(fs), ElementSymbol(2)),
-                                          constOp[Long]("+")(_ + _)(t, d))
+                                          constOp[Long]("+")(_ + _)(t, d)),
             )
           case _ => throw new SlickException("Unexpected empty Take/Drop")
         })

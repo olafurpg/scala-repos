@@ -50,7 +50,7 @@ object DevModeBuild {
         val status = args.tail.head.toInt
         val assertions = args.tail.tail
         DevModeBuild.verifyResourceContains(path, status, assertions, 0)
-      }
+      },
   )
 
   val ServerMaxAttempts = 3 * 60

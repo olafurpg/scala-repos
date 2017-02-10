@@ -89,7 +89,7 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
           val expectedTypes = Seq(
               parentRef.expectedType().filterNot(_.isInstanceOf[NonValueType]),
               extractSeqType,
-              getScopeType
+              getScopeType,
           ).flatten
           val expectedType = expectedTypes match {
             case Seq(t, rest @ _ *) => t

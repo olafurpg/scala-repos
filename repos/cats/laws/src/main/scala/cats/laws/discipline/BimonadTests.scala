@@ -33,7 +33,7 @@ trait BimonadTests[F[_]] extends MonadTests[F] with ComonadTests[F] {
           "extract/flatMap entwining" -> forAll(
               laws.extractFlatMapEntwining[A] _),
           "pure/coflatMap entwining" -> forAll(
-              laws.pureCoflatMapEntwining[A] _)
+              laws.pureCoflatMapEntwining[A] _),
       )
     }
   }

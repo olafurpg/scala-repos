@@ -7,7 +7,7 @@ import com.twitter.util.{Time, Future, Bijection}
 
 class ClientAdaptor[T](
     val self: Client,
-    bijection: Bijection[Buf, T]
+    bijection: Bijection[Buf, T],
 )
     extends BaseClient[T] with Proxy {
   def bufferToType(a: Buf): T = bijection(a)

@@ -197,7 +197,7 @@ sealed abstract class TreeInstances {
       val b = bb
       Tree.Node(
           (a.rootLabel, b.rootLabel),
-          Zip[Stream].zipWith(a.subForest, b.subForest)(zip(_, _))
+          Zip[Stream].zipWith(a.subForest, b.subForest)(zip(_, _)),
       )
     }
   }

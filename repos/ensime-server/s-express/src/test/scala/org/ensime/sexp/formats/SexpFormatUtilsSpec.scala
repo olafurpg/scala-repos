@@ -66,7 +66,7 @@ class SexpFormatUtilsSpec extends FormatSpec with SexpFormats {
             case s: SexpString => s
             case x => deserializationError(x)
           }
-        }
+        },
     )
 
     foo.convertTo[Try[SexpString]](safe) should ===(Success(foo))

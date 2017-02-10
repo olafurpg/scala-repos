@@ -42,7 +42,7 @@ private[scala] final class EmptyMethodCache extends MethodCache {
 
 private[scala] final class MegaMethodCache(
     private[this] val forName: String,
-    private[this] val forParameterTypes: Array[JClass[_]]
+    private[this] val forParameterTypes: Array[JClass[_]],
 )
     extends MethodCache {
 
@@ -56,7 +56,7 @@ private[scala] final class PolyMethodCache(
     private[this] val next: MethodCache,
     private[this] val receiver: JClass[_],
     private[this] val method: JMethod,
-    private[this] val complexity: Int
+    private[this] val complexity: Int,
 )
     extends MethodCache {
 

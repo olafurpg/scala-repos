@@ -40,7 +40,7 @@ trait CORSSupport {
                                       |Referer,
                                       |User-Agent""".stripMargin.replace("\n",
                                                                          " ")),
-      `Access-Control-Max-Age`(1728000)
+      `Access-Control-Max-Age`(1728000),
   )
 
   def cors[T]: Directive0 = mapRequestContext { ctx =>
@@ -57,7 +57,7 @@ trait CORSSupport {
             HttpResponse().withHeaders(
                 `Access-Control-Allow-Methods`(
                     HttpMethods.OPTIONS,
-                    allowedMethods: _*) :: allowOriginHeader :: optionsCorsHeaders
+                    allowedMethods: _*) :: allowOriginHeader :: optionsCorsHeaders,
             )
           }
         }
@@ -72,7 +72,7 @@ trait CORSSupport {
         HttpEntity(
             ContentTypes.`text/plain(UTF-8)`,
             "The server was not able to produce a timely response to your request."),
-        List(allowOriginHeader)
+        List(allowOriginHeader),
     )
   }
 }

@@ -57,6 +57,6 @@ object StackedAreaChartDemo extends JFXApp {
     XYChart.Series[Number, Number](
         name,
         ObservableBuffer(
-            data.map { case (x, y) => XYChart.Data[Number, Number](x, y) })
+            data.map { case (x, y) => XYChart.Data[Number, Number](x, y) }),
     )
 }

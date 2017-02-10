@@ -1208,7 +1208,7 @@ object KeyCode extends SFXEnumDelegateCompanion[jfxsi.KeyCode, KeyCode] {
       VolumeDown,
       Mute,
       Command,
-      Shortcut
+      Shortcut,
   )
 
   /** Parses textual representation of a key. */

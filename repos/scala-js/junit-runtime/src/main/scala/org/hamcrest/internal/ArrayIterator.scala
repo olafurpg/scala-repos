@@ -15,7 +15,7 @@ class ArrayIterator private (
           case arr: Array[_] => arr
           case _ => throw new IllegalArgumentException("not an array")
         },
-        0
+        0,
     )
   }
 

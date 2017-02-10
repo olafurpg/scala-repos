@@ -104,7 +104,7 @@ class Engine[TD, EI, PD, Q, P, A](
       Map("" -> dataSourceClass),
       Map("" -> preparatorClass),
       algorithmClassMap,
-      Map("" -> servingClass)
+      Map("" -> servingClass),
   )
 
   /** Java-friendly constructor
@@ -122,7 +122,7 @@ class Engine[TD, EI, PD, Q, P, A](
       Map("" -> dataSourceClass),
       Map("" -> preparatorClass),
       JavaConversions.mapAsScalaMap(algorithmClassMap).toMap,
-      Map("" -> servingClass)
+      Map("" -> servingClass),
   )
 
   /** Returns a new Engine instance, mimicking case class's copy method behavior.
@@ -280,7 +280,7 @@ class Engine[TD, EI, PD, Q, P, A](
       sc: SparkContext,
       engineInstanceId: String,
       // AlgoName, Algo, Model
-      algoTuples: Seq[(String, Params, BaseAlgorithm[_, _, _, _], Any)]
+      algoTuples: Seq[(String, Params, BaseAlgorithm[_, _, _, _], Any)],
   ): Seq[Any] = {
 
     logger.info(s"engineInstanceId=$engineInstanceId")
@@ -386,7 +386,7 @@ class Engine[TD, EI, PD, Q, P, A](
                   WorkflowUtils.extractParams(engineLanguage,
                                               compact(render(eap.params)),
                                               algorithmClassMap(eap.name),
-                                              jsonExtractor)
+                                              jsonExtractor),
               )
             }
           case _ => Nil
@@ -593,7 +593,7 @@ object Engine {
       dataSourceMap.m,
       preparatorMap.m,
       algorithmClassMap,
-      servingMap.m
+      servingMap.m,
   )
 
   /** Provides concrete implementation of training for [[Engine]].
@@ -614,7 +614,7 @@ object Engine {
       dataSource: BaseDataSource[TD, _, Q, _],
       preparator: BasePreparator[TD, PD],
       algorithmList: Seq[BaseAlgorithm[PD, _, Q, _]],
-      params: WorkflowParams
+      params: WorkflowParams,
   ): Seq[Any] = {
     logger.info("EngineWorkflow.train")
     logger.info(s"DataSource: $dataSource")

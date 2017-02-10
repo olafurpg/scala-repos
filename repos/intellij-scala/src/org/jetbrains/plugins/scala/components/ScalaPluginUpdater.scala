@@ -54,18 +54,18 @@ object ScalaPluginUpdater {
       CASSIOPEIA_OLD -> Map(
           Release -> "DUMMY",
           EAP -> "http://www.jetbrains.com/idea/plugins/scala-eap-cassiopeia.xml",
-          Nightly -> "http://www.jetbrains.com/idea/plugins/scala-nightly-cassiopeia.xml"
+          Nightly -> "http://www.jetbrains.com/idea/plugins/scala-nightly-cassiopeia.xml",
       ),
       FOURTEEN_ONE_OLD -> Map(
           Release -> "DUMMY",
           EAP -> "http://www.jetbrains.com/idea/plugins/scala-eap-14.1.xml",
-          Nightly -> ""
+          Nightly -> "",
       ),
       FOURTEEN_ONE -> Map(
           Release -> "DUMMY",
           EAP -> baseUrl.format("eap"),
-          Nightly -> baseUrl.format("nightly")
-      )
+          Nightly -> baseUrl.format("nightly"),
+      ),
   )
 
   val currentVersion = FOURTEEN_ONE
@@ -273,7 +273,7 @@ object ScalaPluginUpdater {
                   case "Ignore" => appSettings.ASK_PLATFORM_UPDATE = false
                 }
               }
-            }
+            },
             ))
       case Some(result) =>
         Some(

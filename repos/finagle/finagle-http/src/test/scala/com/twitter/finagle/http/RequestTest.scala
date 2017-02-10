@@ -25,7 +25,7 @@ class RequestTest extends FunSuite {
         "/search.json" -> "/search.json",
         "/search.json?" -> "/search.json",
         "/search.json?q=twitter" -> "/search.json",
-        "/search.json%3Fq=twitter" -> "/search.json%3Fq=twitter"
+        "/search.json%3Fq=twitter" -> "/search.json%3Fq=twitter",
     )
     tests.foreach {
       case (input, expected) => assert(Request(input).path == expected)
@@ -43,7 +43,7 @@ class RequestTest extends FunSuite {
         "/search" -> "",
         "/search." -> "",
         "/" -> "",
-        "/." -> ""
+        "/." -> "",
     )
     tests.foreach {
       case (input, expected) =>

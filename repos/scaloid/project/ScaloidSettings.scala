@@ -19,6 +19,6 @@ object ScaloidSettings {
       generate in Scaloid <<= generateTask,
       extract in Scaloid <<= extractTask,
       apiVersion in Scaloid := 16,
-      libraryDependencies += android
+      libraryDependencies += android,
   )
 }

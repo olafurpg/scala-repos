@@ -71,7 +71,7 @@ object ExecutionSpec extends Specification {
               TestRunnable(2,
                            TestRunnable(4, TestRunnable(6), TestRunnable(7)),
                            TestRunnable(5, TestRunnable(8))),
-              TestRunnable(3))
+              TestRunnable(3)),
       )
 
       runRecord must equalTo(0 to 8)

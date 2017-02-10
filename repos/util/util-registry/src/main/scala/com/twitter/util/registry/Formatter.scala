@@ -14,7 +14,7 @@ object Formatter {
   private[registry] def add(
       old: Map[String, Object],
       keys: Seq[String],
-      value: String
+      value: String,
   ): Map[String, Object] =
     old +
     (keys match {

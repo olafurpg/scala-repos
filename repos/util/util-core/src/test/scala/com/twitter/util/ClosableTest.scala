@@ -29,7 +29,7 @@ class ClosableTest extends FunSuite with Eventually with IntegrationPatience {
           closed = true
           Future.Done
         },
-        new Object {}
+        new Object {},
     )
     System.gc()
     eventually { assert(closed) }

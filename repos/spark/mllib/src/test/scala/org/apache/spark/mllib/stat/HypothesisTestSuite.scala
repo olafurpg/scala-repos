@@ -278,8 +278,8 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
             0.970577579543399,
             0.0282226444247749,
             -0.0857821886527593,
-            0.389214404984942
-        )
+            0.389214404984942,
+        ),
     )
     val rCompResult = Statistics.kolmogorovSmirnovTest(rData, "norm", 0, 1)
     assert(rCompResult.statistic ~== rKSStat relTol 1e-4)

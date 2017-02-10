@@ -30,7 +30,7 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
   override val db = new DatabaseOnDocker {
     override val imageName = "postgres:9.4.5"
     override val env = Map(
-        "POSTGRES_PASSWORD" -> "rootpass"
+        "POSTGRES_PASSWORD" -> "rootpass",
     )
     override val jdbcPort = 5432
     override def getJdbcUrl(ip: String, port: Int): String =

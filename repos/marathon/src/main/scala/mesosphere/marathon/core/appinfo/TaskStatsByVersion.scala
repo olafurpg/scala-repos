@@ -35,7 +35,7 @@ object TaskStatsByVersion {
         },
         maybeWithOutdatedConfig = maybeFullVersionInfo.flatMap { vi =>
           statsForVersion(_ < vi.lastConfigChangeAt)
-        }
+        },
     )
   }
 
@@ -64,8 +64,8 @@ object TaskStats {
       Some(
           TaskStats(
               counts = TaskCounts(tasks),
-              maybeLifeTime = TaskLifeTime.forSomeTasks(tasks)
-          )
+              maybeLifeTime = TaskLifeTime.forSomeTasks(tasks),
+          ),
       )
     }
   }

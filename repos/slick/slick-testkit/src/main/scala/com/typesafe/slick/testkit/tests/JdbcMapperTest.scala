@@ -45,7 +45,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
         users.map(_.baseProjection) += ("Homer", "Simpson"),
         users ++= Seq(
             User(None, "Marge", "Bouvier"),
-            User(None, "Carl", "Carlson")
+            User(None, "Carl", "Carlson"),
         ),
         users.map(_.asFoo) += Foo(User(None, "Lenny", "Leonard")),
         users
@@ -74,7 +74,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
           .result
           .head
           .map(_ shouldBe User(Some(3), "Carl", "Carlson")),
-        q1.result.head.map(_.should(_.isInstanceOf[User]))
+        q1.result.head.map(_.should(_.isInstanceOf[User])),
     )
   }
 
@@ -98,7 +98,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
         updateQ2.update(Data(9, 10)),
         ts.to[Set]
           .result
-          .map(_ shouldBe Set(Data(7, 8), Data(9, 10), Data(5, 6)))
+          .map(_ shouldBe Set(Data(7, 8), Data(9, 10), Data(5, 6))),
       )
   }
 
@@ -168,7 +168,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
             (p2i1, p2i2, p2i3, p2i4, p2i5, p2i6) <>
             (Part.tupled, Part.unapply _),
             (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6).mapTo[Part],
-            (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6).mapTo[Part]
+            (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6).mapTo[Part],
         ).mapTo[Whole]
       // Manually composed mapping functions
       def m2 =
@@ -177,7 +177,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
             (p1i1, p1i2, p1i3, p1i4, p1i5, p1i6),
             (p2i1, p2i2, p2i3, p2i4, p2i5, p2i6),
             (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6),
-            (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6)
+            (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6),
         ).shaped <>
         ({
           case (id, p1, p2, p3, p4) =>
@@ -238,7 +238,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
                                  43,
                                  44,
                                  45,
-                                 46))
+                                 46)),
       )
   }
 
@@ -261,8 +261,8 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
     val data = Seq(
         Whole(
             Part1(1, "2"),
-            Part2("3", 4)
-        )
+            Part2("3", 4),
+        ),
     )
 
     T.schema.create >> (T ++= data) >> T.result.map(_ shouldBe data)
@@ -304,7 +304,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
           (A(1, 1), Some(B(1, Some("a")))),
           (A(1, 1), Some(B(2, Some("b")))),
           (A(2, 2), Some(B(1, Some("a")))),
-          (A(2, 2), Some(B(2, Some("b"))))
+          (A(2, 2), Some(B(2, Some("b")))),
       )
     } yield ()
   }
@@ -358,7 +358,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
                           seq(1).asInstanceOf[Rep[Option[String]]]),
             seq =>
               new C(seq(0).asInstanceOf[Int],
-                    seq(1).asInstanceOf[Option[String]])
+                    seq(1).asInstanceOf[Option[String]]),
         )
 
     class A(tag: Tag) extends Table[C](tag, "A_ProductClassShape") {
@@ -416,7 +416,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
         as += Pair(2, "c"),
         as += Pair(3, "b"),
         q2.result.map(_ shouldBe Vector(Pair(3, Pair(42, "bb")),
-                                        Pair(2, Pair(42, "cc"))))
+                                        Pair(2, Pair(42, "cc")))),
     )
   }
 
@@ -462,7 +462,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
           .result
           .map(_.toSet shouldBe Set(Data(1, true, "a"),
                                     Data(2, false, "c"),
-                                    Data(3, false, "b")))
+                                    Data(3, false, "b"))),
       )
   }
 
@@ -540,7 +540,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
         ts.map(_.auto)
           .to[Set]
           .result
-          .map(_ shouldBe Set(Data(7, 8), Data(9, 10), Data(5, 6)))
+          .map(_ shouldBe Set(Data(7, 8), Data(9, 10), Data(5, 6))),
       )
   }
 }

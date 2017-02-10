@@ -317,7 +317,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                 effectivelyFinal = effectivelyFinal,
                 traitMethodWithStaticImplementation = false,
                 annotatedInline = methodSym.hasAnnotation(ScalaInlineClass),
-                annotatedNoInline = methodSym.hasAnnotation(ScalaNoInlineClass)
+                annotatedNoInline = methodSym.hasAnnotation(ScalaNoInlineClass),
             )
             Some((signature, info))
           }
@@ -1064,7 +1064,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           mirrorMethodName,
           mdesc,
           jgensig,
-          mkArray(thrownExceptions)
+          mkArray(thrownExceptions),
       )
 
       emitAnnotations(mirrorMethod, others)
@@ -1176,7 +1176,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
             "serialVersionUID",
             "J",
             null, // no java-generic-signature
-            new java.lang.Long(id)
+            new java.lang.Long(id),
         )
         .visitEnd()
     }
@@ -1211,7 +1211,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           bType.internalName,
           null /* no java-generic-signature */,
           ObjectRef.internalName,
-          EMPTY_STRING_ARRAY
+          EMPTY_STRING_ARRAY,
       )
 
       if (emitSource)
@@ -1260,7 +1260,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           beanInfoType.internalName,
           null, // no java-generic-signature
           sbScalaBeanInfoRef.internalName,
-          EMPTY_STRING_ARRAY
+          EMPTY_STRING_ARRAY,
       )
 
       beanInfoClass.visitSource(
@@ -1296,7 +1296,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       val stringArrayJType: BType = ArrayBType(StringRef)
       val conJType: BType = MethodBType(
           classBTypeFromSymbol(definitions.ClassClass) :: stringArrayJType :: stringArrayJType :: Nil,
-          UNIT
+          UNIT,
       )
 
       def push(lst: List[String]) {
@@ -1388,7 +1388,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           asm.Opcodes.GETSTATIC,
           moduleName,
           strMODULE_INSTANCE_FIELD,
-          "L" + moduleName + ";"
+          "L" + moduleName + ";",
       )
 
       // INVOKEVIRTUAL `moduleName`.CREATOR() : android.os.Parcelable$Creator;
@@ -1398,7 +1398,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           moduleName,
           "CREATOR",
           bt.descriptor,
-          false
+          false,
       )
 
       // PUTSTATIC `thisName`.CREATOR;
@@ -1406,7 +1406,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           asm.Opcodes.PUTSTATIC,
           thisName,
           "CREATOR",
-          tdesc_creator
+          tdesc_creator,
       )
     }
   } // end of trait JAndroidBuilder

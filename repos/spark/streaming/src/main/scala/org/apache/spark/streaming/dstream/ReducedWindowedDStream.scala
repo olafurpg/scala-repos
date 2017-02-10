@@ -32,7 +32,7 @@ private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
     filterFunc: Option[((K, V)) => Boolean],
     _windowDuration: Duration,
     _slideDuration: Duration,
-    partitioner: Partitioner
+    partitioner: Partitioner,
 )
     extends DStream[(K, V)](parent.ssc) {
 

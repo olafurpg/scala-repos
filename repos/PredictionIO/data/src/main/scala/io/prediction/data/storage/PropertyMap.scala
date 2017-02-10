@@ -33,7 +33,7 @@ import org.json4s.native.JsonMethods.parse
 class PropertyMap(
     fields: Map[String, JValue],
     val firstUpdated: DateTime,
-    val lastUpdated: DateTime
+    val lastUpdated: DateTime,
 )
     extends DataMap(fields) {
 
@@ -88,6 +88,6 @@ object PropertyMap {
     apply(
         fields = parse(js).asInstanceOf[JObject].obj.toMap,
         firstUpdated = firstUpdated,
-        lastUpdated = lastUpdated
+        lastUpdated = lastUpdated,
     )
 }

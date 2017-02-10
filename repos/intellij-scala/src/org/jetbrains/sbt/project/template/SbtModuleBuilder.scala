@@ -181,7 +181,7 @@ class SbtModuleBuilder
           ExternalSystemUtil.refreshProjects(
               new ImportSpecBuilder(model.getProject, SbtProjectSystem.Id)
                 .forceWhenUptodate()
-                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC),
             )
       })
     }

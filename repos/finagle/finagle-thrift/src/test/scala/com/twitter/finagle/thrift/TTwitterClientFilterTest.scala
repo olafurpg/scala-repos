@@ -148,7 +148,7 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
     assert(
         clientIdContextWasSet == true,
         "expected ClientId was not set in the ClientIdContext: expected: %s, actual: %s"
-          .format(clientId.name, header.getClient_id.getName)
+          .format(clientId.name, header.getClient_id.getName),
     )
   }
 }

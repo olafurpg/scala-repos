@@ -50,7 +50,7 @@ case class Arguments(sbtData: SbtData,
         filesToPaths(sourceRoots),
         filesToPaths(outputDirs),
         sequenceToString(worksheetFiles),
-        sbtIncOptions
+        sbtIncOptions,
     )
   }
 }

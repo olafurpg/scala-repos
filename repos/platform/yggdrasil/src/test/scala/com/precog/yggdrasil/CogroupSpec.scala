@@ -70,7 +70,7 @@ trait CogroupSpec[M[+ _]]
 
         (SampleData(l.sortBy(_ \ "key").toStream),
          SampleData(r.sortBy(_ \ "key").toStream))
-      }
+      },
   )
 
   type CogroupResult[A] = Stream[Either3[A, (A, A), A]]
@@ -163,7 +163,7 @@ trait CogroupSpec[M[+ _]]
           OuterObjectConcat(
               WrapObject(SourceKey.Left, "key"),
               WrapObject(OuterArrayConcat(SourceValue.Left, SourceValue.Right),
-                         "value"))
+                         "value")),
       )
 
     val jsonResult = toJson(f(result))
@@ -216,7 +216,7 @@ trait CogroupSpec[M[+ _]]
         recBoth(8),
         recBoth(8),
         recBoth(8),
-        recBoth(8)
+        recBoth(8),
     )
 
     val result: Table =
@@ -226,7 +226,7 @@ trait CogroupSpec[M[+ _]]
           OuterObjectConcat(WrapObject(SourceKey.Left, "key"),
                             WrapObject(OuterObjectConcat(SourceValue.Left,
                                                          SourceValue.Right),
-                                       "value"))
+                                       "value")),
       )
 
     val jsonResult = toJson(f(result))
@@ -266,7 +266,7 @@ trait CogroupSpec[M[+ _]]
         recr(7, 0),
         recr(8, 14),
         recr(9, 42),
-        recr(10, 77)
+        recr(10, 77),
     )
 
     val result: Table =
@@ -276,7 +276,7 @@ trait CogroupSpec[M[+ _]]
           OuterObjectConcat(WrapObject(SourceKey.Left, "key"),
                             WrapObject(OuterObjectConcat(SourceValue.Left,
                                                          SourceValue.Right),
-                                       "value"))
+                                       "value")),
       )
 
     val jsonResult = toJson(result)
@@ -306,7 +306,7 @@ trait CogroupSpec[M[+ _]]
         recl(4),
         recr(5),
         recBoth(6),
-        recBoth(7)
+        recBoth(7),
     )
 
     val result: Table =
@@ -316,7 +316,7 @@ trait CogroupSpec[M[+ _]]
           OuterObjectConcat(WrapObject(SourceKey.Left, "key"),
                             WrapObject(OuterObjectConcat(SourceValue.Left,
                                                          SourceValue.Right),
-                                       "value"))
+                                       "value")),
       )
 
     val jsonResult = toJson(result)
@@ -346,7 +346,7 @@ trait CogroupSpec[M[+ _]]
         recr(4),
         recl(5),
         recBoth(6),
-        recBoth(7)
+        recBoth(7),
     )
 
     val result: Table =
@@ -356,7 +356,7 @@ trait CogroupSpec[M[+ _]]
           OuterObjectConcat(WrapObject(SourceKey.Left, "key"),
                             WrapObject(OuterObjectConcat(SourceValue.Left,
                                                          SourceValue.Right),
-                                       "value"))
+                                       "value")),
       )
 
     val jsonResult = toJson(result)
@@ -383,7 +383,7 @@ trait CogroupSpec[M[+ _]]
             OuterObjectConcat(WrapObject(SourceKey.Left, "key"),
                               WrapObject(OuterObjectConcat(SourceValue.Left,
                                                            SourceValue.Right),
-                                         "value"))
+                                         "value")),
         )).copoint must throwAn[Exception]
   }
 
@@ -428,7 +428,7 @@ trait CogroupSpec[M[+ _]]
             toRecord(Array(10), parseUnsafe("""{ "ruoh5A25Jaxa":0.0 }""")),
             toRecord(
                 Array(11),
-                parseUnsafe("""{ "ruoh5A25Jaxa":-2.049657967962047E38 }"""))
+                parseUnsafe("""{ "ruoh5A25Jaxa":-2.049657967962047E38 }""")),
         ))
 
     val s2 = SampleData(
@@ -451,7 +451,7 @@ trait CogroupSpec[M[+ _]]
             toRecord(Array(9), parseUnsafe("""{ "mbsn8ya":0 }""")),
             toRecord(Array(10), parseUnsafe("""{ "mbsn8ya":1 }""")),
             toRecord(
-                Array(11), parseUnsafe("""{ "mbsn8ya":758880641626989193 }"""))
+                Array(11), parseUnsafe("""{ "mbsn8ya":758880641626989193 }""")),
         ))
 
     testCogroup(s1, s2)
@@ -499,7 +499,7 @@ trait CogroupSpec[M[+ _]]
             toRecord(Array(77, 65, 58),
                      JArray(JNum(-4032275398385636682l) :: Nil)),
             toRecord(Array(86, 50, 9),
-                     JArray(JNum(4163435383002324073l) :: Nil))
+                     JArray(JNum(4163435383002324073l) :: Nil)),
         ))
 
     val s2 = SampleData(
@@ -548,7 +548,7 @@ trait CogroupSpec[M[+ _]]
             toRecord(
                 Array(77, 65, 58), JArray(JUndefined :: JNum(1.0) :: Nil)),
             toRecord(Array(86, 50, 9),
-                     JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil))
+                     JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
         ))
 
     testCogroup(s1, s2)
@@ -576,7 +576,7 @@ trait CogroupSpec[M[+ _]]
             parseUnsafe(
                 """{ "value":{ "ugsrry":-8.988465674311579E+307 }, "key":[18.0] }"""),
             parseUnsafe(
-                """{ "value":{ "ugsrry":2.5882896341488965E+307 }, "key":[22.0] }""")
+                """{ "value":{ "ugsrry":2.5882896341488965E+307 }, "key":[22.0] }"""),
         ))
 
     val s2 = SampleData(
@@ -603,7 +603,7 @@ trait CogroupSpec[M[+ _]]
             parseUnsafe(
                 """{ "value":{ "fzqJh5csbfsZqgkoi":[0E+48881] }, "key":[18.0] }"""),
             parseUnsafe(
-                """{ "value":{ "fzqJh5csbfsZqgkoi":[2.326724524858976798E-10633] }, "key":[22.0] }""")
+                """{ "value":{ "fzqJh5csbfsZqgkoi":[2.326724524858976798E-10633] }, "key":[22.0] }"""),
         ))
 
     testCogroup(s1, s2)
@@ -622,7 +622,7 @@ trait CogroupSpec[M[+ _]]
 
     val expected = Stream(
         parseUnsafe("""{ "id": "foo", "left": 4, "right": 2 }"""),
-        parseUnsafe("""{ "id": "foo", "left": 4, "right": 4 }""")
+        parseUnsafe("""{ "id": "foo", "left": 4, "right": 4 }"""),
     )
 
     val keySpec = DerefObjectStatic(Leaf(Source), CPathField("id"))
@@ -654,7 +654,7 @@ trait CogroupSpec[M[+ _]]
     val result: Table = ltable.cogroup(keySpec, keySpec, rtable)(
         WrapObject(Leaf(Source), "blah!"),
         WrapObject(Leaf(Source), "argh!"),
-        DerefObjectStatic(Leaf(SourceRight), CPathField("value"))
+        DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
     )
 
     val jsonResult = toJson(result).copoint
@@ -675,7 +675,7 @@ trait CogroupSpec[M[+ _]]
     val result: Table = ltable.cogroup(keySpec, keySpec, rtable)(
         WrapObject(Leaf(Source), "blah!"),
         WrapObject(Leaf(Source), "argh!"),
-        DerefObjectStatic(Leaf(SourceLeft), CPathField("value"))
+        DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
     )
 
     val jsonResult = toJson(result).copoint
@@ -706,8 +706,8 @@ trait CogroupSpec[M[+ _]]
                        "right"),
             WrapObject(
                 DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
-                "left")
-        )
+                "left"),
+        ),
     )
 
     val jsonResult = toJson(result).copoint
@@ -722,7 +722,7 @@ trait CogroupSpec[M[+ _]]
     val rtable = fromSample(
         SampleData(Stream(
                 JParser.parseUnsafe("""{"key":"Bob","value":50}"""),
-                JParser.parseUnsafe("""{"key":"Charlie","value":60}""")
+                JParser.parseUnsafe("""{"key":"Charlie","value":60}"""),
             )))
 
     val expected =
@@ -742,8 +742,8 @@ trait CogroupSpec[M[+ _]]
                 "right"),
             WrapObject(
                 DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
-                "left")
-        )
+                "left"),
+        ),
     )
 
     val jsonResult = toJson(result).copoint

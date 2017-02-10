@@ -91,14 +91,14 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
 
     Seq(
         ("ServerBuilder", builder, port(builder.boundAddress)),
-        ("Proto", proto, port(proto.boundAddress))
+        ("Proto", proto, port(proto.boundAddress)),
     )
   }
 
   def clients(
       pf: TProtocolFactory,
       clientId: Option[ClientId],
-      port: Int
+      port: Int,
   ): Seq[(String, B.ServiceIface, Closable)] = {
     val dest = s"localhost:$port"
 
@@ -115,7 +115,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
 
     Seq(
         ("ClientBuilder", toIface(builder), builder),
-        ("Proto", toIface(proto), proto)
+        ("Proto", toIface(proto), proto),
     )
   }
 
@@ -130,7 +130,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
         (clientWhich, clientIface, clientClosable) <- clients(
             pf, clientId, port)
       } withClue(
-          s"Server ($serverWhich) Client ($clientWhich) clientId $clientId protocolFactory $pf"
+          s"Server ($serverWhich) Client ($clientWhich) clientId $clientId protocolFactory $pf",
       ) {
         val resp = clientIface.show_me_your_dtab()
         clientId match {
@@ -383,7 +383,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
 
     val server1 = Thrift.serveIface(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
-        new ExtendedEchoService1()
+        new ExtendedEchoService1(),
     )
     val client1 = Thrift.newIface[ExtendedEcho.FutureIface](
         Name.bound(
@@ -400,7 +400,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
     }
     val server2 = Thrift.serveIface(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
-        new ExtendedEchoService2()
+        new ExtendedEchoService2(),
     )
     val client2 = Thrift.newIface[ExtendedEcho.FutureIface](
         Name.bound(
@@ -436,7 +436,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
 
   private def testFailureClassification(
       sr: InMemoryStatsReceiver,
-      client: Echo.FutureIface
+      client: Echo.FutureIface,
   ): Unit = {
     val ex = intercept[InvalidQueryException] {
       Await.result(client.echo("hi"), 5.seconds)
@@ -540,7 +540,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
               .name("server")
               .reportTo(sr)
               .bindTo(new InetSocketAddress(0))
-              .build(new Echo.FinagledService(fi, Protocols.binaryFactory())))
+              .build(new Echo.FinagledService(fi, Protocols.binaryFactory()))),
     )
 
   private[this] val clients: Seq[
@@ -569,7 +569,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
                   .hostConnectionLimit(1)
                   .reportTo(sr)
                   .dest(Name.bound(addr))
-                  .build()))
+                  .build())),
     )
 
   for {

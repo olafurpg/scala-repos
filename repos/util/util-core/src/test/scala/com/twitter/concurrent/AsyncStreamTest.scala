@@ -579,7 +579,7 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val gen = Gen.zip(
         Gen.choose(0, 10).label("numActions"),
         Gen.choose(0, 10).flatMap(Gen.listOfN(_, Arbitrary.arbitrary[Int])),
-        Gen.choose(1, 11).label("concurrency")
+        Gen.choose(1, 11).label("concurrency"),
     )
 
     forAll(gen) {

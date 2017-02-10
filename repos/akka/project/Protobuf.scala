@@ -69,7 +69,7 @@ object Protobuf {
                   log)
           }
         }
-      }
+      },
   )
 
   private def callProtoc[T](protoc: String,

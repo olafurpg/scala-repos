@@ -106,7 +106,7 @@ trait FSLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                 StreamT.empty[M, Slice]
               }
             },
-            UnknownSize
+            UnknownSize,
         )
 
         result.transform(

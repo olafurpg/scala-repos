@@ -227,7 +227,7 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
   def secureXML: XMLLoader[Elem] = {
     val parserFactory = SAXParserFactory.newInstance(
         "org.apache.xerces.jaxp.SAXParserFactoryImpl",
-        SecurityHelpers.getClass.getClassLoader
+        SecurityHelpers.getClass.getClassLoader,
     )
 
     parserFactory.setNamespaceAware(false)

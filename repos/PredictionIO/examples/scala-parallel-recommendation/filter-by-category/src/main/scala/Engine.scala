@@ -6,18 +6,18 @@ import io.prediction.controller.Engine
 case class Query(
     user: String,
     num: Int,
-    categories: Array[String]
+    categories: Array[String],
 )
     extends Serializable
 
 case class PredictedResult(
-    itemScores: Array[ItemScore]
+    itemScores: Array[ItemScore],
 )
     extends Serializable
 
 case class ItemScore(
     item: String,
-    score: Double
+    score: Double,
 )
     extends Serializable
 

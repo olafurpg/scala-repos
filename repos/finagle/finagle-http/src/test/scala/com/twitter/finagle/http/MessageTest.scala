@@ -39,7 +39,7 @@ class MessageTest extends FunSuite {
         "x; charset==" -> "=",
         "x; charset" -> null,
         "x" -> null,
-        ";;;;;;" -> null
+        ";;;;;;" -> null,
     )
     tests.foreach {
       case (header, expected) =>
@@ -58,7 +58,7 @@ class MessageTest extends FunSuite {
         ("x;p1;charset=a;p3" -> "b") -> "x;p1;charset=b;p3",
         ("x;" -> "b") -> "x;charset=b",
         (";" -> "b") -> ";charset=b",
-        ("" -> "b") -> ";charset=b"
+        ("" -> "b") -> ";charset=b",
     )
     tests.foreach {
       case ((header, charset), expected) =>
@@ -78,7 +78,7 @@ class MessageTest extends FunSuite {
         ";;;;;;;;;;" -> "",
         "application/json;" -> "application/json",
         "  application/json  ;  charset=utf-8  " -> "application/json",
-        "APPLICATION/JSON" -> "application/json"
+        "APPLICATION/JSON" -> "application/json",
     )
     tests.foreach {
       case (header, expected) =>
@@ -102,7 +102,7 @@ class MessageTest extends FunSuite {
         ("x;p1; p2 ;p3" -> "y") -> "y;p1; p2 ;p3",
         ("x;" -> "y") -> "y",
         (";" -> "y") -> "y",
-        ("" -> "y") -> "y"
+        ("" -> "y") -> "y",
     )
     tests.foreach {
       case ((header, mediaType), expected) =>

@@ -190,7 +190,7 @@ object IngestMessage {
                                      eventRecords,
                                      ingest.jobId,
                                      defaultTimestamp,
-                                     StreamRef.Append))
+                                     StreamRef.Append)),
                 )
               }
           }

@@ -98,7 +98,7 @@ abstract class CentralMomentAgg(child: Expression)
             If(IsNull(child), avg, newAvg),
             If(IsNull(child), m2, newM2),
             If(IsNull(child), m3, newM3),
-            If(IsNull(child), m4, newM4)
+            If(IsNull(child), m4, newM4),
         ))
   }
 

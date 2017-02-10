@@ -142,7 +142,7 @@ final case class DeploymentPlan(id: String,
     DeploymentPlan(
         original = Group.empty.mergeFromProto(msg.getOriginal),
         target = Group.empty.mergeFromProto(msg.getTarget),
-        version = Timestamp(msg.getVersion)
+        version = Timestamp(msg.getVersion),
     ).copy(id = msg.getId)
 
   override def toProto: Protos.DeploymentPlanDefinition =
@@ -293,7 +293,7 @@ object DeploymentPlan {
     steps += DeploymentStep(
         (originalApps -- targetApps.keys).valuesIterator.map { oldApp =>
           StopApplication(oldApp)
-        }.to[Seq]
+        }.to[Seq],
     )
 
     // 2. Start apps that do not exist in the original, requiring only 0
@@ -302,7 +302,7 @@ object DeploymentPlan {
     steps += DeploymentStep(
         (targetApps -- originalApps.keys).valuesIterator.map { newApp =>
           StartApplication(newApp, 0)
-        }.to[Seq]
+        }.to[Seq],
     )
 
     // 3. For each app in each dependency class,
@@ -325,7 +325,7 @@ object DeploymentPlan {
         original,
         target,
         steps.result().filter(_.actions.nonEmpty),
-        version
+        version,
     )
 
     result

@@ -153,7 +153,7 @@ object StateSpec {
     */
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: (Time, KeyType, Option[ValueType],
-      State[StateType]) => Option[MappedType]
+      State[StateType]) => Option[MappedType],
   ): StateSpec[KeyType, ValueType, StateType, MappedType] = {
     ClosureCleaner.clean(mappingFunction, checkSerializable = true)
     new StateSpecImpl(mappingFunction)
@@ -172,7 +172,7 @@ object StateSpec {
     */
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: (KeyType, Option[ValueType],
-      State[StateType]) => MappedType
+      State[StateType]) => MappedType,
   ): StateSpec[KeyType, ValueType, StateType, MappedType] = {
     ClosureCleaner.clean(mappingFunction, checkSerializable = true)
     val wrappedFunction = (time: Time, key: KeyType, value: Option[ValueType],

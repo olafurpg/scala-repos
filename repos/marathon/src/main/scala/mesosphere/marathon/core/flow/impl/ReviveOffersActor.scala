@@ -99,7 +99,7 @@ private[impl] class ReviveOffersActor(
   override def receive: Receive = LoggingReceive {
     Seq(
         receiveOffersWantedNotifications,
-        receiveReviveOffersEvents
+        receiveReviveOffersEvents,
     ).reduceLeft[Receive](_.orElse[Any, Unit](_))
   }
 

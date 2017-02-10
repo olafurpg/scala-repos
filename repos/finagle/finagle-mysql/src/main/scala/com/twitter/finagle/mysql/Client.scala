@@ -32,7 +32,7 @@ object Client {
       password: String,
       dbname: String = null,
       logLevel: Level = Level.OFF,
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   ): Client = {
     val factory = com.twitter.finagle.exp.Mysql.client
       .withCredentials(username, password)

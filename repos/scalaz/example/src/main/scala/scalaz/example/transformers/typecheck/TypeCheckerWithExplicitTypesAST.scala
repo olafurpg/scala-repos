@@ -35,6 +35,6 @@ object TypeCheckerWithExplicitTypesAST {
       "-" -> (TyLam(numT, TyLam(numT, numT))),
       "==" -> (TyLam(numT, TyLam(numT, boolT))),
       "&&" -> (TyLam(boolT, TyLam(boolT, boolT))),
-      "||" -> (TyLam(boolT, TyLam(boolT, boolT)))
+      "||" -> (TyLam(boolT, TyLam(boolT, boolT))),
   )
 }

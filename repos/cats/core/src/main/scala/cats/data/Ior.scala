@@ -142,14 +142,14 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
         (a, b) =>
           that.fold(a2 => false,
                     b2 => false,
-                    (a2, b2) => AA.eqv(a, a2) && BB.eqv(b, b2))
+                    (a2, b2) => AA.eqv(a, a2) && BB.eqv(b, b2)),
     )
 
   final def show[AA >: A, BB >: B](
       implicit AA: Show[AA], BB: Show[BB]): String = fold(
       a => s"Ior.Left(${AA.show(a)})",
       b => s"Ior.Right(${BB.show(b)})",
-      (a, b) => s"Ior.Both(${AA.show(a)}, ${BB.show(b)})"
+      (a, b) => s"Ior.Both(${AA.show(a)}, ${BB.show(b)})",
   )
 }
 

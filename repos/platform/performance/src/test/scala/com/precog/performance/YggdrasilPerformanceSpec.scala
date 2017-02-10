@@ -116,7 +116,7 @@ tests := load(//test/query_set)
 histogram('platform) :=
   { platform: 'platform, num: count(tests where tests.platform = 'platform) }
 histogram
-"""
+""",
       )
 
       def test(i: Int) = {

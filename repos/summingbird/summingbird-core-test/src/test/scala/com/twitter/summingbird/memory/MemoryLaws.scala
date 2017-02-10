@@ -129,7 +129,7 @@ class MemoryLaws extends WordSpec {
 
     val storeAndServiceMatches = MapAlgebra
       .sumByKey(
-          items1.flatMap(fnA)
+          items1.flatMap(fnA),
       )
       .forall {
         case (k, v) =>
@@ -142,7 +142,7 @@ class MemoryLaws extends WordSpec {
           items2
             .flatMap(fnB)
             .map { case (k, u) => (k, (u, serviceFn(k))) }
-            .flatMap(postJoinFn)
+            .flatMap(postJoinFn),
         )
       .forall {
         case (k, v) =>

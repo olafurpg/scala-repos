@@ -11,7 +11,7 @@ object Test extends CompilerTest {
       "class Ezz{}",
       "class Fzz{} ",
       "class Gzz { }",
-      "class Hzz { }            "
+      "class Hzz { }            ",
   )
   def check(source: String, unit: CompilationUnit) {
     unit.body foreach {

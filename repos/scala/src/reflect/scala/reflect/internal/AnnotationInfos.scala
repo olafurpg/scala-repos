@@ -218,7 +218,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
   class CompleteAnnotationInfo(
       val atp: Type,
       val args: List[Tree],
-      val assocs: List[(Name, ClassfileAnnotArg)]
+      val assocs: List[(Name, ClassfileAnnotArg)],
   )
       extends AnnotationInfo {
     // Classfile annot: args empty. Scala annot: assocs empty.

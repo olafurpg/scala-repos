@@ -127,7 +127,7 @@ object IncompleteClickHandler extends JFXApp {
                   println("Button 6 - Message 1")
                   println("Button 6 - Message 2")
                 }
-              }
+              },
           )
         }
       }

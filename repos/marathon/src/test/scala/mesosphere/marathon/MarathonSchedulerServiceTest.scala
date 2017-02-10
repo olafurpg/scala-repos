@@ -130,7 +130,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override def runDriver(
           abdicateCmdOption: Option[ExceptionalCommand[JoinException]]): Unit =
@@ -165,7 +165,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override def runDriver(
           abdicateCmdOption: Option[ExceptionalCommand[JoinException]]): Unit =
@@ -199,7 +199,7 @@ class MarathonSchedulerServiceTest
         migration,
         schedulerActor,
         events,
-        metrics = new Metrics(new MetricRegistry)
+        metrics = new Metrics(new MetricRegistry),
     ) {
       override def runDriver(
           abdicateCmdOption: Option[ExceptionalCommand[JoinException]]): Unit =
@@ -245,7 +245,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override def runDriver(
           abdicateCmdOption: Option[ExceptionalCommand[JoinException]]): Unit =
@@ -277,7 +277,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override lazy val initialOfferLeadershipBackOff: FiniteDuration =
         1.milliseconds
@@ -319,7 +319,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override lazy val initialOfferLeadershipBackOff: FiniteDuration =
         1.milliseconds
@@ -357,7 +357,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override lazy val initialOfferLeadershipBackOff: FiniteDuration =
         1.milliseconds
@@ -395,7 +395,7 @@ class MarathonSchedulerServiceTest
         system,
         migration,
         schedulerActor,
-        events
+        events,
     ) {
       override lazy val initialOfferLeadershipBackOff: FiniteDuration =
         1.milliseconds

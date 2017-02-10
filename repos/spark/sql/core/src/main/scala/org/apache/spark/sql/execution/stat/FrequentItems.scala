@@ -117,7 +117,7 @@ private[sql] object FrequentItems extends Logging {
                 i += 1
               }
               baseCounts
-          }
+          },
       )
     val justItems = freqItems.map(m => m.baseMap.keys.toArray)
     val resultRow = Row(justItems: _*)

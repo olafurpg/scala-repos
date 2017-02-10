@@ -70,7 +70,7 @@ trait StdLibStaticInlinerModule[M[+ _]]
                                   } yield col cValue 0
 
                                   Const(result getOrElse CUndefined)(graph.loc)
-                              }
+                              },
                           )
                         }
                     }

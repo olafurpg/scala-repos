@@ -229,13 +229,13 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
     sql("insert into table test_insert_parquet select a, b from jt where jt.a > 5")
     checkAnswer(
         sql(s"SELECT intField, stringField FROM test_insert_parquet WHERE intField < 8"),
-        Row(6, "str6") :: Row(7, "str7") :: Nil
+        Row(6, "str6") :: Row(7, "str7") :: Nil,
     )
     // Insert overwrite.
     sql("insert overwrite table test_insert_parquet select a, b from jt where jt.a < 5")
     checkAnswer(
         sql(s"SELECT intField, stringField FROM test_insert_parquet WHERE intField > 2"),
-        Row(3, "str3") :: Row(4, "str4") :: Nil
+        Row(3, "str3") :: Row(4, "str4") :: Nil,
     )
     dropTables("test_insert_parquet")
 
@@ -255,14 +255,14 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
     sql("insert overwrite table test_insert_parquet select a, b from jt where jt.a < 5")
     checkAnswer(
         sql(s"SELECT intField, stringField FROM test_insert_parquet WHERE intField > 2"),
-        Row(3, "str3") :: Row(4, "str4") :: Nil
+        Row(3, "str3") :: Row(4, "str4") :: Nil,
     )
     // Insert into the table.
     sql("insert into table test_insert_parquet select a, b from jt")
     checkAnswer(
         sql(s"SELECT intField, stringField FROM test_insert_parquet"),
         (1 to 10).map(i => Row(i, s"str$i")) ++ (1 to 4).map(
-            i => Row(i, s"str$i"))
+            i => Row(i, s"str$i")),
     )
     dropTables("test_insert_parquet")
   }
@@ -280,7 +280,7 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
 
       checkAnswer(
           sql(s"SELECT a, b FROM test_parquet_ctas WHERE a = 1"),
-          Seq(Row(1, "str1"))
+          Seq(Row(1, "str1")),
       )
 
       table("test_parquet_ctas").queryExecution.optimizedPlan match {
@@ -317,7 +317,7 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
 
       checkAnswer(
           sql("SELECT intField FROM test_insert_parquet WHERE test_insert_parquet.intField > 5"),
-          sql("SELECT a FROM jt WHERE jt.a > 5").collect()
+          sql("SELECT a FROM jt WHERE jt.a > 5").collect(),
       )
     }
   }
@@ -348,7 +348,7 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
 
       checkAnswer(
           sql("SELECT int_array FROM test_insert_parquet"),
-          sql("SELECT a FROM jt_array").collect()
+          sql("SELECT a FROM jt_array").collect(),
       )
     }
   }
@@ -602,7 +602,7 @@ class ParquetSourceSuite extends ParquetPartitioningTest {
       .saveAsTable("spark_6016_fix")
     checkAnswer(
         sql("select * from spark_6016_fix"),
-        (1 to 10).map(i => Row(i))
+        (1 to 10).map(i => Row(i)),
     )
 
     // Create a DataFrame with four partitions. So, the created table will have four parquet files.
@@ -617,7 +617,7 @@ class ParquetSourceSuite extends ParquetPartitioningTest {
     // which will cause an error.
     checkAnswer(
         sql("select * from spark_6016_fix"),
-        (1 to 10).map(i => Row(i))
+        (1 to 10).map(i => Row(i)),
     )
 
     sql("drop table spark_6016_fix")
@@ -801,12 +801,12 @@ abstract class ParquetPartitioningTest
     test(s"ordering of the partitioning columns $table") {
       checkAnswer(
           sql(s"SELECT p, stringField FROM $table WHERE p = 1"),
-          Seq.fill(10)(Row(1, "part-1"))
+          Seq.fill(10)(Row(1, "part-1")),
       )
 
       checkAnswer(
           sql(s"SELECT stringField, p FROM $table WHERE p = 1"),
-          Seq.fill(10)(Row("part-1", 1))
+          Seq.fill(10)(Row("part-1", 1)),
       )
     }
 
@@ -815,7 +815,7 @@ abstract class ParquetPartitioningTest
           sql(s"SELECT p, count(*) FROM $table group by p"),
           Row(1, 10) :: Row(2, 10) :: Row(3, 10) :: Row(4, 10) :: Row(5, 10) :: Row(
               6,
-              10) :: Row(7, 10) :: Row(8, 10) :: Row(9, 10) :: Row(10, 10) :: Nil
+              10) :: Row(7, 10) :: Row(8, 10) :: Row(9, 10) :: Row(10, 10) :: Nil,
       )
     }
 
@@ -829,7 +829,7 @@ abstract class ParquetPartitioningTest
               "part-7",
               7,
               10) :: Row("part-8", 8, 10) :: Row("part-9", 9, 10) :: Row(
-              "part-10", 10, 10) :: Nil
+              "part-10", 10, 10) :: Nil,
       )
     }
 

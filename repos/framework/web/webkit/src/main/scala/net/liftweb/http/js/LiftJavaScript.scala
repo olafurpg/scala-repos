@@ -80,7 +80,7 @@ object LiftJavaScript {
           .openOr(AnonFunc(Noop)),
         "ajaxOnEnd" -> LiftRules.ajaxEnd
           .map(fnc => AnonFunc(fnc()))
-          .openOr(AnonFunc(Noop))
+          .openOr(AnonFunc(Noop)),
       )
   }
 

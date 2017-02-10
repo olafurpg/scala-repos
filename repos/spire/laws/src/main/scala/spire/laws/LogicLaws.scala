@@ -85,7 +85,7 @@ trait LogicLaws[A] extends Laws {
         },
         "(0 → x) = 1" -> forAll { (x: A) =>
           (A.zero imp x) === A.one
-        }
+        },
     )
 
   def bool(implicit A: Bool[A]) =

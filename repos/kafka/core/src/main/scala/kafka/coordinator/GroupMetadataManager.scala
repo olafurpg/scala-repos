@@ -292,7 +292,7 @@ class GroupMetadataManager(val brokerId: Int,
                   topicAndPartition.partition),
             bytes = GroupMetadataManager.offsetCommitValue(offsetAndMetadata),
             timestamp = timestamp,
-            magicValue = magicValue
+            magicValue = magicValue,
         )
     }.toSeq
 
@@ -475,7 +475,7 @@ class GroupMetadataManager(val brokerId: Int,
                                   value.commitTimestamp +
                                   config.offsetsRetentionMs
                                 else value.expireTimestamp
-                              }
+                              },
                           ))
                       trace("Loaded offset %s for %s.".format(value, key))
                     }

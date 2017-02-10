@@ -35,7 +35,7 @@ object cholesky extends UFunc {
           N /* number of rows */,
           A.data,
           scala.math.max(1, N) /* LDA */,
-          info
+          info,
       )
       // A value of info.`val` < 0 would tell us that the i-th argument
       // of the call to dpotrf was erroneous (where i == |info.`val`|).

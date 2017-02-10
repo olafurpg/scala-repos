@@ -45,8 +45,8 @@ class MarathonHealthCheckManagerTest
     system = ActorSystem(
         "test-system",
         ConfigFactory.parseString(
-            """akka.loggers = ["akka.testkit.TestEventListener"]"""
-        )
+            """akka.loggers = ["akka.testkit.TestEventListener"]""",
+        ),
     )
     leadershipModule = AlwaysElectedLeadershipModule(shutdownHooks)
 
@@ -74,7 +74,7 @@ class MarathonHealthCheckManagerTest
         eventStream,
         taskTracker,
         appRepository,
-        config
+        config,
     )
   }
 
@@ -258,7 +258,7 @@ class MarathonHealthCheckManagerTest
         .store(AppDefinition(
                 id = appId,
                 versionInfo = AppDefinition.VersionInfo.forNewConfig(version),
-                healthChecks = healthChecks
+                healthChecks = healthChecks,
             ))
         .futureValue
       taskCreationHandler.created(task).futureValue

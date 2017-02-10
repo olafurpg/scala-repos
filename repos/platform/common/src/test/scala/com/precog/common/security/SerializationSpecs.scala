@@ -84,7 +84,7 @@ class SerializationSpecs extends Specification {
                            None,
                            "A594581E",
                            Set("b994", "3be3"),
-                           false)
+                           false),
           )
 
         case Failure(error) => throw new Exception(error.toString)
@@ -141,7 +141,7 @@ class SerializationSpecs extends Specification {
                   Some("The root API key"),
                   "(undefined)",
                   Set("c6ab82c1f69640de9e5211ebb2b96661e1bff7d8a4134f25ad1aaf1319fa7b3e182e6aa8eb1f4699b1303f0d03022213"),
-                  true)
+                  true),
           ))
     }
   }
@@ -202,7 +202,7 @@ class SerializationSpecs extends Specification {
                   Set("91cb868"),
                   Set(WritePermission(Path("/test/"), WriteAsAny)),
                   i0,
-                  None)
+                  None),
         )
       }).fold({ error =>
         throw new Exception(error.toString)
@@ -262,10 +262,10 @@ class SerializationSpecs extends Specification {
                     ReadPermission(Path("/"), WrittenByAny),
                     ReducePermission(Path("/"), WrittenByAny),
                     WritePermission(Path("/"), WriteAsAny),
-                    DeletePermission(Path("/"), WrittenByAny)
+                    DeletePermission(Path("/"), WrittenByAny),
                 ),
                 i0,
-                None
+                None,
             ),
             Grant(
                 "e5fa39314ca748818e52c50d2d445a6f4d9f9a224ddb4e55bf7c03e2a21fb36ff2bbff861aec43a18cccf2ee7f38841e",
@@ -277,10 +277,10 @@ class SerializationSpecs extends Specification {
                     ReadPermission(Path("/"), WrittenByAny),
                     ReducePermission(Path("/"), WrittenByAny),
                     WritePermission(Path("/"), WriteAsAny),
-                    DeletePermission(Path("/"), WrittenByAny)
+                    DeletePermission(Path("/"), WrittenByAny),
                 ),
                 i0,
-                None
+                None,
             ),
             Grant(
                 "75826da768b64748b8423cdd047d7e8f6361e5bb50d8428080feaf1c0c6269600982be9e1c9f4299bf521aac95065ace",
@@ -294,7 +294,7 @@ class SerializationSpecs extends Specification {
                     WritePermission(Path("/0000000001/"), WriteAsAny),
                     DeletePermission(Path("/0000000001/"), WrittenByAny)),
                 i0,
-                None)
+                None),
         )
       }).fold({ error =>
         throw new Exception(error.toString)

@@ -74,7 +74,7 @@ private[kestrel] class CommandToEncoding extends OneToOneEncoder {
   private[this] def keyWithSuffix(
       queueName: Buf,
       suffix: Buf,
-      timeout: Option[Duration]
+      timeout: Option[Duration],
   ): Buf = {
     timeout match {
       case Some(t) => queueName.concat(suffix).concat(encodeTimeout(t))

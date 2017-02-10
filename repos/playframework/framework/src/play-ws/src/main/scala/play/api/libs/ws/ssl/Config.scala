@@ -209,7 +209,7 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
     val protocol = c.get[String]("protocol")
     val checkRevocation = c.get[Option[Boolean]]("checkRevocation")
     val revocationLists: Option[Seq[URL]] = Some(
-        c.get[Seq[String]]("revocationLists").map(new URL(_))
+        c.get[Seq[String]]("revocationLists").map(new URL(_)),
     ).filter(_.nonEmpty)
 
     val debug = parseDebug(c.get[PlayConfig]("debug"))
@@ -260,7 +260,7 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
         allowWeakProtocols = allowWeakProtocols,
         allowLegacyHelloMessages = allowMessages,
         allowUnsafeRenegotiation = allowUnsafeRenegotiation,
-        acceptAnyCertificate = acceptAnyCertificate
+        acceptAnyCertificate = acceptAnyCertificate,
     )
   }
 

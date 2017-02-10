@@ -62,7 +62,7 @@ class TypedStaticQueryTest {
                 assertEquals(
                     1 :: "2" :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 :: 10 :: 11 :: 12 :: 13 :: 14 :: 15 :: 16 :: 17 :: 18 :: 19 :: 20 :: 21 :: 22 :: 23 :: HNil,
                     hlist1Typed)
-              }
+              },
               )),
           Duration.Inf)
     } finally dc.db.close()
@@ -128,7 +128,7 @@ class TypedStaticQueryTest {
                 assertEquals(
                     Set(Bar("Groundsville"), Bar("Meadows"), Bar("Mendocino")),
                     t4.toSet)
-              }
+              },
               )),
           Duration.Inf)
     } finally dc.db.close()
@@ -170,7 +170,7 @@ class TypedStaticQueryTest {
                            s4.map { o4 =>
                          val t4: Supplier = o4.map(supplierGetter).head
                          assertEquals(Supplier(49, "Superior Coffee"), t4)
-                       }
+                       },
                        )),
                    Duration.Inf)
     } finally dc.db.close()
@@ -217,7 +217,7 @@ class TypedStaticQueryTest {
                 },
                     tsql"""DELETE FROM SUPPLIERS WHERE SUP_ID = '102';""" map testUnitDML,
                     tsql"""DELETE FROM SUPPLIERS WHERE SUP_ID = '103';""" map testUnitDML,
-                    tsql"""drop table "SUPPLIERS2" """
+                    tsql"""drop table "SUPPLIERS2" """,
                 )
                 .withPinnedSession),
           Duration.Inf)

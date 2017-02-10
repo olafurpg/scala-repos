@@ -38,7 +38,7 @@ class CatalystQlSuite extends PlanTest {
   test("test NOT operator with comparison operations") {
     val parsed = parser.parsePlan("SELECT NOT TRUE > TRUE")
     val expected = Project(UnresolvedAlias(
-                               Not(GreaterThan(Literal(true), Literal(true)))
+                               Not(GreaterThan(Literal(true), Literal(true))),
                            ) :: Nil,
                            OneRowRelation)
     comparePlans(parsed, expected)
@@ -80,7 +80,7 @@ class CatalystQlSuite extends PlanTest {
     def checkInterval(sql: String, result: CalendarInterval): Unit = {
       val parsed = parser.parsePlan(sql)
       val expected = Project(UnresolvedAlias(
-                                 Literal(result)
+                                 Literal(result),
                              ) :: Nil,
                              OneRowRelation)
       comparePlans(parsed, expected)
@@ -127,7 +127,7 @@ class CatalystQlSuite extends PlanTest {
     def assertRight(input: String, output: Double): Unit = {
       val parsed = parser.parsePlan("SELECT " + input)
       val expected = Project(UnresolvedAlias(
-                                 Literal(output)
+                                 Literal(output),
                              ) :: Nil,
                              OneRowRelation)
       comparePlans(parsed, expected)

@@ -1490,7 +1490,7 @@ private[optimizer] abstract class OptimizerCore(
       "s_reflect_ManifestFactory$ObjectManifest$",
       "s_reflect_ManifestFactory$AnyValManifest$",
       "s_reflect_ManifestFactory$NullManifest$",
-      "s_reflect_ManifestFactory$NothingManifest$"
+      "s_reflect_ManifestFactory$NothingManifest$",
   )
 
   private def shouldInlineBecauseOfArgs(
@@ -4065,7 +4065,7 @@ private[optimizer] object OptimizerCore {
         "sjs_js_typedarray_package$.uint16Array2CharArray__sjs_js_typedarray_Uint16Array__AC" -> Uint16ArrayToCharArray,
         "sjs_js_typedarray_package$.int32Array2IntArray__sjs_js_typedarray_Int32Array__AI" -> Int32ArrayToIntArray,
         "sjs_js_typedarray_package$.float32Array2FloatArray__sjs_js_typedarray_Float32Array__AF" -> Float32ArrayToFloatArray,
-        "sjs_js_typedarray_package$.float64Array2DoubleArray__sjs_js_typedarray_Float64Array__AD" -> Float64ArrayToDoubleArray
+        "sjs_js_typedarray_package$.float64Array2DoubleArray__sjs_js_typedarray_Float64Array__AD" -> Float64ArrayToDoubleArray,
     ).withDefaultValue(-1)
   }
 

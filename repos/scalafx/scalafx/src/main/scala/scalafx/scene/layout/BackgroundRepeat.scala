@@ -53,7 +53,7 @@ object BackgroundRepeat
       NoRepeat,
       Repeat,
       Round,
-      Space
+      Space,
   )
 }
 

@@ -33,7 +33,7 @@ private[setup] object UserConfigRepo {
     userConfigTube.coll
       .find(
           BSONDocument("_id" -> user.id),
-          BSONDocument("filter" -> true)
+          BSONDocument("filter" -> true),
       )
       .one[BSONDocument] map {
       _ flatMap (_.getAs[FilterConfig]("filter")) getOrElse FilterConfig.default

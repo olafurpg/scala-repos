@@ -584,7 +584,7 @@ case class NTile(buckets: Expression)
       bucket,
       bucketThreshold,
       bucketSize,
-      bucketsWithPadding
+      bucketsWithPadding,
   )
 
   override val initialValues = Seq(
@@ -592,7 +592,7 @@ case class NTile(buckets: Expression)
       zero,
       zero,
       Cast(Divide(n, buckets), IntegerType),
-      Cast(Remainder(n, buckets), IntegerType)
+      Cast(Remainder(n, buckets), IntegerType),
   )
 
   override val updateExpressions = Seq(
@@ -603,7 +603,7 @@ case class NTile(buckets: Expression)
               Add(bucketSize,
                   If(LessThan(bucket, bucketsWithPadding), one, zero)))),
       NoOp,
-      NoOp
+      NoOp,
   )
 
   override val evaluateExpression = bucket

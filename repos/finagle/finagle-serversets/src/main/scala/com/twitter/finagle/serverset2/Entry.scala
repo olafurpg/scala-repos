@@ -34,7 +34,7 @@ case class Endpoint(
     port: Int,
     shard: Int,
     status: Endpoint.Status.Value,
-    memberId: String
+    memberId: String,
 )
     extends Entry {
 

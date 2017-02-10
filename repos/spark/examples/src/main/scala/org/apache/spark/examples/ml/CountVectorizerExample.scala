@@ -34,7 +34,7 @@ object CountVectorizerExample {
     val df = sqlContext
       .createDataFrame(Seq(
               (0, Array("a", "b", "c")),
-              (1, Array("a", "b", "b", "c", "a"))
+              (1, Array("a", "b", "b", "c", "a")),
           ))
       .toDF("id", "words")
 

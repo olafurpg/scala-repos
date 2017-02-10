@@ -89,7 +89,7 @@ object Workflow {
         evaluationInstance = evaluationInstance,
         evaluator = evaluation.evaluator,
         env = env,
-        params = params
+        params = params,
     )
   }
 

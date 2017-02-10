@@ -17,12 +17,12 @@ object CodeGenerator extends App {
         "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
     //#default-runner
     slick.codegen.SourceCodeGenerator.main(
-        Array(profile, jdbcDriver, url, outputFolder, pkg)
+        Array(profile, jdbcDriver, url, outputFolder, pkg),
     )
     //#default-runner
     //#default-runner-with-auth
     slick.codegen.SourceCodeGenerator.main(
-        Array(profile, jdbcDriver, url, outputFolder, pkg, user, password)
+        Array(profile, jdbcDriver, url, outputFolder, pkg, user, password),
     )
     //#default-runner-with-auth
     //#customization
@@ -69,7 +69,7 @@ object CodeGenerator extends App {
             "some/folder/",
             "some.packag",
             "Tables",
-            "Tables.scala"
+            "Tables.scala",
         )
     }
     //#customization

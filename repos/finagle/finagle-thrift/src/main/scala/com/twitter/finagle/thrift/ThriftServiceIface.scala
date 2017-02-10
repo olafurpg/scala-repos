@@ -14,7 +14,7 @@ import org.apache.thrift.transport.TMemoryInputTransport
 object maxReusableBufferSize
     extends GlobalFlag[StorageUnit](
         16.kilobytes,
-        "Max size (bytes) for ThriftServiceIface reusable transport buffer"
+        "Max size (bytes) for ThriftServiceIface reusable transport buffer",
     )
 
 /**
@@ -32,7 +32,7 @@ trait ServiceIfaceBuilder[ServiceIface] {
   def newServiceIface(
       thriftService: Service[ThriftClientRequest, Array[Byte]],
       pf: TProtocolFactory,
-      stats: StatsReceiver
+      stats: StatsReceiver,
   ): ServiceIface
 }
 
@@ -111,7 +111,7 @@ object ThriftServiceIface {
       method: ThriftMethod,
       thriftService: Service[ThriftClientRequest, Array[Byte]],
       pf: TProtocolFactory,
-      stats: StatsReceiver
+      stats: StatsReceiver,
   ): Service[method.Args, method.Result] = {
     statsFilter(method, stats) andThen thriftCodecFilter(method, pf) andThen thriftService
   }
@@ -122,14 +122,14 @@ object ThriftServiceIface {
     */
   private def statsFilter(
       method: ThriftMethod,
-      stats: StatsReceiver
+      stats: StatsReceiver,
   ): SimpleFilter[method.Args, method.Result] = {
     val methodStats = ThriftMethodStats(
         stats.scope(method.serviceName).scope(method.name))
     new SimpleFilter[method.Args, method.Result] {
       def apply(
           args: method.Args,
-          service: Service[method.Args, method.Result]
+          service: Service[method.Args, method.Result],
       ): Future[method.Result] = {
         methodStats.requestsCounter.incr()
         service(args).onSuccess { result =>
@@ -154,12 +154,12 @@ object ThriftServiceIface {
     */
   private def thriftCodecFilter(
       method: ThriftMethod,
-      pf: TProtocolFactory
+      pf: TProtocolFactory,
   ): Filter[method.Args, method.Result, ThriftClientRequest, Array[Byte]] =
     new Filter[method.Args, method.Result, ThriftClientRequest, Array[Byte]] {
       override def apply(
           args: method.Args,
-          service: Service[ThriftClientRequest, Array[Byte]]
+          service: Service[ThriftClientRequest, Array[Byte]],
       ): Future[method.Result] = {
         val request = encodeRequest(method.name, args, pf, method.oneway)
         service(request).map { bytes =>
@@ -169,12 +169,12 @@ object ThriftServiceIface {
     }
 
   def resultFilter(
-      method: ThriftMethod
+      method: ThriftMethod,
   ): Filter[method.Args, method.SuccessType, method.Args, method.Result] =
     new Filter[method.Args, method.SuccessType, method.Args, method.Result] {
       def apply(
           args: method.Args,
-          service: Service[method.Args, method.Result]
+          service: Service[method.Args, method.Result],
       ): Future[method.SuccessType] = {
         service(args).flatMap { response: method.Result =>
           response.firstException() match {
@@ -189,7 +189,7 @@ object ThriftServiceIface {
                   Future.exception(
                       new TApplicationException(
                           TApplicationException.MISSING_RESULT,
-                          s"Thrift method '${method.name}' failed: missing result"
+                          s"Thrift method '${method.name}' failed: missing result",
                       ))
               }
           }
@@ -219,7 +219,7 @@ object ThriftServiceIface {
       methodName: String,
       args: ThriftStruct,
       pf: TProtocolFactory,
-      oneway: Boolean
+      oneway: Boolean,
   ): ThriftClientRequest = {
     val buf = getReusableBuffer()
     val oprot = pf.getProtocol(buf)
@@ -237,7 +237,7 @@ object ThriftServiceIface {
   private def decodeResponse[T <: ThriftStruct](
       resBytes: Array[Byte],
       codec: ThriftStructCodec[T],
-      pf: TProtocolFactory
+      pf: TProtocolFactory,
   ): T = {
     val iprot = pf.getProtocol(new TMemoryInputTransport(resBytes))
     val msg = iprot.readMessageBegin()

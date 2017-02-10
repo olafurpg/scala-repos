@@ -48,7 +48,7 @@ object Utils {
         aggregateAttributes = completeAggregateAttributes,
         initialInputBufferOffset = 0,
         resultExpressions = resultExpressions,
-        child = child
+        child = child,
     ) :: Nil
   }
 

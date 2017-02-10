@@ -447,7 +447,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         MaxSize(maxOpenPaths),
         OnRemoval({ (p: Path, _: Unit, _: RemovalCause) =>
           pathActors.get(p).foreach(_ ! ReceiveTimeout)
-        })
+        }),
     )
 
     private[this] var pathActors = Map.empty[Path, ActorRef]
@@ -693,7 +693,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       } yield {
         created.fold(
             error => PathOpFailure(path, error),
-            (_: Resource) => UpdateSuccess(path)
+            (_: Resource) => UpdateSuccess(path),
         )
       }
     }
@@ -715,7 +715,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                                               clock.instant())
               }
           },
-          nihdbr => IO(PrecogUnit)
+          nihdbr => IO(PrecogUnit),
       )
     }
 
@@ -743,7 +743,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
               blob =>
                 left(IO(NotFound(
                             "Located resource on %s is a BLOB, not a projection" format path.path))),
-              db => right(IO(db))
+              db => right(IO(db)),
           )
         }
       }
@@ -773,7 +773,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                     // FIXME: We aren't actually guaranteed success here because NIHDB might do something screwy.
                     maybeCompleteJob(msg, terminal, UpdateSuccess(msg.path)) pipeTo requestor
                     PrecogUnit
-                }
+                },
             )
             .join
         } else if (createIfAbsent) {

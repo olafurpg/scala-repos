@@ -185,7 +185,7 @@ class TasksResourceTest
         groupManager,
         healthCheckManager,
         auth.auth,
-        auth.auth
+        auth.auth,
     )
 
     Given("the app exists")
@@ -247,7 +247,7 @@ class TasksResourceTest
         groupManager,
         healthCheckManager,
         auth.auth,
-        auth.auth
+        auth.auth,
     )
   }
 }

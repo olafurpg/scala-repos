@@ -69,7 +69,7 @@ private[netty4] class Netty4ChannelInitializer(
 
       ch.pipeline.addFirst(
           "sslShutdown",
-          new TlsShutdownHandler(engine)
+          new TlsShutdownHandler(engine),
       )
     }
   }

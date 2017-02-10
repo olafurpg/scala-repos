@@ -24,7 +24,7 @@ case class ALSAlgorithmParams(
     rank: Int,
     numIterations: Int,
     lambda: Double,
-    seed: Option[Long]
+    seed: Option[Long],
 )
     extends Params
 
@@ -33,7 +33,7 @@ class ALSModel(
     val userFeatures: Map[Int, Array[Double]],
     val productFeatures: Map[Int, (Item, Option[Array[Double]])],
     val userStringIntMap: BiMap[String, Int],
-    val itemStringIntMap: BiMap[String, Int]
+    val itemStringIntMap: BiMap[String, Int],
 )
     extends Serializable {
 
@@ -145,7 +145,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         userFeatures = userFeatures,
         productFeatures = productFeatures,
         userStringIntMap = userStringIntMap,
-        itemStringIntMap = itemStringIntMap
+        itemStringIntMap = itemStringIntMap,
     )
   }
 
@@ -172,7 +172,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             eventNames = Some(ap.seenEvents),
             targetEntityType = Some(Some("item")),
             // set time limit to avoid super long DB access
-            timeout = Duration(200, "millis")
+            timeout = Duration(200, "millis"),
         ) match {
           case Right(x) => x
           case Left(e) => {
@@ -203,7 +203,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         eventNames = Some(Seq("$set")),
         limit = Some(1),
         latest = true,
-        timeout = Duration(200, "millis")
+        timeout = Duration(200, "millis"),
     ) match {
       case Right(x) => {
           if (x.hasNext) {
@@ -246,7 +246,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                   item = item,
                   categories = query.categories,
                   whiteList = whiteList,
-                  blackList = finalBlackList
+                  blackList = finalBlackList,
               )
           }.map {
             case (i, (item, feature)) =>
@@ -269,7 +269,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             model = model,
             query = query,
             whiteList = whiteList,
-            blackList = finalBlackList
+            blackList = finalBlackList,
         )
       }
 
@@ -278,7 +278,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         new ItemScore(
             // convert item int index back to string ID
             item = model.itemIntStringMap(i),
-            score = s
+            score = s,
         )
     }
 
@@ -305,7 +305,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         limit = Some(10),
         latest = true,
         // set time limit to avoid super long DB access
-        timeout = Duration(200, "millis")
+        timeout = Duration(200, "millis"),
     ) match {
       case Right(x) => x
       case Left(e) => {
@@ -348,7 +348,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                 item = item,
                 categories = query.categories,
                 whiteList = whiteList,
-                blackList = blackList
+                blackList = blackList,
             )
         }.map {
           case (i, (item, feature)) =>
@@ -418,7 +418,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       item: Item,
       categories: Option[Set[String]],
       whiteList: Option[Set[Int]],
-      blackList: Set[Int]
+      blackList: Set[Int],
   ): Boolean = {
     // can add other custom filtering here
     whiteList.map(_.contains(i)).getOrElse(true) && !blackList.contains(i) &&

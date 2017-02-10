@@ -117,7 +117,7 @@ object GuiceApplicationBuilderSpec extends Specification {
 
   class AModule extends Module {
     def bindings(env: Environment, conf: Configuration) = Seq(
-        bind[A].to[A1]
+        bind[A].to[A1],
     )
   }
 

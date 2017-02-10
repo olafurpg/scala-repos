@@ -233,8 +233,8 @@ trait TransformSpec[M[+ _]]
             Map1(
                 DerefObjectStatic(Leaf(Source), CPathField("value")),
                 lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(
-                    Nil, "eq").applyr(CLong(0))
-            )
+                    Nil, "eq").applyr(CLong(0)),
+            ),
         )
       })
 
@@ -366,7 +366,7 @@ trait TransformSpec[M[+ _]]
             DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                 CPathField("value")),
                               CPathField("value2")),
-            lookupF2(Nil, "eq")
+            lookupF2(Nil, "eq"),
         )
       })
 
@@ -396,7 +396,7 @@ trait TransformSpec[M[+ _]]
             DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                 CPathField("value")),
                               CPathField("value2")),
-            lookupF2(Nil, "add")
+            lookupF2(Nil, "add"),
         )
       })
 
@@ -545,7 +545,7 @@ trait TransformSpec[M[+ _]]
                             CPathField("value1")),
           DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                               CPathField("value")),
-                            CPathField("value2"))
+                            CPathField("value2")),
       )
     })
 
@@ -590,7 +590,7 @@ trait TransformSpec[M[+ _]]
                             CPathField("value1")),
           DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                               CPathField("value")),
-                            CPathField("value2"))
+                            CPathField("value2")),
       )
     })
 
@@ -638,7 +638,7 @@ trait TransformSpec[M[+ _]]
                             CPathField("value1")),
           DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                               CPathField("value")),
-                            CPathField("value2"))
+                            CPathField("value2")),
       )
     })
 
@@ -680,7 +680,7 @@ trait TransformSpec[M[+ _]]
                             CPathField("value1")),
           DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                               CPathField("value")),
-                            CPathField("value2"))
+                            CPathField("value2")),
       )
     })
 
@@ -706,7 +706,7 @@ trait TransformSpec[M[+ _]]
                             CPathField("value1")),
           DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                               CPathField("value")),
-                            CPathField("value2"))
+                            CPathField("value2")),
       )
     })
 
@@ -758,7 +758,7 @@ trait TransformSpec[M[+ _]]
                 }
 
               case (jv, _) => jv
-            }
+            },
         )
       }
     }
@@ -816,7 +816,7 @@ trait TransformSpec[M[+ _]]
                 }
 
               case (jv, _) => jv
-            }
+            },
         )
       }
     }
@@ -867,7 +867,7 @@ trait TransformSpec[M[+ _]]
                 }
 
               case (jv, _) => jv
-            }
+            },
         )
       }
     }
@@ -1181,7 +1181,7 @@ trait TransformSpec[M[+ _]]
                                                         CPathField("value")),
                                       CPathField("value2")),
                                   "value2"),
-                       "value")
+                       "value"),
         )
       })
 
@@ -1197,7 +1197,7 @@ trait TransformSpec[M[+ _]]
             WrapObject(WrapObject(
                            DerefObjectStatic(DerefObjectStatic(Leaf(Source), CPathField("value")), CPathField("value2")),
                            "value2"),
-                       "value")
+                       "value"),
         )
       })
 
@@ -1238,7 +1238,7 @@ trait TransformSpec[M[+ _]]
                 DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                     CPathField("value")),
                                   CPathField("value2")),
-                "value1")
+                "value1"),
         )
       })
 
@@ -1253,7 +1253,7 @@ trait TransformSpec[M[+ _]]
                 DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                     CPathField("value")),
                                   CPathField("value2")),
-                "value1")
+                "value1"),
         )
       })
 
@@ -1315,9 +1315,9 @@ trait TransformSpec[M[+ _]]
                         CPathIndex(0))),
                 WrapArray(DerefArrayStatic(
                         DerefObjectStatic(Leaf(Source), CPathField("value")),
-                        CPathIndex(1)))
+                        CPathIndex(1))),
             ),
-            "value"
+            "value",
         )
       })
 
@@ -1329,9 +1329,9 @@ trait TransformSpec[M[+ _]]
                         CPathIndex(0))),
                 WrapArray(DerefArrayStatic(
                         DerefObjectStatic(Leaf(Source), CPathField("value")),
-                        CPathIndex(1)))
+                        CPathIndex(1))),
             ),
-            "value"
+            "value",
         )
       })
 
@@ -2052,7 +2052,7 @@ trait TransformSpec[M[+ _]]
               .mkType(cschema)
               .getOrElse(sys.error(
                       "Could not generate JType from schema " + cschema)),
-            "key" -> JArrayUnfixedT
+            "key" -> JArrayUnfixedT,
         ))
 
     val table = fromSample(sample)
@@ -2133,7 +2133,7 @@ trait TransformSpec[M[+ _]]
               .mkType(cschema)
               .getOrElse(sys.error(
                       "Could not generate JType from schema " + cschema)),
-            "key" -> JArrayUnfixedT
+            "key" -> JArrayUnfixedT,
         ))
 
     val table = fromSample(sample)
@@ -2552,7 +2552,7 @@ trait TransformSpec[M[+ _]]
         table.transform {
       DerefObjectDynamic(
           Leaf(Source),
-          DerefObjectStatic(Leaf(Source), CPathField("ref"))
+          DerefObjectStatic(Leaf(Source), CPathField("ref")),
       )
     })
 
@@ -2601,7 +2601,7 @@ trait TransformSpec[M[+ _]]
   def checkConst = {
     implicit val gen = undefineRowsForColumn(
         sample(_ => Seq(JPath("field") -> CLong)),
-        JPath("value") \ "field"
+        JPath("value") \ "field",
     )
 
     check { (sample: SampleData) =>

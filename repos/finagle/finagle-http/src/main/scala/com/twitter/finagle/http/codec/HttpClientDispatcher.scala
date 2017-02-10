@@ -94,7 +94,7 @@ class HttpClientDispatcher(
                   // We rely on the base class to satisfy p.
                   Future.exception(new IllegalArgumentException(
                           s"invalid message '$invalid'"))
-              }
+              },
           )
           .unit
       } onFailure { _ =>

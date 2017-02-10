@@ -43,7 +43,7 @@ class SpdyRawFrameCodecTest extends FunSuite {
       0x61,
       0x6C,
       0x75, // (5) value
-      0x65
+      0x65,
   ).map { _.toByte }
 
   def spdyFrameCodec = new SpdyRawFrameCodec(SpdyVersion.SPDY_3_1, 8192, 16384)

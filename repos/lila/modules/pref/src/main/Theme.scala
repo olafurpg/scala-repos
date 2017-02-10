@@ -47,7 +47,7 @@ object Theme extends ThemeObject {
         "grey",
         "metal",
         "olive",
-        "purple"
+        "purple",
     ) map { name =>
       new Theme(name)
     }
@@ -73,7 +73,7 @@ object Theme3d extends ThemeObject {
         "Marble",
         "Wax",
         "Jade",
-        "Woodi"
+        "Woodi",
     ) map { name =>
       new Theme(name)
     }

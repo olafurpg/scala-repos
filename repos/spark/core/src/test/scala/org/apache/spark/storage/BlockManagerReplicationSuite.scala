@@ -207,7 +207,7 @@ class BlockManagerReplicationSuite
         StorageLevel(true, true, false, true, 4),
         StorageLevel(true, false, false, false, 3),
         MEMORY_ONLY_SER_2,
-        MEMORY_ONLY
+        MEMORY_ONLY,
     )
     testReplication(5, storageLevels)
   }
@@ -257,7 +257,7 @@ class BlockManagerReplicationSuite
     assert(
         a2Locs2x.subsetOf(a2Locs3x),
         "Inserting a with 2x replication gave locations that are not a subset of locations" +
-        s" with 3x replication [3x: ${a2Locs3x.mkString(",")}; 2x: ${a2Locs2x.mkString(",")}"
+        s" with 3x replication [3x: ${a2Locs3x.mkString(",")}; 2x: ${a2Locs2x.mkString(",")}",
     )
 
     // Test if 4x replication of a2 returns a strict superset of the locations of 3x replication
@@ -265,7 +265,7 @@ class BlockManagerReplicationSuite
     assert(
         a2Locs3x.subsetOf(a2Locs4x),
         "Inserting a with 4x replication gave locations that are not a superset of locations " +
-        s"with 3x replication [3x: ${a2Locs3x.mkString(",")}; 4x: ${a2Locs4x.mkString(",")}"
+        s"with 3x replication [3x: ${a2Locs3x.mkString(",")}; 4x: ${a2Locs4x.mkString(",")}",
     )
 
     // Test if 3x replication of two different blocks gives two different sets of locations
@@ -482,7 +482,7 @@ class BlockManagerReplicationSuite
               newBlockStatusOption.isEmpty ||
               newBlockStatusOption.get.memSize === 0,
               s"after dropping, master does not know size of ${blockId.name} " +
-              s"stored in memory of $testStoreName"
+              s"stored in memory of $testStoreName",
           )
         }
 

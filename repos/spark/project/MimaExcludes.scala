@@ -63,10 +63,10 @@ object MimaExcludes {
         // SPARK-13664 Replace HadoopFsRelation with FileFormat
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.ml.source.libsvm.LibSVMRelation"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.sources.HadoopFsRelationProvider"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.sources.HadoopFsRelation$FileStatusCache")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.sources.HadoopFsRelation$FileStatusCache"),
       ) ++ Seq(
         ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.SparkContext.emptyRDD"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.broadcast.HttpBroadcastFactory")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.broadcast.HttpBroadcastFactory"),
       ) ++
       Seq(
         // SPARK-3369 Fix Iterable/Iterator in Java API
@@ -97,7 +97,7 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleResultTypeProblem](
           "org.apache.spark.api.java.function.FlatMapGroupsFunction.call"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.api.java.function.FlatMapGroupsFunction.call")
+          "org.apache.spark.api.java.function.FlatMapGroupsFunction.call"),
       ) ++
       Seq(
         // SPARK-4819 replace Guava Optional
@@ -106,7 +106,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.api.java.JavaRDDLike.getCheckpointFile"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.api.java.JavaRDDLike.partitioner"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.api.java.JavaRDDLike.getCheckpointFile"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.api.java.JavaRDDLike.partitioner")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.api.java.JavaRDDLike.partitioner"),
       ) ++
       Seq(
         // SPARK-12481 Remove Hadoop 1.x
@@ -165,34 +165,34 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.externalBlockStoreFolderName"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.storage.ExternalBlockStore$"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.storage.ExternalBlockManager"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.storage.ExternalBlockStore")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.storage.ExternalBlockStore"),
       ) ++ Seq(
         // SPARK-12149 Added new fields to ExecutorSummary
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.status.api.v1.ExecutorSummary.this")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.status.api.v1.ExecutorSummary.this"),
       ) ++
       // SPARK-12665 Remove deprecated and unused classes
       Seq(
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.graphx.GraphKryoRegistrator"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.Vector"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.Vector$Multiplier"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.Vector$")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.Vector$"),
       ) ++ Seq(
         // SPARK-12591 Register OpenHashMapBasedStateMap for Kryo
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.serializer.KryoInputDataInputBridge"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.serializer.KryoOutputDataOutputBridge")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.serializer.KryoOutputDataOutputBridge"),
       ) ++ Seq(
         // SPARK-12510 Refactor ActorReceiver to support Java
-        ProblemFilters.exclude[AbstractClassProblem]("org.apache.spark.streaming.receiver.ActorReceiver")
+        ProblemFilters.exclude[AbstractClassProblem]("org.apache.spark.streaming.receiver.ActorReceiver"),
       ) ++ Seq(
         // SPARK-12895 Implement TaskMetrics using accumulators
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.TaskContext.internalMetricsToAccumulators"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.TaskContext.collectInternalAccumulators"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.TaskContext.collectAccumulators")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.TaskContext.collectAccumulators"),
       ) ++ Seq(
         // SPARK-12896 Send only accumulator updates to driver, not TaskMetrics
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.Accumulable.this"),
         ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.Accumulator.this"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.Accumulator.initialValue")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.Accumulator.initialValue"),
       ) ++ Seq(
         // SPARK-12692 Scala style: Fix the style violation (Space before "," or ":")
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.flume.sink.SparkSink.org$apache$spark$streaming$flume$sink$Logging$$log_"),
@@ -204,12 +204,12 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.flume.sink.Logging.org$apache$spark$streaming$flume$sink$Logging$$_log"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.flume.sink.Logging.org$apache$spark$streaming$flume$sink$Logging$$_log_="),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.flume.sink.TransactionProcessor.org$apache$spark$streaming$flume$sink$Logging$$log_"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.flume.sink.TransactionProcessor.org$apache$spark$streaming$flume$sink$Logging$$log__=")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.flume.sink.TransactionProcessor.org$apache$spark$streaming$flume$sink$Logging$$log__="),
       ) ++ Seq(
         // SPARK-12689 Migrate DDL parsing to the newly absorbed parser
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.execution.datasources.DDLParser"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.execution.datasources.DDLException"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.sql.SQLContext.ddlParser")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.sql.SQLContext.ddlParser"),
       ) ++ Seq(
         // SPARK-7799 Add "streaming-akka" project
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.zeromq.ZeroMQUtils.createStream"),
@@ -221,7 +221,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.StreamingContext.actorStream"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.api.java.JavaStreamingContext.actorStream"),
         ProblemFilters.exclude[MissingTypesProblem]("org.apache.spark.streaming.zeromq.ZeroMQReceiver"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.streaming.receiver.ActorReceiver$Supervisor")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.streaming.receiver.ActorReceiver$Supervisor"),
       ) ++ Seq(
         // SPARK-12348 Remove deprecated Streaming APIs.
         ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.streaming.dstream.DStream.foreach"),
@@ -235,21 +235,21 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.api.java.JavaDStreamLike.reduceByWindow"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.api.java.JavaDStreamLike.foreachRDD"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.api.java.JavaDStreamLike.foreach"),
-        ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.streaming.api.java.JavaStreamingContext.getOrCreate")
+        ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.streaming.api.java.JavaStreamingContext.getOrCreate"),
       ) ++ Seq(
         // SPARK-12847 Remove StreamingListenerBus and post all Streaming events to the same thread as Spark events
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.AsynchronousListenerBus$"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.AsynchronousListenerBus")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.util.AsynchronousListenerBus"),
       ) ++ Seq(
         // SPARK-11622 Make LibSVMRelation extends HadoopFsRelation and Add LibSVMOutputWriter
         ProblemFilters.exclude[MissingTypesProblem]("org.apache.spark.ml.source.libsvm.DefaultSource"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.ml.source.libsvm.DefaultSource.createRelation")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.ml.source.libsvm.DefaultSource.createRelation"),
       ) ++ Seq(
         // SPARK-6363 Make Scala 2.11 the default Scala version
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.cleanup"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.metadataCleaner"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.scheduler.cluster.YarnSchedulerBackend$YarnDriverEndpoint"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.scheduler.cluster.YarnSchedulerBackend$YarnSchedulerEndpoint")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.scheduler.cluster.YarnSchedulerBackend$YarnSchedulerEndpoint"),
       ) ++ Seq(
         // SPARK-7889
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.deploy.history.HistoryServer.org$apache$spark$deploy$history$HistoryServer$@tachSparkUI"),
@@ -258,46 +258,46 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.UserDefinedPythonFunction$"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.UserDefinedPythonFunction"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.UserDefinedFunction"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.UserDefinedFunction$")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.UserDefinedFunction$"),
       ) ++ Seq(
         // SPARK-12995 Remove deprecated APIs in graphx
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.lib.SVDPlusPlus.runSVDPlusPlus"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.Graph.mapReduceTriplets"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.Graph.mapReduceTriplets$default$3"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.impl.GraphImpl.mapReduceTriplets")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.impl.GraphImpl.mapReduceTriplets"),
       ) ++ Seq(
         // SPARK-13426 Remove the support of SIMR
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkMasterRegex.SIMR_REGEX")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkMasterRegex.SIMR_REGEX"),
       ) ++ Seq(
         // SPARK-13413 Remove SparkContext.metricsSystem/schedulerBackend_ setter
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.metricsSystem"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.schedulerBackend_=")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.schedulerBackend_="),
       ) ++ Seq(
         // SPARK-13220 Deprecate yarn-client and yarn-cluster mode
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.SparkContext.org$apache$spark$SparkContext$$createTaskScheduler")
+          "org.apache.spark.SparkContext.org$apache$spark$SparkContext$$createTaskScheduler"),
       ) ++ Seq(
         // SPARK-13465 TaskContext.
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.TaskContext.addTaskFailureListener")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.TaskContext.addTaskFailureListener"),
       ) ++ Seq (
         // SPARK-7729 Executor which has been killed should also be displayed on Executor Tab
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.status.api.v1.ExecutorSummary.this")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.status.api.v1.ExecutorSummary.this"),
       ) ++ Seq(
         // SPARK-13526 Move SQLContext per-session states to new class
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-          "org.apache.spark.sql.UDFRegistration.this")
+          "org.apache.spark.sql.UDFRegistration.this"),
       ) ++ Seq(
         // [SPARK-13486][SQL] Move SQLConf into an internal package
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SQLConf"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SQLConf$SQLConfEntry"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SQLConf$"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SQLConf$SQLConfEntry$")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SQLConf$SQLConfEntry$"),
       ) ++ Seq(
         //SPARK-11011 UserDefinedType serialization should be strongly typed
         ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.mllib.linalg.VectorUDT.serialize"),
         // SPARK-12073: backpressure rate controller consumes events preferentially from lagging partitions
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.kafka.KafkaTestUtils.createTopic"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.kafka.DirectKafkaInputDStream.maxMessagesPerPartition")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.streaming.kafka.DirectKafkaInputDStream.maxMessagesPerPartition"),
       ) ++ Seq(
         // [SPARK-13244][SQL] Migrates DataFrame to Dataset
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.sql.DataFrameHolder.apply"),
@@ -319,10 +319,10 @@ object MimaExcludes {
 
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.mllib.evaluation.MultilabelMetrics.this"),
         ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.ml.classification.LogisticRegressionSummary.predictions"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.ml.classification.LogisticRegressionSummary.predictions")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.ml.classification.LogisticRegressionSummary.predictions"),
       ) ++ Seq(
         // [SPARK-13686][MLLIB][STREAMING] Add a constructor parameter `reqParam` to (Streaming)LinearRegressionWithSGD
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.regression.LinearRegressionWithSGD.this")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.regression.LinearRegressionWithSGD.this"),
       ) ++ Seq(
         // SPARK-13920: MIMA checks should apply to @Experimental and @DeveloperAPI APIs
         ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.Aggregator.combineCombinersByKey"),
@@ -532,16 +532,16 @@ object MimaExcludes {
         ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.ml.evaluation.Evaluator.evaluate"),
         ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.scheduler.SparkListener.onOtherEvent"),
         ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.sql.sources.CreatableRelationProvider.createRelation"),
-        ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.sql.sources.InsertableRelation.insert")
+        ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.sql.sources.InsertableRelation.insert"),
       ) ++ Seq(
         // [SPARK-13926] Automatically use Kryo serializer when shuffling RDDs with simple types
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ShuffleDependency.this"),
         ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.ShuffleDependency.serializer"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.serializer.Serializer$")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.serializer.Serializer$"),
       ) ++ Seq(
         // SPARK-13927: add row/column iterator to local matrices
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.linalg.Matrix.rowIter"),
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.linalg.Matrix.colIter")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.linalg.Matrix.colIter"),
       ) ++ Seq(
         // SPARK-13948: MiMa Check should catch if the visibility change to `private`
         // TODO(josh): Some of these may be legitimate incompatibilities; we should follow up before the 2.0.0 release
@@ -559,7 +559,7 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.sql.Dataset.toDF"),
         ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.Logging.initializeLogIfNecessary"),
         ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.scheduler.SparkListenerEvent.logEvent"),
-        ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.sql.sources.OutputWriterFactory.newInstance")
+        ProblemFilters.exclude[ReversedMissingMethodProblem]("org.apache.spark.sql.sources.OutputWriterFactory.newInstance"),
       ) ++ Seq(
         // [SPARK-13928] Move org.apache.spark.Logging into org.apache.spark.internal.Logging
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.Logging"),
@@ -567,7 +567,7 @@ object MimaExcludes {
           case MissingTypesProblem(_, missing)
             if missing.map(_.fullName).sameElements(Seq("org.apache.spark.Logging")) => false
           case _ => true
-        }
+        },
       )
     case v if v.startsWith("1.6") =>
       Seq(
@@ -585,17 +585,17 @@ object MimaExcludes {
         // The shuffle package is considered private.
         excludePackage("org.apache.spark.shuffle"),
         // The collections utilities are considered private.
-        excludePackage("org.apache.spark.util.collection")
+        excludePackage("org.apache.spark.util.collection"),
       ) ++
       MimaBuild.excludeSparkClass("streaming.flume.FlumeTestUtils") ++
       MimaBuild.excludeSparkClass("streaming.flume.PollingFlumeTestUtils") ++
       Seq(
         // MiMa does not deal properly with sealed traits
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.ml.classification.LogisticRegressionSummary.featuresCol")
+          "org.apache.spark.ml.classification.LogisticRegressionSummary.featuresCol"),
       ) ++ Seq(
         // SPARK-11530
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.feature.PCAModel.this")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.mllib.feature.PCAModel.this"),
       ) ++ Seq(
         // SPARK-10381 Fix types / units in private AskPermissionToCommitOutput RPC message.
         // This class is marked as `private` but MiMa still seems to be confused by the change.
@@ -612,10 +612,10 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
           "org.apache.spark.scheduler.AskPermissionToCommitOutput.this"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-          "org.apache.spark.scheduler.AskPermissionToCommitOutput.apply")
+          "org.apache.spark.scheduler.AskPermissionToCommitOutput.apply"),
       ) ++ Seq(
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.shuffle.FileShuffleBlockResolver$ShuffleFileGroup")
+          "org.apache.spark.shuffle.FileShuffleBlockResolver$ShuffleFileGroup"),
       ) ++ Seq(
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.ml.regression.LeastSquaresAggregator.add"),
@@ -640,7 +640,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.sql.SQLContext.setSession"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.sql.SQLContext.createSession")
+          "org.apache.spark.sql.SQLContext.createSession"),
       ) ++ Seq(
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.SparkContext.preferredNodeLocationData_="),
@@ -648,7 +648,7 @@ object MimaExcludes {
           "org.apache.spark.rdd.MapPartitionsWithPreparationRDD"),
         ProblemFilters.exclude[MissingClassProblem](
           "org.apache.spark.rdd.MapPartitionsWithPreparationRDD$"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SparkSQLParser")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.SparkSQLParser"),
       ) ++ Seq(
         // SPARK-11485
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.sql.DataFrameHolder.df"),
@@ -668,26 +668,26 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.sql.jdbc.PostgresDialect.productPrefix"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.sql.jdbc.PostgresDialect.toString"),
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.sql.jdbc.PostgresDialect.hashCode"),
-        ProblemFilters.exclude[MissingTypesProblem]("org.apache.spark.sql.jdbc.NoopDialect$")
+        ProblemFilters.exclude[MissingTypesProblem]("org.apache.spark.sql.jdbc.NoopDialect$"),
       ) ++ Seq (
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.status.api.v1.ApplicationInfo.this"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.status.api.v1.StageData.this")
+          "org.apache.spark.status.api.v1.StageData.this"),
       ) ++ Seq(
         // SPARK-11766 add toJson to Vector
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.Vector.toJson")
+          "org.apache.spark.mllib.linalg.Vector.toJson"),
       ) ++ Seq(
         // SPARK-9065 Support message handler in Kafka Python API
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.streaming.kafka.KafkaUtilsPythonHelper.createDirectStream"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.streaming.kafka.KafkaUtilsPythonHelper.createRDD")
+          "org.apache.spark.streaming.kafka.KafkaUtilsPythonHelper.createRDD"),
       ) ++ Seq(
         // SPARK-4557 Changed foreachRDD to use VoidFunction
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.streaming.api.java.JavaDStreamLike.foreachRDD")
+          "org.apache.spark.streaming.api.java.JavaDStreamLike.foreachRDD"),
       ) ++ Seq(
         // SPARK-11996 Make the executor thread dump work again
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.executor.ExecutorEndpoint"),
@@ -695,14 +695,14 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem](
           "org.apache.spark.storage.BlockManagerMessages$GetRpcHostPortForExecutor"),
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.storage.BlockManagerMessages$GetRpcHostPortForExecutor$")
+          "org.apache.spark.storage.BlockManagerMessages$GetRpcHostPortForExecutor$"),
       ) ++ Seq(
         // SPARK-3580 Add getNumPartitions method to JavaRDD
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.api.java.JavaRDDLike.getNumPartitions")
+          "org.apache.spark.api.java.JavaRDDLike.getNumPartitions"),
       ) ++ Seq(
         // SPARK-12149 Added new fields to ExecutorSummary
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.status.api.v1.ExecutorSummary.this")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.status.api.v1.ExecutorSummary.this"),
       ) ++
       // SPARK-11314: YARN backend moved to yarn sub-module and MiMA complains even though it's a
       // private class.
@@ -743,28 +743,28 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.sql.SQLContext.org$apache$spark$sql$SQLContext$$needsConversion$1"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.sql.UDFRegistration.org$apache$spark$sql$UDFRegistration$$builder$24")
+          "org.apache.spark.sql.UDFRegistration.org$apache$spark$sql$UDFRegistration$$builder$24"),
       ) ++ Seq(
         // SPARK-8479 Add numNonzeros and numActives to Matrix.
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.mllib.linalg.Matrix.numNonzeros"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.Matrix.numActives")
+          "org.apache.spark.mllib.linalg.Matrix.numActives"),
       ) ++ Seq(
         // SPARK-8914 Remove RDDApi
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.RDDApi")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.RDDApi"),
       ) ++ Seq(
         // SPARK-7292 Provide operator to truncate lineage cheaply
         ProblemFilters.exclude[AbstractClassProblem](
           "org.apache.spark.rdd.RDDCheckpointData"),
         ProblemFilters.exclude[AbstractClassProblem](
-          "org.apache.spark.rdd.CheckpointRDD")
+          "org.apache.spark.rdd.CheckpointRDD"),
       ) ++ Seq(
         // SPARK-8701 Add input metadata in the batch page.
         ProblemFilters.exclude[MissingClassProblem](
           "org.apache.spark.streaming.scheduler.InputInfo$"),
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.streaming.scheduler.InputInfo")
+          "org.apache.spark.streaming.scheduler.InputInfo"),
       ) ++ Seq(
         // SPARK-6797 Support YARN modes for SparkR
         ProblemFilters.exclude[MissingMethodProblem](
@@ -776,11 +776,11 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.api.r.StringRRDD.this"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.api.r.BaseRRDD.this")
+          "org.apache.spark.api.r.BaseRRDD.this"),
       ) ++ Seq(
         // SPARK-7422 add argmax for sparse vectors
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.Vector.argmax")
+          "org.apache.spark.mllib.linalg.Vector.argmax"),
       ) ++ Seq(
         // SPARK-8906 Move all internal data source classes into execution.datasources
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.sources.ResolvedDataSource"),
@@ -847,11 +847,11 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.DefaultSource"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.JDBCRelation$"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.package$"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.JDBCRelation")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.JDBCRelation"),
       ) ++ Seq(
         // SPARK-4751 Dynamic allocation for standalone mode
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.SparkContext.supportDynamicAllocation")
+          "org.apache.spark.SparkContext.supportDynamicAllocation"),
       ) ++ Seq(
         // SPARK-9580: Remove SQL test singletons
         ProblemFilters.exclude[MissingClassProblem](
@@ -861,11 +861,11 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem](
           "org.apache.spark.sql.test.TestSQLContext"),
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.sql.test.TestSQLContext$")
+          "org.apache.spark.sql.test.TestSQLContext$"),
       ) ++ Seq(
         // SPARK-9704 Made ProbabilisticClassifier, Identifiable, VectorUDT public APIs
         ProblemFilters.exclude[IncompatibleResultTypeProblem](
-          "org.apache.spark.mllib.linalg.VectorUDT.serialize")
+          "org.apache.spark.mllib.linalg.VectorUDT.serialize"),
       ) ++ Seq(
         // SPARK-10381 Fix types / units in private AskPermissionToCommitOutput RPC message.
         // This class is marked as `private` but MiMa still seems to be confused by the change.
@@ -882,7 +882,7 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
           "org.apache.spark.scheduler.AskPermissionToCommitOutput.this"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-          "org.apache.spark.scheduler.AskPermissionToCommitOutput.apply")
+          "org.apache.spark.scheduler.AskPermissionToCommitOutput.apply"),
       )
 
     case v if v.startsWith("1.4") =>
@@ -905,30 +905,30 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleResultTypeProblem](
           "org.apache.spark.broadcast.TorrentBroadcastFactory.newBroadcast"),
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.scheduler.OutputCommitCoordinator$OutputCommitCoordinatorEndpoint")
+          "org.apache.spark.scheduler.OutputCommitCoordinator$OutputCommitCoordinatorEndpoint"),
       ) ++ Seq(
         // SPARK-4655 - Making Stage an Abstract class broke binary compatibility even though
         // the stage class is defined as private[spark]
-        ProblemFilters.exclude[AbstractClassProblem]("org.apache.spark.scheduler.Stage")
+        ProblemFilters.exclude[AbstractClassProblem]("org.apache.spark.scheduler.Stage"),
       ) ++ Seq(
         // SPARK-6510 Add a Graph#minus method acting as Set#difference
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.VertexRDD.minus")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.VertexRDD.minus"),
       ) ++ Seq(
         // SPARK-6492 Fix deadlock in SparkContext.stop()
         ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.SparkContext.org$" +
-            "apache$spark$SparkContext$$SPARK_CONTEXT_CONSTRUCTOR_LOCK")
+            "apache$spark$SparkContext$$SPARK_CONTEXT_CONSTRUCTOR_LOCK"),
       )++ Seq(
         // SPARK-6693 add tostring with max lines and width for matrix
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.Matrix.toString")
+          "org.apache.spark.mllib.linalg.Matrix.toString"),
       )++ Seq(
         // SPARK-6703 Add getOrCreate method to SparkContext
         ProblemFilters.exclude[IncompatibleResultTypeProblem]
-            ("org.apache.spark.SparkContext.org$apache$spark$SparkContext$$activeContext")
+            ("org.apache.spark.SparkContext.org$apache$spark$SparkContext$$activeContext"),
       )++ Seq(
         // SPARK-7090 Introduce LDAOptimizer to LDA to further improve extensibility
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.mllib.clustering.LDA$EMOptimizer")
+          "org.apache.spark.mllib.clustering.LDA$EMOptimizer"),
       ) ++ Seq(
         // SPARK-6756 add toSparse, toDense, numActives, numNonzeros, and compressed to Vector
         ProblemFilters.exclude[MissingMethodProblem](
@@ -947,7 +947,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.mllib.linalg.DenseMatrix.multiply"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.SparseMatrix.multiply")
+          "org.apache.spark.mllib.linalg.SparseMatrix.multiply"),
       ) ++ Seq(
         // Execution should never be included as its always internal.
         MimaBuild.excludeSparkPackage("sql.execution"),
@@ -989,17 +989,17 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.CacheManager"),
         // TODO: Remove the following rule once ParquetTest has been moved to src/test.
         ProblemFilters.exclude[MissingClassProblem](
-          "org.apache.spark.sql.parquet.ParquetTest")
+          "org.apache.spark.sql.parquet.ParquetTest"),
       ) ++ Seq(
         // SPARK-7530 Added StreamingContext.getState()
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.streaming.StreamingContext.state_=")
+          "org.apache.spark.streaming.StreamingContext.state_="),
       ) ++ Seq(
         // SPARK-7081 changed ShuffleWriter from a trait to an abstract class and removed some
         // unnecessary type bounds in order to fix some compiler warnings that occurred when
         // implementing this interface in Java. Note that ShuffleWriter is private[spark].
         ProblemFilters.exclude[IncompatibleTemplateDefProblem](
-          "org.apache.spark.shuffle.ShuffleWriter")
+          "org.apache.spark.shuffle.ShuffleWriter"),
       ) ++ Seq(
         // SPARK-6888 make jdbc driver handling user definable
         // This patch renames some classes to API friendly names.
@@ -1007,7 +1007,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.DriverQuirks"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.PostgresQuirks"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.NoQuirks"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.MySQLQuirks")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.sql.jdbc.MySQLQuirks"),
       )
 
     case v if v.startsWith("1.3") =>
@@ -1017,19 +1017,19 @@ object MimaExcludes {
         // These are needed if checking against the sbt build, since they are part of
         // the maven-generated artifacts in the 1.2 build.
         MimaBuild.excludeSparkPackage("unused"),
-        ProblemFilters.exclude[MissingClassProblem]("com.google.common.base.Optional")
+        ProblemFilters.exclude[MissingClassProblem]("com.google.common.base.Optional"),
       ) ++ Seq(
         // SPARK-2321
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.SparkStageInfoImpl.this"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.SparkStageInfo.submissionTime")
+          "org.apache.spark.SparkStageInfo.submissionTime"),
       ) ++ Seq(
         // SPARK-4614
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.mllib.linalg.Matrices.randn"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.Matrices.rand")
+          "org.apache.spark.mllib.linalg.Matrices.rand"),
       ) ++ Seq(
         // SPARK-5321
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1043,7 +1043,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.mllib.linalg.Matrix.isTransposed"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.linalg.Matrix.foreachActive")
+          "org.apache.spark.mllib.linalg.Matrix.foreachActive"),
       ) ++ Seq(
         // SPARK-5540
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1052,7 +1052,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.mllib.recommendation.ALS.org$apache$spark$mllib$recommendation$ALS$^dateFeatures"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.recommendation.ALS.org$apache$spark$mllib$recommendation$ALS$^dateBlock")
+          "org.apache.spark.mllib.recommendation.ALS.org$apache$spark$mllib$recommendation$ALS$^dateBlock"),
       ) ++ Seq(
         // SPARK-3325
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1060,7 +1060,7 @@ object MimaExcludes {
         // SPARK-2757
         ProblemFilters.exclude[IncompatibleResultTypeProblem](
           "org.apache.spark.streaming.flume.sink.SparkAvroCallbackHandler." +
-            "removeAndGetProcessor")
+            "removeAndGetProcessor"),
       ) ++ Seq(
         // SPARK-5123 (SparkSQL data type change) - alpha component only
         ProblemFilters.exclude[IncompatibleResultTypeProblem](
@@ -1072,13 +1072,13 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
           "org.apache.spark.ml.classification.LogisticRegressionModel.validateAndTransformSchema"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-          "org.apache.spark.ml.classification.LogisticRegression.validateAndTransformSchema")
+          "org.apache.spark.ml.classification.LogisticRegression.validateAndTransformSchema"),
       ) ++ Seq(
         // SPARK-4014
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.TaskContext.taskAttemptId"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.TaskContext.attemptNumber")
+          "org.apache.spark.TaskContext.attemptNumber"),
       ) ++ Seq(
         // SPARK-5166 Spark SQL API stabilization
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ml.Transformer.transform"),
@@ -1095,36 +1095,36 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ml.feature.StandardScalerModel.transform"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ml.classification.LogisticRegressionModel.transform"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ml.classification.LogisticRegression.fit"),
-        ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ml.evaluation.BinaryClassificationEvaluator.evaluate")
+        ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.ml.evaluation.BinaryClassificationEvaluator.evaluate"),
       ) ++ Seq(
         // SPARK-5270
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.api.java.JavaRDDLike.isEmpty")
+          "org.apache.spark.api.java.JavaRDDLike.isEmpty"),
       ) ++ Seq(
         // SPARK-5430
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.api.java.JavaRDDLike.treeReduce"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.api.java.JavaRDDLike.treeAggregate")
+          "org.apache.spark.api.java.JavaRDDLike.treeAggregate"),
       ) ++ Seq(
         // SPARK-5297 Java FileStream do not work with custom key/values
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.streaming.api.java.JavaStreamingContext.fileStream")
+          "org.apache.spark.streaming.api.java.JavaStreamingContext.fileStream"),
       ) ++ Seq(
         // SPARK-5315 Spark Streaming Java API returns Scala DStream
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.streaming.api.java.JavaDStreamLike.reduceByWindow")
+          "org.apache.spark.streaming.api.java.JavaDStreamLike.reduceByWindow"),
       ) ++ Seq(
         // SPARK-5461 Graph should have isCheckpointed, getCheckpointFiles methods
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.graphx.Graph.getCheckpointFiles"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.graphx.Graph.isCheckpointed")
+          "org.apache.spark.graphx.Graph.isCheckpointed"),
       ) ++ Seq(
         // SPARK-4789 Standardize ML Prediction APIs
         ProblemFilters.exclude[MissingTypesProblem]("org.apache.spark.mllib.linalg.VectorUDT"),
         ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.mllib.linalg.VectorUDT.serialize"),
-        ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.mllib.linalg.VectorUDT.sqlType")
+        ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.mllib.linalg.VectorUDT.sqlType"),
       ) ++ Seq(
         // SPARK-5814
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1152,21 +1152,21 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.mllib.recommendation.ALS.org$apache$spark$mllib$recommendation$ALS$$implicitPrefs"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.mllib.recommendation.ALS.org$apache$spark$mllib$recommendation$ALS$$rank")
+          "org.apache.spark.mllib.recommendation.ALS.org$apache$spark$mllib$recommendation$ALS$$rank"),
       ) ++ Seq(
         // SPARK-4682
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.RealClock"),
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.Clock"),
-        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.TestClock")
+        ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.TestClock"),
       ) ++ Seq(
         // SPARK-5922 Adding a generalized diff(other: RDD[(VertexId, VD)]) to VertexRDD
-        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.VertexRDD.diff")
+        ProblemFilters.exclude[MissingMethodProblem]("org.apache.spark.graphx.VertexRDD.diff"),
       )
 
     case v if v.startsWith("1.2") =>
       Seq(
         MimaBuild.excludeSparkPackage("deploy"),
-        MimaBuild.excludeSparkPackage("graphx")
+        MimaBuild.excludeSparkPackage("graphx"),
       ) ++
       MimaBuild.excludeSparkClass("mllib.linalg.Matrix") ++
       MimaBuild.excludeSparkClass("mllib.linalg.Vector") ++
@@ -1190,7 +1190,7 @@ object MimaExcludes {
         ProblemFilters.exclude[AbstractClassProblem](
           "org.apache.spark.TaskContext"),
         ProblemFilters.exclude[IncompatibleTemplateDefProblem](
-          "org.apache.spark.util.collection.SortDataFormat")
+          "org.apache.spark.util.collection.SortDataFormat"),
       ) ++ Seq(
         // Adding new methods to the JavaRDDLike trait:
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1202,11 +1202,11 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.api.java.JavaRDDLike.foreachAsync"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.api.java.JavaRDDLike.collectAsync")
+          "org.apache.spark.api.java.JavaRDDLike.collectAsync"),
       ) ++ Seq(
         // SPARK-3822
         ProblemFilters.exclude[IncompatibleResultTypeProblem](
-          "org.apache.spark.SparkContext.org$apache$spark$SparkContext$$createTaskScheduler")
+          "org.apache.spark.SparkContext.org$apache$spark$SparkContext$$createTaskScheduler"),
       ) ++ Seq(
         // SPARK-1209
         ProblemFilters.exclude[MissingClassProblem](
@@ -1214,17 +1214,17 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingClassProblem](
           "org.apache.hadoop.mapred.SparkHadoopMapRedUtil"),
         ProblemFilters.exclude[MissingTypesProblem](
-          "org.apache.spark.rdd.PairRDDFunctions")
+          "org.apache.spark.rdd.PairRDDFunctions"),
       ) ++ Seq(
         // SPARK-4062
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.streaming.kafka.KafkaReceiver#MessageHandler.this")
+          "org.apache.spark.streaming.kafka.KafkaReceiver#MessageHandler.this"),
       )
 
     case v if v.startsWith("1.1") =>
       Seq(
         MimaBuild.excludeSparkPackage("deploy"),
-        MimaBuild.excludeSparkPackage("graphx")
+        MimaBuild.excludeSparkPackage("graphx"),
       ) ++
       Seq(
         // Adding new method to JavaRDLike trait - we should probably mark this as a developer API.
@@ -1252,7 +1252,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.storage.DiskStore.getValues"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.storage.MemoryStore.Entry")
+          "org.apache.spark.storage.MemoryStore.Entry"),
       ) ++
       Seq(
         // Serializer interface change. See SPARK-3045.
@@ -1263,7 +1263,7 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleTemplateDefProblem](
           "org.apache.spark.serializer.SerializationStream"),
         ProblemFilters.exclude[IncompatibleTemplateDefProblem](
-          "org.apache.spark.serializer.SerializerInstance")
+          "org.apache.spark.serializer.SerializerInstance"),
       )++
       Seq(
         // Renamed putValues -> putArray + putIterator
@@ -1272,7 +1272,7 @@ object MimaExcludes {
         ProblemFilters.exclude[MissingMethodProblem](
           "org.apache.spark.storage.DiskStore.putValues"),
         ProblemFilters.exclude[MissingMethodProblem](
-          "org.apache.spark.storage.TachyonStore.putValues")
+          "org.apache.spark.storage.TachyonStore.putValues"),
       ) ++
       Seq(
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1280,7 +1280,7 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
           "org.apache.spark.streaming.kafka.KafkaUtils.createStream"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-          "org.apache.spark.streaming.kafka.KafkaReceiver.this")
+          "org.apache.spark.streaming.kafka.KafkaReceiver.this"),
       ) ++
       Seq( // Ignore some private methods in ALS.
         ProblemFilters.exclude[MissingMethodProblem](
@@ -1307,7 +1307,7 @@ object MimaExcludes {
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
           "org.apache.spark.mllib.tree.impurity.Entropy.calculate"),
         ProblemFilters.exclude[IncompatibleMethTypeProblem](
-          "org.apache.spark.mllib.tree.impurity.Variance.calculate")
+          "org.apache.spark.mllib.tree.impurity.Variance.calculate"),
       ) ++
       Seq( // Package-private classes removed in SPARK-2341
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.mllib.util.BinaryLabelParser"),
@@ -1336,7 +1336,7 @@ object MimaExcludes {
       Seq(
         MimaBuild.excludeSparkPackage("api.java"),
         MimaBuild.excludeSparkPackage("mllib"),
-        MimaBuild.excludeSparkPackage("streaming")
+        MimaBuild.excludeSparkPackage("streaming"),
       ) ++
       MimaBuild.excludeSparkClass("rdd.ClassTags") ++
       MimaBuild.excludeSparkClass("util.XORShiftRandom") ++

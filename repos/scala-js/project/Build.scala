@@ -127,7 +127,7 @@ object Build extends sbt.Build {
             "-unchecked",
             "-feature",
             "-encoding",
-            "utf8"
+            "utf8",
         ),
         // Scaladoc linking
         apiURL := {
@@ -223,7 +223,7 @@ object Build extends sbt.Build {
 
           if (errorsSeen.size > 0) sys.error("ScalaDoc patching had errors")
           else outDir
-        }
+        },
     ) ++ mimaDefaultSettings
 
   val noClassFilesSettings: Setting[_] =
@@ -259,7 +259,7 @@ object Build extends sbt.Build {
           </developers>),
       pomIncludeRepository := { _ =>
         false
-      }
+      },
   )
 
   val fatalWarningsSettings = Seq(
@@ -282,7 +282,7 @@ object Build extends sbt.Build {
 
         if (fatalInDoc) baseOptions
         else baseOptions.filterNot(_ == "-Xfatal-warnings")
-      }
+      },
   )
 
   private def publishToScalaJSRepoSettings = Seq(
@@ -300,19 +300,19 @@ object Build extends sbt.Build {
           case _ =>
             None
         }
-      }
+      },
   )
 
   private def publishToBintraySettings = (bintrayPublishSettings) ++ Seq(
       repository in bintray := "scala-js-releases",
-      bintrayOrganization in bintray := Some("scala-js")
+      bintrayOrganization in bintray := Some("scala-js"),
   )
 
   val publishIvySettings =
     (if (Properties.envOrNone("PUBLISH_TO_BINTRAY") == Some("true"))
        publishToBintraySettings
      else publishToScalaJSRepoSettings) ++ Seq(
-        publishMavenStyle := false
+        publishMavenStyle := false,
     )
 
   val myScalaJSSettings =
@@ -330,9 +330,9 @@ object Build extends sbt.Build {
                 // Link source maps to github sources
                 "-P:scalajs:mapSourceURI:" + root.base.toURI +
                 "->https://raw.githubusercontent.com/scala-js/scala-js/v" +
-                scalaJSVersion + "/"
+                scalaJSVersion + "/",
             )
-        }
+        },
     )
 
   implicit class ProjectOps(val project: Project) extends AnyVal {
@@ -352,7 +352,7 @@ object Build extends sbt.Build {
               val prods = (products in (library, Compile)).value
               val analysis = (compile in (library, Compile)).value
               prods.map(p => Classpaths.analyzed(p, analysis))
-            }
+            },
         )
       }
     }
@@ -364,7 +364,7 @@ object Build extends sbt.Build {
       } else {
         project.settings(
             unmanagedSourceDirectories in Compile +=
-            (scalaSource in (dependency, Compile)).value
+            (scalaSource in (dependency, Compile)).value,
         )
       }
     }
@@ -387,7 +387,7 @@ object Build extends sbt.Build {
             "2.11.6",
             "2.11.7",
             "2.11.8",
-            "2.12.0-M3"
+            "2.12.0-M3",
         ),
         // JDK version we are running with
         javaVersion in Global := {
@@ -401,7 +401,7 @@ object Build extends sbt.Build {
               sLog.value.warn(s"Unknown JDK version $v. Assuming max compat.")
               Int.MaxValue
           }
-        }
+        },
     )
 
   lazy val root: Project = Project(
@@ -443,8 +443,8 @@ object Build extends sbt.Build {
                          clean in partestSuite)
               .value,
             publish := {},
-            publishLocal := {}
-        )
+            publishLocal := {},
+        ),
   )
 
   val commonIrProjectSettings =
@@ -458,7 +458,7 @@ object Build extends sbt.Build {
   lazy val irProject: Project = Project(
       id = "ir",
       base = file("ir"),
-      settings = commonIrProjectSettings
+      settings = commonIrProjectSettings,
   )
 
   lazy val irProjectJS: Project = Project(
@@ -467,8 +467,8 @@ object Build extends sbt.Build {
       settings = commonIrProjectSettings ++ myScalaJSSettings ++ Seq(
             crossVersion := ScalaJSCrossVersion.binary,
             unmanagedSourceDirectories in Compile +=
-            (scalaSource in Compile in irProject).value
-        )
+            (scalaSource in Compile in irProject).value,
+        ),
   ).withScalaJSCompiler.dependsOn(javalibEx)
 
   lazy val compiler: Project = Project(
@@ -480,7 +480,7 @@ object Build extends sbt.Build {
             libraryDependencies ++= Seq(
                 "org.scala-lang" % "scala-compiler" % scalaVersion.value,
                 "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-                "com.novocode" % "junit-interface" % "0.9" % "test"
+                "com.novocode" % "junit-interface" % "0.9" % "test",
             ),
             testOptions += Tests.Setup { () =>
             val testOutDir =
@@ -507,8 +507,8 @@ object Build extends sbt.Build {
               }
             }
           },
-            exportJars := true
-        )
+            exportJars := true,
+        ),
   ).dependsOnSource(irProject)
 
   val commonToolsSettings =
@@ -534,16 +534,16 @@ object Build extends sbt.Build {
                 "com.google.javascript" % "closure-compiler" % "v20130603",
                 "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
                 ("junit", "junit"),
-                "com.novocode" % "junit-interface" % "0.9" % "test"
-            )
-        )
+                "com.novocode" % "junit-interface" % "0.9" % "test",
+            ),
+        ),
   ).dependsOn(irProject)
 
   lazy val toolsJS: Project = Project(
       id = "toolsJS",
       base = file("tools/js"),
       settings = myScalaJSSettings ++ commonToolsSettings ++ Seq(
-            crossVersion := ScalaJSCrossVersion.binary
+            crossVersion := ScalaJSCrossVersion.binary,
         ) ++ inConfig(Test) {
         // Redefine test to run Node.js and link HelloWorld
         test := {
@@ -591,7 +591,7 @@ object Build extends sbt.Build {
 
           runner.run(streams.value.log, scalaJSConsole.value)
         }
-      }
+      },
   ).withScalaJSCompiler
     .dependsOn(javalibEx, testSuite % "test->test", irProjectJS)
 
@@ -603,12 +603,12 @@ object Build extends sbt.Build {
             libraryDependencies ++= Seq(
                 "io.apigee" % "rhino" % "1.7R5pre4",
                 "org.webjars" % "envjs" % "1.2",
-                "com.novocode" % "junit-interface" % "0.9" % "test"
+                "com.novocode" % "junit-interface" % "0.9" % "test",
             ) ++ ScalaJSPluginInternal.phantomJSJettyModules.map(
                 _ % "provided"),
             previousArtifactSetting,
-            binaryIssueFilters ++= BinaryIncompatibilities.JSEnvs
-        )
+            binaryIssueFilters ++= BinaryIncompatibilities.JSEnvs,
+        ),
   ).dependsOn(tools)
 
   lazy val testAdapter = Project(
@@ -618,8 +618,8 @@ object Build extends sbt.Build {
             name := "Scala.js sbt test adapter",
             libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0",
             previousArtifactSetting,
-            binaryIssueFilters ++= BinaryIncompatibilities.TestAdapter
-        )
+            binaryIssueFilters ++= BinaryIncompatibilities.TestAdapter,
+        ),
   ).dependsOn(jsEnvs)
 
   lazy val plugin: Project = Project(
@@ -648,8 +648,8 @@ object Build extends sbt.Build {
               url(s"http://www.scala-sbt.org/${sbtVersion.value}/api/")
 
             sbtJars.map(_.data -> docUrl).toMap
-          }
-        )
+          },
+        ),
   ).dependsOn(tools, jsEnvs, testAdapter)
 
   lazy val delambdafySetting = {
@@ -691,10 +691,10 @@ object Build extends sbt.Build {
             val base = (resourceManaged in Compile).value
             Seq(
                 serializeHardcodedIR(base, JavaLangObject.InfoAndTree),
-                serializeHardcodedIR(base, JavaLangString.InfoAndTree)
+                serializeHardcodedIR(base, JavaLangString.InfoAndTree),
             )
-          }
-        ) ++ (scalaJSExternalCompileSettings)
+          },
+        ) ++ (scalaJSExternalCompileSettings),
   ).withScalaJSCompiler.dependsOnLibraryNoJar
 
   lazy val javalib: Project = Project(
@@ -704,8 +704,8 @@ object Build extends sbt.Build {
             name := "Java library for Scala.js",
             publishArtifact in Compile := false,
             delambdafySetting,
-            noClassFilesSettings
-        ) ++ (scalaJSExternalCompileSettings)
+            noClassFilesSettings,
+        ) ++ (scalaJSExternalCompileSettings),
   ).withScalaJSCompiler.dependsOnLibraryNoJar
 
   lazy val scalalib: Project = Project(
@@ -720,7 +720,7 @@ object Build extends sbt.Build {
             "-P:scalajs:mapSourceURI:" + (artifactPath in fetchScalaSource).value.toURI +
             "->https://raw.githubusercontent.com/scala/scala/v" +
             scalaVersion.value + "/src/library/"
-          }
+          },
         ) ++ myScalaJSSettings ++ Seq(
             name := "Scala library for Scala.js",
             publishArtifact in Compile := false,
@@ -833,8 +833,8 @@ object Build extends sbt.Build {
             if (scalaVersion.value.startsWith("2.10."))
               Seq("-P:continuations:enable")
             else Nil
-          }
-        ) ++ (scalaJSExternalCompileSettings)
+          },
+        ) ++ (scalaJSExternalCompileSettings),
   ).withScalaJSCompiler.dependsOnLibraryNoJar
 
   lazy val libraryAux: Project = Project(
@@ -844,8 +844,8 @@ object Build extends sbt.Build {
             name := "Scala.js aux library",
             publishArtifact in Compile := false,
             delambdafySetting,
-            noClassFilesSettings
-        ) ++ (scalaJSExternalCompileSettings)
+            noClassFilesSettings,
+        ) ++ (scalaJSExternalCompileSettings),
   ).withScalaJSCompiler.dependsOnLibraryNoJar
 
   lazy val library: Project = Project(
@@ -859,7 +859,7 @@ object Build extends sbt.Build {
             previousArtifactSetting,
             binaryIssueFilters ++= BinaryIncompatibilities.Library,
             libraryDependencies +=
-              "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+              "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
         ) ++ (scalaJSExternalCompileSettings) ++ inConfig(Compile)(Seq(
                 /* Add the .sjsir files from other lib projects
                  * (but not .class files)
@@ -888,8 +888,8 @@ object Build extends sbt.Build {
               otherProducts.flatMap(base => Path.selectSubpaths(base, filter))
 
             libraryMappings ++ otherMappings ++ javalibFilteredMappings
-          }
-            ))
+          },
+            )),
   ).withScalaJSCompiler
 
   lazy val javalibEx: Project = Project(
@@ -901,8 +901,8 @@ object Build extends sbt.Build {
             noClassFilesSettings,
             exportJars := true,
             jsDependencies +=
-              "org.webjars" % "jszip" % "2.4.0" / "jszip.min.js" commonJSName "JSZip"
-        ) ++ (scalaJSExternalCompileSettings)
+              "org.webjars" % "jszip" % "2.4.0" / "jszip.min.js" commonJSName "JSZip",
+        ) ++ (scalaJSExternalCompileSettings),
   ).withScalaJSCompiler.dependsOn(library)
 
   lazy val stubs: Project = Project(
@@ -912,8 +912,8 @@ object Build extends sbt.Build {
             name := "Scala.js Stubs",
             libraryDependencies +=
               "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-            previousArtifactSetting
-        )
+            previousArtifactSetting,
+        ),
   )
 
   // Scala.js command line interface
@@ -923,7 +923,7 @@ object Build extends sbt.Build {
       settings = (commonSettings ++ publishSettings ++ fatalWarningsSettings) ++ Seq(
             name := "Scala.js CLI",
             libraryDependencies ++= Seq(
-                "com.github.scopt" %% "scopt" % "3.2.0"
+                "com.github.scopt" %% "scopt" % "3.2.0",
             ),
             previousArtifactSetting,
             binaryIssueFilters ++= BinaryIncompatibilities.CLI,
@@ -931,8 +931,8 @@ object Build extends sbt.Build {
             mainClass in assembly := None, // don't want an executable JAR
             assemblyOption in assembly ~= { _.copy(includeScala = false) },
             assemblyJarName in assembly :=
-              s"${normalizedName.value}-assembly_${scalaBinaryVersion.value}-${version.value}.jar"
-        )
+              s"${normalizedName.value}-assembly_${scalaBinaryVersion.value}-${version.value}.jar",
+        ),
   ).dependsOn(tools)
 
   // Test framework
@@ -943,8 +943,8 @@ object Build extends sbt.Build {
             name := "Scala.js test interface",
             delambdafySetting,
             previousArtifactSetting,
-            binaryIssueFilters ++= BinaryIncompatibilities.TestInterface
-        )
+            binaryIssueFilters ++= BinaryIncompatibilities.TestInterface,
+        ),
   ).withScalaJSCompiler.dependsOn(library)
 
   lazy val jasmineTestFramework = Project(
@@ -954,16 +954,16 @@ object Build extends sbt.Build {
             name := "Scala.js jasmine test framework",
             jsDependencies ++= Seq(
                 ProvidedJS / "jasmine-polyfills.js",
-                "org.webjars" % "jasmine" % "1.3.1" / "jasmine.js" dependsOn "jasmine-polyfills.js"
-            )
-        )
+                "org.webjars" % "jasmine" % "1.3.1" / "jasmine.js" dependsOn "jasmine-polyfills.js",
+            ),
+        ),
   ).withScalaJSCompiler.dependsOn(library, testInterface)
 
   lazy val jUnitRuntime = Project(
       id = "jUnitRuntime",
       base = file("junit-runtime"),
       settings = commonSettings ++ publishSettings ++ myScalaJSSettings ++ fatalWarningsSettings ++ Seq(
-            name := "Scala.js JUnit test runtime")
+            name := "Scala.js JUnit test runtime"),
   ).withScalaJSCompiler.dependsOn(testInterface)
 
   lazy val jUnitPlugin = Project(
@@ -974,8 +974,8 @@ object Build extends sbt.Build {
             crossVersion := CrossVersion.full,
             libraryDependencies +=
               "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-            exportJars := true
-        )
+            exportJars := true,
+        ),
   )
 
   // Examples
@@ -984,8 +984,8 @@ object Build extends sbt.Build {
       id = "examples",
       base = file("examples"),
       settings = commonSettings ++ Seq(
-            name := "Scala.js examples"
-        )
+            name := "Scala.js examples",
+        ),
   ).aggregate(helloworld, reversi, testingExample)
 
   lazy val exampleSettings =
@@ -997,8 +997,8 @@ object Build extends sbt.Build {
       settings = exampleSettings ++ Seq(
             name := "Hello World - Scala.js example",
             moduleName := "helloworld",
-            persistLauncher := true
-        )
+            persistLauncher := true,
+        ),
   ).withScalaJSCompiler.dependsOn(library)
 
   lazy val reversi = Project(
@@ -1006,8 +1006,8 @@ object Build extends sbt.Build {
       base = file("examples") / "reversi",
       settings = exampleSettings ++ Seq(
             name := "Reversi - Scala.js example",
-            moduleName := "reversi"
-        )
+            moduleName := "reversi",
+        ),
   ).withScalaJSCompiler.dependsOn(library)
 
   lazy val testingExample = Project(
@@ -1018,9 +1018,9 @@ object Build extends sbt.Build {
             moduleName := "testing",
             jsDependencies ++= Seq(
                 RuntimeDOM % "test",
-                "org.webjars" % "jquery" % "1.10.2" / "jquery.js" % "test"
-            )
-        )
+                "org.webjars" % "jquery" % "1.10.2" / "jquery.js" % "test",
+            ),
+        ),
   ).withScalaJSCompiler.dependsOn(library, jasmineTestFramework % "test")
 
   // Testing
@@ -1106,7 +1106,7 @@ object Build extends sbt.Build {
             Tests.Argument("-t" + arg)
 
           testOptionTags.value.map(testArgument)
-        }
+        },
     )
   }
 
@@ -1144,7 +1144,7 @@ object Build extends sbt.Build {
         } else {
           Nil
         }
-      }
+      },
   )
 
   lazy val testSuite: Project = Project(
@@ -1215,12 +1215,12 @@ object Build extends sbt.Build {
               val jar = (packageBin in (jUnitPlugin, Compile)).value
               Seq(s"-Xplugin:$jar")
             }
-          }
-        )
+          },
+        ),
   ).withScalaJSCompiler.dependsOn(
       library,
       jUnitRuntime,
-      jasmineTestFramework % "test"
+      jasmineTestFramework % "test",
   )
 
   lazy val testSuiteJVM: Project = Project(
@@ -1229,8 +1229,8 @@ object Build extends sbt.Build {
       settings = commonSettings ++ testSuiteCommonSettings(isJSTest = false) ++ Seq(
             name := "Scala.js test suite on JVM",
             libraryDependencies +=
-              "com.novocode" % "junit-interface" % "0.11" % "test"
-        )
+              "com.novocode" % "junit-interface" % "0.11" % "test",
+        ),
   )
 
   lazy val noIrCheckTest: Project = Project(
@@ -1240,8 +1240,8 @@ object Build extends sbt.Build {
             name := "Scala.js not IR checked tests",
             scalaJSOptimizerOptions ~=
             (_.withCheckScalaJSIR(false).withBypassLinkingErrors(true)),
-            publishArtifact in Compile := false
-        )
+            publishArtifact in Compile := false,
+        ),
   ).withScalaJSCompiler.dependsOn(library, jasmineTestFramework % "test")
 
   lazy val javalibExTestSuite: Project = Project(
@@ -1250,8 +1250,8 @@ object Build extends sbt.Build {
       settings = (commonSettings ++ myScalaJSSettings ++ testTagSettings) ++ Seq(
             name := "JavaLib Ex Test Suite",
             publishArtifact in Compile := false,
-            scalacOptions in Test ~= (_.filter(_ != "-deprecation"))
-        )
+            scalacOptions in Test ~= (_.filter(_ != "-deprecation")),
+        ),
   ).withScalaJSCompiler.dependsOn(javalibEx, jasmineTestFramework % "test")
 
   lazy val partest: Project = Project(
@@ -1299,7 +1299,7 @@ object Build extends sbt.Build {
                   "com.google.javascript" % "closure-compiler" % "v20130603",
                   "io.apigee" % "rhino" % "1.7R5pre4",
                   "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-                  ("junit", "junit")
+                  ("junit", "junit"),
               )
             else Seq()
           },
@@ -1324,8 +1324,8 @@ object Build extends sbt.Build {
               }
               toolSrcs ++ baseSrcs ++ jsenvSrcs
             } else Seq()
-          }
-        )
+          },
+        ),
   ).dependsOn(compiler)
 
   lazy val partestSuite: Project = Project(
@@ -1356,12 +1356,12 @@ object Build extends sbt.Build {
                       def annotationName = "partest"
                     },
                         true,
-                        Array()
+                        Array(),
                     ))
               } else {
               Def.task(Seq())
             }
-          }
-        )
+          },
+        ),
   ).dependsOn(partest % "test", library)
 }

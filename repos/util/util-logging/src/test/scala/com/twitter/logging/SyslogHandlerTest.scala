@@ -42,8 +42,8 @@ class SyslogHandlerTest extends WordSpec {
           port = serverPort,
           formatter = new SyslogFormatter(
                 timezone = Some("UTC"),
-                hostname = "raccoon.local"
-            )
+                hostname = "raccoon.local",
+            ),
       ).apply()
       syslog.publish(record1)
       syslog.publish(record2)
@@ -68,8 +68,8 @@ class SyslogHandlerTest extends WordSpec {
           formatter = new SyslogFormatter(
                 serverName = Some("pingd"),
                 timezone = Some("UTC"),
-                hostname = "raccoon.local"
-            )
+                hostname = "raccoon.local",
+            ),
       ).apply()
       syslog.publish(record1)
 
@@ -90,8 +90,8 @@ class SyslogHandlerTest extends WordSpec {
           formatter = new SyslogFormatter(
                 useIsoDateFormat = false,
                 timezone = Some("UTC"),
-                hostname = "raccoon.local"
-            )
+                hostname = "raccoon.local",
+            ),
       ).apply()
       syslog.publish(record1)
 

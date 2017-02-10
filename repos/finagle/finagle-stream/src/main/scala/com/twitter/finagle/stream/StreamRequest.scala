@@ -7,7 +7,7 @@ case class StreamRequest(
     uri: String,
     version: Version = Version(1, 1),
     headers: Seq[Header] = Nil,
-    body: Buf = Buf.Empty
+    body: Buf = Buf.Empty,
 )
 
 object StreamRequest {

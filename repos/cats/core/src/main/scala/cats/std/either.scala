@@ -41,7 +41,7 @@ trait EitherInstances extends EitherInstances1 {
           implicit F: Applicative[F]): F[Either[A, C]] =
         fa.fold(
             a => F.pure(Left(a)),
-            b => F.map(f(b))(Right(_))
+            b => F.map(f(b))(Right(_)),
         )
 
       def foldLeft[B, C](fa: Either[A, B], c: C)(f: (C, B) => C): C =
@@ -57,7 +57,7 @@ trait EitherInstances extends EitherInstances1 {
     new Order[Either[A, B]] {
       def compare(x: Either[A, B], y: Either[A, B]): Int = x.fold(
           a => y.fold(A.compare(a, _), _ => -1),
-          b => y.fold(_ => 1, B.compare(b, _))
+          b => y.fold(_ => 1, B.compare(b, _)),
       )
     }
 
@@ -66,7 +66,7 @@ trait EitherInstances extends EitherInstances1 {
     new Show[Either[A, B]] {
       def show(f: Either[A, B]): String = f.fold(
           a => s"Left(${A.show(a)})",
-          b => s"Right(${B.show(b)})"
+          b => s"Right(${B.show(b)})",
       )
     }
 }
@@ -78,7 +78,7 @@ private[std] sealed trait EitherInstances1 extends EitherInstances2 {
     new PartialOrder[Either[A, B]] {
       def partialCompare(x: Either[A, B], y: Either[A, B]): Double = x.fold(
           a => y.fold(A.partialCompare(a, _), _ => -1),
-          b => y.fold(_ => 1, B.partialCompare(b, _))
+          b => y.fold(_ => 1, B.partialCompare(b, _)),
       )
     }
 }
@@ -88,7 +88,7 @@ private[std] sealed trait EitherInstances2 {
     new Eq[Either[A, B]] {
       def eqv(x: Either[A, B], y: Either[A, B]): Boolean = x.fold(
           a => y.fold(A.eqv(a, _), _ => false),
-          b => y.fold(_ => false, B.eqv(b, _))
+          b => y.fold(_ => false, B.eqv(b, _)),
       )
     }
 }

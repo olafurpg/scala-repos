@@ -526,7 +526,7 @@ class HiveContext private[hive](
         ConfVars.SPARK_CLIENT_FUTURE_TIMEOUT -> TimeUnit.SECONDS,
         ConfVars.SPARK_JOB_MONITOR_TIMEOUT -> TimeUnit.SECONDS,
         ConfVars.SPARK_RPC_CLIENT_CONNECT_TIMEOUT -> TimeUnit.MILLISECONDS,
-        ConfVars.SPARK_RPC_CLIENT_HANDSHAKE_TIMEOUT -> TimeUnit.MILLISECONDS
+        ConfVars.SPARK_RPC_CLIENT_HANDSHAKE_TIMEOUT -> TimeUnit.MILLISECONDS,
     ).map {
       case (confVar, unit) =>
         confVar.varname -> hiveconf.getTimeVar(confVar, unit).toString

@@ -43,7 +43,7 @@ class FileUploadExample
                "Content-Type" ->
                (file.contentType.getOrElse("application/octet-stream")),
                "Content-Disposition" ->
-               ("attachment; filename=\"" + file.name + "\"")
+               ("attachment; filename=\"" + file.name + "\""),
            ))
 
       case None =>

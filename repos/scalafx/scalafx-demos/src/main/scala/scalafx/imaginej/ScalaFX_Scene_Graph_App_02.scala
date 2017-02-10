@@ -65,7 +65,7 @@ object ScalaFX_Scene_Graph_App_02 extends JFXApp {
             width = 250
             height = 250
             fill = Color.Blue
-          }
+          },
       )
     }
   }

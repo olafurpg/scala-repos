@@ -38,7 +38,7 @@ class StaticAPIKeyFinder[M[+ _]](apiKey: APIKey)(implicit val M: Monad[M])
   private val permissions = Set[Permission](
       ReadPermission(Path("/"), WrittenByAny),
       WritePermission(Path("/"), WriteAs.any),
-      DeletePermission(Path("/"), WrittenByAny)
+      DeletePermission(Path("/"), WrittenByAny),
   )
 
   val rootGrant = v1.GrantDetails(java.util.UUID.randomUUID.toString,

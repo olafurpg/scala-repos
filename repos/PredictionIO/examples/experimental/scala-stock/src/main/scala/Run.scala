@@ -596,7 +596,7 @@ object Run {
         enterThreshold = 0.01,
         exitThreshold = 0.0,
         maxPositions = 10,
-        optOutputPath = Some(new File("metrics_results").getCanonicalPath)
+        optOutputPath = Some(new File("metrics_results").getCanonicalPath),
     )
 
     Workflow.run(
@@ -607,7 +607,7 @@ object Run {
         algorithmClassMapOpt = Some(
               Map(
                   //"" -> classOf[MomentumStrategy]
-                  "" -> classOf[RegressionStrategy]
+                  "" -> classOf[RegressionStrategy],
               )),
         algorithmParamsList = Seq(("", momentumParams)),
         servingClassOpt = Some(LFirstServing(classOf[EmptyStrategy])),

@@ -11,6 +11,6 @@ class KeywordSimilarityModel(
     val itemKeyword: Array[HashMap[Int, Double]],
     // Weight and threshold trained
     val keywordSimWeight: Double,
-    val keywordSimThreshold: Double
+    val keywordSimThreshold: Double,
 )
     extends Serializable

@@ -166,7 +166,7 @@ class AccountServiceHandlers(
             DescriptionMetadata(
                 "The email address associated with the account ID you want to retrieve.")),
         DescriptionMetadata(
-            "This endpoint provides capabilities for account search, returning a list of matching account identifiers.")
+            "This endpoint provides capabilities for account search, returning a list of matching account identifiers."),
     )
   }
 
@@ -257,7 +257,7 @@ class AccountServiceHandlers(
         ParameterMetadata(
             'apiKey, Some("<api key associated with authorizing account>")),
         DescriptionMetadata(
-            "Returns the list of accounts associated with the authorized account's API key, or the API key specified by the apiKey request parameter if the authorized account has elevated account management privileges.")
+            "Returns the list of accounts associated with the authorized account's API key, or the API key specified by the apiKey request parameter if the authorized account has elevated account management privileges."),
     )
   }
 
@@ -329,7 +329,7 @@ class AccountServiceHandlers(
                               HttpStatus(BadRequest, errmsg),
                               content = Some(JString(errmsg))))
                   }
-                }
+                },
             )
           } getOrElse {
             Failure(DispatchError(BadRequest, "Missing request body content."))
@@ -443,7 +443,7 @@ class AccountServiceHandlers(
                                         "token" -> resetToken,
                                         "requestor" -> remoteIpFrom(request),
                                         "accountId" -> account.accountId,
-                                        "time" -> (new java.util.Date).toString
+                                        "time" -> (new java.util.Date).toString,
                                     )
 
                                     emailer.sendEmail(
@@ -586,7 +586,7 @@ class AccountServiceHandlers(
         DescriptionMetadata(
             """The request body must be of the form: {"password": "my new password"}"""),
         DescriptionMetadata(
-            "This service can be used to reset your account password.")
+            "This service can be used to reset your account password."),
     )
   }
 

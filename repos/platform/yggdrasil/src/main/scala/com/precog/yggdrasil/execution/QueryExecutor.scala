@@ -71,7 +71,7 @@ case class QueryOptions(
     sortOrder: TableModule.DesiredSortOrder = TableModule.SortAscending,
     timeout: Option[Duration] = None,
     output: MimeType = MimeTypes.application / MimeTypes.json,
-    cacheControl: CacheControl = CacheControl.NoCache
+    cacheControl: CacheControl = CacheControl.NoCache,
 )
 
 case class CacheControl(maxAge: Option[Long],

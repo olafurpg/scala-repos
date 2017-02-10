@@ -80,7 +80,7 @@ private class ForkJoinScheduler(
       // work queue by another.
       statsReceiver.addGauge("steals") { pool.getStealCount() },
       // The number of tasks that were split off a local schedule.
-      statsReceiver.addGauge("splits") { splitCount.get }
+      statsReceiver.addGauge("splits") { splitCount.get },
   )
 
   def submit(r: Runnable) {

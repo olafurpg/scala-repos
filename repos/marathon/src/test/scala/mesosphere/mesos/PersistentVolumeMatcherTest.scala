@@ -74,7 +74,7 @@ class PersistentVolumeMatcherTest
             Task.Reservation(Seq(localVolumeId2), f.taskReservationStateNew)),
         f.makeTask(
             app.id,
-            Task.Reservation(Seq(localVolumeId3), f.taskReservationStateNew))
+            Task.Reservation(Seq(localVolumeId3), f.taskReservationStateNew)),
     )
     val unknownTaskId = Task.Id.forApp(app.id)
     val offer = f

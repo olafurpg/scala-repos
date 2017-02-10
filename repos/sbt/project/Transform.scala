@@ -28,14 +28,14 @@ object Transform {
               "No managed boot.properties file.")
         copyConscriptProperties(source, src / "conscript")
         ()
-      }
+      },
   )
   def copyConscriptProperties(source: File, conscriptBase: File): Seq[File] = {
     IO.delete(conscriptBase)
     val pairs = Seq(
         "sbt.xMain" -> "sbt",
         "sbt.ScriptMain" -> "scalas",
-        "sbt.ConsoleMain" -> "screpl"
+        "sbt.ConsoleMain" -> "screpl",
     )
     for ((main, dir) <- pairs) yield {
       val file = conscriptBase / dir / "launchconfig"
@@ -51,7 +51,7 @@ object Transform {
 
   def crossGenSettings = transSourceSettings ++ Seq(
       sourceProperties :=
-        Map("cross.package0" -> "sbt", "cross.package1" -> "cross")
+        Map("cross.package0" -> "sbt", "cross.package1" -> "cross"),
   )
   def transSourceSettings = Seq(
       inputSourceDirectory := sourceDirectory.value / "input_sources",
@@ -64,7 +64,7 @@ object Transform {
         (rs, props) =>
           rs map { case (in, out) => transform(in, out, props) }
       },
-      sourceGenerators <+= transformSources
+      sourceGenerators <+= transformSources,
   )
   def transformSourceMappings =
     (inputSources, inputSourceDirectories, sourceManaged) map {
@@ -76,7 +76,7 @@ object Transform {
         (organization, version, scalaVersion, isSnapshot) map {
         (org, v, sv, isSnapshot) =>
           Map("org" -> org, "sbt.version" -> v, "scala.version" -> sv)
-      }
+      },
   )
   def transResourceSettings = Seq(
       inputResourceDirectory := sourceDirectory.value / "input_resources",
@@ -89,7 +89,7 @@ object Transform {
         (rs, props) =>
           rs map { case (in, out) => transform(in, out, props) }
       },
-      resourceGenerators <+= transformResources
+      resourceGenerators <+= transformResources,
   )
   def transformResourceMappings =
     (inputResources, inputResourceDirectories, resourceManaged) map {

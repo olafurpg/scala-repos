@@ -249,9 +249,9 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
   val metadata = AboutMetadata(
       AndMetadata(
           ParameterMetadata('jobId, None),
-          ParameterMetadata('prevStatusId, None)
+          ParameterMetadata('prevStatusId, None),
       ),
-      DescriptionMetadata("Post status updates to a job.")
+      DescriptionMetadata("Post status updates to a job."),
   )
 }
 
@@ -277,7 +277,7 @@ class ListChannelsHandler(jobs: JobManager[Future])(
 
   val metadata = AboutMetadata(
       ParameterMetadata('jobId, None),
-      DescriptionMetadata("Return channels that have messages posted to them.")
+      DescriptionMetadata("Return channels that have messages posted to them."),
   )
 }
 
@@ -309,9 +309,9 @@ class AddMessageHandler(jobs: JobManager[Future])(
   val metadata = AboutMetadata(
       AndMetadata(
           ParameterMetadata('jobId, None),
-          ParameterMetadata('channel, None)
+          ParameterMetadata('channel, None),
       ),
-      DescriptionMetadata("Post a message to a channel.")
+      DescriptionMetadata("Post a message to a channel."),
   )
 }
 
@@ -353,9 +353,9 @@ class ListMessagesHandler(jobs: JobManager[Future])(
   val metadata = AboutMetadata(
       AndMetadata(
           ParameterMetadata('jobId, None),
-          ParameterMetadata('channel, None)
+          ParameterMetadata('channel, None),
       ),
-      DescriptionMetadata("Retrieve a list of messages posted to a channel.")
+      DescriptionMetadata("Retrieve a list of messages posted to a channel."),
   )
 }
 
@@ -386,7 +386,7 @@ class GetJobStateHandler(jobs: JobManager[Future])(
 
   val metadata = AboutMetadata(
       ParameterMetadata('jobId, None),
-      DescriptionMetadata("Retreive the current state of a job.")
+      DescriptionMetadata("Retreive the current state of a job."),
   )
 }
 
@@ -478,7 +478,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                   Future(HttpResponse[JValue](
                           BadRequest,
                           content = Some(JString(
-                                    "Invalid 'state '%s'. Expected one of 'started', 'cancelled', 'finished', 'aborted' or 'expired'." format state
+                                    "Invalid 'state '%s'. Expected one of 'started', 'cancelled', 'finished', 'aborted' or 'expired'." format state,
                                 ))))
 
                 case JUndefined =>
@@ -491,7 +491,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                           BadRequest,
                           content = Some(JString(
                                     "Invalid 'state given: %s is not a string."
-                                      .format(other.renderCompact)
+                                      .format(other.renderCompact),
                                 ))))
               }
           }
@@ -505,7 +505,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
 
   val metadata = AboutMetadata(
       ParameterMetadata('jobId, None),
-      DescriptionMetadata("Update the state of a job if it is permissable.")
+      DescriptionMetadata("Update the state of a job if it is permissable."),
   )
 }
 
@@ -544,7 +544,7 @@ class CreateResultHandler(
 
   val metadata = AboutMetadata(
       ParameterMetadata('jobId, None),
-      DescriptionMetadata("Save the result of a job.")
+      DescriptionMetadata("Save the result of a job."),
   )
 }
 
@@ -582,7 +582,7 @@ class GetResultHandler(
 
   val metadata = AboutMetadata(
       ParameterMetadata('jobId, None),
-      DescriptionMetadata("Get a job's result.")
+      DescriptionMetadata("Get a job's result."),
   )
 }
 // type JobServiceHandlers

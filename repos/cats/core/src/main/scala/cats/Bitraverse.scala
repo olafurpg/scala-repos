@@ -39,10 +39,10 @@ trait CompositeBitraverse[F[_, _], G[_, _]]
 
   def bitraverse[H[_]: Applicative, A, B, C, D](fab: F[G[A, B], G[A, B]])(
       f: A => H[C],
-      g: B => H[D]
+      g: B => H[D],
   ): H[F[G[C, D], G[C, D]]] =
     F.bitraverse(fab)(
         gab => G.bitraverse(gab)(f, g),
-        gab => G.bitraverse(gab)(f, g)
+        gab => G.bitraverse(gab)(f, g),
     )
 }

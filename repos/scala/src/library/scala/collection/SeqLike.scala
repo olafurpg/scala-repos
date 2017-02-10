@@ -877,7 +877,7 @@ object SeqLike {
       target: Seq[B],
       targetOffset: Int,
       targetCount: Int,
-      fromIndex: Int
+      fromIndex: Int,
   ): Int = {
     // Fiddle with variables to match previous behavior and use kmpSearch
     // Doing LOTS of max/min, both clearer and faster to use math._
@@ -913,7 +913,7 @@ object SeqLike {
       target: Seq[B],
       targetOffset: Int,
       targetCount: Int,
-      fromIndex: Int
+      fromIndex: Int,
   ): Int = {
     // Fiddle with variables to match previous behavior and use kmpSearch
     // Doing LOTS of max/min, both clearer and faster to use math._

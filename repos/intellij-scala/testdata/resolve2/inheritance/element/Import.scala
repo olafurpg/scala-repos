@@ -19,7 +19,7 @@ class C1 {
   import Holder.O
   import Holder.A
   import Holder.v1
-  import Holder.v2
+  import Holder.v2,
 }
 
 class C2 extends C1 {

@@ -197,14 +197,14 @@ trait WithPlay { self: PackageObject =>
     def thenPp: Fu[A] = fua ~ {
       _.effectFold(
           e => println("[failure] " + e),
-          a => println("[success] " + a)
+          a => println("[success] " + a),
       )
     }
 
     def thenPp(msg: String): Fu[A] = fua ~ {
       _.effectFold(
           e => println(s"[$msg] [failure] $e"),
-          a => println(s"[$msg] [success] $a")
+          a => println(s"[$msg] [success] $a"),
       )
     }
 

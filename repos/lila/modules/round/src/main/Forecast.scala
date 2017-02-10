@@ -20,7 +20,7 @@ case class Forecast(_id: String, // player full id
                 snd.is(move) =>
               rest
           },
-          date = DateTime.now
+          date = DateTime.now,
       ) -> move
     }
 

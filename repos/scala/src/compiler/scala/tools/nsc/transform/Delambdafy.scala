@@ -302,9 +302,9 @@ abstract class Delambdafy
         val body =
           Block(
               List(
-                  atPos(newClass.pos)(Apply(gen.mkSuperInitCall, Nil))
+                  atPos(newClass.pos)(Apply(gen.mkSuperInitCall, Nil)),
               ) ++ assigns,
-              Literal(Constant(())): Tree
+              Literal(Constant(())): Tree,
           ) setPos newClass.pos
 
         (localTyper typed DefDef(constrSym, List(params), body) setPos newClass.pos)

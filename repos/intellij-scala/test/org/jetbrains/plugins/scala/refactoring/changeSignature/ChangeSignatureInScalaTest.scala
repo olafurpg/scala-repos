@@ -149,7 +149,7 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
         Seq(parameterInfo("ii", 0, types.Int),
             parameterInfo("argss", 2, types.Int, isRep = true)),
         Seq(parameterInfo("cc", 1, types.Char),
-            parameterInfo("b", -1, types.Boolean, "true"))
+            parameterInfo("b", -1, types.Boolean, "true")),
     )
     doTest(null, "CClass", null, params)
   }

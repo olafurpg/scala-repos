@@ -135,7 +135,7 @@ package json {
         FastTypeTag.ArrayDouble.key ->
         ((picklee: Any) =>
               pickleArray(picklee.asInstanceOf[Array[Double]],
-                          FastTypeTag.Double))
+                          FastTypeTag.Double)),
     )
     override def beginEntry(picklee: Any, tag: FastTypeTag[_]): PBuilder =
       withHints { hints =>
@@ -300,7 +300,7 @@ package json {
                 .asInstanceOf[JSONArray]
                 .list
                 .map(el => el.asInstanceOf[Double])
-                .toArray)
+                .toArray),
       )
     private def mkNestedReader(datum: Any) = {
       val nested = new JSONPickleReader(datum, format)

@@ -15,7 +15,7 @@ case class RandomForestAlgorithmParams(
     featureSubsetStrategy: String,
     impurity: String,
     maxDepth: Int,
-    maxBins: Int
+    maxBins: Int,
 )
     extends Params
 

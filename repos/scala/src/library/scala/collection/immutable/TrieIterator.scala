@@ -207,7 +207,7 @@ private[collection] abstract class TrieIterator[+T](elems: Array[Iterable[T]])
           val m = arrayD(posD)
           arrayToIterators(
               if (isTrie(m)) getElems(m)
-              else collisionToArray(m)
+              else collisionToArray(m),
           )
         } else {
           // 3b) arrayD has more free elements

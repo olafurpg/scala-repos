@@ -63,7 +63,7 @@ object Commands {
       Load.reapply(filtered ++ Seq(
                        publishArtifact in GlobalScope in packageDoc := toggle,
                        publishArtifact in GlobalScope in packageSrc := toggle,
-                       publishArtifact in GlobalScope := true
+                       publishArtifact in GlobalScope := true,
                    ),
                    structure)
     Project.setProject(

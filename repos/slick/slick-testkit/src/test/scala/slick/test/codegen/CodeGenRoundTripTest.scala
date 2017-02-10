@@ -33,7 +33,7 @@ class CodeGeneratorRoundTripTest(val tdb: JdbcTestDB) extends DBTest {
                   3,
                   "post 3",
                   Some(
-                      1))
+                      1)),
           ),
           Categories += CategoriesRow(2, "cat"),
           Posts.length.result
@@ -57,7 +57,7 @@ class CodeGeneratorRoundTripTest(val tdb: JdbcTestDB) extends DBTest {
                     "id")} = 0"""
                   .as[LargeRow]
                   .head
-                  .map(res => assertEquals(oData, res))
+                  .map(res => assertEquals(oData, res)),
               ) },
           (X.map(r => (r.pk, r.pk2, r.column, r.schemaNameXX, r.schemaNameX)) +=
               (1, 1,
@@ -91,7 +91,7 @@ class CodeGeneratorRoundTripTest(val tdb: JdbcTestDB) extends DBTest {
             X.map(r => { (r.index4: Index) == null })
 
             TypeTest.map(r => { (r.pk: PrimaryKey) == null })
-          }
+          },
       )
       .withPinnedSession
   }

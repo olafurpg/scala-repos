@@ -30,7 +30,7 @@ trait GroupLaws[A] extends Laws {
           (x: A, y: A, z: A) => ((x |+| y) |+| z) === (x |+| (y |+| z))),
       "combinen(a, 1) === a" → forAll((a: A) => A.combinen(a, 1) === a),
       "combinen(a, 2) === a |+| a" → forAll(
-          (a: A) => A.combinen(a, 2) === (a |+| a))
+          (a: A) => A.combinen(a, 2) === (a |+| a)),
   )
 
   def monoid(implicit A: Monoid[A]) = new GroupProperties(
@@ -40,20 +40,20 @@ trait GroupLaws[A] extends Laws {
       "right identity" → forAll((x: A) => (x |+| A.id) === x),
       "combinen(a, 0) === id" → forAll((a: A) => A.combinen(a, 0) === A.id),
       "combine(Nil) === id" → forAll((a: A) => A.combine(Nil) === A.id),
-      "isId" → forAll((x: A) => (x === A.id) === (x.isId))
+      "isId" → forAll((x: A) => (x === A.id) === (x.isId)),
   )
 
   def group(implicit A: Group[A]) = new GroupProperties(
       name = "group",
       parent = Some(monoid),
       "left inverse" → forAll((x: A) => A.id === (x.inverse |+| x)),
-      "right inverse" → forAll((x: A) => A.id === (x |+| x.inverse))
+      "right inverse" → forAll((x: A) => A.id === (x |+| x.inverse)),
   )
 
   def abGroup(implicit A: AbGroup[A]) = new GroupProperties(
       name = "abelian group",
       parent = Some(group),
-      "commutative" → forAll((x: A, y: A) => (x |+| y) === (y |+| x))
+      "commutative" → forAll((x: A, y: A) => (x |+| y) === (y |+| x)),
   )
 
   // additive groups
@@ -70,7 +70,7 @@ trait GroupLaws[A] extends Laws {
               (A.sumOption(Seq.empty[A]) === Option.empty[A]) &&
               (A.sumOption(Seq(a)) === Option(a)) &&
               (A.sumOption(Seq(a, a)) === Option(a + a)) &&
-              (A.sumOption(Seq(a, a, a)) === Option(a + a + a)))
+              (A.sumOption(Seq(a, a, a)) === Option(a + a + a))),
     )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
@@ -78,18 +78,18 @@ trait GroupLaws[A] extends Laws {
       parent = Some(additiveSemigroup),
       "sumn(a, 0) === zero" → forAll((a: A) => A.sumn(a, 0) === A.zero),
       "sum(Nil) === zero" → forAll((a: A) => A.sum(Nil) === A.zero),
-      "isZero" → forAll((a: A) => a.isZero === (a === A.zero))
+      "isZero" → forAll((a: A) => a.isZero === (a === A.zero)),
   )
 
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(
       base = group(A.additive),
       parent = Some(additiveMonoid),
-      "minus consistent" → forAll((x: A, y: A) => (x - y) === (x + (-y)))
+      "minus consistent" → forAll((x: A, y: A) => (x - y) === (x + (-y))),
   )
 
   def additiveAbGroup(implicit A: AdditiveAbGroup[A]) = new AdditiveProperties(
       base = abGroup(A.additive),
-      parent = Some(additiveGroup)
+      parent = Some(additiveGroup),
   )
 
   // property classes
@@ -97,14 +97,14 @@ trait GroupLaws[A] extends Laws {
   class GroupProperties(
       name: String,
       parent: Option[GroupProperties],
-      props: (String, Prop)*
+      props: (String, Prop)*,
   )
       extends DefaultRuleSet(name, parent, props: _*)
 
   class AdditiveProperties(
       val base: GroupProperties,
       val parent: Option[AdditiveProperties],
-      val props: (String, Prop)*
+      val props: (String, Prop)*,
   )
       extends RuleSet with HasOneParent {
     val name = base.name

@@ -149,7 +149,7 @@ final class JSONIngestProcessing(
                   _.fold(
                       storeFailure =>
                         IngestReport(0, (0, storeFailure.message) :: Nil),
-                      _ => IngestReport(completedRecords.size, Nil)
+                      _ => IngestReport(completedRecords.size, Nil),
                   )
                 }
               } else {
@@ -237,7 +237,7 @@ final class JSONIngestProcessing(
                         parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
                           .map(i => (i, overLargeMsg))
                       continue(state.update(updatedParser, ingestSize, errors))
-                  }
+                  },
               )
             }
 
@@ -259,7 +259,7 @@ final class JSONIngestProcessing(
                     storeFailure =>
                       sys.error(
                           "Do something useful with %s" format storeFailure.message),
-                    _ => continue(state.update(updatedParser, ingestSize, Nil))
+                    _ => continue(state.update(updatedParser, ingestSize, Nil)),
                 )
               }
             } else {
@@ -281,7 +281,7 @@ final class JSONIngestProcessing(
                               toIngest.size -> overLargeMsg)
 
                         state.update(updatedParser, ingestSize, errors)
-                    }
+                    },
                 )
               }
             }

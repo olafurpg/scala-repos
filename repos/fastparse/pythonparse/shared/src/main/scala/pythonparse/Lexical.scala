@@ -58,12 +58,12 @@ object Lexical {
       "def",
       "for",
       "lambda",
-      "try"
+      "try",
   )
 
   val stringliteral: P[String] = P(stringprefix.? ~ (longstring | shortstring))
   val stringprefix: P0 = P(
-      "r" | "u" | "ur" | "R" | "U" | "UR" | "Ur" | "uR" | "b" | "B" | "br" | "Br" | "bR" | "BR"
+      "r" | "u" | "ur" | "R" | "U" | "UR" | "Ur" | "uR" | "b" | "B" | "br" | "Br" | "bR" | "BR",
   )
   val shortstring: P[String] = P(shortstring0("'") | shortstring0("\""))
   def shortstring0(delimiter: String) =

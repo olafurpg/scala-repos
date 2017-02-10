@@ -38,6 +38,6 @@ object ForkTestsTest extends Build {
             concurrentRestrictions :=
               Tags.limit(Tags.ForkedTestGroup, 2) :: Nil,
             libraryDependencies +=
-              "org.scalatest" %% "scalatest" % "1.8" % "test"
+              "org.scalatest" %% "scalatest" % "1.8" % "test",
         ))
 }

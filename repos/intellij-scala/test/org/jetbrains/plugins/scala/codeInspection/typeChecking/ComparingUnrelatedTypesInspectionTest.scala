@@ -233,7 +233,7 @@ class ComparingUnrelatedTypesInspectionTest
         |  implicit val store = new Store(12, ":)")
         |  (fooBinder == 12, fooBinder == 3, ${START}fooBinder == ":)"$END, barBinder == ":)") // (true, false, false, true)
         |}
-      """.stripMargin
+      """.stripMargin,
     )
   }
 

@@ -58,7 +58,7 @@ object Sample {
           }
           BuildDependencies(classpathWithProjectDependencies,
                             dependencies.aggregate)
-        }
+        },
   )
 
   private val excludeLibraryDependencies = (project: Project) =>
@@ -74,7 +74,7 @@ object Sample {
             module.excludeAll(
                 ExclusionRule(organization = module.organization))
           case module => module
-        }
+        },
   )
 
   /**

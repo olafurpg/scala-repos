@@ -122,7 +122,7 @@ trait TestShardService
   val testPermissions = Set[Permission](
       ReadPermission(Path.Root, WrittenByAccount("test")),
       WritePermission(testPath, WriteAsAny),
-      DeletePermission(testPath, WrittenByAny)
+      DeletePermission(testPath, WrittenByAny),
   )
 
   val expiredPath = Path("expired")
@@ -166,7 +166,7 @@ trait TestShardService
           Path("/test/foo") -> Set("test"),
           Path("/expired") -> Set("expired"),
           Path("/inaccessible") -> Set("other"),
-          Path("/inaccessible/foo") -> Set("other")
+          Path("/inaccessible/foo") -> Set("other"),
       )
 
       def stubValue(authorities: Authorities)

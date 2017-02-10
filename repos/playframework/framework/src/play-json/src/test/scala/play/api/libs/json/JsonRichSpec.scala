@@ -24,7 +24,7 @@ object JsonRichSpec extends Specification {
               "value41",
               345.6,
               JsString("test"),
-              JsObject(Seq("key411" -> obj("key4111" -> 987.654))))
+              JsObject(Seq("key411" -> obj("key4111" -> 987.654)))),
       )
 
       js must equalTo(
@@ -33,7 +33,7 @@ object JsonRichSpec extends Specification {
                   "key1" -> JsObject(Seq(
                           "key11" -> JsString("value11"),
                           "key12" -> JsNumber(123L),
-                          "key13" -> JsNull
+                          "key13" -> JsNull,
                       )),
                   "key2" -> JsNumber(123),
                   "key3" -> JsBoolean(true),
@@ -42,9 +42,9 @@ object JsonRichSpec extends Specification {
                           JsNumber(345.6),
                           JsString("test"),
                           JsObject(Seq("key411" -> JsObject(
-                                      Seq("key4111" -> JsNumber(987.654)))))
-                      ))
-              ))
+                                      Seq("key4111" -> JsNumber(987.654))))),
+                      )),
+              )),
       )
     }
   }

@@ -250,7 +250,7 @@ abstract class TreeBrowsers {
               closeWindow()
               global.currentRun.cancel()
             }
-          }
+          },
       )
       jmFile add jmiCancel
 
@@ -259,7 +259,7 @@ abstract class TreeBrowsers {
             putValue(Action.ACCELERATOR_KEY,
                      KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuKey, false))
             override def actionPerformed(e: ActionEvent) = closeWindow()
-          }
+          },
       )
       jmFile add jmiExit
       add(jmFile)
@@ -272,7 +272,7 @@ abstract class TreeBrowsers {
             override def actionPerformed(e: ActionEvent) {
               expandAll(jTree)
             }
-          }
+          },
       )
       jmView add jmiExpand
       val jmiCollapse = new JMenuItem(
@@ -282,7 +282,7 @@ abstract class TreeBrowsers {
             override def actionPerformed(e: ActionEvent) {
               collapseAll(jTree)
             }
-          }
+          },
       )
       jmView add jmiCollapse
       add(jmView)
@@ -583,7 +583,7 @@ abstract class TreeBrowsers {
         Document.group(
             Document.nest(
                 4,
-                "SingleType(" :/: toDocument(pre) :: ", " :/: sym.name.toString :: ")")
+                "SingleType(" :/: toDocument(pre) :: ", " :/: sym.name.toString :: ")"),
         )
 
       case ConstantType(value) =>
@@ -594,19 +594,19 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "TypeRef(" :/: toDocument(pre) :: ", " :/: sym.name.toString +
-                sym.idString :: ", " :/: "[ " :: toDocument(args) :: "]" :: ")")
+                sym.idString :: ", " :/: "[ " :: toDocument(args) :: "]" :: ")"),
         )
 
       case TypeBounds(lo, hi) =>
         Document.group(
             Document.nest(
                 4,
-                "TypeBounds(" :/: toDocument(lo) :: ", " :/: toDocument(hi) :: ")")
+                "TypeBounds(" :/: toDocument(lo) :: ", " :/: toDocument(hi) :: ")"),
         )
 
       case RefinedType(parents, defs) =>
         Document.group(
-            Document.nest(4, "RefinedType(" :/: toDocument(parents) :: ")")
+            Document.nest(4, "RefinedType(" :/: toDocument(parents) :: ")"),
         )
 
       case ClassInfoType(parents, defs, clazz) =>
@@ -614,7 +614,7 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "ClassInfoType(" :/: toDocument(parents) :: ", " :/: clazz.name.toString +
-                clazz.idString :: ")")
+                clazz.idString :: ")"),
         )
 
       case MethodType(params, result) =>
@@ -623,13 +623,13 @@ abstract class TreeBrowsers {
                 4,
                 "MethodType(" :/: Document.group(
                     "(" :/: symsToDocument(params) :/: "), ") :/: toDocument(
-                    result) :: ")")
+                    result) :: ")"),
         )
 
       case NullaryMethodType(result) =>
         Document.group(
             Document.nest(
-                4, "NullaryMethodType(" :/: toDocument(result) :: ")")
+                4, "NullaryMethodType(" :/: toDocument(result) :: ")"),
         )
 
       case PolyType(tparams, result) =>
@@ -638,7 +638,7 @@ abstract class TreeBrowsers {
                 4,
                 "PolyType(" :/: Document.group(
                     "(" :/: symsToDocument(tparams) :/: "), ") :/: toDocument(
-                    result) :: ")")
+                    result) :: ")"),
         )
 
       case AnnotatedType(annots, tp) =>
@@ -646,7 +646,7 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "AnnotatedType(" :/: annots.mkString("[", ",", "]") :/: "," :/: toDocument(
-                    tp) :: ")")
+                    tp) :: ")"),
         )
 
       case ExistentialType(tparams, result) =>

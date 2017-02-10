@@ -164,7 +164,7 @@ object CSVExporter {
         timers.map { name =>
           Row(name + ".stddev",
               metrics.map(_.timers.find(_.name == name).map(_.stddev)))
-        }
+        },
     ).flatten
   }
 

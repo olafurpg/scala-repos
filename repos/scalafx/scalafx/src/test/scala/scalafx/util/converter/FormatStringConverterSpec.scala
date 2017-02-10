@@ -60,7 +60,7 @@ class FormatStringConverterSpec
   val examples = List[(Number, String)](
       (0.0, "$0.00"),
       (123.45, "$123.45"),
-      (-123.45, "($123.45)")
+      (-123.45, "($123.45)"),
   )
 
   private def runConverterForExamples() {

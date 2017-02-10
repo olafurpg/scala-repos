@@ -152,7 +152,7 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
         Seq(
             (RDDBlockId(0, 100), BlockStatus(memAndDisk, 400L, 0L)),
             (RDDBlockId(0, 101), BlockStatus(memAndDisk, 0L, 400L)),
-            (RDDBlockId(1, 20), BlockStatus(memAndDisk, 0L, 240L))
+            (RDDBlockId(1, 20), BlockStatus(memAndDisk, 0L, 240L)),
         ))
     bus.postToAll(SparkListenerTaskEnd(
             1, 0, "obliteration", Success, taskInfo, metrics1))

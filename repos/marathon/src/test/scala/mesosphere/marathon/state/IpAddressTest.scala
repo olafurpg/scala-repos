@@ -19,27 +19,27 @@ class IpAddressTest extends MarathonSpec with Matchers {
 
     lazy val ipAddressWithGroups = IpAddress(
         groups = Vector("foo", "bar"),
-        labels = Map.empty
+        labels = Map.empty,
     )
 
     lazy val ipAddressWithGroupsAndLabels = IpAddress(
         groups = Vector("a", "b", "c"),
         labels = Map(
               "foo" -> "bar",
-              "baz" -> "buzz"
-          )
+              "baz" -> "buzz",
+          ),
     )
 
     lazy val ipAddressWithDiscoveryInfo = IpAddress(
         groups = Vector("a", "b", "c"),
         labels = Map(
               "foo" -> "bar",
-              "baz" -> "buzz"
+              "baz" -> "buzz",
           ),
         discoveryInfo = DiscoveryInfo(
               ports = Vector(DiscoveryInfo.Port(
-                        name = "http", number = 80, protocol = "tcp"))
-          )
+                        name = "http", number = 80, protocol = "tcp")),
+          ),
     )
   }
 

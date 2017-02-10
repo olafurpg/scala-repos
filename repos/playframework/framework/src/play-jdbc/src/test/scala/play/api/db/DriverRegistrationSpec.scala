@@ -59,7 +59,7 @@ object DriverRegistrationSpec extends Specification {
         Map("default" -> Configuration
               .from(Map(
                       "driver" -> "acolyte.jdbc.Driver",
-                      "url" -> jdbcUrl
+                      "url" -> jdbcUrl,
                   ))
               .underlying
               .withFallback(ConfigFactory.defaultReference.getConfig(

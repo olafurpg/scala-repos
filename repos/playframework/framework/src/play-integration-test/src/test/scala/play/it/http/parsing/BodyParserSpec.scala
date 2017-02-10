@@ -52,7 +52,7 @@ object BodyParserSpec
         Results.Ok,
         Results.BadRequest,
         Results.NotFound,
-        Results.InternalServerError
+        Results.InternalServerError,
     )
   }
 

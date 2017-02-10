@@ -91,7 +91,7 @@ object MergeOperations {
     val initBatch = Semigroup
       .plus(
           Some(nowBatch - (batchesToKeep - 1)),
-          offlineReturn
+          offlineReturn,
       )
       .get // This will never throw, as this option can never be None
     // (because we included an explicit "Some" inside)
@@ -106,7 +106,7 @@ object MergeOperations {
       collected <- collect(
           ks.map { k =>
             lookup(k).map { k -> expand(_, nowBatch, batchesToKeep) }
-          }
+          },
       )
     } yield pivot.invert(collected.toMap).toSet
 }

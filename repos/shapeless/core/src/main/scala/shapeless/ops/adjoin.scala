@@ -43,7 +43,7 @@ object adjoin {
       }
 
     implicit def coproductAdjoin0[H, T <: Coproduct](
-        implicit adjoinT: Adjoin[T] { type Out <: Coproduct }
+        implicit adjoinT: Adjoin[T] { type Out <: Coproduct },
     ): Aux[H :+: T, H :+: adjoinT.Out] =
       new Adjoin[H :+: T] {
         type Out = H :+: adjoinT.Out

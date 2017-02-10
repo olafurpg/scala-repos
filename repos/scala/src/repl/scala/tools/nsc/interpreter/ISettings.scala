@@ -42,7 +42,7 @@ class ISettings(intp: IMain) {
       "maxPrintString" -> maxPrintString,
       "maxAutoprintCompletion" -> maxAutoprintCompletion,
       "unwrapStrings" -> unwrapStrings,
-      "deprecation" -> deprecation
+      "deprecation" -> deprecation,
   )
 
   private def allSettingsString =

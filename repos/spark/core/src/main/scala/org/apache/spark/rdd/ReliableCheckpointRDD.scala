@@ -35,7 +35,7 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
 private[spark] class ReliableCheckpointRDD[T : ClassTag](
     sc: SparkContext,
     val checkpointPath: String,
-    _partitioner: Option[Partitioner] = None
+    _partitioner: Option[Partitioner] = None,
 )
     extends CheckpointRDD[T](sc) {
 

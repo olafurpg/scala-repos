@@ -35,7 +35,7 @@ class UpdateTaskTrackerStepImplTest
       .processUpdate(
           updateTimestamp,
           existingTask,
-          status
+          status,
       )
       .futureValue
 
@@ -61,7 +61,7 @@ class UpdateTaskTrackerStepImplTest
       .processUpdate(
           updateTimestamp,
           existingTask,
-          status
+          status,
       )
       .failed
       .futureValue

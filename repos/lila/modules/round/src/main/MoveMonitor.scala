@@ -21,7 +21,7 @@ private final class MoveMonitor(system: ActorSystem, channel: ActorRef) {
           if (!h.isEmpty)
             channel ! lila.socket.Channel.Publish(
                 lila.socket.Socket.makeMessage(
-                    "mlat", (h.sum / h.numberOfMeasurements / 1000000).toInt)
+                    "mlat", (h.sum / h.numberOfMeasurements / 1000000).toInt),
             )
         }
     }

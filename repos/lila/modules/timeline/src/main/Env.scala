@@ -27,7 +27,7 @@ final class Env(config: Config,
                          getFriendIds = getFriendIds,
                          getFollowerIds = getFollowerIds,
                          unsubApi = unsubApi,
-                         entryRepo = entryRepo
+                         entryRepo = entryRepo,
                      )),
                  name = UserActorName)
 

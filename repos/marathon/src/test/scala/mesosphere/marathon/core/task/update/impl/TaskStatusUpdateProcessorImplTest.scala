@@ -76,7 +76,7 @@ class TaskStatusUpdateProcessorImplTest
         Some(MarathonTestHelper.minimalReservedTask(
                 taskId.appId,
                 Task.Reservation(Iterable.empty,
-                                 MarathonTestHelper.taskReservationStateNew)))
+                                 MarathonTestHelper.taskReservationStateNew))),
     )
 
     When("we process the updated")
@@ -231,8 +231,8 @@ class TaskStatusUpdateProcessorImplTest
             notifyLaunchQueue,
             emitUpdate,
             postToEventStream,
-            scaleApp
-        )
+            scaleApp,
+        ),
     )
 
     def verifyNoMoreInteractions(): Unit = {

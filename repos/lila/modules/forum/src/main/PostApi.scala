@@ -55,7 +55,7 @@ final class PostApi(env: Env,
                         userId, topic.id.some, topic.name, post.id)).|>(prop =>
                       post.isStaff.fold(
                           prop toStaffFriendsOf userId,
-                          prop toFollowersOf userId toUsers topicUserIds exceptUser userId
+                          prop toFollowersOf userId toUsers topicUserIds exceptUser userId,
                     ))
               }
               lila.mon.forum.post.create()

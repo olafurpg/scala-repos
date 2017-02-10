@@ -35,7 +35,7 @@ final class TeamApi(cached: Cached,
         (forum ! MakeTeam(team.id, team.name))
         (indexer ! InsertTeam(team))
         (timeline ! Propagate(
-                TeamCreate(me.id, team.id)
+                TeamCreate(me.id, team.id),
             ).toFollowersOf(me.id))
       } inject team
     }

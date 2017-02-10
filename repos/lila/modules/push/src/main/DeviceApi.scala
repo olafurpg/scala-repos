@@ -22,7 +22,7 @@ private final class DeviceApi(coll: Coll) {
     coll
       .find(BSONDocument(
               "platform" -> platform,
-              "userId" -> userId
+              "userId" -> userId,
           ))
       .sort(BSONDocument("seenAt" -> -1))
       .one[Device]
@@ -35,7 +35,7 @@ private final class DeviceApi(coll: Coll) {
                   _id = deviceId,
                   platform = platform,
                   userId = user.id,
-                  seenAt = DateTime.now
+                  seenAt = DateTime.now,
               ),
               upsert = true)
       .void

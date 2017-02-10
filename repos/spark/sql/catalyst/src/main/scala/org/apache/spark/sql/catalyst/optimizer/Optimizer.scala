@@ -307,7 +307,7 @@ object SetOperationPushDown extends Rule[LogicalPlan] with PredicateHelper {
       Filter(nondeterministic,
              Except(
                  Filter(deterministic, left),
-                 Filter(pushToRight(deterministic, rewrites), right)
+                 Filter(pushToRight(deterministic, rewrites), right),
              ))
   }
 }

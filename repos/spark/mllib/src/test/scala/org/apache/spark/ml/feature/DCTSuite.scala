@@ -69,7 +69,7 @@ class DCTSuite
 
     val dataset = sqlContext.createDataFrame(
         Seq(
-            DCTTestData(data, expectedResult)
+            DCTTestData(data, expectedResult),
         ))
 
     val transformer = new DCT()

@@ -126,7 +126,7 @@ class VertexRDDImpl[VD] private[graphx](
                 other.partitionBy(this.partitioner.get),
                 preservesPartitioning = true) { (partIter, msgs) =>
               partIter.map(_.minus(msgs))
-            }
+            },
         )
     }
   }
@@ -144,7 +144,7 @@ class VertexRDDImpl[VD] private[graphx](
     }
     val newPartitionsRDD = partitionsRDD.zipPartitions(
         otherPartition,
-        preservesPartitioning = true
+        preservesPartitioning = true,
     ) { (thisIter, otherIter) =>
       val thisPart = thisIter.next()
       val otherPart = otherIter.next()
@@ -158,7 +158,7 @@ class VertexRDDImpl[VD] private[graphx](
       f: (VertexId, VD, Option[VD2]) => VD3): VertexRDD[VD3] = {
     val newPartitionsRDD = partitionsRDD.zipPartitions(
         other.partitionsRDD,
-        preservesPartitioning = true
+        preservesPartitioning = true,
     ) { (thisIter, otherIter) =>
       val thisPart = thisIter.next()
       val otherPart = otherIter.next()
@@ -181,7 +181,7 @@ class VertexRDDImpl[VD] private[graphx](
                 other.partitionBy(this.partitioner.get),
                 preservesPartitioning = true) { (partIter, msgs) =>
               partIter.map(_.leftJoin(msgs)(f))
-            }
+            },
         )
     }
   }
@@ -190,7 +190,7 @@ class VertexRDDImpl[VD] private[graphx](
       f: (VertexId, VD, U) => VD2): VertexRDD[VD2] = {
     val newPartitionsRDD = partitionsRDD.zipPartitions(
         other.partitionsRDD,
-        preservesPartitioning = true
+        preservesPartitioning = true,
     ) { (thisIter, otherIter) =>
       val thisPart = thisIter.next()
       val otherPart = otherIter.next()
@@ -213,7 +213,7 @@ class VertexRDDImpl[VD] private[graphx](
                 other.partitionBy(this.partitioner.get),
                 preservesPartitioning = true) { (partIter, msgs) =>
               partIter.map(_.innerJoin(msgs)(f))
-            }
+            },
         )
     }
   }

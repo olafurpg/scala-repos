@@ -29,22 +29,22 @@ class FormatterTest extends WordSpec {
   val basicFormatter = new Formatter
 
   val utcFormatter = new Formatter(
-      timezone = Some("UTC")
+      timezone = Some("UTC"),
   )
 
   val fullPackageFormatter = new Formatter(
       timezone = Some("UTC"),
-      useFullPackageNames = true
+      useFullPackageNames = true,
   )
 
   val prefixFormatter = new Formatter(
       timezone = Some("UTC"),
-      prefix = "%2$s <HH:mm> %1$.4s "
+      prefix = "%2$s <HH:mm> %1$.4s ",
   )
 
   val truncateFormatter = new Formatter(
       timezone = Some("UTC"),
-      truncateAt = 30
+      truncateAt = 30,
   )
 
   val record1 = new javalog.LogRecord(Level.ERROR, "boo.")

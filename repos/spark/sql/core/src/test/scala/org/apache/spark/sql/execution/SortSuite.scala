@@ -37,7 +37,7 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
     val input = Seq(
         ("Hello", 4, 2.0),
         ("Hello", 1, 1.0),
-        ("World", 8, 3.0)
+        ("World", 8, 3.0),
     )
 
     checkAnswer(input.toDF("a", "b", "c"),
@@ -60,7 +60,7 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
           GlobalLimit(10, Sort('a.asc :: Nil, global = true, child = child)),
         (child: SparkPlan) =>
           GlobalLimit(10, ReferenceSort('a.asc :: Nil, global = true, child)),
-        sortAnswers = false
+        sortAnswers = false,
     )
   }
 
@@ -73,7 +73,7 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
           .repartition(1),
         Sort(sortOrder, global = true, _: SparkPlan, testSpillFrequency = 1),
         ReferenceSort(sortOrder, global = true, _: SparkPlan),
-        sortAnswers = false
+        sortAnswers = false,
     )
   }
 
@@ -98,7 +98,7 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
       val inputData = Seq.fill(1000)(randomDataGenerator())
       val inputDf = sqlContext.createDataFrame(
           sparkContext.parallelize(Random.shuffle(inputData).map(v => Row(v))),
-          StructType(StructField("a", dataType, nullable = true) :: Nil)
+          StructType(StructField("a", dataType, nullable = true) :: Nil),
       )
       checkThatPlansAgree(
           inputDf,
@@ -108,7 +108,7 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
                  p: SparkPlan,
                  testSpillFrequency = 23),
           ReferenceSort(sortOrder, global = true, _: SparkPlan),
-          sortAnswers = false
+          sortAnswers = false,
       )
     }
   }

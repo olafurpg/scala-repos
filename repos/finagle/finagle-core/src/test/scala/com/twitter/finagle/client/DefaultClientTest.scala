@@ -105,7 +105,7 @@ class DefaultClientTest
           endPointer,
           pool = pool,
           requestTimeout = rTimeout,
-          timer = timer
+          timer = timer,
       )
 
       Time.withCurrentTimeFrozen { control =>
@@ -144,7 +144,7 @@ class DefaultClientTest
         endPointer,
         pool = pool,
         timer = timer,
-        statsReceiver = statsReceiver
+        statsReceiver = statsReceiver,
     )
   }
 
@@ -228,7 +228,7 @@ class DefaultClientTest
         endPointer,
         pool = pool,
         timer = timer,
-        statsReceiver = statsReceiver
+        statsReceiver = statsReceiver,
     )
   }
 
@@ -257,7 +257,7 @@ class DefaultClientTest
                 DefaultLogger,
                 failing,
                 ResponseClassifier.Default)(timer) andThen factory
-          }
+          },
       )
 
       Time.withCurrentTimeFrozen { control =>

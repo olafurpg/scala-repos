@@ -63,7 +63,7 @@ object CommonHelperFunctions {
           evaluatorInfo,
           testingPoints.map { d =>
             (queryCreator(d), actualCreator(d))
-          }
+          },
       )
     }
   }

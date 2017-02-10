@@ -539,10 +539,10 @@ trait RestHelper extends LiftRules.DispatchPF {
     * @return Nothing
     */
   protected implicit def asyncToResponse[AsyncResolvableType, T](
-      asyncContainer: AsyncResolvableType
+      asyncContainer: AsyncResolvableType,
   )(
       implicit asyncResolveProvider: CanResolveAsync[AsyncResolvableType, T],
-      responseCreator: T => LiftResponse
+      responseCreator: T => LiftResponse,
   ): () => Box[LiftResponse] =
     () =>
       {
@@ -565,11 +565,11 @@ trait RestHelper extends LiftRules.DispatchPF {
     * @return Nothing
     */
   protected implicit def asyncBoxToResponse[AsyncResolvableType, T](
-      asyncBoxContainer: AsyncResolvableType
+      asyncBoxContainer: AsyncResolvableType,
   )(
       implicit asyncResolveProvider: CanResolveAsync[
           AsyncResolvableType, Box[T]],
-      responseCreator: T => LiftResponse
+      responseCreator: T => LiftResponse,
   ): () => Box[LiftResponse] =
     () =>
       {

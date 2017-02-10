@@ -130,7 +130,7 @@ trait PlayRunners extends HttpVerbs {
         ("db." + name + ".driver") -> "org.h2.Driver",
         ("db." + name + ".url") ->
         ("jdbc:h2:mem:play-test-" + scala.util.Random.nextInt +
-            optionsForDbUrl)
+            optionsForDbUrl),
     )
   }
 }

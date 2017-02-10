@@ -28,6 +28,6 @@ object ApplicationBuild extends Build {
               case _ =>
             }
           }
-        }
+        },
     )
 }

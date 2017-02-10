@@ -83,7 +83,7 @@ trait Positional { self: Config =>
         game.copy(variant = chess.variant.FromPosition,
                   castleLastMoveTime = game.castleLastMoveTime.copy(
                         lastMove = board.history.lastMove.map(_.origDest),
-                        castles = board.history.castles
+                        castles = board.history.castles,
                     ),
                   turns = sit.turns)
     }

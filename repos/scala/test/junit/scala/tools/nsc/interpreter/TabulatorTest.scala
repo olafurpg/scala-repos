@@ -142,7 +142,7 @@ class TabulatorTest {
         "unary_+",
         "unary_-",
         "unary_~",
-        "|"
+        "|",
     )
     val rows = sut tabulate items
     assert(rows.size == 4)

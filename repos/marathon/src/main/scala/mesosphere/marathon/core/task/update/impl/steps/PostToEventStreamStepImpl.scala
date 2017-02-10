@@ -51,7 +51,7 @@ class PostToEventStreamStepImpl @Inject()(
     task.launched.foreach { launched =>
       log.info(
           "Sending event notification for {} of app [{}]: {}",
-          Array[Object](taskId, taskId.appId, status.getState): _*
+          Array[Object](taskId, taskId.appId, status.getState): _*,
       )
       eventBus.publish(
           MesosStatusUpdateEvent(
@@ -71,8 +71,8 @@ class PostToEventStreamStepImpl @Inject()(
                 case _ => Iterable.empty
               },
               version = launched.appVersion.toString,
-              timestamp = timestamp.toString
-          )
+              timestamp = timestamp.toString,
+          ),
       )
     }
   }

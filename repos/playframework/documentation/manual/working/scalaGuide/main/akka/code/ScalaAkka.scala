@@ -269,7 +269,7 @@ package scalaguide.akka {
     }
 
     class ParentActor @Inject()(
-        childFactory: ConfiguredChildActor.Factory
+        childFactory: ConfiguredChildActor.Factory,
     )
         extends Actor with InjectedActorSupport {
       import ParentActor._

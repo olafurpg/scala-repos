@@ -49,16 +49,16 @@ class EncoderTest extends FunSuite with MockitoSugar {
         StatLines(
             Seq(
                 Tokens(Seq(Buf.Utf8("tok1"))),
-                Tokens(Seq(Buf.Utf8("tok2")))
-            )
-        )
+                Tokens(Seq(Buf.Utf8("tok2"))),
+            ),
+        ),
     )
 
     info("value lines")
     encodeIsPure(
         ValueLines(Seq(TokensWithData(Seq(Buf.Utf8("foo")),
                                       Buf.Utf8("bar"),
-                                      Some(Buf.Utf8("quux")))))
+                                      Some(Buf.Utf8("quux"))))),
     )
   }
 }

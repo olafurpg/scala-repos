@@ -36,11 +36,11 @@ class DataSource(val dsp: DataSourceParams)
 case class Rating(
     user: String,
     item: String,
-    rating: Double
+    rating: Double,
 )
 
 class TrainingData(
-    val ratings: RDD[Rating]
+    val ratings: RDD[Rating],
 )
     extends Serializable {
   override def toString = {

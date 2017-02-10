@@ -24,7 +24,7 @@ class SequenceTest extends AsyncTest[JdbcTestDB] {
         ddl.create,
         users ++= Seq(1, 2, 3),
         q1.result.map(r => r.toSet shouldBe Set((200, 1), (210, 2), (220, 3))),
-        ifCap(scap.sequenceCurr)(mySequence.curr.result.map(_ shouldBe 220))
+        ifCap(scap.sequenceCurr)(mySequence.curr.result.map(_ shouldBe 220)),
     ).withPinnedSession
   }
 
@@ -48,12 +48,12 @@ class SequenceTest extends AsyncTest[JdbcTestDB] {
         values(s3).map(_ shouldBe List(3, 5, 7, 9, 11)),
         ifCap(scap.sequenceMin, scap.sequenceMax, scap.sequenceCycle)(seq(
                 values(s4).map(_ shouldBe List(3, 4, 5, 2, 3)),
-                values(s5).map(_ shouldBe List(3, 2, 5, 4, 3))
+                values(s5).map(_ shouldBe List(3, 2, 5, 4, 3)),
             )),
         ifCap(scap.sequenceMin, scap.sequenceMax, scap.sequenceLimited)(seq(
                 values(s6, 3).map(_ shouldBe List(3, 4, 5)),
-                values(s6, 1, false).failed
-            ))
+                values(s6, 1, false).failed,
+            )),
     ).withPinnedSession
   }
 }

@@ -106,7 +106,7 @@ trait BaseInMemoryJobManager[M[+ _]]
     val jval = JObject(
         JField("message", JString(msg)) :: JField("progress", JNum(progress)) :: JField(
             "unit", JString(unit)) ::
-        (extra map (JField("info", _) :: Nil) getOrElse Nil)
+        (extra map (JField("info", _) :: Nil) getOrElse Nil),
     )
 
     synchronized {

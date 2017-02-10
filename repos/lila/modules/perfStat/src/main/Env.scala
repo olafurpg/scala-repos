@@ -25,7 +25,7 @@ final class Env(config: Config,
                                                    classOf[lila.hub.Sequencer],
                                                    None,
                                                    None,
-                                                   lila.log("perfStat")
+                                                   lila.log("perfStat"),
                                                )))
 
   lazy val jsonView = new JsonView(lightUser)

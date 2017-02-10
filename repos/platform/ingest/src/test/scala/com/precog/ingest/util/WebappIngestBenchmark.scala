@@ -186,7 +186,7 @@ object JsonLoader extends App with AkkaDefaults {
 Usage:
 
   command {host} {API key} {json data file}
-"""
+""",
     )
   }
 

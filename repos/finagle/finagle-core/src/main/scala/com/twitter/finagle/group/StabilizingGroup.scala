@@ -24,7 +24,7 @@ object StabilizingGroup {
       pulse: Offer[State.Health],
       grace: Duration,
       statsReceiver: StatsReceiver = NullStatsReceiver,
-      timer: Timer = DefaultTimer.twitter
+      timer: Timer = DefaultTimer.twitter,
   ): Group[T] = {
     new StabilizingGroup(underlying, pulse, grace, statsReceiver, timer)
   }
@@ -47,7 +47,7 @@ object StabilizingGroup {
       pulse: Offer[State.Health],
       grace: Duration,
       statsReceiver: StatsReceiver,
-      implicit val timer: Timer
+      implicit val timer: Timer,
   )
       extends Group[T] {
     import State._
@@ -112,7 +112,7 @@ object StabilizingGroup {
               set() -= elem
               loop(nextq, h)
             }
-          }
+          },
       )
 
     loop(Queue.empty, Healthy)

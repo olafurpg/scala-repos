@@ -35,7 +35,7 @@ object Test extends ScaladocModelTest {
         (fooCL, "L.Z", 1),
         (fooPA, "a.C", 1),
         (fooPB, "b.C", 1),
-        (fooPC, "C", 1)
+        (fooPC, "C", 1),
     )
 
     for ((method, name, refs) <- expected) {

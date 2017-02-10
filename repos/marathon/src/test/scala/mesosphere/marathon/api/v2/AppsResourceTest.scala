@@ -61,7 +61,7 @@ class AppsResourceTest
             versionInfo = AppDefinition.VersionInfo.OnlyVersion(clock.now())),
         maybeTasks = Some(immutable.Seq.empty),
         maybeCounts = Some(TaskCounts.zero),
-        maybeDeployments = Some(immutable.Seq(Identifiable(plan.id)))
+        maybeDeployments = Some(immutable.Seq(Identifiable(plan.id))),
     )
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
@@ -120,7 +120,7 @@ class AppsResourceTest
         id = PathId("/app"),
         cmd = Some("cmd"),
         portDefinitions = PortDefinitions(1000, 1001),
-        versionInfo = OnlyVersion(Timestamp.zero)
+        versionInfo = OnlyVersion(Timestamp.zero),
     )
     val group = Group(PathId("/"), Set(app))
     val plan = DeploymentPlan(group, group)
@@ -147,7 +147,7 @@ class AppsResourceTest
             versionInfo = AppDefinition.VersionInfo.OnlyVersion(clock.now())),
         maybeTasks = Some(immutable.Seq.empty),
         maybeCounts = Some(TaskCounts.zero),
-        maybeDeployments = Some(immutable.Seq(Identifiable(plan.id)))
+        maybeDeployments = Some(immutable.Seq(Identifiable(plan.id))),
     )
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
@@ -523,7 +523,7 @@ class AppsResourceTest
         AppDefinition("/visible/other/foo/app".toPath),
         AppDefinition("/secure/app".toPath),
         AppDefinition("/root".toPath),
-        AppDefinition("/other/great/app".toPath)
+        AppDefinition("/other/great/app".toPath),
     )
 
     When("The selector selects applications")
@@ -590,7 +590,7 @@ class AppsResourceTest
         config,
         auth.auth,
         auth.auth,
-        groupManager
+        groupManager,
     )
   }
 
@@ -611,7 +611,7 @@ class AppsResourceTest
         config,
         auth.auth,
         auth.auth,
-        groupManager
+        groupManager,
     )
   }
 }

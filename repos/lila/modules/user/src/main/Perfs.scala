@@ -146,7 +146,7 @@ case class Perfs(standard: Perf,
                  recent = Nil,
                  latest = date.some)
         }
-      }
+      },
   )
 }
 

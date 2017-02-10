@@ -47,7 +47,7 @@ object ThrottledHandler {
   def apply(
       handler: HandlerFactory,
       duration: Duration = 0.seconds,
-      maxToDisplay: Int = Int.MaxValue
+      maxToDisplay: Int = Int.MaxValue,
   ) = () => new ThrottledHandler(handler(), duration, maxToDisplay)
 }
 
@@ -69,7 +69,7 @@ object ThrottledHandler {
 class ThrottledHandler(
     handler: Handler,
     val duration: Duration,
-    val maxToDisplay: Int
+    val maxToDisplay: Int,
 )
     extends ProxyHandler(handler) {
 
@@ -155,7 +155,7 @@ class ThrottledHandler(
       val throttle = synchronized {
         throttleMap.getOrElseUpdate(
             key,
-            new Throttle(now, record.getLoggerName(), record.getLevel())
+            new Throttle(now, record.getLoggerName(), record.getLevel()),
         )
       }
 

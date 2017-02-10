@@ -83,7 +83,7 @@ object TreeTableViewWithTwoColumns extends JFXApp {
               cellValueFactory = { p =>
                 ReadOnlyStringWrapper(p.value.value.value.email())
               }
-            }
+            },
         )
         tableMenuButtonVisible = true
       }

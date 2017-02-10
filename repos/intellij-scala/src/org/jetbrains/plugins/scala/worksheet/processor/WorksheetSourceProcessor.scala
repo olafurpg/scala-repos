@@ -451,7 +451,7 @@ object WorksheetSourceProcessor {
       objectPrologue + importStmts.mkString(";") + classRes.toString() +
       "\n\n\n" + objectRes.toString()
     Left(
-        (codeResult, packOpt.map(_ + ".").getOrElse("") + name)
+        (codeResult, packOpt.map(_ + ".").getOrElse("") + name),
     )
   }
 

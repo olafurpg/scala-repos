@@ -106,7 +106,7 @@ object GeneratedCodeTest {
             assertEquals(None, ERow(1, 2).n)
             assertEquals("test", ERow(1, 2).s)
             assertEquals("asdf", ERow(1, 2, "asdf").s)
-          }
+          },
       )
   }
 
@@ -123,7 +123,7 @@ object GeneratedCodeTest {
         schema.create,
         Suppliers.length.result.map(assertEquals(0, _)),
         Suppliers += s,
-        Suppliers.result.map(assertEquals(List(s), _))
+        Suppliers.result.map(assertEquals(List(s), _)),
     )
   }
 
@@ -135,7 +135,7 @@ object GeneratedCodeTest {
     DBIO.seq(
         schema.create,
         Suppliers += s,
-        Suppliers.result.map(assertEquals(List(s), _))
+        Suppliers.result.map(assertEquals(List(s), _)),
     )
   }
 
@@ -147,7 +147,7 @@ object GeneratedCodeTest {
         Supps.length.result.map(assertEquals(0, _)),
         Supps += Supplier(1, "1", "2", "3", "4", "5"),
         Supps.length.result.map(assertEquals(1, _)),
-        Coffs.length.result.map(assertEquals(0, _))
+        Coffs.length.result.map(assertEquals(0, _)),
     )
   }
 
@@ -160,7 +160,7 @@ object GeneratedCodeTest {
         SimpleAs += SimpleA(CustomTyping.True, "1"),
         SimpleAs.length.result.map(assertEquals(1, _)),
         SimpleAs.result.map(
-            assertEquals(List(SimpleA(CustomTyping.True, "1")), _))
+            assertEquals(List(SimpleA(CustomTyping.True, "1")), _)),
     )
   }
 
@@ -178,7 +178,7 @@ object GeneratedCodeTest {
         E += ERow(2, "foo", Some("bar")),
         E += ERow(3, "foo", Some("bar"), None),
         E.result.map(assertAll),
-        sql"select k1, k2, s, n from e".as[ERow].map(assertAll)
+        sql"select k1, k2, s, n from e".as[ERow].map(assertAll),
     )
   }
 

@@ -92,19 +92,19 @@ sealed abstract class Validated[+E, +A] extends Product with Serializable {
   def compare[EE >: E, AA >: A](that: Validated[EE, AA])(
       implicit EE: Order[EE], AA: Order[AA]): Int = fold(
       a => that.fold(EE.compare(a, _), _ => -1),
-      b => that.fold(_ => 1, AA.compare(b, _))
+      b => that.fold(_ => 1, AA.compare(b, _)),
   )
 
   def partialCompare[EE >: E, AA >: A](that: Validated[EE, AA])(
       implicit EE: PartialOrder[EE], AA: PartialOrder[AA]): Double = fold(
       a => that.fold(EE.partialCompare(a, _), _ => -1),
-      b => that.fold(_ => 1, AA.partialCompare(b, _))
+      b => that.fold(_ => 1, AA.partialCompare(b, _)),
   )
 
   def ===[EE >: E, AA >: A](that: Validated[EE, AA])(
       implicit EE: Eq[EE], AA: Eq[AA]): Boolean = fold(
       a => that.fold(EE.eqv(a, _), _ => false),
-      b => that.fold(_ => false, AA.eqv(b, _))
+      b => that.fold(_ => false, AA.eqv(b, _)),
   )
 
   /**

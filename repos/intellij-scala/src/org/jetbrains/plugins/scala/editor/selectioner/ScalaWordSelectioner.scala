@@ -31,7 +31,7 @@ class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
           val end =
             if (Set(ScalaTokenTypes.tRPARENTHESIS, ScalaTokenTypes.tRSQBRACKET)
                   .contains(
-                    e.getNode.getLastChildNode.getElementType
+                    e.getNode.getLastChildNode.getElementType,
                 )) range.getEndOffset - 1
             else range.getEndOffset
           result.add(new TextRange(start, end))

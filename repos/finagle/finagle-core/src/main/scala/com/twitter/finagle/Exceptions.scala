@@ -106,7 +106,7 @@ trait TimeoutException extends SourcedException { self: Exception =>
   */
 class RequestTimeoutException(
     protected val timeout: Duration,
-    protected val explanation: String
+    protected val explanation: String,
 )
     extends RequestException with TimeoutException
 
@@ -154,7 +154,7 @@ class GlobalRequestTimeoutException(timeout: Duration)
 class NoBrokersAvailableException(
     val name: String,
     val baseDtab: Dtab,
-    val localDtab: Dtab
+    val localDtab: Dtab,
 )
     extends RequestException {
   def this(name: String = "unknown") = this(name, Dtab.empty, Dtab.empty)

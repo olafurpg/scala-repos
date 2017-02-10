@@ -87,7 +87,7 @@ abstract class RefChecks
 
   def accessFlagsToString(sym: Symbol) = flagsToString(
       sym getFlag (PRIVATE | PROTECTED),
-      if (sym.hasAccessBoundary) "" + sym.privateWithin.name else ""
+      if (sym.hasAccessBoundary) "" + sym.privateWithin.name else "",
   )
 
   def overridesTypeInPrefix(
@@ -382,7 +382,7 @@ abstract class RefChecks
               ";\n (Note that %s is abstract,\n  and is therefore overridden by concrete %s)"
                 .format(
                   infoStringWithLocation(other),
-                  infoStringWithLocation(member)
+                  infoStringWithLocation(member),
               )
             else if (settings.debug)
               analyzer.foundReqMsg(member.tpe, other.tpe)
@@ -392,7 +392,7 @@ abstract class RefChecks
               infoStringWithLocation(other),
               infoString(member),
               msg,
-              addendum
+              addendum,
           )
         }
         def emitOverrideError(fullmsg: String) {
@@ -408,7 +408,7 @@ abstract class RefChecks
           if (noErrorType) {
             emitOverrideError(
                 if (member.isModule && other.isModule) objectOverrideErrorMsg
-                else overrideErrorMsg("has incompatible type")
+                else overrideErrorMsg("has incompatible type"),
             )
           }
         }
@@ -491,7 +491,7 @@ abstract class RefChecks
                   infoStringWithLocation(other) + "  and\n  " +
                   infoStringWithLocation(member) +
                   "\n(Note: this can be resolved by declaring an override in " +
-                  clazz + ".)"
+                  clazz + ".)",
               )
             else overrideError("needs `override' modifier")
           } else if (other.isAbstractOverride && other.isIncompleteIn(clazz) &&
@@ -775,7 +775,7 @@ abstract class RefChecks
                       "\n(Note that an abstract var requires a setter in addition to the getter)"
                     else if (member.isGetter && !isMultiple)
                       "\n(Note that an abstract var requires a getter in addition to the setter)"
-                    else analyzer.abstractVarMessage(member)
+                    else analyzer.abstractVarMessage(member),
                 )
             } else if (underlying.isMethod) {
               // If there is a concrete method whose name matches the unimplemented
@@ -1578,7 +1578,7 @@ abstract class RefChecks
               memberSym.fullLocationString,
               comparison,
               accessFlagsToString(otherSym),
-              otherSym
+              otherSym,
           ) + "\nClasses which cannot access %s %s %s.".format(
               otherSym.decodedName, cannot, memberSym.decodedName))
     }

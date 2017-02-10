@@ -30,6 +30,6 @@ object SitaClustering extends PerfTestSuite {
 
     points := { x: locations.x, y: locations.y }
     kMedians(points, 5)
-    """
+    """,
   )
 }

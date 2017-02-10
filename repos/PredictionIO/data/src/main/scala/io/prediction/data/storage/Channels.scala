@@ -28,7 +28,7 @@ import io.prediction.annotation.DeveloperApi
 case class Channel(
     id: Int,
     name: String, // must be unique within the same app
-    appid: Int
+    appid: Int,
 ) {
   require(Channel.isValidName(name),
           "Invalid channel name: ${name}. ${Channel.nameConstraint}")

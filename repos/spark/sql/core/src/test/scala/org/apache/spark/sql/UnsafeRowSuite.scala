@@ -89,13 +89,13 @@ class UnsafeRowSuite extends SparkFunSuite {
             arrayBackedUnsafeRow.getBaseOffset,
             offheapRowPage.getBaseObject,
             offheapRowPage.getBaseOffset,
-            arrayBackedUnsafeRow.getSizeInBytes
+            arrayBackedUnsafeRow.getSizeInBytes,
         )
         val offheapUnsafeRow: UnsafeRow = new UnsafeRow(3)
         offheapUnsafeRow.pointTo(
             offheapRowPage.getBaseObject,
             offheapRowPage.getBaseOffset,
-            arrayBackedUnsafeRow.getSizeInBytes
+            arrayBackedUnsafeRow.getSizeInBytes,
         )
         assert(offheapUnsafeRow.getBaseObject === null)
         val baos = new ByteArrayOutputStream()

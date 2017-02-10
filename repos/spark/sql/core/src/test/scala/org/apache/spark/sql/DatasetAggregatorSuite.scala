@@ -188,7 +188,7 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
 
     checkDataset(
         ds.select(ComplexBufferAgg.toColumn),
-        2
+        2,
     )
 
     checkDataset(

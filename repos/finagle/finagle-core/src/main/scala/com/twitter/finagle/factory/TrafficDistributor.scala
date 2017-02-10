@@ -52,7 +52,7 @@ private[finagle] object TrafficDistributor {
     */
   private def safelyScanLeft[T, U](
       init: U,
-      stream: Event[Activity.State[T]]
+      stream: Event[Activity.State[T]],
   )(f: (U, T) => U): Event[Activity.State[U]] = {
     val initState: Activity.State[U] = Activity.Ok(init)
     stream.foldLeft(initState) {
@@ -145,7 +145,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
     * the [[Address]] does not have a weight, a default weight of 1.0 is used.
     */
   private[this] def weightEndpoints(
-      addrs: Event[Activity.State[Set[Address]]]
+      addrs: Event[Activity.State[Set[Address]]],
   ): Event[Activity.State[Set[WeightedFactory[Req, Rep]]]] = {
     val init = Map.empty[Address, WeightedFactory[Req, Rep]]
     safelyScanLeft(init, addrs) {
@@ -205,7 +205,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
     * Because balancer instances are stateful, they need to be cached across updates.
     */
   private[this] def partition(
-      endpoints: Event[Activity.State[Set[WeightedFactory[Req, Rep]]]]
+      endpoints: Event[Activity.State[Set[WeightedFactory[Req, Rep]]]],
   ): Event[Activity.State[Iterable[WeightClass[Req, Rep]]]] = {
     // Cache entries are balancer instances together with their backing collection
     // which is updatable. The entries are keyed by weight class.

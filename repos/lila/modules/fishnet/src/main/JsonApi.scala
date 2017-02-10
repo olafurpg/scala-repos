@@ -136,7 +136,7 @@ object JsonApi {
                   Json.obj("type" -> "move",
                            "id" -> work.id,
                            "level" -> m.level)
-              })
+              }),
       ) ++ Json.toJson(work.game).as[JsObject]
     }
   }

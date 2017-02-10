@@ -170,7 +170,7 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
           None: Option[Long],
           None: Option[Float],
           None: Option[Double],
-          None: Option[Boolean]
+          None: Option[Boolean],
       ) :: Nil
 
     withOrcFile(data) { file =>

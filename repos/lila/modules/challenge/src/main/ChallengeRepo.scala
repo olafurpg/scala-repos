@@ -45,7 +45,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
     coll
       .remove(BSONDocument("$or" -> BSONArray(
                   BSONDocument("challenger.id" -> userId),
-                  BSONDocument("destUser.id" -> userId)
+                  BSONDocument("destUser.id" -> userId),
               )))
       .void
 
@@ -66,7 +66,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
       date: DateTime, max: Int): Fu[List[Challenge]] =
     coll
       .find(selectCreated ++ selectClock ++ BSONDocument(
-              "seenAt" -> BSONDocument("$lt" -> date)
+              "seenAt" -> BSONDocument("$lt" -> date),
           ))
       .cursor[Challenge]()
       .collect[List](max)
@@ -74,7 +74,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
   private[challenge] def expiredIds(max: Int): Fu[List[Challenge.ID]] =
     coll.distinct(
         "_id",
-        BSONDocument("expiresAt" -> BSONDocument("$lt" -> DateTime.now)).some
+        BSONDocument("expiresAt" -> BSONDocument("$lt" -> DateTime.now)).some,
     ) map lila.db.BSON.asStrings
 
   def setSeenAgain(id: Challenge.ID) =
@@ -83,7 +83,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
           selectId(id),
           BSONDocument("$set" -> BSONDocument("status" -> Status.Created.id,
                                               "seenAt" -> DateTime.now,
-                                              "expiresAt" -> inTwoWeeks))
+                                              "expiresAt" -> inTwoWeeks)),
       )
       .void
 
@@ -91,7 +91,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
     coll
       .update(
           selectId(id),
-          BSONDocument("$set" -> BSONDocument("seenAt" -> DateTime.now))
+          BSONDocument("$set" -> BSONDocument("seenAt" -> DateTime.now)),
       )
       .void
 
@@ -108,7 +108,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
     coll
       .find(
           selectId(id),
-          BSONDocument("status" -> true, "_id" -> false)
+          BSONDocument("status" -> true, "_id" -> false),
       )
       .one[BSONDocument]
       .map { _.flatMap(_.getAs[Status]("status")) }
@@ -124,8 +124,8 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
                   "status" -> status.id,
                   "expiresAt" -> expiresAt.fold(inTwoWeeks) {
                 _ (DateTime.now)
-              }
-              ))
+              },
+              )),
       )
       .void
 

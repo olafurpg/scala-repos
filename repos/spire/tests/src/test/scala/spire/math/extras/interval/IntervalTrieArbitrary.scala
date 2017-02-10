@@ -30,7 +30,7 @@ object IntervalTrieArbitrary {
       1 -> IntervalTrie.empty[Long],
       1 -> IntervalTrie.all[Long],
       15 -> randomProfileXor(0, 100, size),
-      15 -> randomProfileXor(Long.MinValue, Long.MaxValue, size)
+      15 -> randomProfileXor(Long.MinValue, Long.MaxValue, size),
   )
 
   implicit val arbIntervalTrie =

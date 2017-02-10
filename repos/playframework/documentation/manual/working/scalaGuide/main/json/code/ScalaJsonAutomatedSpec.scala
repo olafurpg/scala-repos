@@ -21,7 +21,7 @@ class ScalaJsonAutomatedSpec extends Specification {
       """{
       "name" : "Fiver",
       "age" : 4
-    }"""
+    }""",
   )
   val sampleData = Resident("Fiver", 4, None)
 

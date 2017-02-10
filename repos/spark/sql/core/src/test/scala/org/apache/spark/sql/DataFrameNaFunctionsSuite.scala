@@ -31,7 +31,7 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
         ("David", 60, null),
         ("Nina", 25, Double.NaN),
         ("Amy", null, null),
-        (null, null, null)
+        (null, null, null),
     ).toDF("name", "age", "height")
   }
 
@@ -127,7 +127,7 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
                         "a" -> "test",
                         "c" -> 1,
                         "d" -> 2.2,
-                        "e" -> false
+                        "e" -> false,
                     )),
                 Row("test", null, 1, 2.2, false))
 
@@ -136,7 +136,7 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
                         "a" -> "test",
                         "c" -> 1,
                         "d" -> 2.2,
-                        "e" -> false
+                        "e" -> false,
                     ).asJava),
                 Row("test", null, 1, 2.2, false))
   }

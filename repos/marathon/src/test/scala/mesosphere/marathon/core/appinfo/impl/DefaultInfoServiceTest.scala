@@ -261,12 +261,12 @@ class DefaultInfoServiceTest
   val someApps = Set(
       app1,
       AppDefinition(PathId("/test2")),
-      AppDefinition(PathId("/test3"))
+      AppDefinition(PathId("/test3")),
   )
 
   val someNestedApps = Set(
       AppDefinition(PathId("/nested/test1")),
-      AppDefinition(PathId("/nested/test2"))
+      AppDefinition(PathId("/nested/test2")),
   )
 
   val someGroupWithNested = Group.empty.copy(
@@ -274,9 +274,9 @@ class DefaultInfoServiceTest
       groups = Set(
             Group.empty.copy(
                 id = PathId("/nested"),
-                apps = someNestedApps
-            )
-        )
+                apps = someNestedApps,
+            ),
+        ),
   )
 
   val nestedGroup = Group(
@@ -286,13 +286,13 @@ class DefaultInfoServiceTest
                 Set(AppDefinition(PathId("/visible/app1"))),
                 Set(
                     Group(PathId("/visible/group"),
-                          Set(AppDefinition(PathId("/visible/group/app1"))))
+                          Set(AppDefinition(PathId("/visible/group/app1")))),
                 )),
           Group(PathId("/secure"),
                 Set(AppDefinition(PathId("/secure/app1"))),
                 Set(
                     Group(PathId("/secure/group"),
-                          Set(AppDefinition(PathId("/secure/group/app1"))))
+                          Set(AppDefinition(PathId("/secure/group/app1")))),
                 )),
           Group(PathId("/other"),
                 Set(AppDefinition(PathId("/other/app1"))),

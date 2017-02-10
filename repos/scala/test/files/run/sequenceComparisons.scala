@@ -27,7 +27,7 @@ object Test {
       immutable.IndexedSeq(_: _*), // was Vector
       //mutable.Vector(_: _*),
       immutable.List(_: _*),
-      immutable.Stream(_: _*)
+      immutable.Stream(_: _*),
   )
 
   abstract class Data[T] {
@@ -38,7 +38,7 @@ object Test {
     case class Method(
         f: (Seq[T], Seq[T]) => Boolean,
         inputs: Inputs,
-        descr: String
+        descr: String,
     ) {
       def trueList = inputs._1
       def falseList = inputs._2
@@ -74,12 +74,12 @@ object Test {
 
     val startsWithInputs = (
         List(Nil, List(1), List(1, 2), seq),
-        List(List(1, 2, 3, 4, 6), seq ::: List(5), List(0))
+        List(List(1, 2, 3, 4, 6), seq ::: List(5), List(0)),
     )
 
     val endsWithInputs = (
         List(Nil, List(5), List(4, 5), seq),
-        List(0 :: seq, List(5, 2, 3, 4, 5), List(3, 4), List(5, 6))
+        List(0 :: seq, List(5, 2, 3, 4, 5), List(3, 4), List(5, 6)),
     )
 
     val indexOfSliceInputs = (
@@ -91,7 +91,7 @@ object Test {
              List(2, 3, 4),
              List(4, 5),
              seq),
-        List(List(1, 2, 3, 5), List(6), List(5, 4, 3, 2, 1), List(2, 1))
+        List(List(1, 2, 3, 5), List(6), List(5, 4, 3, 2, 1), List(2, 1)),
     )
 
     val sameElementsInputs = (
@@ -103,7 +103,7 @@ object Test {
              List(2, 3, 4, 5),
              List(2, 3, 4, 5, 1),
              List(1, 2, 3, 5, 4),
-             seq.reverse)
+             seq.reverse),
     )
   }
 

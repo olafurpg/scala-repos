@@ -249,7 +249,7 @@ trait TimeLikeSpec[T <: TimeLike[T]]
           2592000000000000000L, // 30000.days
           1040403005001003L, // 12.days+1.hour+3.seconds+5.milliseconds+1.microsecond+3.nanoseconds
           123000000000L, // 123.seconds
-          1L
+          1L,
       )
 
       for (ns <- nss) {
@@ -270,7 +270,7 @@ trait TimeLikeSpec[T <: TimeLike[T]]
       val nss = Seq(
           315370851000000000L, // 3650.days+3.hours+51.seconds
           1040403005001003L, // 12.days+1.hour+3.seconds+5.milliseconds+1.microsecond+3.nanoseconds
-          1L
+          1L,
       )
       for (ns <- nss) {
         val t = fromNanoseconds(ns)

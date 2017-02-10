@@ -112,7 +112,7 @@ class OffersWantedForReconciliationActorTest
         reviveOffersConfig,
         clock,
         eventStream,
-        offersWanted
+        offersWanted,
     ) {
       override protected def scheduleNextCheck: Cancellable =
         Fixture.this.scheduleNextCheck

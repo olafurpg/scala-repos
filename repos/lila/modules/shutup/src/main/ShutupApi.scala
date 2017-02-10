@@ -58,14 +58,14 @@ final class ShutupApi(coll: Coll,
               if (textType == TextType.PublicChat && analysed.nbBadWords > 0)
                 BSONDocument(
                     "pub" -> BSONDocument("$each" -> List(text),
-                                          "$slice" -> -20)
+                                          "$slice" -> -20),
                 )
               else BSONDocument()
             val push =
               BSONDocument(
                   textType.key -> BSONDocument(
                       "$each" -> List(BSONDouble(analysed.ratio)),
-                      "$slice" -> -textType.rotation)
+                      "$slice" -> -textType.rotation),
               ) ++ pushPublicLine
             coll
               .findAndUpdate(selector = BSONDocument("_id" -> userId),
@@ -91,7 +91,7 @@ final class ShutupApi(coll: Coll,
                     TextType.TeamForumMessage.key -> true,
                     TextType.PrivateMessage.key -> true,
                     TextType.PrivateChat.key -> true,
-                    TextType.PublicChat.key -> true))
+                    TextType.PublicChat.key -> true)),
         )
         .void
     }

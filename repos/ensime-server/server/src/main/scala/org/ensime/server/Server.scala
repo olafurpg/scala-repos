@@ -29,7 +29,7 @@ case class ShutdownRequest(reason: String, isError: Boolean = false)
 class ServerActor(
     config: EnsimeConfig,
     protocol: Protocol,
-    interface: String = "127.0.0.1"
+    interface: String = "127.0.0.1",
 )
     extends Actor with ActorLogging {
 
@@ -60,8 +60,8 @@ class ServerActor(
                             project,
                             broadcaster,
                             shutdownOnLastDisconnect,
-                            preferredTcpPort
-                        )
+                            preferredTcpPort,
+                        ),
                     ),
                     "tcp-server")
 
@@ -128,7 +128,7 @@ object Server {
   def main(args: Array[String]): Unit = {
     val ensimeFileStr = propOrNone("ensime.config").getOrElse(
         throw new RuntimeException(
-            "ensime.config (the location of the .ensime file) must be set")
+            "ensime.config (the location of the .ensime file) must be set"),
     )
 
     val ensimeFile = new File(ensimeFileStr)

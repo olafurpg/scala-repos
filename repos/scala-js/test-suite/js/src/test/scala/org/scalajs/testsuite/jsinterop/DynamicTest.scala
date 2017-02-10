@@ -146,7 +146,7 @@ class DynamicTest {
         inner = obj(name = "inner obj"),
         fun = { () =>
           42
-        }
+        },
     )
     val y_inner_name = y.inner.name
     assertEquals("inner obj", y_inner_name)
@@ -232,7 +232,7 @@ class DynamicTest {
         obj("'" + quote -> 7357),
         obj(s"'$quote" -> 7357),
         obj("'\"" -> 7357),
-        obj("'" + quote -> 7357)
+        obj("'" + quote -> 7357),
     ).foreach { o =>
       val dict = o.asInstanceOf[js.Dictionary[js.Any]]
       assertEquals(7357, dict("'\""))

@@ -14,7 +14,7 @@ object Test extends App {
             name + " has code: " + code
           case None =>
             "Unknown color: " + name
-        }
+        },
     )
   }.eval
 }

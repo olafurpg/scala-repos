@@ -38,7 +38,7 @@ object LogQuery {
       | GTB7.4; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR
       | 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR
       | 3.5.30729; Release=ARP)" "UD-1" - "image/jpeg" "whatever" 0.352 "-" - "" 256 977 988 ""
-      | 0 73.23.2.15 images.com 1358492557 - Whatup""".stripMargin.lines.mkString
+      | 0 73.23.2.15 images.com 1358492557 - Whatup""".stripMargin.lines.mkString,
   )
 
   def main(args: Array[String]) {

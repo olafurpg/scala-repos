@@ -103,7 +103,7 @@ object FileContent {
     def decompose(v: FileContent) = JObject(
         "data" -> JString(v.encoding.encode(v.data)),
         "mimeType" -> v.mimeType.jv,
-        "encoding" -> v.encoding.jv
+        "encoding" -> v.encoding.jv,
     )
   }
 

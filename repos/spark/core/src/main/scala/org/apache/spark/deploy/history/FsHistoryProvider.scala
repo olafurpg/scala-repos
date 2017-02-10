@@ -614,7 +614,7 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
             eventLog.getModificationTime(),
             appListener.sparkUser.getOrElse(NOT_STARTED),
             appCompleted,
-            eventLog.getLen()
+            eventLog.getLen(),
         )
         fileToAppInfo(logPath) = attemptInfo
         Some(attemptInfo)

@@ -154,7 +154,7 @@ case class ScCompoundType(components: Seq[ScType],
                        case f: ScFieldId => ScFieldId.getCompoundCopy(rt, f)
                        case named => named
                      },
-                     s.hasRepeatedParam
+                     s.hasRepeatedParam,
                  ),
                  rt)
             },
@@ -206,7 +206,7 @@ case class ScCompoundType(components: Seq[ScType],
                      tParams,
                      ScSubstitutor.empty,
                      s.namedElement,
-                     s.hasRepeatedParam
+                     s.hasRepeatedParam,
                  ),
                  tp.recursiveVarianceUpdateModifiable(newData, update, 1))
             },

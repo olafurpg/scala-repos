@@ -129,7 +129,7 @@ object Transport {
   case class Liveness(
       readTimeout: Duration,
       writeTimeout: Duration,
-      keepAlive: Option[Boolean]
+      keepAlive: Option[Boolean],
   ) {
     def mk(): (Liveness, Stack.Param[Liveness]) =
       (this, Liveness.param)

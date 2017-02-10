@@ -25,7 +25,7 @@ object TimeTestJVM extends SpecLite {
           Gen.choose(0, 23),
           Gen.choose(0, 59),
           Gen.choose(0, 59),
-          Gen.choose(0, 999999999)
+          Gen.choose(0, 999999999),
       )(LocalDateTime.of(_, _, _, _, _, _, _)))
 
   implicit val InstantArbitrary: Arbitrary[Instant] = arb[Long].map {
@@ -35,28 +35,28 @@ object TimeTestJVM extends SpecLite {
   implicit val zonedOffsetArbitrary: Arbitrary[ZoneOffset] = Arbitrary(
       Apply[Gen].apply3(
           Gen.choose(0, 17), Gen.choose(0, 59), Gen.choose(0, 59))(
-          ZoneOffset.ofHoursMinutesSeconds
-      )
+          ZoneOffset.ofHoursMinutesSeconds,
+      ),
   )
 
   implicit val zoneIdArbitrary: Arbitrary[ZoneId] = Arbitrary(
       Gen.oneOf(ZoneId.getAvailableZoneIds.asScala
-            .map(ZoneId.of)(collection.breakOut))
+            .map(ZoneId.of)(collection.breakOut)),
   )
 
   implicit val offsetDateTimeArbitrary: Arbitrary[OffsetDateTime] =
     Apply[Arbitrary].apply2(arb[LocalDateTime], arb[ZoneOffset])(
-        OffsetDateTime.of(_, _)
+        OffsetDateTime.of(_, _),
     )
 
   implicit val offsetTimeArbitrary: Arbitrary[OffsetTime] =
     Apply[Arbitrary].apply2(arb[LocalTime], arb[ZoneOffset])(
-        OffsetTime.of(_, _)
+        OffsetTime.of(_, _),
     )
 
   implicit val zonedDateTimeArbitrary: Arbitrary[ZonedDateTime] =
     Apply[Arbitrary].apply2(arb[LocalDateTime], arb[ZoneId])(
-        ZonedDateTime.of(_, _)
+        ZonedDateTime.of(_, _),
     )
 
   checkAll("DayOfWeek", ScalazProperties.enum.laws[DayOfWeek])

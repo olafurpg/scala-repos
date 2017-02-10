@@ -34,7 +34,7 @@ private object StackClientTest {
 
     protected def copy1(
         stack: Stack[ServiceFactory[String, String]] = this.stack,
-        params: Stack.Params = this.params
+        params: Stack.Params = this.params,
     ): LocalCheckingStringClient = copy(localKey, stack, params)
 
     protected type In = String
@@ -44,7 +44,7 @@ private object StackClientTest {
       Netty3Transporter(StringClientPipeline, params)
 
     protected def newDispatcher(
-        transport: Transport[In, Out]
+        transport: Transport[In, Out],
     ): Service[String, String] = {
       Contexts.local.get(localKey) match {
         case Some(s) =>
@@ -275,7 +275,7 @@ class StackClientTest
 
     val stk = client.stack.replace(
         LoadBalancerFactory.role,
-        (_: ServiceFactory[String, String]) => stubLB
+        (_: ServiceFactory[String, String]) => stubLB,
     )
 
     val cl = client
@@ -322,7 +322,7 @@ class StackClientTest
       new RequeueCtx {
     override val stubLB = new ServiceFactory[String, String] {
       def apply(conn: ClientConnection) = Future.exception(
-          Failure.rejected("unable to establish session")
+          Failure.rejected("unable to establish session"),
       )
       def close(deadline: Time) = Future.Done
     }
@@ -336,7 +336,7 @@ class StackClientTest
       new RequeueCtx {
     override val stubLB = new ServiceFactory[String, String] {
       def apply(conn: ClientConnection) = Future.exception(
-          Failure("don't restart this!")
+          Failure("don't restart this!"),
       )
       def close(deadline: Time) = Future.Done
     }

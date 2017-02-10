@@ -57,7 +57,7 @@ object MediaRangeSpec extends Specification {
                          "bar2",
                          Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
                          None,
-                         Nil)
+                         Nil),
       )
     }
     "allow valueless parameters" in {
@@ -81,7 +81,7 @@ object MediaRangeSpec extends Specification {
           exactly(
               new MediaRange("foo1", "bar1", Nil, None, Nil),
               new MediaRange("foo3", "bar3", Nil, None, Nil),
-              new MediaRange("foo2", "bar2", Nil, None, Nil)
+              new MediaRange("foo2", "bar2", Nil, None, Nil),
           ).inOrder)
     }
     "order by q value" in {
@@ -89,7 +89,7 @@ object MediaRangeSpec extends Specification {
           exactly(
               new MediaRange("foo3", "bar3", Nil, None, Nil),
               new MediaRange("foo2", "bar2", Nil, Some(0.5f), Nil),
-              new MediaRange("foo1", "bar1", Nil, Some(0.25f), Nil)
+              new MediaRange("foo1", "bar1", Nil, Some(0.25f), Nil),
           ).inOrder)
     }
     "order by specificity" in {
@@ -97,7 +97,7 @@ object MediaRangeSpec extends Specification {
           exactly(
               new MediaRange("foo", "bar", Nil, None, Nil),
               new MediaRange("foo", "*", Nil, None, Nil),
-              new MediaRange("*", "*", Nil, None, Nil)
+              new MediaRange("*", "*", Nil, None, Nil),
           ).inOrder)
     }
     "order by parameters" in {
@@ -109,7 +109,7 @@ object MediaRangeSpec extends Specification {
                              None,
                              Nil),
               new MediaRange("foo", "bar", Seq("p1" -> Some("v1")), None, Nil),
-              new MediaRange("foo", "bar", Nil, None, Nil)
+              new MediaRange("foo", "bar", Nil, None, Nil),
           ).inOrder)
     }
     "just order it all damn it" in {
@@ -122,7 +122,7 @@ object MediaRangeSpec extends Specification {
               new MediaRange("foo", "bar3", Nil, Some(0.5f), Nil),
               new MediaRange("foo", "bar1", Nil, Some(0.25f), Nil),
               new MediaRange("foo", "*", Nil, Some(0.25f), Nil),
-              new MediaRange("*", "*", Nil, Some(0.25f), Nil)
+              new MediaRange("*", "*", Nil, Some(0.25f), Nil),
           ).inOrder)
     }
     "be able to be convert back to a string" in {
@@ -153,7 +153,7 @@ object MediaRangeSpec extends Specification {
             "fo%so/bar, text/plain;charset=utf-8",
             "foo/ba%sr, text/plain;charset=utf-8",
             "text/plain;pa%sram;charset=utf-8",
-            "text/plain;param=va%slue;charset=utf-8"
+            "text/plain;param=va%slue;charset=utf-8",
         )
       } yield {
         // Use URL encoder so we can see which ctl character it's using

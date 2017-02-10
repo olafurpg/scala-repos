@@ -92,7 +92,7 @@ class HttpClientDispatcherTest extends FunSuite {
     val httpRes = new DefaultFullHttpResponse(
         NettyHttp.HttpVersion.HTTP_1_1,
         NettyHttp.HttpResponseStatus.OK,
-        Unpooled.wrappedBuffer("hello".getBytes("UTF-8"))
+        Unpooled.wrappedBuffer("hello".getBytes("UTF-8")),
     )
     val req = Request()
     val f = disp(req)
@@ -104,7 +104,7 @@ class HttpClientDispatcherTest extends FunSuite {
 
   def chunk(content: String): NettyHttp.HttpContent =
     new NettyHttp.DefaultHttpContent(
-        BufAsByteBuf.Owned(Buf.Utf8(content))
+        BufAsByteBuf.Owned(Buf.Utf8(content)),
     )
 
   test("chunked response") {
@@ -273,7 +273,7 @@ class HttpClientDispatcherTest extends FunSuite {
     // send back an http ok to the dispatcher
     val sentResult = new NettyHttp.DefaultHttpResponse(
         NettyHttp.HttpVersion.HTTP_1_1,
-        NettyHttp.HttpResponseStatus.OK
+        NettyHttp.HttpResponseStatus.OK,
     )
     out.write(sentResult)
 
@@ -313,7 +313,7 @@ class HttpClientDispatcherTest extends FunSuite {
     // send back an http ok to the dispatcher
     val sentResult = new NettyHttp.DefaultHttpResponse(
         NettyHttp.HttpVersion.HTTP_1_1,
-        NettyHttp.HttpResponseStatus.OK
+        NettyHttp.HttpResponseStatus.OK,
     )
     out.write(sentResult)
 
@@ -354,7 +354,7 @@ class HttpClientDispatcherTest extends FunSuite {
       // send back an http ok to the dispatcher
       val sentResult = new NettyHttp.DefaultHttpResponse(
           NettyHttp.HttpVersion.HTTP_1_1,
-          NettyHttp.HttpResponseStatus.OK
+          NettyHttp.HttpResponseStatus.OK,
       )
       out.write(sentResult)
 

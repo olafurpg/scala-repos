@@ -151,7 +151,7 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
               "openid.mode" -> "checkid_setup",
               "openid.claimed_id" -> claimedId,
               "openid.identity" -> identity,
-              "openid.return_to" -> callbackURL
+              "openid.return_to" -> callbackURL,
           ) ++ axParameters(axRequired, axOptional) ++ realm
             .map("openid.realm" -> _)
             .toList
@@ -386,7 +386,7 @@ class OpenIDModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
         bind[OpenIdClient].to[WsOpenIdClient],
-        bind[Discovery].to[WsDiscovery]
+        bind[Discovery].to[WsDiscovery],
     )
   }
 }

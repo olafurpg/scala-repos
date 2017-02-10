@@ -77,7 +77,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   def allCreated: Fu[List[Simul]] =
     simulColl
       .find(
-          createdSelect
+          createdSelect,
       )
       .sort(createdSort)
       .cursor[Simul]()
@@ -89,8 +89,8 @@ private[simul] final class SimulRepo(simulColl: Coll) {
           createdSelect ++ BSONDocument(
               "createdAt" -> BSONDocument(
                   "$gte" -> DateTime.now.minusMinutes(15)),
-              "hostRating" -> BSONDocument("$gte" -> 1700)
-          )
+              "hostRating" -> BSONDocument("$gte" -> 1700),
+          ),
       )
       .sort(createdSort)
       .cursor[Simul]()
@@ -99,7 +99,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   def allStarted: Fu[List[Simul]] =
     simulColl
       .find(
-          startedSelect
+          startedSelect,
       )
       .sort(createdSort)
       .cursor[Simul]()
@@ -108,7 +108,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   def allFinished(max: Int): Fu[List[Simul]] =
     simulColl
       .find(
-          finishedSelect
+          finishedSelect,
       )
       .sort(createdSort)
       .cursor[Simul]()
@@ -118,7 +118,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
     simulColl
       .find(
           BSONDocument(
-              "status" -> BSONDocument("$ne" -> SimulStatus.Finished.id))
+              "status" -> BSONDocument("$ne" -> SimulStatus.Finished.id)),
       )
       .cursor[Simul]()
       .collect[List]()
@@ -136,7 +136,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
     simulColl
       .update(
           BSONDocument("_id" -> simul.id),
-          BSONDocument("$set" -> BSONDocument("hostGameId" -> gameId))
+          BSONDocument("$set" -> BSONDocument("hostGameId" -> gameId)),
       )
       .void
 
@@ -144,7 +144,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
     simulColl
       .update(
           BSONDocument("_id" -> simul.id),
-          BSONDocument("$set" -> BSONDocument("hostSeenAt" -> DateTime.now))
+          BSONDocument("$set" -> BSONDocument("hostSeenAt" -> DateTime.now)),
       )
       .void
 

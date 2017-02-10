@@ -120,7 +120,7 @@ class MigrationTo0_16Test
             cmd = Some("true"),
             portDefinitions = PortDefinitions(1000, 1001),
             versionInfo = AppDefinition.VersionInfo.OnlyVersion(
-                  Timestamp(version))
+                  Timestamp(version)),
         ) with DeprecatedSerialization
 
     new T()

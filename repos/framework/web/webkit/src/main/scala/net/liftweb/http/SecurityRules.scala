@@ -44,7 +44,7 @@ final case class HttpsRules(
     /**
       * When set to true, the required time above includes subdomains.
       */
-    includeSubDomains: Boolean = false
+    includeSubDomains: Boolean = false,
 ) {
   lazy val headers: List[(String, String)] = {
     requiredTime.toList.map { duration =>
@@ -247,10 +247,10 @@ final case class ContentSecurityPolicy(
     objectSources: List[ContentSourceRestriction] = Nil,
     scriptSources: List[JavaScriptSourceRestriction] = List(
           ContentSourceRestriction.UnsafeEval,
-          ContentSourceRestriction.Self
+          ContentSourceRestriction.Self,
       ),
     styleSources: List[StylesheetSourceRestriction] = Nil,
-    reportUri: Option[URI] = Some(ContentSecurityPolicy.defaultReportUri)
+    reportUri: Option[URI] = Some(ContentSecurityPolicy.defaultReportUri),
 ) {
 
   /**
@@ -267,7 +267,7 @@ final case class ContentSecurityPolicy(
         "media-src" -> mediaSources,
         "object-src" -> objectSources,
         "script-src" -> scriptSources,
-        "style-src" -> styleSources
+        "style-src" -> styleSources,
     )
 
     val restrictionString = allRestrictions.collect {
@@ -286,13 +286,13 @@ final case class ContentSecurityPolicy(
   private[this] lazy val reportOnlyHeaders = {
     List(
         "Content-Security-Policy-Report-Only" -> contentSecurityPolicyString,
-        "X-Content-Security-Policy-Report-Only" -> contentSecurityPolicyString
+        "X-Content-Security-Policy-Report-Only" -> contentSecurityPolicyString,
     )
   }
   private[this] lazy val enforcedHeaders = {
     List(
         "Content-Security-Policy" -> contentSecurityPolicyString,
-        "X-Content-Security-Policy" -> contentSecurityPolicyString
+        "X-Content-Security-Policy" -> contentSecurityPolicyString,
     )
   }
 
@@ -344,7 +344,7 @@ case class ContentSecurityPolicyViolation(
     referrer: String,
     blockedUri: String,
     violatedDirective: String,
-    originalPolicy: String
+    originalPolicy: String,
 )
 object ContentSecurityPolicyViolation extends LazyLoggable {
   private[this] implicit val formats = DefaultFormats
@@ -381,7 +381,7 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
             case _ =>
               logger.warn(
                   s"Got a content security violation report we couldn't interpret: '${request.body
-                    .map(new String(_, "UTF-8"))}'."
+                    .map(new String(_, "UTF-8"))}'.",
               )
 
               Full(BadRequestResponse(
@@ -455,7 +455,7 @@ final case class SecurityRules(
     enforceInOtherModes: Boolean = false,
     logInOtherModes: Boolean = true,
     enforceInDevMode: Boolean = false,
-    logInDevMode: Boolean = true
+    logInDevMode: Boolean = true,
 ) {
   private val enforce_? = {
     if (Props.devMode) {
@@ -495,7 +495,7 @@ object SecurityRules {
     apply(
         Some(HttpsRules.secure),
         Some(ContentSecurityPolicy.secure),
-        enforceInOtherModes = true
+        enforceInOtherModes = true,
     )
   }
 }

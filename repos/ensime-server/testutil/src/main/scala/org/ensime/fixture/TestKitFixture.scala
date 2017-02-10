@@ -24,7 +24,7 @@ import akka.testkit._
 trait TestKitFixture {
   require(
       !this.isInstanceOf[TestKit],
-      "IsolatedActorSystems are incompatible with TestKit. Instead, 'import sys._'"
+      "IsolatedActorSystems are incompatible with TestKit. Instead, 'import sys._'",
   )
 
   implicit protected val akkaTimeout: Timeout = ConfigFactory

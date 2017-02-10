@@ -131,7 +131,7 @@ object JGitUtil {
       newObjectId: Option[String],
       oldMode: String,
       newMode: String,
-      tooLarge: Boolean
+      tooLarge: Boolean,
   )
 
   /**
@@ -230,7 +230,7 @@ object JGitUtil {
               TagInfo(ref.getName.stripPrefix("refs/tags/"),
                       revCommit.getCommitterIdent.getWhen,
                       revCommit.getName)
-            }.sortBy(_.time).toList
+            }.sortBy(_.time).toList,
         )
       } catch {
         // not initialized
@@ -623,7 +623,7 @@ object JGitUtil {
                    newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
                    oldMode = treeWalk.getFileMode(0).toString,
                    newMode = treeWalk.getFileMode(0).toString,
-                   tooLarge = false
+                   tooLarge = false,
                )
              } else {
                DiffInfo(
@@ -641,7 +641,7 @@ object JGitUtil {
                    newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
                    oldMode = treeWalk.getFileMode(0).toString,
                    newMode = treeWalk.getFileMode(0).toString,
-                   tooLarge = false
+                   tooLarge = false,
                )
              }))
           }
@@ -681,7 +681,7 @@ object JGitUtil {
             newObjectId = Option(diff.getNewId).map(_.name),
             oldMode = diff.getOldMode.toString,
             newMode = diff.getNewMode.toString,
-            tooLarge = true
+            tooLarge = true,
         )
       } else {
         val oldIsImage = FileUtil.isImage(diff.getOldPath)
@@ -699,7 +699,7 @@ object JGitUtil {
               newObjectId = Option(diff.getNewId).map(_.name),
               oldMode = diff.getOldMode.toString,
               newMode = diff.getNewMode.toString,
-              tooLarge = false
+              tooLarge = false,
           )
         } else {
           DiffInfo(
@@ -720,7 +720,7 @@ object JGitUtil {
               newObjectId = Option(diff.getNewId).map(_.name),
               oldMode = diff.getOldMode.toString,
               newMode = diff.getNewMode.toString,
-              tooLarge = false
+              tooLarge = false,
           )
         }
       }
@@ -793,7 +793,7 @@ object JGitUtil {
     Seq(
         Some(if (revstr.isEmpty) repository.repository.defaultBranch
             else revstr),
-        repository.branchList.headOption
+        repository.branchList.headOption,
     ).flatMap {
       case Some(rev) => Some((git.getRepository.resolve(rev), rev))
       case None => None

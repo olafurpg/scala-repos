@@ -144,7 +144,7 @@ object BasicCommands {
       Command.command(Compat.FailureWall) { s =>
         s.log.warn(Compat.FailureWallDeprecated)
         s
-      }
+      },
   )
 
   def clearOnFailure =

@@ -45,7 +45,7 @@ object IndentationTests extends TestSuite {
           |  1
           |  1
         """.stripMargin.trim,
-          2
+          2,
       )
       check(
           """+
@@ -54,7 +54,7 @@ object IndentationTests extends TestSuite {
           |    1
           |    2
         """.stripMargin.trim,
-          3
+          3,
       )
 
       check(
@@ -70,21 +70,21 @@ object IndentationTests extends TestSuite {
           |    5
           |
         """.stripMargin.trim,
-          63
+          63,
       )
       check(
           """/
           |  15
           |  3
         """.stripMargin.trim,
-          5
+          5,
       )
       check(
           """/
           |  63
           |  3
         """.stripMargin.trim,
-          21
+          21,
       )
       check(
           """+
@@ -100,7 +100,7 @@ object IndentationTests extends TestSuite {
           |      5
           |    20
         """.stripMargin.trim,
-          6
+          6,
       )
       check(
           """/
@@ -116,7 +116,7 @@ object IndentationTests extends TestSuite {
           |        5
           |  3
         """.stripMargin.trim,
-          21
+          21,
       )
     }
     'fail {
@@ -127,21 +127,21 @@ object IndentationTests extends TestSuite {
       }
       * - check(
           "+",
-          """ expr:1:1 / block:1:1 / "\n":1:1 ..."" """
+          """ expr:1:1 / block:1:1 / "\n":1:1 ..."" """,
       )
       * - check(
           """+
           |  1
           |1
         """.stripMargin.trim,
-          """ expr:1:1 / (End | "\n  "):2:3 ..."\n1" """
+          """ expr:1:1 / (End | "\n  "):2:3 ..."\n1" """,
       )
       * - check(
           """+
           |  1
           |   1
         """.stripMargin.trim,
-          """ expr:1:1 / block:1:1 / factor:3:3 / (number | block):3:3 ..." 1" """
+          """ expr:1:1 / block:1:1 / factor:3:3 / (number | block):3:3 ..." 1" """,
       )
     }
   }

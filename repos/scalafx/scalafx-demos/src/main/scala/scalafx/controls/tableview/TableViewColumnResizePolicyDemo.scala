@@ -63,7 +63,7 @@ object TableViewColumnResizePolicyDemo extends JFXApp {
     val data = ObservableBuffer(
         new MyDomain("Apple", "This is a fruit.", "Red"),
         new MyDomain("Orange", "This is also a fruit.", "Orange"),
-        new MyDomain("Potato", "This is a vegetable.", "Brown")
+        new MyDomain("Potato", "This is a vegetable.", "Brown"),
     )
 
     val table1 = createTableView(data)
@@ -80,7 +80,7 @@ object TableViewColumnResizePolicyDemo extends JFXApp {
         new Label("Unconstrained Resize Policy") {
           style = "-fx-font-weight:bold;"
         },
-        table2
+        table2,
     )
   }
 
@@ -102,7 +102,7 @@ object TableViewColumnResizePolicyDemo extends JFXApp {
             text = "Color"
             prefWidth = 100
             cellValueFactory = { _.value.color }
-          }.delegate
+          }.delegate,
       )
       items = data
     }

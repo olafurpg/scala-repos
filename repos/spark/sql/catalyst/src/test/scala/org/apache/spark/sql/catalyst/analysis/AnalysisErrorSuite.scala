@@ -213,7 +213,7 @@ class AnalysisErrorSuite extends AnalysisTest {
   errorTest(
       "missing group by",
       testRelation2.groupBy('a)('b),
-      "'`b`'" :: "group by" :: Nil
+      "'`b`'" :: "group by" :: Nil,
   )
 
   errorTest("ambiguous field",

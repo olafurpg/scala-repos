@@ -79,34 +79,34 @@ abstract class MongoRefListField[OwnerType <: BsonRecord[OwnerType],
 class ObjectIdRefListField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType,
-    val refMeta: MongoMetaRecord[RefType]
+    val refMeta: MongoMetaRecord[RefType],
 )
     extends MongoRefListField[OwnerType, RefType, ObjectId](rec) {}
 
 class UUIDRefListField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType,
-    val refMeta: MongoMetaRecord[RefType]
+    val refMeta: MongoMetaRecord[RefType],
 )
     extends MongoRefListField[OwnerType, RefType, UUID](rec) {}
 
 class StringRefListField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType,
-    val refMeta: MongoMetaRecord[RefType]
+    val refMeta: MongoMetaRecord[RefType],
 )
     extends MongoRefListField[OwnerType, RefType, String](rec) {}
 
 class IntRefListField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType,
-    val refMeta: MongoMetaRecord[RefType]
+    val refMeta: MongoMetaRecord[RefType],
 )
     extends MongoRefListField[OwnerType, RefType, Int](rec) {}
 
 class LongRefListField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType,
-    val refMeta: MongoMetaRecord[RefType]
+    val refMeta: MongoMetaRecord[RefType],
 )
     extends MongoRefListField[OwnerType, RefType, Long](rec) {}

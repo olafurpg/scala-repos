@@ -25,7 +25,7 @@ import org.apache.spark.streaming.{Duration, Time}
 
 private[streaming] class TransformedDStream[U : ClassTag](
     parents: Seq[DStream[_]],
-    transformFunc: (Seq[RDD[_]], Time) => RDD[U]
+    transformFunc: (Seq[RDD[_]], Time) => RDD[U],
 )
     extends DStream[U](parents.head.ssc) {
 

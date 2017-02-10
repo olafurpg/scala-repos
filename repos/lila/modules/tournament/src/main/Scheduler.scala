@@ -29,7 +29,7 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
       Spring -> day(2016, 4, 16),
       Summer -> day(2016, 8, 6),
       Autumn -> day(2016, 10, 22),
-      Winter -> day(2016, 12, 28)
+      Winter -> day(2016, 12, 28),
   )
 
   override def preStart {
@@ -177,7 +177,7 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
                   11 -> opening1,
                   15 -> opening2,
                   19 -> opening1,
-                  23 -> opening2
+                  23 -> opening2,
               ) | List( // random opening replaces hourly 2 times a day
                        11 -> opening1,
                        23 -> opening2)).flatMap {
@@ -202,7 +202,7 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
                            Classical,
                            Standard,
                            opening,
-                           at(today, hour) |> orTomorrow)
+                           at(today, hour) |> orTomorrow),
               )
           },
           // hourly standard tournaments!
@@ -222,7 +222,7 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
                   Schedule(Hourly, SuperBlitz, Standard, std, at(date, hour)).some,
                   Schedule(Hourly, Blitz, Standard, std, at(date, hour)).some,
                   (hour % 2 == 0) option Schedule(
-                      Hourly, Classical, Standard, std, at(date, hour))
+                      Hourly, Classical, Standard, std, at(date, hour)),
               ).flatten
           },
           // hourly crazyhouse tournaments!
@@ -237,9 +237,9 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
             List(
                 Schedule(Hourly, speed, Crazyhouse, std, at(date, hour)).some,
                 (speed == Bullet) option Schedule(
-                    Hourly, speed, Crazyhouse, std, at(date, hour, 30))
+                    Hourly, speed, Crazyhouse, std, at(date, hour, 30)),
             ).flatten
-          }
+          },
       ).flatten
 
       nextSchedules.foldLeft(List[Schedule]()) {

@@ -498,7 +498,7 @@ object KleeneDemo {
         Edge(2, 3),
         Edge(2, 4),
         Edge(3, 1),
-        Edge(4, 3)
+        Edge(4, 3),
     )
 
     // build the example graph
@@ -530,7 +530,7 @@ object KleeneDemo {
         (Edge(2, 3), 11),
         (Edge(2, 5), 2),
         (Edge(3, 4), 6),
-        (Edge(4, 5), 9)
+        (Edge(4, 5), 9),
     )
 
     val weighted: Matrix[Tropical[Int]] = {

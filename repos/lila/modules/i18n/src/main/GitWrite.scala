@@ -53,7 +53,7 @@ private[i18n] final class GitWrite(
                     git.checkout(branch, true) >> writeMessages(translation) >>- logger
                       .info("Add " + relFileOf(translation)) >>
                     (git add relFileOf(translation)) >>- logger.info("- " +
-                        commitMsg) >> (git commit commitMsg).void
+                        commitMsg) >> (git commit commitMsg).void,
                 )
               }).await
         }

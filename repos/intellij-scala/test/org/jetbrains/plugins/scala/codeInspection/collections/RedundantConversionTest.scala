@@ -39,7 +39,7 @@ class RedundantConversionTest extends OperationsOnCollectionInspectionTest {
         """
         |def list() = List(1, 2)
         |list()
-      """.stripMargin
+      """.stripMargin,
     )
   }
 
@@ -53,7 +53,7 @@ class RedundantConversionTest extends OperationsOnCollectionInspectionTest {
           |}""".stripMargin,
         s"""Seq(1) match {
           |  case seq => seq
-          |}""".stripMargin
+          |}""".stripMargin,
     )
   }
 }

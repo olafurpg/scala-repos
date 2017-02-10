@@ -20,7 +20,7 @@ final class DataForm(
   val empty = Form(
       mapping(
           "gameId" -> nonEmptyText,
-          "move" -> nonEmptyText
+          "move" -> nonEmptyText,
       )(Empty.apply)(_ => None)
         .verifying(captchaFailMessage, validateCaptcha _))
 
@@ -43,7 +43,7 @@ final class DataForm(
               error = "Invalid username. Please use only letters, numbers and dash"),
           Constraints.pattern(
               regex = """^[^\d].+$""".r,
-              error = "The username must not start with a number")
+              error = "The username must not start with a number"),
       )
       .verifying("This user already exists",
                  u => !$count.exists(u.toLowerCase) awaitSeconds 2)
@@ -56,7 +56,7 @@ final class DataForm(
             "email" -> acceptableUniqueEmail(none),
             "g-recaptcha-response" -> nonEmptyText,
             "gameId" -> nonEmptyText,
-            "move" -> nonEmptyText
+            "move" -> nonEmptyText,
         )(SignupData.apply)(_ => None)
           .verifying(captchaFailMessage, validateCaptcha _))
 
@@ -64,7 +64,7 @@ final class DataForm(
         mapping(
             "username" -> username,
             "password" -> text(minLength = 4),
-            "email" -> optional(acceptableUniqueEmail(none))
+            "email" -> optional(acceptableUniqueEmail(none)),
         )(MobileSignupData.apply)(_ => None))
 
     def websiteWithCaptcha = withCaptcha(website)
@@ -74,7 +74,7 @@ final class DataForm(
       mapping(
           "email" -> anyEmail, // allow unacceptable emails for BC
           "gameId" -> nonEmptyText,
-          "move" -> nonEmptyText
+          "move" -> nonEmptyText,
       )(PasswordReset.apply)(_ => None)
         .verifying(captchaFailMessage, validateCaptcha _))
 
@@ -82,7 +82,7 @@ final class DataForm(
 
   val newPassword = Form(
       single(
-          "password" -> text(minLength = 4)
+          "password" -> text(minLength = 4),
       ))
 
   case class PasswordResetConfirm(newPasswd1: String, newPasswd2: String) {
@@ -92,17 +92,17 @@ final class DataForm(
   val passwdReset = Form(
       mapping(
           "newPasswd1" -> nonEmptyText(minLength = 2),
-          "newPasswd2" -> nonEmptyText(minLength = 2)
+          "newPasswd2" -> nonEmptyText(minLength = 2),
       )(PasswordResetConfirm.apply)(PasswordResetConfirm.unapply).verifying(
           "the new passwords don't match",
-          _.samePasswords
+          _.samePasswords,
       ))
 
   def changeEmail(user: User) =
     Form(
         mapping(
             "email" -> acceptableUniqueEmail(user.some),
-            "passwd" -> nonEmptyText
+            "passwd" -> nonEmptyText,
         )(ChangeEmail.apply)(ChangeEmail.unapply))
 
   def modEmail(user: User) =

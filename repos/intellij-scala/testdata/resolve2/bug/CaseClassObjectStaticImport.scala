@@ -5,6 +5,6 @@ package a {
   }
 
   class F {
-    import /* */ CaseClassObjectStaticImport. /* */ H
+    import /* */ CaseClassObjectStaticImport. /* */ H,
   }
 }

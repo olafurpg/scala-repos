@@ -60,7 +60,7 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
     _ssc: StreamingContext,
     val kafkaParams: Map[String, String],
     val fromOffsets: Map[TopicAndPartition, Long],
-    messageHandler: MessageAndMetadata[K, V] => R
+    messageHandler: MessageAndMetadata[K, V] => R,
 )
     extends InputDStream[R](_ssc) with Logging {
   val maxRetries =

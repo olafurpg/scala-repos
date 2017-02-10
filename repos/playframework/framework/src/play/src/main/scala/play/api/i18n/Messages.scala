@@ -325,7 +325,7 @@ object Messages {
                 """\""" | // Handle escaped \\
                 "^.".r ^^ ("""\""" + _)) | "^.".r // Or any character
         ) ^^ { case chars => chars.mkString },
-        "Message pattern expected"
+        "Message pattern expected",
     )
 
     val message =
@@ -355,7 +355,7 @@ object Messages {
                 def position = in.pos.column - 1
                 def input = messageSource.read
                 def sourceName = messageSourceName
-              }
+              },
           )
       }
     }
@@ -624,7 +624,7 @@ class I18nModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
         bind[Langs].to[DefaultLangs],
-        bind[MessagesApi].to[DefaultMessagesApi]
+        bind[MessagesApi].to[DefaultMessagesApi],
     )
   }
 }

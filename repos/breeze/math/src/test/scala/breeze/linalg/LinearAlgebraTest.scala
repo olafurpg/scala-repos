@@ -679,7 +679,7 @@ class LinearAlgebraTest
         (5.0, 0.0, 0.9),
         (3.0, 5.0, 0.5),
         (7.5, 1.0, 6.0),
-        (0.0, 7.0, 0.0)
+        (0.0, 7.0, 0.0),
     )
 
     for (m <- List(a, a.t)) {
@@ -699,7 +699,7 @@ class LinearAlgebraTest
         (5.0, 0.0, 0.9),
         (3.0, 5.0, 0.5),
         (7.5, 1.0, 6.0),
-        (0.0, 7.0, 0.0)
+        (0.0, 7.0, 0.0),
     ).t
 
     val SVD(u, sr, vt) = svdr(m, m.rows min m.cols)
@@ -715,7 +715,7 @@ class LinearAlgebraTest
         (5.0, 0.0, 0.9),
         (3.0, 5.0, 0.5),
         (7.5, 1.0, 6.0),
-        (0.0, 7.0, 0.0)
+        (0.0, 7.0, 0.0),
     )
 
     val SVD(u, sr, vt) = svdr(m, m.rows min m.cols)

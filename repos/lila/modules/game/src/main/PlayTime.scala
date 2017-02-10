@@ -21,11 +21,11 @@ object PlayTime {
           .find(BSONDocument(
                   Game.BSONFields.playerUids -> user.id,
                   Game.BSONFields.status -> BSONDocument(
-                      "$gte" -> chess.Status.Mate.id)
+                      "$gte" -> chess.Status.Mate.id),
               ))
           .projection(BSONDocument(
                   moveTimeField -> true,
-                  tvField -> true
+                  tvField -> true,
               ))
           .cursor[BSONDocument]()
           .enumerate() |>>>

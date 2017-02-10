@@ -116,7 +116,7 @@ case class UpgradeArgs(
     from: String = "0.0.0",
     to: String = "0.0.0",
     oldAppId: Int = 0,
-    newAppId: Int = 0
+    newAppId: Int = 0,
 )
 
 object Console extends Logging {
@@ -803,7 +803,7 @@ object Console extends Logging {
     AdminServer.createAdminServer(
         AdminServerConfig(
             ip = ca.adminServer.ip,
-            port = ca.adminServer.port
+            port = ca.adminServer.port,
         ))
   }
 

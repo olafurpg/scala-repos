@@ -17,9 +17,9 @@ abstract class Base {
 class SA(val settings: Settings) extends Base {
   override val demands =
     List(
-        SD
+        SD,
     ) ::: settings.f(
-        SC
+        SC,
     )
 }
 

@@ -48,8 +48,8 @@ private[play] class PlayRequestHandler(val server: NettyServer)
   private lazy val modelConversion = new NettyModelConversion(
       new ForwardedHeaderHandler(
           ForwardedHeaderHandler.ForwardedHeaderHandlerConfig(
-              server.applicationProvider.get.toOption.map(_.configuration))
-      )
+              server.applicationProvider.get.toOption.map(_.configuration)),
+      ),
   )
 
   /**
@@ -167,8 +167,8 @@ private[play] class PlayRequestHandler(val server: NettyServer)
                         "Upgrade to WebSocket required")
                     .withHeaders(
                         HeaderNames.UPGRADE -> "websocket",
-                        HeaderNames.CONNECTION -> HeaderNames.UPGRADE
-                    )
+                        HeaderNames.CONNECTION -> HeaderNames.UPGRADE,
+                    ),
               ))
         handleAction(action, requestHeader, request, Some(app))
 

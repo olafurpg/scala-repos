@@ -135,7 +135,7 @@ object CassandraCQLTest {
         classOf[java.util.Map[String, ByteBuffer]],
         classOf[java.util.List[ByteBuffer]],
         classOf[CqlOutputFormat],
-        job.getConfiguration()
+        job.getConfiguration(),
     )
 
     sc.stop()

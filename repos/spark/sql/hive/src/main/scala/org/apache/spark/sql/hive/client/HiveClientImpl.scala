@@ -323,7 +323,7 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                   inputFormat = Option(h.getInputFormatClass).map(_.getName),
                   outputFormat = Option(h.getOutputFormatClass).map(_.getName),
                   serde = Option(h.getSerializationLib),
-                  serdeProperties = h.getTTable.getSd.getSerdeInfo.getParameters.asScala.toMap
+                  serdeProperties = h.getTTable.getSd.getSerdeInfo.getParameters.asScala.toMap,
               ),
             properties = h.getParameters.asScala.toMap,
             viewOriginalText = Option(h.getViewOriginalText),

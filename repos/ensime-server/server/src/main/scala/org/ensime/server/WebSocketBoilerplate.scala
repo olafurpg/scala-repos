@@ -48,13 +48,13 @@ object WebSocketBoilerplate {
     * @return a `Flow` suitable for use in a `Route`.
     */
   def jsonWebsocket[Incoming, Outgoing](
-      actor: ActorRef => ActorRef
+      actor: ActorRef => ActorRef,
   )(
       implicit m1: RootJsonFormat[Incoming],
       m2: RootJsonFormat[Outgoing],
       mat: Materializer,
       oc: ClassTag[Outgoing],
-      printer: JsonPrinter = PrettyPrinter
+      printer: JsonPrinter = PrettyPrinter,
   ): Route = {
     val underlying = actorRefAsFlow[Incoming, Outgoing](actor)
     val marshalled = jsonMarshalledMessageFlow(underlying)
@@ -69,14 +69,14 @@ object WebSocketBoilerplate {
     *         with caution.
     */
   def actorRefAsFlow[Incoming, Outgoing](
-      actor: ActorRef => ActorRef
+      actor: ActorRef => ActorRef,
   )(
-      implicit mat: Materializer
+      implicit mat: Materializer,
   ): Flow[Incoming, Outgoing, Unit] = {
     val (target, pub) = Source
       .actorRef[Outgoing](
           0,
-          OverflowStrategy.fail
+          OverflowStrategy.fail,
       )
       .toMat(Sink.publisher)(Keep.both)
       .run()
@@ -93,13 +93,13 @@ object WebSocketBoilerplate {
     * @return a `Flow` using WebSocket `Message`s
     */
   def jsonMarshalledMessageFlow[Incoming, Outgoing](
-      flow: Flow[Incoming, Outgoing, Unit]
+      flow: Flow[Incoming, Outgoing, Unit],
   )(
       implicit m1: RootJsonFormat[Incoming],
       m2: RootJsonFormat[Outgoing],
       //mat: Materializer,
       oc: ClassTag[Outgoing],
-      printer: JsonPrinter = PrettyPrinter
+      printer: JsonPrinter = PrettyPrinter,
   ): Flow[Message, Message, Unit] = {
     Flow[Message].collect {
       case TextMessage.Strict(msg) =>

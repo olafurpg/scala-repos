@@ -55,7 +55,7 @@ class HandshakeResponseTest extends FunSuite {
       salt,
       Capability(0xf7ff),
       Charset.Utf8_general_ci,
-      16777216
+      16777216,
   )
   val br = BufferReader(req.toPacket.body)
 
@@ -139,7 +139,7 @@ class ExecuteRequestTest extends FunSuite {
       LongValue(longVal),
       FloatValue(floatVal),
       DoubleValue(doubleVal),
-      null
+      null,
   )
   // create a prepared statement
   val stmtId = 1

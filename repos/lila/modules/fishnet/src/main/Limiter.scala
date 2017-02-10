@@ -10,11 +10,11 @@ private final class Limiter(analysisColl: Coll) {
     case Work.Sender(_, _, mod, system) if (mod || system) => fuccess(true)
     case Work.Sender(Some(userId), _, _, _) =>
       analysisColl.count(BSONDocument(
-              "sender.userId" -> userId
+              "sender.userId" -> userId,
           ).some) map (0 ==)
     case Work.Sender(_, Some(ip), _, _) =>
       analysisColl.count(BSONDocument(
-              "sender.ip" -> ip
+              "sender.ip" -> ip,
           ).some) map (0 ==)
     case _ => fuccess(false)
   }

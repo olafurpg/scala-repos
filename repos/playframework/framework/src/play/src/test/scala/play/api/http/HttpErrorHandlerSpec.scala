@@ -84,7 +84,7 @@ object HttpErrorHandlerSpec extends Specification {
               BindingKey(classOf[OptionalSourceMapper]).to(
                   new OptionalSourceMapper(None)),
               BindingKey(classOf[Configuration]).to(config),
-              BindingKey(classOf[Environment]).to(env)
+              BindingKey(classOf[Environment]).to(env),
           ))
       .instanceOf[HttpErrorHandler]
   }

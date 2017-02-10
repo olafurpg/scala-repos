@@ -101,9 +101,9 @@ class DeploymentManager(appRepository: AppRepository,
               taskQueue,
               storage,
               healthCheckManager,
-              eventBus
+              eventBus,
           ),
-          plan.id
+          plan.id,
       )
       runningDeployments += plan.id -> DeploymentInfo(ref, plan)
 

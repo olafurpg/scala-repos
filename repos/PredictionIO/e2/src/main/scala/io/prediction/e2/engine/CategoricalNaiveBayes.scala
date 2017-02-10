@@ -65,7 +65,7 @@ object CategoricalNaiveBayes {
                    case (m1, m2) =>
                      m2 ++ m2.map { case (k, v) => k -> (v + m2(k)) }
                  })
-          }
+          },
       )
       .mapValues {
         case (labelCount, featureCounts) =>
@@ -117,7 +117,7 @@ case class CategoricalNaiveBayesModel(
   def logScore(
       point: LabeledPoint,
       defaultLikelihood: (Seq[Double]) => Double = ls =>
-          Double.NegativeInfinity
+          Double.NegativeInfinity,
   ): Option[Double] = {
     val label = point.label
     val features = point.features
@@ -133,7 +133,7 @@ case class CategoricalNaiveBayesModel(
       label: String,
       features: Array[String],
       defaultLikelihood: (Seq[Double]) => Double = ls =>
-          Double.NegativeInfinity
+          Double.NegativeInfinity,
   ): Double = {
 
     val prior = priors(label)
@@ -143,7 +143,7 @@ case class CategoricalNaiveBayesModel(
       case (feature, featureLikelihoods) =>
         featureLikelihoods.getOrElse(
             feature,
-            defaultLikelihood(featureLikelihoods.values.toSeq)
+            defaultLikelihood(featureLikelihoods.values.toSeq),
         )
     }
 

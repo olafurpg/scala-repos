@@ -245,8 +245,8 @@ class ScalaJsonCombinatorsSpec extends Specification {
           Location(51.235685, -1.309197),
           Seq(
               Resident("Fiver", 4, None),
-              Resident("Bigwig", 6, Some("Owsla"))
-          )
+              Resident("Bigwig", 6, Some("Owsla")),
+          ),
       )
 
       val json = Json.toJson(place)

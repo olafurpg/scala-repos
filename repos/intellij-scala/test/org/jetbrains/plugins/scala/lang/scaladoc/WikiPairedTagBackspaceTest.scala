@@ -46,7 +46,7 @@ class WikiPairedTagBackspaceTest
          | /**
          |  * a $CARET_MARKER b
          |  */
-       """.stripMargin
+       """.stripMargin,
     )
   }
 

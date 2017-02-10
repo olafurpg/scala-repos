@@ -19,7 +19,7 @@ object TestDetector {
       "SJSDefinedAutoExportClass",
       "SJSDefinedAutoExportedClassClass",
       "SJSDefinedAutoExportIgnoreClass",
-      "SJSDefinedAutoExportedIgnoreClassClass"
+      "SJSDefinedAutoExportedIgnoreClassClass",
   ).map(basePackage + ".jsinterop." + _)
 
   def detectTestNames(): List[String] = detectTestsInternal().map(_._2).toList

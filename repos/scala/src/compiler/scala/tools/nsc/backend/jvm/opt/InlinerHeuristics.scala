@@ -328,7 +328,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
       ("javafx/util/Builder", "build()Ljava/lang/Object;"),
       ("javafx/util/BuilderFactory",
        "getBuilder(Ljava/lang/Class;)Ljavafx/util/Builder;"),
-      ("javafx/util/Callback", "call(Ljava/lang/Object;)Ljava/lang/Object;")
+      ("javafx/util/Callback", "call(Ljava/lang/Object;)Ljava/lang/Object;"),
   )
   def javaSam(internalName: InternalName): Option[String] =
     javaSams.get(internalName)

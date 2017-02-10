@@ -18,7 +18,7 @@ object RegressionTests extends TestSuite {
         Seq(Ast.stmt.Pass),
         """# a
         |# b
-        |pass""".stripMargin
+        |pass""".stripMargin,
     )
 
     'multiple_newlines - TestUtils.check(
@@ -26,7 +26,7 @@ object RegressionTests extends TestSuite {
         Seq(Expr('a), Expr('b)),
         """a
         |
-        |b""".stripMargin
+        |b""".stripMargin,
     )
 
     'multi_line_function - TestUtils.check(
@@ -38,7 +38,7 @@ object RegressionTests extends TestSuite {
         """def session_config():
         |    a
         |
-        |    b""".stripMargin
+        |    b""".stripMargin,
     )
 
     'backslash_breaks - TestUtils.check(
@@ -46,14 +46,14 @@ object RegressionTests extends TestSuite {
         Seq(Expr(Attribute('a, 'b, Load))),
         """a\
         |.b
-        |""".stripMargin
+        |""".stripMargin,
     )
     'multiline_string - TestUtils.check(
         Statements.file_input,
         Seq(Expr(Str("\n"))),
         """'''
         |'''
-        |""".stripMargin
+        |""".stripMargin,
     )
 
     'try_finally_no_except - TestUtils.check(
@@ -64,7 +64,7 @@ object RegressionTests extends TestSuite {
         |finally:
         |    b
         |
-        |""".stripMargin
+        |""".stripMargin,
     )
     'indented_try_except_with_space - TestUtils.check(
         Statements.file_input,
@@ -76,8 +76,8 @@ object RegressionTests extends TestSuite {
                                 Seq(Pass),
                                 Seq(excepthandler.ExceptHandler(
                                         Some('s), None, Seq(Pass))),
-                                Nil
-                            )
+                                Nil,
+                            ),
                         ),
                         Nil)),
         """def f():
@@ -87,7 +87,7 @@ object RegressionTests extends TestSuite {
         |    except s:
         |        pass
         |
-        |""".stripMargin
+        |""".stripMargin,
     )
     'indented_block_with_spaces_and_offset_comments - TestUtils.check(
         Statements.file_input,
@@ -96,14 +96,14 @@ object RegressionTests extends TestSuite {
                 'post,
                 arguments(Seq(Name('self, Param)), None, None, Nil),
                 Seq(If(Num(1), Seq(Expr('a)), Nil)),
-                Nil
+                Nil,
             )),
         """def post(self):
         |#LOL
         |
         |    if 1:
         |        a
-        |""".stripMargin
+        |""".stripMargin,
     )
     'indented_block_with_spaces_and_offset_comments - TestUtils.check(
         Statements.file_input,
@@ -119,18 +119,18 @@ object RegressionTests extends TestSuite {
                                                         Seq(Return(Some('a)))),
                             excepthandler.ExceptHandler(None,
                                                         None,
-                                                        Seq(Expr('a)))
+                                                        Seq(Expr('a))),
                         ),
-                        Nil
-                    )
+                        Nil,
+                    ),
                 ),
-                Nil
+                Nil,
             )),
         """while a:
         |    try: a
         |    except: return a
         |    except: a
-        |""".stripMargin
+        |""".stripMargin,
     )
 
     'weird_comments - TestUtils.check(
@@ -139,12 +139,12 @@ object RegressionTests extends TestSuite {
             While(
                 Num(1),
                 Seq(Expr('a)),
-                Nil
+                Nil,
             )),
         """while 1:
         |    #
         |    a
-        |""".stripMargin
+        |""".stripMargin,
     )
     'ident_looking_string - TestUtils.check(
         Statements.file_input,
@@ -152,13 +152,13 @@ object RegressionTests extends TestSuite {
             If(
                 Call('match, Seq(Str("^[a-zA-Z0-9]")), Nil, None, None),
                 Seq(Expr('a)),
-                Nil
+                Nil,
             )),
         """
         |if match(r'^[a-zA-Z0-9]'):
         |    a
         |
-        |""".stripMargin
+        |""".stripMargin,
     )
     'same_line_comment - TestUtils.check(
         Statements.file_input,
@@ -168,14 +168,14 @@ object RegressionTests extends TestSuite {
                 Seq(If(
                         'c,
                         Seq(Pass),
-                        Nil
+                        Nil,
                     )),
-                Nil
+                Nil,
             )),
         """if b:  #
         |    if c:
         |        pass
-        |""".stripMargin
+        |""".stripMargin,
     )
     'chained_elifs - TestUtils.check(
         Statements.file_input,
@@ -187,8 +187,8 @@ object RegressionTests extends TestSuite {
                          Seq(
                              If('b,
                                 Seq(Expr('b)),
-                                Seq(If('c, Seq(Expr('c)), Nil)))
-                         ))
+                                Seq(If('c, Seq(Expr('c)), Nil))),
+                         )),
                   ),
                   Nil)),
         """while 1:
@@ -198,19 +198,19 @@ object RegressionTests extends TestSuite {
         |        b
         |    elif c:
         |        c
-        |""".stripMargin
+        |""".stripMargin,
     )
     'bitand - TestUtils.check(
         Statements.file_input,
         Seq(Expr(BinOp('a, BitAnd, 'a))),
         """a & a
-        |""".stripMargin
+        |""".stripMargin,
     )
     'octal - TestUtils.check(
         Statements.file_input,
         Seq(Expr(Num(0))),
         """0x0
-        |""".stripMargin
+        |""".stripMargin,
     )
     'comment_after_decorator - TestUtils.check(
         Statements.file_input,
@@ -221,7 +221,7 @@ object RegressionTests extends TestSuite {
         """@override_settings # ForeignKey(unique=True)
         |class GenericForeignKeyTests:
         |    pass
-        |""".stripMargin
+        |""".stripMargin,
     )
     'while_block - TestUtils.check(
         Statements.file_input,
@@ -230,7 +230,7 @@ object RegressionTests extends TestSuite {
         |
         |    2
         |    3
-        |""".stripMargin
+        |""".stripMargin,
     )
     'while_in_if - TestUtils.check(
         Statements.file_input,
@@ -240,13 +240,13 @@ object RegressionTests extends TestSuite {
         |        pass
         |else:
         |    pass
-        |""".stripMargin
+        |""".stripMargin,
     )
 
     'tab_indent - TestUtils.check(
         Statements.file_input,
         Seq(While(Num(1), Seq(Pass), Nil)),
-        "while 1:\n\tpass"
+        "while 1:\n\tpass",
     )
   }
 }

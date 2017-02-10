@@ -26,7 +26,7 @@ private[team] object Member {
 
   private[team] lazy val tube = JsTube(
       (__.json update readDate('date)) andThen Json.reads[Member],
-      Json.writes[Member] andThen (__.json update writeDate('date))
+      Json.writes[Member] andThen (__.json update writeDate('date)),
   )
 }
 

@@ -44,7 +44,7 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
           stats collect {
             case vd: ValDef if checkableForInit(vd.symbol) =>
               vd.symbol.accessedOrSelf
-          }: _*
+          }: _*,
       )
       if (uninitializedVals.size > 1)
         log(

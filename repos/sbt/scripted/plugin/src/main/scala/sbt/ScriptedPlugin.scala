@@ -89,7 +89,7 @@ object ScriptedPlugin extends Plugin {
       sbtTestDirectory := sourceDirectory.value / "sbt-test",
       libraryDependencies ++= Seq(
           "org.scala-sbt" % "scripted-sbt" % scriptedSbt.value % scriptedConf.toString,
-          "org.scala-sbt" % "sbt-launch" % scriptedSbt.value % scriptedLaunchConf.toString
+          "org.scala-sbt" % "sbt-launch" % scriptedSbt.value % scriptedLaunchConf.toString,
       ),
       scriptedBufferLog := true,
       scriptedClasspath := getJars(scriptedConf).value,
@@ -100,7 +100,7 @@ object ScriptedPlugin extends Plugin {
         Unit
       },
       scriptedLaunchOpts := Seq(),
-      scripted <<= scriptedTask
+      scripted <<= scriptedTask,
   )
   private[this] def getJars(
       config: Configuration): Initialize[Task[PathFinder]] = Def.task {

@@ -370,7 +370,7 @@ class AccountServiceSpec extends TestAccountService with Tags {
         case (
             HttpResponse(HttpStatus(OK, _), _, _, _),
             HttpResponse(HttpStatus(OK, _), _, _, _),
-            HttpResponse(HttpStatus(OK, _), _, _, _)
+            HttpResponse(HttpStatus(OK, _), _, _, _),
             ) =>
           ok
       }

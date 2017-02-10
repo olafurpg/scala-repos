@@ -282,7 +282,7 @@ object TestPurgatoryPerformance {
           "# interval samples: rate = %f, min = %d, max = %d".format(
               1000d / (samples.map(_.toDouble).sum / sampleSize.toDouble),
               samples.min,
-              samples.max)
+              samples.max),
       )
     }
   }

@@ -360,7 +360,7 @@ abstract class FileWatcherSpec
         override def baseRemoved(f: FileObject): Unit = {
           tk.testActor ! BaseRemoved(f)
         }
-      }
+      },
   )
 }
 

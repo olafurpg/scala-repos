@@ -11,13 +11,13 @@ object MesosFormats {
   implicit lazy val ITResourceScalarValueFormat: Format[ITResourceScalarValue] =
     Format(
         Reads.of[Double].map(ITResourceScalarValue(_)),
-        Writes(scalarValue => JsNumber(scalarValue.value))
+        Writes(scalarValue => JsNumber(scalarValue.value)),
     )
 
   implicit lazy val ITResourcePortValueFormat: Format[ITResourcePortValue] =
     Format(
         Reads.of[String].map(ITResourcePortValue(_)),
-        Writes(portValue => JsString(portValue.portString))
+        Writes(portValue => JsString(portValue.portString)),
     )
 
   implicit lazy val ITResourceValueFormat: Format[ITResourceValue] = Format(
@@ -31,12 +31,12 @@ object MesosFormats {
       Writes[ITResourceValue] {
         case ITResourceScalarValue(value) => JsNumber(value)
         case ITResourcePortValue(portsString) => JsString(portsString)
-      }
+      },
   )
 
   implicit lazy val ITResourcesFormat: Format[ITResources] = Format(
       Reads.of[Map[String, ITResourceValue]].map(ITResources(_)),
-      Writes[ITResources](resources => Json.toJson(resources.resources))
+      Writes[ITResources](resources => Json.toJson(resources.resources)),
   )
 
   implicit lazy val ITAgentFormat: Format[ITAgent] =

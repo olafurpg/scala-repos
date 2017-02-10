@@ -135,7 +135,7 @@ class StoragePageSuite extends SparkFunSuite {
                     "localhost:10000",
                     StorageLevel.DISK_ONLY,
                     memSize = 0,
-                    diskSize = 100)
+                    diskSize = 100),
     )
     val executor0 =
       ExecutorStreamBlockStatus("0", "localhost:10000", blocksForExecutor0)
@@ -150,7 +150,7 @@ class StoragePageSuite extends SparkFunSuite {
                     "localhost:10001",
                     StorageLevel.MEMORY_ONLY_SER,
                     memSize = 100,
-                    diskSize = 0)
+                    diskSize = 0),
     )
     val executor1 =
       ExecutorStreamBlockStatus("1", "localhost:10001", blocksForExecutor1)

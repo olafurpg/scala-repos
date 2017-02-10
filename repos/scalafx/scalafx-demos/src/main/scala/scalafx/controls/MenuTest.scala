@@ -48,7 +48,7 @@ object MenuTest extends JFXApp {
         new MenuItem("Close") {
           onAction = (ae: ActionEvent) =>
             history.children += new Label("Selected item `Close`")
-        }
+        },
     )
 
     onShowing = handle { printEvent("on showing") }

@@ -48,6 +48,6 @@ object JUnitXmlReportTest extends Build {
               sys.error(oneSecondReportFile + " should not exist")
             if (file(failingReportFile).exists())
               sys.error(failingReportFile + " should not exist")
-          }
+          },
         ))
 }

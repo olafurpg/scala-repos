@@ -71,7 +71,7 @@ object ScribeHandler {
       maxMessagesToBuffer: Int = DefaultMaxMessagesToBuffer,
       formatter: Formatter = new Formatter(),
       level: Option[Level] = None,
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   ) =
     () =>
       new ScribeHandler(hostname,
@@ -94,7 +94,7 @@ object ScribeHandler {
       maxMessagesPerTransaction: Int,
       maxMessagesToBuffer: Int,
       formatter: Formatter,
-      level: Option[Level]
+      level: Option[Level],
   ): () => ScribeHandler =
     apply(hostname,
           port,
@@ -135,7 +135,7 @@ class ScribeHandler(hostname: String,
       maxMessagesPerTransaction: Int,
       maxMessagesToBuffer: Int,
       formatter: Formatter,
-      level: Option[Level]
+      level: Option[Level],
   ) =
     this(hostname,
          port,
@@ -418,7 +418,7 @@ class ScribeHandler(hostname: String,
       15,
       0,
       1,
-      12
+      12,
   )
   private[this] val OLD_SCRIBE_PREFIX: Array[Byte] = Array[Byte](
       // (no version), "Log", reply, reqid=0
@@ -438,7 +438,7 @@ class ScribeHandler(hostname: String,
       15,
       0,
       1,
-      12
+      12,
   )
 
   private[this] val SCRIBE_REPLY: Array[Byte] = Array[Byte](
@@ -466,7 +466,7 @@ class ScribeHandler(hostname: String,
       0,
       0,
       0,
-      0
+      0,
   )
   private[this] val OLD_SCRIBE_REPLY: Array[Byte] = Array[Byte](
       0,
@@ -494,7 +494,7 @@ class ScribeHandler(hostname: String,
       0,
       0,
       0,
-      0
+      0,
   )
 
   private class ScribeHandlerStats(statsReceiver: StatsReceiver) {

@@ -33,7 +33,7 @@ class AppInfoBaseDataTest
         taskTracker,
         healthCheckManager,
         marathonSchedulerService,
-        taskFailureRepository
+        taskFailureRepository,
     )
 
     def verifyNoMoreInteractions(): Unit = {
@@ -79,8 +79,8 @@ class AppInfoBaseDataTest
         Map(
             running1.taskId -> Seq.empty,
             running2.taskId -> Seq(alive),
-            running3.taskId -> Seq(unhealthy)
-        )
+            running3.taskId -> Seq(unhealthy),
+        ),
     )
 
     When("requesting AppInfos with tasks")
@@ -99,8 +99,8 @@ class AppInfoBaseDataTest
                       Seq(
                           EnrichedTask(app.id, running1, Seq.empty),
                           EnrichedTask(app.id, running2, Seq(alive)),
-                          EnrichedTask(app.id, running3, Seq(unhealthy))
-                      )
+                          EnrichedTask(app.id, running3, Seq(unhealthy)),
+                      ),
                   )))
 
     And("the taskTracker should have been called")
@@ -132,8 +132,8 @@ class AppInfoBaseDataTest
             Task.Id("task2") -> Seq(
                 Health(Task.Id("task2"), lastFailure = Some(Timestamp(1)))),
             Task.Id("task3") -> Seq(
-                Health(Task.Id("task3"), lastSuccess = Some(Timestamp(2))))
-        )
+                Health(Task.Id("task3"), lastSuccess = Some(Timestamp(2)))),
+        ),
     )
 
     When("requesting AppInfos with counts")
@@ -147,7 +147,7 @@ class AppInfoBaseDataTest
                       TaskCounts(tasksStaged = 1,
                                  tasksRunning = 2,
                                  tasksHealthy = 1,
-                                 tasksUnhealthy = 1)
+                                 tasksUnhealthy = 1),
                   )))
 
     And("the taskTracker should have been called")
@@ -174,7 +174,7 @@ class AppInfoBaseDataTest
             DeploymentStepInfo(
                 relatedDeployment, DeploymentStep(Seq.empty), 1),
             DeploymentStepInfo(
-                unrelatedDeployment, DeploymentStep(Seq.empty), 1)
+                unrelatedDeployment, DeploymentStep(Seq.empty), 1),
         ))
 
     When("Getting AppInfos without counts")
@@ -185,7 +185,7 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeDeployments = Some(
-                      Seq(Identifiable(relatedDeployment.id))
+                      Seq(Identifiable(relatedDeployment.id)),
                   )))
 
     And("the marathonSchedulerService should have been called to retrieve the deployments")
@@ -200,7 +200,7 @@ class AppInfoBaseDataTest
     Given("No deployments")
     f.marathonSchedulerService.listRunningDeployments() returns Future
       .successful(
-        Seq.empty[DeploymentStepInfo]
+        Seq.empty[DeploymentStepInfo],
     )
 
     When("Getting AppInfos with deployments")
@@ -211,7 +211,7 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeDeployments = Some(
-                      Seq.empty
+                      Seq.empty,
                   )))
 
     And("the marathonSchedulerService should have been called to retrieve the deployments")
@@ -236,7 +236,7 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeLastTaskFailure = Some(
-                      TaskFailureTestHelper.taskFailure
+                      TaskFailureTestHelper.taskFailure,
                   )))
 
     And("the taskFailureRepository should have been called to retrieve the failure")
@@ -287,7 +287,7 @@ class AppInfoBaseDataTest
         running.taskId -> Seq(
             Health(running.taskId, lastFailure = Some(Timestamp(1)))),
         running2.taskId -> Seq(
-            Health(running2.taskId, lastSuccess = Some(Timestamp(2))))
+            Health(running2.taskId, lastSuccess = Some(Timestamp(2)))),
     )
     f.healthCheckManager.statuses(app.id) returns Future.successful(statuses)
 
@@ -310,7 +310,7 @@ class AppInfoBaseDataTest
       appInfo should be(AppInfo(
               app,
               maybeTaskStats = Some(TaskStatsByVersion(
-                        f.clock.now(), app.versionInfo, tasks, statuses))
+                        f.clock.now(), app.versionInfo, tasks, statuses)),
           ))
     }
 
@@ -331,7 +331,7 @@ class AppInfoBaseDataTest
         Some(TaskFailureTestHelper.taskFailure))
     f.marathonSchedulerService.listRunningDeployments() returns Future
       .successful(
-        Seq.empty[DeploymentStepInfo]
+        Seq.empty[DeploymentStepInfo],
     )
 
     When("Getting AppInfos with last task failures and deployments")
@@ -345,7 +345,7 @@ class AppInfoBaseDataTest
         AppInfo(
             app,
             maybeLastTaskFailure = Some(TaskFailureTestHelper.taskFailure),
-            maybeDeployments = Some(Seq.empty)
+            maybeDeployments = Some(Seq.empty),
         ))
 
     And("the taskFailureRepository should have been called to retrieve the failure")

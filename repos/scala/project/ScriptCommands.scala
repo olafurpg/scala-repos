@@ -19,7 +19,7 @@ object ScriptCommands {
                   Some("scala-pr" at url.replaceAll("/$", "") +
                     ";build.timestamp=" + System.currentTimeMillis),
                 publishArtifact in (Compile, packageDoc) in ThisBuild := false,
-                scalacOptions in Compile in ThisBuild += "-optimise"
+                scalacOptions in Compile in ThisBuild += "-optimise",
             ),
             state)
   }

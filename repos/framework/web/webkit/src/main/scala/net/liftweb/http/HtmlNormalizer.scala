@@ -29,7 +29,7 @@ private object EventAttribute {
     */
   val eventsByAttributeName = Map(
       "action" -> "submit",
-      "href" -> "click"
+      "href" -> "click",
   )
 
   object EventForAttribute {
@@ -43,7 +43,7 @@ case class NodesAndEventJs(nodes: NodeSeq, js: JsCmd) {
   def append(newNodesAndEventJs: NodesAndEventJs): NodesAndEventJs = {
     this.copy(
         nodes = nodes ++ newNodesAndEventJs.nodes,
-        js = js & newNodesAndEventJs.js
+        js = js & newNodesAndEventJs.js,
     )
   }
   def append(newNodeAndEventJs: NodeAndEventJs): NodesAndEventJs = {
@@ -87,7 +87,7 @@ private[http] final object HtmlNormalizer {
       attributes: MetaData,
       contextPath: String,
       shouldRewriteUrl: Boolean, // whether to apply URLRewrite.rewriteFunc
-      eventAttributes: List[EventAttribute] = Nil
+      eventAttributes: List[EventAttribute] = Nil,
   ): (Option[String], MetaData, List[EventAttribute]) = {
     if (attributes == Null) {
       (None, Null, eventAttributes)
@@ -100,14 +100,14 @@ private[http] final object HtmlNormalizer {
             attributes.next,
             contextPath,
             shouldRewriteUrl,
-            eventAttributes
+            eventAttributes,
         )
 
       attributes match {
         case attribute @ UnprefixedAttribute(
             EventAttribute.EventForAttribute(eventName),
             attributeValue,
-            remainingAttributes
+            remainingAttributes,
             ) if attributeValue.text.startsWith("javascript:") =>
           val attributeJavaScript = {
             // Could be javascript: or javascript://.
@@ -134,13 +134,13 @@ private[http] final object HtmlNormalizer {
               contextPath,
               attributes.value,
               shouldRewriteUrl,
-              URLRewriter.rewriteFunc
+              URLRewriter.rewriteFunc,
           )
 
           val newMetaData = new UnprefixedAttribute(
               attributeToNormalize,
               normalizedUrl,
-              normalizedRemainingAttributes
+              normalizedRemainingAttributes,
           )
 
           (id, newMetaData, remainingEventAttributes)
@@ -177,7 +177,7 @@ private[http] final object HtmlNormalizer {
             "lift.onEvent",
             elementId,
             name,
-            AnonFunc("event", JsRaw(handlerJs).cmd)
+            AnonFunc("event", JsRaw(handlerJs).cmd),
         ).cmd
     }.foldLeft(Noop)(_ & _)
   }
@@ -192,7 +192,7 @@ private[http] final object HtmlNormalizer {
           attributeToNormalize,
           element.attributes,
           contextPath,
-          shouldRewriteUrl
+          shouldRewriteUrl,
       )
 
     val attributesIncludingEventsAsData =
@@ -212,7 +212,7 @@ private[http] final object HtmlNormalizer {
     id.map { foundId =>
       NodeAndEventJs(
           element.copy(attributes = attributesIncludingEventsAsData),
-          jsForEventAttributes(foundId, eventAttributes)
+          jsForEventAttributes(foundId, eventAttributes),
       )
     } getOrElse {
       if (eventAttributes.nonEmpty) {
@@ -221,12 +221,12 @@ private[http] final object HtmlNormalizer {
         NodeAndEventJs(
             element.copy(attributes = new UnprefixedAttribute(
                       "id", generatedId, attributesIncludingEventsAsData)),
-            jsForEventAttributes(generatedId, eventAttributes)
+            jsForEventAttributes(generatedId, eventAttributes),
         )
       } else {
         NodeAndEventJs(
             element.copy(attributes = attributesIncludingEventsAsData),
-            Noop
+            Noop,
         )
       }
     }
@@ -258,8 +258,8 @@ private[http] final object HtmlNormalizer {
                 element,
                 attributeToFix,
                 contextPath,
-                shouldRewriteUrl
-            )
+                shouldRewriteUrl,
+            ),
         )
 
       case _: Comment if stripComments =>
@@ -285,7 +285,7 @@ private[http] final object HtmlNormalizer {
   def normalizeHtmlAndEventHandlers(
       nodes: NodeSeq,
       contextPath: String,
-      stripComments: Boolean
+      stripComments: Boolean,
   ): NodesAndEventJs = {
     nodes.foldLeft(NodesAndEventJs(Vector[Node](), Noop)) {
       (soFar, nodeToNormalize) =>
@@ -295,7 +295,7 @@ private[http] final object HtmlNormalizer {
               normalizeHtmlAndEventHandlers(
                   normalizedElement.child,
                   contextPath,
-                  stripComments
+                  stripComments,
               )
 
             soFar

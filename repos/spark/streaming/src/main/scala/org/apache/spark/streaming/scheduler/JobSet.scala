@@ -71,7 +71,7 @@ private[streaming] case class JobSet(
         if (hasCompleted) Some(processingEndTime) else None,
         jobs.map { job =>
           (job.outputOpId, job.toOutputOperationInfo)
-        }.toMap
+        }.toMap,
     )
   }
 }

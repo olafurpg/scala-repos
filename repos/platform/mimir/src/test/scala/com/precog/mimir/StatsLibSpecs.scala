@@ -267,7 +267,7 @@ trait StatsLibSpecs[M[+ _]]
           morpher(Rank, "rank"),
           morpher(DenseRank, "denseRank"),
           morpher(IndexedRank, "indexedRank"),
-          wrapper(data, "point")
+          wrapper(data, "point"),
       ).reduceLeft(joiner)
 
       // sort a tuple by its first (Long) field
@@ -338,7 +338,7 @@ trait StatsLibSpecs[M[+ _]]
           Map("indexedRank" -> SDecimal(14),
               "denseRank" -> SDecimal(8),
               "rank" -> SDecimal(14),
-              "point" -> SDecimal(50))
+              "point" -> SDecimal(50)),
       )
 
       result must_== expected
@@ -363,7 +363,7 @@ trait StatsLibSpecs[M[+ _]]
           morpher(Rank, "rank"),
           morpher(DenseRank, "denseRank"),
           morpher(IndexedRank, "indexedRank"),
-          wrapper(data, "point")
+          wrapper(data, "point"),
       ).reduceLeft(joiner)
 
       // sort a tuple by its first (Long) field
@@ -434,7 +434,7 @@ trait StatsLibSpecs[M[+ _]]
           Map("indexedRank" -> SDecimal(14),
               "denseRank" -> SDecimal(8),
               "rank" -> SDecimal(14),
-              "point" -> SDecimal(50))
+              "point" -> SDecimal(50)),
       )
 
       result must_== expected
@@ -829,7 +829,7 @@ trait StatsLibSpecs[M[+ _]]
           JoinArray,
           IdentitySort,
           Operate(WrapArray, data)(line),
-          Operate(WrapArray, dag.Morph1(Rank, data)(line))(line)
+          Operate(WrapArray, dag.Morph1(Rank, data)(line))(line),
       )(line)
 
       val result = testEval(input).map(_._2)
@@ -856,7 +856,7 @@ trait StatsLibSpecs[M[+ _]]
           tpl(sv(34), sv(13)),
           tpl(SObject(Map()), sv(15)),
           tpl(arr(), sv(16)),
-          tpl(SNull, sv(17))
+          tpl(SNull, sv(17)),
       )
 
       result must_== expected

@@ -154,7 +154,7 @@ object DependencyResolver {
           dependencies = sameName.flatMap(_.dependencies).toSet,
           origins = sameName.map(_.origin).toList,
           commonJSName = sameName.flatMap(_.commonJSName).headOption,
-          relPathMinified = sameName.flatMap(_.relPathMinified).headOption
+          relPathMinified = sameName.flatMap(_.relPathMinified).headOption,
       )
     }
   }

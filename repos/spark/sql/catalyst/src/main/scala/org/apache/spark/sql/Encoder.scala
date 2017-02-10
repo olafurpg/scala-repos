@@ -259,7 +259,7 @@ object Encoders {
               BoundReference(0, BinaryType, nullable = true),
               classTag[T],
               kryo = useKryo),
-        clsTag = classTag[T]
+        clsTag = classTag[T],
     )
   }
 

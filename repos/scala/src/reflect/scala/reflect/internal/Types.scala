@@ -3073,7 +3073,7 @@ trait Types
   class HKTypeVar(
       _origin: Type,
       _constr: TypeConstraint,
-      override val params: List[Symbol]
+      override val params: List[Symbol],
   )
       extends TypeVar(_origin, _constr) {
 
@@ -3086,7 +3086,7 @@ trait Types
   class AppliedTypeVar(
       _origin: Type,
       _constr: TypeConstraint,
-      zippedArgs: List[(Symbol, Type)]
+      zippedArgs: List[(Symbol, Type)],
   )
       extends TypeVar(_origin, _constr) {
 
@@ -3132,7 +3132,7 @@ trait Types
     */
   abstract case class TypeVar(
       origin: Type,
-      var constr: TypeConstraint
+      var constr: TypeConstraint,
   )
       extends Type {
 
@@ -3466,7 +3466,7 @@ trait Types
           Some(encl.enclClass),
           if (encl.isMethod) Some(encl) else None,
           if (sym.owner.isTerm && (sym.owner != encl)) Some(sym.owner)
-          else None
+          else None,
       ).flatten map (s => s.decodedName + tparamsOfSym(s)) mkString "#"
     }
     private def levelString = if (settings.explaintypes) level else ""

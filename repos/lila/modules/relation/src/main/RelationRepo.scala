@@ -22,14 +22,14 @@ private[relation] object RelationRepo {
     coll.distinct("u1",
                   BSONDocument(
                       "u2" -> userId,
-                      "r" -> relation
+                      "r" -> relation,
                   ).some) map lila.db.BSON.asStringSet
 
   private def relating(userId: ID, relation: Relation): Fu[Set[ID]] =
     coll.distinct("u2",
                   BSONDocument(
                       "u1" -> userId,
-                      "r" -> relation
+                      "r" -> relation,
                   ).some) map lila.db.BSON.asStringSet
 
   def follow(u1: ID, u2: ID): Funit = save(u1, u2, Follow)
@@ -41,7 +41,7 @@ private[relation] object RelationRepo {
 
   private def save(u1: ID, u2: ID, relation: Relation): Funit = $save(
       makeId(u1, u2),
-      Json.obj("u1" -> u1, "u2" -> u2, "r" -> relation)
+      Json.obj("u1" -> u1, "u2" -> u2, "r" -> relation),
   )
 
   def remove(u1: ID, u2: ID): Funit = $remove byId makeId(u1, u2)
@@ -52,7 +52,7 @@ private[relation] object RelationRepo {
         "_id",
         _ sort $sort.naturalAsc,
         max = nb.some,
-        hint = reactivemongo.bson.BSONDocument("u1" -> 1)
+        hint = reactivemongo.bson.BSONDocument("u1" -> 1),
     )(_.asOpt[String]) flatMap { ids =>
       $remove(Json.obj("_id" -> $in(ids)))
     }

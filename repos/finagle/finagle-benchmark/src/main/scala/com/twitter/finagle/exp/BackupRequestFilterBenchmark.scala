@@ -25,7 +25,7 @@ class BackupRequestFilterBenchmark extends StdBenchAnnotations {
       1.second,
       timer,
       NullStatsReceiver,
-      1.minute
+      1.minute,
   )
 
   private[this] val svc = backupReqFilter.andThen(Service.const(Response))

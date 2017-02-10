@@ -256,7 +256,7 @@ object GlobalSettings {
         throw new PlayException(
             "Cannot init the Global object",
             e.getMessage,
-            e
+            e,
         )
     }
   }

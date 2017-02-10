@@ -64,7 +64,7 @@ object scala extends Command {
             "With no arguments specified, a Scala shell starts " & "and reads commands interactively.",
             "With " & Mono("-howtorun:object") & " specified, the fully " & "qualified name of a top-level " & "Scala object may be specified.  The object should previously have " & "been compiled using " & Link(
                 Bold("scalac") & "(1)", "scalac.html") & ".",
-            "With " & Mono("-howtorun:script") & " specified, a file " & "containing Scala code may be specified."
+            "With " & Mono("-howtorun:script") & " specified, a file " & "containing Scala code may be specified.",
         ),
         "If " & Mono("-howtorun:") & " is left as the default (" & Mono(
             "guess") & "), then the " & MBold(command) & " command " & "will check whether a file of the " & "specified name exists.  If it does, then it will treat it as a " & "script file; if it does not, then it will treat it as the name " & "of an object.",
@@ -111,7 +111,7 @@ object scala extends Command {
                              "java") & " command defined by " & MBold(
                              "JAVACMD") & ".",
                          "With Java 1.5 (or newer) one may for example configure the " & "memory usage of the JVM as follows: " & Mono(
-                             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\"")
+                             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\""),
                      ))))
 
   val examples = Section(

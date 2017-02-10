@@ -136,7 +136,7 @@ package mongotestdocs {
       bytefield: Byte,
       booleanfield: Boolean,
       shortfield: Short,
-      datefield: Date
+      datefield: Date,
   )
       extends MongoDocument[Primitive] {
 

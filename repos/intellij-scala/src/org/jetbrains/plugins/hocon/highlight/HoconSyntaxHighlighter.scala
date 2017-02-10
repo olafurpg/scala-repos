@@ -44,7 +44,7 @@ object HoconSyntaxHighlighter extends SyntaxHighlighter {
       StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN -> Array(
           HHC.InvalidStringEscape),
       StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN -> Array(
-          HHC.InvalidStringEscape)
+          HHC.InvalidStringEscape),
   )
 
   def getTokenHighlights(tokenType: IElementType) =

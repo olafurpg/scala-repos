@@ -276,7 +276,7 @@ trait OracleProfile extends JdbcProfile {
         Seq(
             s"create sequence $seq start with 1 increment by 1",
             s"create or replace trigger $trg before insert on $tab referencing new as new for each row" +
-            s" when (new.$col is null) begin select $seq.nextval into :new.$col from sys.dual; end;"
+            s" when (new.$col is null) begin select $seq.nextval into :new.$col from sys.dual; end;",
         )
       }
 
@@ -291,7 +291,7 @@ trait OracleProfile extends JdbcProfile {
             else triggerName)
         Seq(
             s"drop trigger $trg",
-            s"drop sequence $seq"
+            s"drop sequence $seq",
         )
       }
   }

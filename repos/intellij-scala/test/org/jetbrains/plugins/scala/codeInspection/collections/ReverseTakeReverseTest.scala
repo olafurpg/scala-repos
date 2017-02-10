@@ -16,7 +16,7 @@ class ReverseTakeReverseTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val n = 2; Seq().${START}reverse.take(n).reverse$END",
         "val n = 2; Seq().reverse.take(n).reverse",
-        "val n = 2; Seq().takeRight(n)"
+        "val n = 2; Seq().takeRight(n)",
     )
   }
 }

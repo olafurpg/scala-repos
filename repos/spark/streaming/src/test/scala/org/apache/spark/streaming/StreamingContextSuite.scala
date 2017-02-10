@@ -325,7 +325,7 @@ class StreamingContextSuite
       assert(
           TestReceiver.counter.get() == runningCount + 1,
           "Received records = " + TestReceiver.counter.get() + ", " +
-          "processed records = " + runningCount
+          "processed records = " + runningCount,
       )
       Thread.sleep(100)
     }

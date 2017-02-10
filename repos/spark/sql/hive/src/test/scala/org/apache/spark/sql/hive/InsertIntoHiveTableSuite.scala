@@ -58,7 +58,7 @@ class InsertIntoHiveTableSuite
     // Make sure the table has also been updated.
     checkAnswer(
         sql("SELECT * FROM createAndInsertTest"),
-        testData.collect().toSeq
+        testData.collect().toSeq,
     )
 
     // Add more data.
@@ -67,7 +67,7 @@ class InsertIntoHiveTableSuite
     // Make sure the table has been updated.
     checkAnswer(
         sql("SELECT * FROM createAndInsertTest"),
-        testData.toDF().collect().toSeq ++ testData.toDF().collect().toSeq
+        testData.toDF().collect().toSeq ++ testData.toDF().collect().toSeq,
     )
 
     // Now overwrite.
@@ -76,7 +76,7 @@ class InsertIntoHiveTableSuite
     // Make sure the registered table has also been updated.
     checkAnswer(
         sql("SELECT * FROM createAndInsertTest"),
-        testData.collect().toSeq
+        testData.collect().toSeq,
     )
   }
 
@@ -105,7 +105,7 @@ class InsertIntoHiveTableSuite
 
     checkAnswer(
         sql("SELECT * FROM hiveTableWithMapValue"),
-        rowRDD.collect().toSeq
+        rowRDD.collect().toSeq,
     )
 
     sql("DROP TABLE hiveTableWithMapValue")
@@ -156,7 +156,7 @@ class InsertIntoHiveTableSuite
         "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=2" :: Nil,
         "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=3" :: Nil,
         "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=1" :: Nil,
-        "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=4" :: Nil
+        "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=4" :: Nil,
     )
     assert(
         listFolders(tmpDir, List()).sortBy(_.toString()) === expected.sortBy(

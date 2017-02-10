@@ -36,5 +36,5 @@ case class WebHookEvent(
     userName: String,
     repositoryName: String,
     url: String,
-    event: WebHook.Event
+    event: WebHook.Event,
 )

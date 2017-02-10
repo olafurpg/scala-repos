@@ -31,7 +31,7 @@ object FixInternalDebugLogging {
 
     val debugClassName = foldRuntime(
         older = "com.sun.net.ssl.internal.ssl.Debug",
-        newer = "sun.security.ssl.Debug"
+        newer = "sun.security.ssl.Debug",
     )
 
     /**

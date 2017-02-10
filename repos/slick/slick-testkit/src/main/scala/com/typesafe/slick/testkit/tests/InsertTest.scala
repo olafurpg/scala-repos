@@ -45,7 +45,7 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
               .map(_ shouldBe Set((1, "A"), (2, "B"), (42, "X"))),
             dst3comp.forceInsertQuery(q4comp),
             dst3comp.result.map(
-                v => v.to[Set] shouldBe Set((1, "A"), (2, "B")))
+                v => v.to[Set] shouldBe Set((1, "A"), (2, "B"))),
         ))
   }
 
@@ -59,7 +59,7 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
     DBIO.seq(
         as.schema.create,
         as += 42,
-        as.result.map(_ shouldBe Seq(1))
+        as.result.map(_ shouldBe Seq(1)),
     )
   }
 
@@ -144,8 +144,8 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
                 ts.filter(_.id.between(90, 99))
                   .result
                   .headOption
-                  .map(_ shouldBe Some((90, "X", 1, false, "S1", "S2", 0)))
-              ))
+                  .map(_ shouldBe Some((90, "X", 1, false, "S1", "S2", 0))),
+              )),
       )
   }
 

@@ -49,7 +49,7 @@ object Boilerplate {
       GenTupleTypeableInstances,
       GenSizedBuilder,
       GenHMapBuilder,
-      GenUnpackInstances
+      GenUnpackInstances,
   )
 
   /** Returns a seq of the generated files.  As a side-effect, it actually generates them... */

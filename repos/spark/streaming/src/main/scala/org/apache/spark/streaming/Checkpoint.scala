@@ -182,7 +182,7 @@ private[streaming] class CheckpointWriter(
     jobGenerator: JobGenerator,
     conf: SparkConf,
     checkpointDir: String,
-    hadoopConf: Configuration
+    hadoopConf: Configuration,
 )
     extends Logging {
   val MAX_ATTEMPTS = 3

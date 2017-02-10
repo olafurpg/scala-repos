@@ -98,7 +98,7 @@ class WorksheetCompiler {
                     module,
                     tempFile,
                     outputDir,
-                    name
+                    name,
                 ).compileAndRun(new Runnable {
                   override def run() {
                     if (runType == OutOfProcessServer)

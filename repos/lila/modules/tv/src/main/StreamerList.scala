@@ -72,7 +72,7 @@ final class StreamerList(
             case (_, errs) =>
               Invalid(ValidationError(errs.map(_.getMessage) mkString ","))
           }
-        })
+        }),
         ))
   }
 }

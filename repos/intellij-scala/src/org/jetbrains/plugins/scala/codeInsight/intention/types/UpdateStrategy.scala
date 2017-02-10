@@ -192,7 +192,7 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
                 "_root_.scala.collection.immutable.Set[",
                 "_root_.scala.collection.Map[",
                 "_root_.scala.collection.mutable.Map[",
-                "_root_.scala.collection.immutable.Map["
+                "_root_.scala.collection.immutable.Map[",
             )
             val baseTypes = BaseTypes
               .get(tp)

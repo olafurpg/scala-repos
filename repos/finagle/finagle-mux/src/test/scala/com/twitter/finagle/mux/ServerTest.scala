@@ -199,7 +199,7 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
           Service.mk { _req: Request =>
             req = _req
             p
-          }
+          },
       )
 
       clientToServer.offer(

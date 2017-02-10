@@ -32,7 +32,7 @@ final class HistoryApi(coll: Coll) {
         (isStd && game.speed == Speed.Classical)
           .option("classical" -> perfs.classical),
         (isStd && game.speed == Speed.Correspondence).option(
-            "correspondence" -> perfs.correspondence)
+            "correspondence" -> perfs.correspondence),
     ).flatten.map {
       case (k, p) => k -> p.intRating
     }
@@ -43,7 +43,7 @@ final class HistoryApi(coll: Coll) {
           BSONDocument("$set" -> BSONDocument(changes.map {
             case (perf, rating) => s"$perf.$days" -> BSONInteger(rating)
           })),
-          upsert = true
+          upsert = true,
       )
       .void
   }

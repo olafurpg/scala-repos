@@ -79,7 +79,7 @@ class ContainerPlacementStrategySuite
         Array(
             createContainer("host1"),
             createContainer("host1"),
-            createContainer("host2")
+            createContainer("host2"),
         ))
 
     val localities =
@@ -106,7 +106,7 @@ class ContainerPlacementStrategySuite
         Array(
             createContainer("host1"),
             createContainer("host1"),
-            createContainer("host2")
+            createContainer("host2"),
         ))
 
     val localities =
@@ -131,7 +131,7 @@ class ContainerPlacementStrategySuite
             createContainer("host1"),
             createContainer("host2"),
             createContainer("host2"),
-            createContainer("host3")
+            createContainer("host3"),
         ))
 
     val localities =
@@ -168,7 +168,7 @@ class ContainerPlacementStrategySuite
         Array(
             createContainer("host1"),
             createContainer("host1"),
-            createContainer("host2")
+            createContainer("host2"),
         ))
 
     val pendingAllocationRequests =

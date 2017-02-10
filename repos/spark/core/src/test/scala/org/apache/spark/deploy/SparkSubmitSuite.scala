@@ -147,7 +147,7 @@ class SparkSubmitSuite
         "spark.submit.deployMode=client",
         "--class",
         "org.SomeClass",
-        "thejar.jar"
+        "thejar.jar",
     )
     val appArgs = new SparkSubmitArguments(clArgs)
     val (_, _, sysProps, _) = prepareSubmitEnvironment(appArgs)
@@ -165,7 +165,7 @@ class SparkSubmitSuite
         "spark.submit.deployMode=client",
         "-class",
         "org.SomeClass",
-        "thejar.jar"
+        "thejar.jar",
     )
     val appArgs1 = new SparkSubmitArguments(clArgs1)
     val (_, _, sysProps1, _) = prepareSubmitEnvironment(appArgs1)
@@ -179,7 +179,7 @@ class SparkSubmitSuite
         "yarn",
         "--class",
         "org.SomeClass",
-        "thejar.jar"
+        "thejar.jar",
     )
     val appArgs2 = new SparkSubmitArguments(clArgs2)
     appArgs2.deployMode should be(null)
@@ -563,7 +563,7 @@ class SparkSubmitSuite
         files,
         "--archives",
         archives,
-        "thejar.jar"
+        "thejar.jar",
     )
     val appArgs2 = new SparkSubmitArguments(clArgs2)
     val sysProps2 = SparkSubmit.prepareSubmitEnvironment(appArgs2)._3
@@ -579,7 +579,7 @@ class SparkSubmitSuite
         "local",
         "--py-files",
         pyFiles,
-        "mister.py"
+        "mister.py",
     )
     val appArgs3 = new SparkSubmitArguments(clArgs3)
     val sysProps3 = SparkSubmit.prepareSubmitEnvironment(appArgs3)._3
@@ -609,7 +609,7 @@ class SparkSubmitSuite
         "org.SomeClass",
         "--properties-file",
         f1.getPath,
-        "thejar.jar"
+        "thejar.jar",
     )
     val appArgs = new SparkSubmitArguments(clArgs)
     val sysProps = SparkSubmit.prepareSubmitEnvironment(appArgs)._3
@@ -629,7 +629,7 @@ class SparkSubmitSuite
         "org.SomeClass",
         "--properties-file",
         f2.getPath,
-        "thejar.jar"
+        "thejar.jar",
     )
     val appArgs2 = new SparkSubmitArguments(clArgs2)
     val sysProps2 = SparkSubmit.prepareSubmitEnvironment(appArgs2)._3
@@ -647,7 +647,7 @@ class SparkSubmitSuite
         "local",
         "--properties-file",
         f3.getPath,
-        "mister.py"
+        "mister.py",
     )
     val appArgs3 = new SparkSubmitArguments(clArgs3)
     val sysProps3 = SparkSubmit.prepareSubmitEnvironment(appArgs3)._3

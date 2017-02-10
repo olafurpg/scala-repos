@@ -54,7 +54,7 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
         "new E[Int](new Z[Int])",
         "new E(new Y[Int])",
         "new E(new Z[Int])",
-        "new Alias[Int](0)"
+        "new Alias[Int](0)",
     )
     for { code <- codes } {
       assertMatches(messages(code)) {

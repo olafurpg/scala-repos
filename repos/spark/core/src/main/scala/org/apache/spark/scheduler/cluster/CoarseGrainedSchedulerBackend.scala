@@ -496,7 +496,7 @@ private[spark] class CoarseGrainedSchedulerBackend(
   final override def requestTotalExecutors(
       numExecutors: Int,
       localityAwareTasks: Int,
-      hostToLocalTaskCount: Map[String, Int]
+      hostToLocalTaskCount: Map[String, Int],
   ): Boolean = synchronized {
     if (numExecutors < 0) {
       throw new IllegalArgumentException(

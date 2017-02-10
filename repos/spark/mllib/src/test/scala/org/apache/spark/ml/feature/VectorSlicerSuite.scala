@@ -62,7 +62,7 @@ class VectorSlicerSuite
         Vectors.dense(-2.0, 2.3, 0.0, 0.0, 1.0),
         Vectors.dense(0.0, 0.0, 0.0, 0.0, 0.0),
         Vectors.dense(0.6, -1.1, -3.0, 4.5, 3.3),
-        Vectors.sparse(5, Seq())
+        Vectors.sparse(5, Seq()),
     )
 
     // Expected after selecting indices 1, 4
@@ -71,7 +71,7 @@ class VectorSlicerSuite
         Vectors.dense(2.3, 1.0),
         Vectors.dense(0.0, 0.0),
         Vectors.dense(-1.1, 3.3),
-        Vectors.sparse(2, Seq())
+        Vectors.sparse(2, Seq()),
     )
 
     val defaultAttr = NumericAttribute.defaultAttr

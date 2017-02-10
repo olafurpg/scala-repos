@@ -34,7 +34,7 @@ class HealthCheckWorkerActor extends Actor with ActorLogging {
           replyTo ! Unhealthy(
               task.taskId,
               launched.appVersion,
-              s"${t.getClass.getSimpleName}: ${t.getMessage}"
+              s"${t.getClass.getSimpleName}: ${t.getMessage}",
           )
       }.onComplete { case _ => self ! PoisonPill }
   }

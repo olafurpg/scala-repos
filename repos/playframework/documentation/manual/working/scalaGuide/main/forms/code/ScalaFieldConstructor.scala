@@ -33,7 +33,7 @@ package scalaguide.forms.scalafieldconstructor {
 
     val form = Form(
         mapping(
-            "username" -> text
+            "username" -> text,
         )(User.apply)(User.unapply))
   }
 

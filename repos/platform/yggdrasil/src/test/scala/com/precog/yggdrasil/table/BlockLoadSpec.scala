@@ -145,8 +145,8 @@ trait BlockLoadSpec[M[+ _]]
             (1,
              List(JPath(".u") -> CBoolean,
                   JPath(".md") -> CString,
-                  JPath(".l") -> CEmptyArray))
-        )
+                  JPath(".l") -> CEmptyArray)),
+        ),
     )
 
     testLoadDense(sampleData)
@@ -168,8 +168,8 @@ trait BlockLoadSpec[M[+ _]]
             (2,
              List(JPath(".fa") -> CNull,
                   JPath(".hW") -> CLong,
-                  JPath(".rzp") -> CEmptyObject))
-        )
+                  JPath(".rzp") -> CEmptyObject)),
+        ),
     )
 
     testLoadDense(sampleData)
@@ -209,8 +209,8 @@ trait BlockLoadSpec[M[+ _]]
                   JPath(".ljz[0]") -> CNull,
                   JPath(".ljz[1][0]") -> CString,
                   JPath(".ljz[2]") -> CBoolean,
-                  JPath(".jmy") -> CDouble))
-        )
+                  JPath(".jmy") -> CDouble)),
+        ),
     )
 
     testLoadDense(sampleData)
@@ -242,8 +242,8 @@ trait BlockLoadSpec[M[+ _]]
                   JPath(".dV.l") -> CBoolean,
                   JPath(".dV.vq") -> CEmptyObject,
                   JPath(".oy.nm") -> CBoolean,
-                  JPath(".uR") -> CDouble))
-        )
+                  JPath(".uR") -> CDouble)),
+        ),
     )
 
     testLoadDense(sampleData)
@@ -349,7 +349,7 @@ trait BlockLoadSpec[M[+ _]]
                   (JPath(".fg[1]") -> CLong),
                   (JPath(".fg[2]") -> CNum),
                   (JPath(".fg[2]") -> CLong),
-                  (JPath(".cfnYTg92dg") -> CString))))
+                  (JPath(".cfnYTg92dg") -> CString)))),
     )
 
     testLoadDense(sampleData)

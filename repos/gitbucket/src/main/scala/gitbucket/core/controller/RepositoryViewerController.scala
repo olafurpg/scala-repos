@@ -54,14 +54,14 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       charset: String,
       lineSeparator: String,
       newFileName: String,
-      oldFileName: Option[String]
+      oldFileName: Option[String],
   )
 
   case class DeleteForm(
       branch: String,
       path: String,
       message: Option[String],
-      fileName: String
+      fileName: String,
   )
 
   case class CommentForm(
@@ -69,7 +69,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       oldLineNumber: Option[Int],
       newLineNumber: Option[Int],
       content: String,
-      issueId: Option[Int]
+      issueId: Option[Int],
   )
 
   val editorForm = mapping(
@@ -80,14 +80,14 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       "charset" -> trim(label("Charset", text(required))),
       "lineSeparator" -> trim(label("Line Separator", text(required))),
       "newFileName" -> trim(label("Filename", text(required))),
-      "oldFileName" -> trim(label("Old filename", optional(text())))
+      "oldFileName" -> trim(label("Old filename", optional(text()))),
   )(EditorForm.apply)
 
   val deleteForm = mapping(
       "branch" -> trim(label("Branch", text(required))),
       "path" -> trim(label("Path", text())),
       "message" -> trim(label("Message", optional(text()))),
-      "fileName" -> trim(label("Filename", text(required)))
+      "fileName" -> trim(label("Filename", text(required))),
   )(DeleteForm.apply)
 
   val commentForm = mapping(
@@ -95,7 +95,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       "oldLineNumber" -> trim(label("Old line number", optional(number()))),
       "newLineNumber" -> trim(label("New line number", optional(number()))),
       "content" -> trim(label("Content", text(required))),
-      "issueId" -> trim(label("Issue Id", optional(number())))
+      "issueId" -> trim(label("Issue Id", optional(number()))),
   )(CommentForm.apply)
 
   /**
@@ -113,7 +113,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         enableTaskList = params("enableTaskList").toBoolean,
         enableAnchor = false,
         hasWritePermission = hasWritePermission(
-              repository.owner, repository.name, context.loginAccount)
+              repository.owner, repository.name, context.loginAccount),
     )
   })
 
@@ -231,7 +231,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                                                      form.lineSeparator),
                                 form.lineSeparator),
         charset = form.charset,
-        message = form.message.getOrElse(s"Create ${form.newFileName}")
+        message = form.message.getOrElse(s"Create ${form.newFileName}"),
     )
 
     redirect(
@@ -256,7 +256,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         } else {
           form.message.getOrElse(
               s"Rename ${form.oldFileName.get} to ${form.newFileName}")
-        }
+        },
     )
 
     redirect(
@@ -462,7 +462,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         issueId,
         hasWritePermission = hasWritePermission(
               repository.owner, repository.name, context.loginAccount),
-        repository = repository
+        repository = repository,
     )
   })
 
@@ -528,8 +528,8 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                         enableLineBreaks = true,
                         hasWritePermission = isEditable(x.userName,
                                                         x.repositoryName,
-                                                        x.commentedUserName)
-                    )
+                                                        x.commentedUserName),
+                    ),
                 ))
           }
         } else Unauthorized
@@ -575,7 +575,7 @@ trait RepositoryViewerControllerBase extends ControllerBase {
           owner = repository.owner,
           name = repository.name,
           defaultBranch = repository.repository.defaultBranch,
-          origin = repository.repository.originUserName.isEmpty
+          origin = repository.repository.originUserName.isEmpty,
       )
       .sortBy(br => (br.mergeInfo.isEmpty, br.commitTime))
       .map(br =>

@@ -85,7 +85,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
             }
           }
         },
-        ExactSize(values.length)
+        ExactSize(values.length),
     )
   }
 
@@ -99,7 +99,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
         "coerceToDouble" -> cf.util.CoerceToDouble,
         "true" -> CF1("testing::true") { _ =>
           Some(Column.const(true))
-        }
+        },
     )
 
     lib(name)
@@ -109,7 +109,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
     val lib = Map[String, CF2](
         "add" -> cf.math.Add,
         "mod" -> cf.math.Mod,
-        "eq" -> cf.std.Eq
+        "eq" -> cf.std.Eq,
     )
     lib(name)
   }
@@ -160,7 +160,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
             (a2,
              Map(ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(mask, arr)))
           }
-        }
+        },
     )
 
     lib(name)

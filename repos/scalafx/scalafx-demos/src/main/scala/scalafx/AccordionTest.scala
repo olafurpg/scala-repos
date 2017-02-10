@@ -58,7 +58,7 @@ object AccordionTest extends JFXApp {
                 stroke = Color.Yellow
                 strokeWidth = 3
               }
-            }
+            },
         )
       }
     }

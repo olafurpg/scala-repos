@@ -38,14 +38,14 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
 
   def xmap[X1, X2](f: S2 => X1)(g: X2 => S1): IndexedStateT[F, X2, X1, A] =
     IndexedStateT.createState(
-        (F: Monad[F]) => (x: X2) => F.map(self(g(x))(F))(t => (f(t._1), t._2))
+        (F: Monad[F]) => (x: X2) => F.map(self(g(x))(F))(t => (f(t._1), t._2)),
     )
 
   /** Map both the return value and final state using the given function. */
   def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(
       implicit M: Monad[F]): IndexedStateT[G, S1, S, B] =
     IndexedStateT.createState(
-        (m: Monad[G]) => (s: S1) => f(apply(s)(M))
+        (m: Monad[G]) => (s: S1) => f(apply(s)(M)),
     )
 
   import BijectionT._
@@ -80,7 +80,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
       implicit F: Monad[F],
       M: Applicative[M]): IndexedStateT[λ[α => M[F[α]]], S1, S2, A] =
     IndexedStateT.createState[λ[α => M[F[α]]], S1, S2, A](
-        (m: Monad[λ[α => M[F[α]]]]) => (s: S1) => M.point(self(s))
+        (m: Monad[λ[α => M[F[α]]]]) => (s: S1) => M.point(self(s)),
     )
 
   import Liskov._
@@ -93,7 +93,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
         (s: S) =>
           {
             M.copoint(ev(self)(s))
-      }
+      },
   )
 
   def unliftId[M[_], S <: S1](
@@ -110,7 +110,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
               (sf: (S1 => F[(S2, A)])) =>
                 F.map(sf(s)) {
               case (s, a) => (W.zero, a, s)
-          })
+          }),
     )
 
   def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(
@@ -328,7 +328,7 @@ private trait StateTHoist[S] extends Hoist[λ[(g[_], a) => StateT[g, S, a]]] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
     new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
       def apply[A](action: StateT[M, S, A]) = IndexedStateT.createState(
-          (n: Monad[N]) => (s: S) => f(action.run(s))
+          (n: Monad[N]) => (s: S) => f(action.run(s)),
       )
     }
 

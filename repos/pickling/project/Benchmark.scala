@@ -121,6 +121,6 @@ object Benchmark {
         graphJava :=
           benchTask("WikiGraphJavaBench", 5000 to 14000 by 1000).evaluated,
         graphKryo :=
-          benchTask("WikiGraphKryoBench", 5000 to 14000 by 1000).evaluated
+          benchTask("WikiGraphKryoBench", 5000 to 14000 by 1000).evaluated,
     )
 }

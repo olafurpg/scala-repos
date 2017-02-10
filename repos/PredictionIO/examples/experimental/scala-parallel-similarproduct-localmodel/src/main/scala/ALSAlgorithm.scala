@@ -165,7 +165,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             categories = query.categories,
             queryList = queryList,
             whiteList = whiteList,
-            blackList = blackList
+            blackList = blackList,
         )
     }
 
@@ -175,7 +175,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       case (i, s) =>
         new ItemScore(
             item = model.itemIntStringMap(i),
-            score = s
+            score = s,
         )
     }
 
@@ -223,7 +223,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       categories: Option[Set[String]],
       queryList: Set[Int],
       whiteList: Option[Set[Int]],
-      blackList: Option[Set[Int]]
+      blackList: Option[Set[Int]],
   ): Boolean = {
     whiteList.map(_.contains(i)).getOrElse(true) &&
     blackList.map(!_.contains(i)).getOrElse(true) &&

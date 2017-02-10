@@ -24,7 +24,7 @@ class ImplicitAnalyzerSpec
         (
             "conversion",
             content.substring(c.start, c.end),
-            c.fun.name
+            c.fun.name,
         )
       case c: ImplicitParamInfo =>
         (
@@ -34,7 +34,7 @@ class ImplicitAnalyzerSpec
             c.params.map { p =>
               p.name
             },
-            c.funIsImplicit
+            c.funIsImplicit,
         )
     }
   }
@@ -50,10 +50,10 @@ class ImplicitAnalyzerSpec
               implicit def StringToTest(v: String): Test = new Test
               val t: Test  = "sample";
             }
-        """
+        """,
       )
       dets should ===(List(
-              ("conversion", "\"sample\"", "StringToTest")
+              ("conversion", "\"sample\"", "StringToTest"),
           ))
     }
   }
@@ -71,11 +71,11 @@ class ImplicitAnalyzerSpec
               implicit def StringToTest(v: String)(implicit th: Thing): Test = new Test
               val t: Test = "sample"
             }
-        """
+        """,
       )
       dets should ===(List(
               ("param", "\"sample\"", "StringToTest", List("myThing"), true),
-              ("conversion", "\"sample\"", "StringToTest")
+              ("conversion", "\"sample\"", "StringToTest"),
           ))
     }
   }
@@ -96,7 +96,7 @@ class ImplicitAnalyzerSpec
               val t = zz(1)("abc")    // Two explicit applications
               val z = yy              // Zero explicit application
             }
-        """
+        """,
       )
       dets should ===(
           List(
@@ -105,7 +105,7 @@ class ImplicitAnalyzerSpec
                "zz",
                List("myThing", "myThong"),
                false),
-              ("param", "yy", "yy", List("myThing"), false)
+              ("param", "yy", "yy", List("myThing"), false),
           ))
     }
   }

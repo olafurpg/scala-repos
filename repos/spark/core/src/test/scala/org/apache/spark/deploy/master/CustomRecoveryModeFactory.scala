@@ -30,7 +30,7 @@ import org.apache.spark.serializer.Serializer
 
 class CustomRecoveryModeFactory(
     conf: SparkConf,
-    serializer: Serializer
+    serializer: Serializer,
 )
     extends StandaloneRecoveryModeFactory(conf, serializer) {
 

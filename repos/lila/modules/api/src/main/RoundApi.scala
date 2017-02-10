@@ -135,7 +135,7 @@ private[api] final class RoundApi(
         json +
         ("analysis" -> Json.obj(
                 "white" -> analysisApi.player(chess.Color.White)(analysis),
-                "black" -> analysisApi.player(chess.Color.Black)(analysis)
+                "black" -> analysisApi.player(chess.Color.Black)(analysis),
             ))
     }
 
@@ -154,7 +154,7 @@ private[api] final class RoundApi(
                   SecondsToDoFirstMove.secondsToMoveFor(data.tour)
                 },
                 "ranks" -> data.tour.isStarted.option(Json.obj(
-                        "white" -> data.whiteRank, "black" -> data.blackRank))
+                        "white" -> data.whiteRank, "black" -> data.blackRank)),
             )
             .noNull)
     }
@@ -166,7 +166,7 @@ private[api] final class RoundApi(
               "id" -> simul.id,
               "hostId" -> simul.hostId,
               "name" -> simul.name,
-              "nbPlaying" -> simul.playingPairings.size
+              "nbPlaying" -> simul.playingPairings.size,
           ))
     }
 

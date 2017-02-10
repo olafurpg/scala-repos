@@ -1078,7 +1078,7 @@ trait GrouperSpec[M[+ _]]
                  -2147483648,
                  -2147483648,
                  1,
-                 1496400141)
+                 1496400141),
       )
       "and with joinable datasets" >> testCtrPartialJoinAnd(
           Stream((-1, Some(-1771882715)),
@@ -1102,7 +1102,7 @@ trait GrouperSpec[M[+ _]]
                  -2147483648,
                  -2147483648,
                  766980226,
-                 -1047565460)
+                 -1047565460),
       )
       "and with repeated group keys in joinable datasets" >> testCtrPartialJoinAnd(
           Stream((1, Some(-421523375)),
@@ -1127,7 +1127,7 @@ trait GrouperSpec[M[+ _]]
                  -1676020815,
                  -627348537,
                  2147483647,
-                 -2147483648)
+                 -2147483648),
       )
 
       // TODO: the performance of the following is too awful to run under scalacheck, even with a minimal
@@ -1138,11 +1138,11 @@ trait GrouperSpec[M[+ _]]
                                                           Stream())
       "or with un-joinable datasets" >> testCtrPartialJoinOr(
           Stream((-2, Some(1))),
-          Stream(-1)
+          Stream(-1),
       )
       "or with a join in datasets" >> testCtrPartialJoinOr(
           Stream((2, Some(-1)), (1, Some(-1)), (3, Some(4)), (1, Some(-1))),
-          Stream(-2, 1, 1, 5, 0, 6)
+          Stream(-2, 1, 1, 5, 0, 6),
       )
 
       // runs a bit long
@@ -1304,7 +1304,7 @@ trait GrouperSpec[M[+ _]]
                  (-2147483648, Some(-2014951990)),
                  (2147483647, Some(293027634)),
                  (-1964286008, Some(132426726))),
-          Stream(-1)
+          Stream(-1),
       )
     }
   }

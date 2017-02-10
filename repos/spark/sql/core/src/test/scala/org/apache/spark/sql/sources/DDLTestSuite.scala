@@ -66,7 +66,7 @@ case class SimpleDDLScan(from: Int, to: Int, table: String)(
             StructField("structType",
                         StructType(
                             StructField("f1", StringType) :: StructField(
-                                "f2", IntegerType) :: Nil))
+                                "f2", IntegerType) :: Nil)),
         ))
 
   override def needConversion: Boolean = false
@@ -115,7 +115,7 @@ class DDLTestSuite extends DataSourceTest with SharedSQLContext {
               Row("floatType", "float", ""),
               Row("mapType", "map<string,string>", ""),
               Row("arrayType", "array<string>", ""),
-              Row("structType", "struct<f1:string,f2:int>", "")
+              Row("structType", "struct<f1:string,f2:int>", ""),
           ))
 
   test(

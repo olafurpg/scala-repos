@@ -62,8 +62,8 @@ object MemcacheStress extends App {
                   new NamedPoolThreadFactory("memcacheboss")),
               Executors.newCachedThreadPool(
                   new NamedPoolThreadFactory("memcacheIO")),
-              config.nworkers()
-          )
+              config.nworkers(),
+          ),
       )
 
     if (config.stats()) builder = builder.reportTo(new OstrichStatsReceiver)

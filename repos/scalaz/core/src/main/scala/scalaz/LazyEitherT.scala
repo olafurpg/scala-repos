@@ -38,7 +38,7 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
     LazyEitherT(
         m.bind(g)(_.fold(
                 _ => x.run,
-                _ => g
+                _ => g,
             )))
   }
 
@@ -182,7 +182,7 @@ object LazyEitherT extends LazyEitherTInstances {
           m.bind(g)((z: LazyEither[A, B]) =>
                 z.fold(
                     _ => g,
-                    _ => x.run
+                    _ => x.run,
               )))
     }
 
@@ -391,10 +391,10 @@ private trait LazyEitherTPlus[F[_], E] extends Plus[LazyEitherT[F, E, ?]] {
             F.map(b.run) { rr =>
               rr.fold(
                   ll => LazyEither.lazyLeft(E.append(l, ll)),
-                  _ => rr
+                  _ => rr,
               )
           },
-          _ => F.point(r)
+          _ => F.point(r),
       )
     })
 }
@@ -465,7 +465,7 @@ private trait LazyEitherTBindRec[F[_], E]
               F.map(f(a).run) {
             _.fold(e => \/.right(LazyEither.lazyLeft(e)),
                    _.map(b => LazyEither.lazyRight(b)))
-        })(a)
+        })(a),
     )
 }
 

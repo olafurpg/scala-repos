@@ -746,7 +746,7 @@ final class TrieMap[K, V] private (
       AtomicReferenceFieldUpdater.newUpdater(
           classOf[TrieMap[K, V]], classOf[AnyRef], "root"),
       hashf,
-      ef
+      ef,
   )
 
   def this() = this(Hashing.default, Equiv.universal)

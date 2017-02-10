@@ -51,7 +51,7 @@ object CanFirwin {
           multiplier,
           "FIRKernel1D(firwin): " + taps + " taps, " + omegas + ", " +
           optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
-          ", scale=" + scale
+          ", scale=" + scale,
       )
     }
   }
@@ -77,7 +77,7 @@ object CanFirwin {
           multiplier,
           "FIRKernel1D(firwin): " + taps + " taps, " + omegas + ", " +
           optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
-          ", scale=" + scale
+          ", scale=" + scale,
       )
     }
   }

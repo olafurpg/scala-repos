@@ -184,7 +184,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
             Option_java_sql_Time,
             Option_java_sql_Timestamp,
             Option_java_sql_Blob //,Option_java_sql_Clob
-        )
+        ),
     )
     def pk = primaryKey("PK", (Int, Long))
   }
@@ -246,7 +246,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                 case RelationalProfile.ColumnOption.Length(length, varying) =>
                   (length, varying)
               }
-              .head
+              .head,
           )
         //assertEquals( categories.indices.toString, 1, categories.indices.size ) // Removed until made sure all dbs actually produce indices model
         //assertEquals( "IDX_NAME", categories.indices.head.name.get.toUpperCase )
@@ -292,14 +292,14 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                 "BPCHAR" // bpchar: postgres
                 //"char" // jtds
             ) contains tpe("title").toUpperCase,
-            tpe("title")
+            tpe("title"),
         )
         assert(
             Seq(
                 "VARCHAR",
                 "VARCHAR2" // oracle
             ) contains tpe("some_string").toUpperCase,
-            tpe("title")
+            tpe("title"),
         )
         assertEquals(
             (99, false),
@@ -311,7 +311,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                 case RelationalProfile.ColumnOption.Length(length, varying) =>
                   (length, varying)
               }
-              .head
+              .head,
           )
         assertEquals(
             (111, true),
@@ -323,7 +323,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                 case RelationalProfile.ColumnOption.Length(length, varying) =>
                   (length, varying)
               }
-              .head
+              .head,
           )
         posts.columns.foreach {
           _.options.foreach {
@@ -355,7 +355,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
           ifNotCapU(jcap.booleanMetaData) {
             assertEquals(false, column("some_bool_default_true").nullable)
             assert(Seq(Some(1), Some('1')).contains(
-                       columnDefault("some_bool_default_true")
+                       columnDefault("some_bool_default_true"),
                    ),
                    columnDefault("some_bool_default_true").toString)
           }
@@ -364,7 +364,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
           }
           ifNotCapU(jcap.booleanMetaData) {
             assert(Seq(Some(0), Some('0')).contains(
-                       columnDefault("some_bool_default_false")
+                       columnDefault("some_bool_default_false"),
                    ),
                    columnDefault("some_bool_default_false").toString)
           }
@@ -380,7 +380,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
           }
           ifNotCapU(jcap.booleanMetaData) {
             assert(Seq(Some(Some(1)), Some(Some('1'))).contains(
-                       columnDefault("some_bool_option_default_some")
+                       columnDefault("some_bool_option_default_some"),
                    ),
                    columnDefault("some_bool_option_default_some").toString)
           }
@@ -512,7 +512,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
 
         DBIO.seq(
             noDefaultTest.map(_.int) += 1,
-            noDefaultTest.map(_.stringOption).result.head.map(_ shouldBe None)
+            noDefaultTest.map(_.stringOption).result.head.map(_ shouldBe None),
         )
       }
     } yield ()

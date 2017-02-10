@@ -23,12 +23,12 @@ class DockerAppIntegrationTest
           container = Some(
                 Container(
                     docker = Some(mesosphere.marathon.state.Container.Docker(
-                              image = "busybox"
-                          )))
+                              image = "busybox",
+                          ))),
             ),
           cpus = 0.2,
           mem = 16.0,
-          instances = 1
+          instances = 1,
       )
 
       When("The app is deployed")

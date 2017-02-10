@@ -115,7 +115,7 @@ class ControllerChannelManager(controllerContext: ControllerContext,
           ChannelBuilders.create(config.interBrokerSecurityProtocol,
                                  Mode.CLIENT,
                                  LoginType.SERVER,
-                                 config.values)
+                                 config.values),
       )
       new NetworkClient(
           selector,
@@ -126,7 +126,7 @@ class ControllerChannelManager(controllerContext: ControllerContext,
           Selectable.USE_DEFAULT_BUFFER_SIZE,
           Selectable.USE_DEFAULT_BUFFER_SIZE,
           config.requestTimeoutMs,
-          time
+          time,
       )
     }
     val threadName = threadNamePrefix match {

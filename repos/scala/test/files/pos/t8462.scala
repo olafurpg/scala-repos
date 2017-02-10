@@ -5,6 +5,6 @@ trait ConstantOps {
       64 >>> 2L: Int, // was: error: type mismatch; found   : Long(4L)
       'a' << 2L: Int,
       'a' >> 2L: Int,
-      'a' >>> 2L: Int
+      'a' >>> 2L: Int,
   )
 }

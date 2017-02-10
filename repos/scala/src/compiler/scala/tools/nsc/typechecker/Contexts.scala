@@ -57,7 +57,7 @@ trait Contexts { self: Analyzer =>
   private lazy val startContext = NoContext.make(
       Template(List(), noSelfType, List()) setSymbol global.NoSymbol setType global.NoType,
       rootMirror.RootClass,
-      rootMirror.RootClass.info.decls
+      rootMirror.RootClass.info.decls,
   )
 
   private lazy val allUsedSelectors =
@@ -834,7 +834,7 @@ trait Contexts { self: Analyzer =>
           if (isUnique && isPresent)
             devWarningResult(
                 s"Preserving inference: ${sym.nameString}=$hi in $current (based on $current_s) before restoring $sym to saved $saved_s")(
-                current.instantiateTypeParams(List(sym), List(hi))
+                current.instantiateTypeParams(List(sym), List(hi)),
             )
           else if (isPresent)
             devWarningResult(
@@ -1027,7 +1027,7 @@ trait Contexts { self: Analyzer =>
         List(
             s"types:  $t1 =:= $t2  ${t1 =:= t2}  members: ${mt1 =:= mt2}",
             s"member type 1: $mt1",
-            s"member type 2: $mt2"
+            s"member type 2: $mt2",
         ).mkString("\n  ")
 
       if (!ambiguous || !imp2Symbol.exists) Some(imp1)
@@ -1670,7 +1670,7 @@ object ContextMode {
       StarPatterns -> "StarPatterns",
       SuperInit -> "SuperInit",
       SecondTry -> "SecondTry",
-      TypeConstructorAllowed -> "TypeConstructorAllowed"
+      TypeConstructorAllowed -> "TypeConstructorAllowed",
   )
 }
 

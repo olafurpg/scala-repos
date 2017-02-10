@@ -16,7 +16,7 @@ class CommandEncodingTest extends FunSuite {
       name: String,
       timeout: Option[Duration] = None,
       mkCommand: (Buf, Option[Duration]) => GetCommand,
-      extractCommand: GetCommand => Option[(Buf, Option[Duration])]
+      extractCommand: GetCommand => Option[(Buf, Option[Duration])],
   ) {
     val decoder = new DecodingToCommand
     val encoder = new CommandToEncoding
@@ -36,7 +36,7 @@ class CommandEncodingTest extends FunSuite {
   private def testCommandEncodeDecode(
       name: String,
       mkCommand: Buf => Command,
-      extractCommand: Command => Option[Buf]
+      extractCommand: Command => Option[Buf],
   ) {
     val decoder = new DecodingToCommand
     val encoder = new CommandToEncoding
@@ -62,7 +62,7 @@ class CommandEncodingTest extends FunSuite {
       .encode(
           null,
           null,
-          Set(Buf.Utf8(qName), time, Buf.Utf8(data))
+          Set(Buf.Utf8(qName), time, Buf.Utf8(data)),
       )
       .asInstanceOf[TokensWithData]
 
@@ -81,7 +81,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case d: Delete => Delete.unapply(d)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -92,7 +92,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case f: Flush => Flush.unapply(f)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -103,7 +103,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Get => Get.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -115,7 +115,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Get => Get.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -126,7 +126,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Peek => Peek.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -138,7 +138,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Peek => Peek.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -149,7 +149,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Get => Get.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -161,7 +161,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Abort => Abort.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -172,7 +172,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Close => Close.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -184,7 +184,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Close => Close.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -196,7 +196,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Open => Open.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -207,7 +207,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: Open => Open.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -218,7 +218,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: CloseAndOpen => CloseAndOpen.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 
@@ -230,7 +230,7 @@ class CommandEncodingTest extends FunSuite {
         extractCommand = {
           case c: CloseAndOpen => CloseAndOpen.unapply(c)
           case x => throw new MatchError(x)
-        }
+        },
     )
   }
 }

@@ -110,7 +110,7 @@ case class Group(id: PathId,
           group.id != appDef.id || group.containsApps
         },
         // replace potentially existing app definition
-        apps = apps.filter(_.id != appDef.id) + appDef
+        apps = apps.filter(_.id != appDef.id) + appDef,
     )
   }
 
@@ -228,7 +228,7 @@ object Group {
         apps = msg.getAppsList.map(AppDefinition.fromProto).toSet,
         groups = msg.getGroupsList.map(fromProto).toSet,
         dependencies = msg.getDependenciesList.map(PathId.apply).toSet,
-        version = Timestamp(msg.getVersion)
+        version = Timestamp(msg.getVersion),
     )
   }
 

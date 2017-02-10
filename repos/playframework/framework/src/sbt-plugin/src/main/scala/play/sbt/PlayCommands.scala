@@ -68,8 +68,8 @@ object PlayCommands {
 
     compileTask.all(
         ScopeFilter(
-            inDependencies(thisProjectRef.value)
-        )
+            inDependencies(thisProjectRef.value),
+        ),
     )
   }
 
@@ -92,7 +92,7 @@ object PlayCommands {
 
     def filter = ScopeFilter(
         inDependencies(projectRef),
-        inConfigurations(Compile, Assets)
+        inConfigurations(Compile, Assets),
     )
 
     Def.task {

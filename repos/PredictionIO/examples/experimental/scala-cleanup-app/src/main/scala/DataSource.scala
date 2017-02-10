@@ -20,7 +20,7 @@ import scala.concurrent.{Await, Future}
 
 case class DataSourceParams(
     appId: Int,
-    cutoffTime: DateTime
+    cutoffTime: DateTime,
 )
     extends Params
 
@@ -37,7 +37,7 @@ class DataSource(val dsp: DataSourceParams)
 
     val countBefore = eventsDb
       .find(
-          appId = dsp.appId
+          appId = dsp.appId,
       )(sc)
       .count
     logger.info(s"Event count before cleanup: $countBefore")
@@ -45,7 +45,7 @@ class DataSource(val dsp: DataSourceParams)
     val countRemove = eventsDb
       .find(
           appId = dsp.appId,
-          untilTime = Some(dsp.cutoffTime)
+          untilTime = Some(dsp.cutoffTime),
       )(sc)
       .count
     logger.info(s"Number of events to remove: $countRemove")
@@ -54,7 +54,7 @@ class DataSource(val dsp: DataSourceParams)
     val eventsToRemove: Array[String] = eventsDb
       .find(
           appId = dsp.appId,
-          untilTime = Some(dsp.cutoffTime)
+          untilTime = Some(dsp.cutoffTime),
       )(sc)
       .map {
         case e =>
@@ -76,7 +76,7 @@ class DataSource(val dsp: DataSourceParams)
 
     val countAfter = eventsDb
       .find(
-          appId = dsp.appId
+          appId = dsp.appId,
       )(sc)
       .count
     logger.info(s"Event count after cleanup: $countAfter")

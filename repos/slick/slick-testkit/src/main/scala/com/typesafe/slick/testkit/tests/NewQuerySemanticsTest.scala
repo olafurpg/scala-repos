@@ -73,8 +73,8 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
             ("French_Roast", 49, 799, 2, 0),
             ("Espresso", 150, 999, 3, 0),
             ("Colombian_Decaf", 101, 849, 4, 0),
-            ("French_Roast_Decaf", 49, 999, 5, 0)
-        )
+            ("French_Roast_Decaf", 49, 999, 5, 0),
+        ),
     ).named("setup")
 
     val qa = for {
@@ -114,7 +114,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
             rc.size shouldBe 2
             // No sorting, so result contents can vary
             rc shouldAllMatch { case (i: String, 42) => () }
-          }
+          },
       )
 
     // Plain table
@@ -148,7 +148,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 ("French_Roast", 49, 799, 2, 0),
                 ("Espresso", 150, 999, 3, 0),
                 ("Colombian_Decaf", 101, 849, 4, 0),
-                ("French_Roast_Decaf", 49, 999, 5, 0)
+                ("French_Roast_Decaf", 49, 999, 5, 0),
             )
           },
         mark("q1", q1.result)
@@ -179,7 +179,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 (("Colombian_Decaf", "Meadows:"),
                  ("Colombian_Decaf", 101, 849, 4, 0),
                  (150, "The High Ground", "100 Coffee Lane"),
-                 3396)
+                 3396),
             )
           },
         ifCap(rcap.pagingNested) {
@@ -189,10 +189,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
               r1b.toSet shouldBe Set(
                   ("French_Roast", "Mendocino", "Colombian"),
                   ("French_Roast", "Mendocino", "French_Roast"),
-                  ("French_Roast", "Mendocino", "Colombian_Decaf")
+                  ("French_Roast", "Mendocino", "Colombian_Decaf"),
               )
             }
-        }
+        },
     )
 
     // More elaborate query
@@ -246,7 +246,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
           r2 shouldBe Set(
               ("Colombian", "Acme, Inc."),
               ("French_Roast", "Superior Coffee"),
-              ("Colombian_Decaf", "Acme, Inc.")
+              ("Colombian_Decaf", "Acme, Inc."),
           )
         }
         _ <- q3.result.named("Lifting scalar values").map(_.toSet).map { r3 =>
@@ -270,7 +270,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                  "Colombian_Decaf",
                  0,
                  3396,
-                 42)
+                 42),
             )
           }
         _ <- ifCap(rcap.pagingNested) {
@@ -283,7 +283,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 (("Colombian", 799, 42), ("Colombian", 799, 42)),
                 (("Colombian", 799, 42), ("French_Roast", 799, 42)),
                 (("French_Roast", 799, 42), ("Colombian", 799, 42)),
-                (("French_Roast", 799, 42), ("French_Roast", 799, 42))
+                (("French_Roast", 799, 42), ("French_Roast", 799, 42)),
             ))
       } yield ()
 
@@ -314,7 +314,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 (("French_Roast", 49, 799, 2, 0),
                  ("Colombian", 101, 799, 1, 0)),
                 (("French_Roast", 49, 799, 2, 0),
-                 ("French_Roast", 49, 799, 2, 0))
+                 ("French_Roast", 49, 799, 2, 0)),
             )
           },
         mark("q5b", q5b.result)
@@ -324,7 +324,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
             r5b shouldBe Set(
                 (("Colombian", 101, 799, 1, 0), ("Colombian", 101, 799, 1, 0)),
                 (("French_Roast", 49, 799, 2, 0),
-                 ("French_Roast", 49, 799, 2, 0))
+                 ("French_Roast", 49, 799, 2, 0)),
             )
           },
         mark("q6", q6.result)
@@ -334,9 +334,9 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
             r6 shouldBe Set(
                 (101, "Acme, Inc.", "99 Market Street"),
                 (49, "Superior Coffee", "1 Party Place"),
-                (150, "The High Ground", "100 Coffee Lane")
+                (150, "The High Ground", "100 Coffee Lane"),
             )
-          }
+          },
       )
 
     // Simple union
@@ -365,7 +365,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 ("Colombian", 101, 0),
                 ("French_Roast", 49, 0),
                 ("Espresso", 150, 0),
-                ("French_Roast_Decaf", 49, 0)
+                ("French_Roast_Decaf", 49, 0),
             )
           },
         q7.result
@@ -376,7 +376,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 ("Colombian", 101, 1),
                 ("French_Roast", 49, 1),
                 ("Espresso", 150, 2),
-                ("French_Roast_Decaf", 49, 2)
+                ("French_Roast_Decaf", 49, 2),
             )
           },
         q71.result
@@ -385,9 +385,9 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
           .map { r71 =>
             r71 shouldBe Set(
                 ("Colombian", 101, 1),
-                ("French_Roast", 49, 1)
+                ("French_Roast", 49, 1),
             )
-          }
+          },
       )
 
     // Union with filter on the outside
@@ -416,7 +416,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
             r7b shouldBe Set(
                 ("French_Roast", 49, 1),
                 ("Espresso", 150, 2),
-                ("French_Roast_Decaf", 49, 2)
+                ("French_Roast_Decaf", 49, 2),
             )
           },
         q8.result
@@ -426,7 +426,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
             r8 shouldBe Set(
                 ("Colombian", Some("Colombian")),
                 ("French_Roast", Some("French_Roast")),
-                ("Colombian_Decaf", None)
+                ("Colombian_Decaf", None),
             )
           },
         q8b.result
@@ -439,9 +439,9 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                  Some(("Colombian", 101, 799, 1, 0))),
                 ((("Colombian", 101, 799, 1, 0),
                   Some(("Colombian", 101, 799, 1, 0))),
-                 Some(("Colombian_Decaf", 101, 849, 4, 0)))
+                 Some(("Colombian_Decaf", 101, 849, 4, 0))),
             )
-          }
+          },
       )
 
     seq(setup, a1, a2, a3, a4, a5, a6)
@@ -499,7 +499,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         q6a.result,
         q6b.result,
         q6c.result,
-        (users.schema ++ orders.schema).drop
+        (users.schema ++ orders.schema).drop,
     )
   }
 
@@ -572,7 +572,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       _ <- as.map(a => (a.id, a.a, a.b)) ++= Seq(
           (1, "a1", "b1"),
           (2, "a2", "b2"),
-          (3, "a3", "b3")
+          (3, "a3", "b3"),
       )
 
       q1 = as.map(identity).filter(_.b === "b3")

@@ -57,8 +57,8 @@ trait PathReads {
                     a match {
                       case JsNull => JsSuccess(None)
                       case js => reads.reads(js).repath(path).map(Some(_))
-                  }
-            )
+                  },
+            ),
         )
   }
 
@@ -237,7 +237,7 @@ trait PathWrites {
             .flatMap(js =>
                   js.asOpt[JsObject]
                     .map(obj => obj.deepMerge(wrs.writes(obj))))
-            .getOrElse(JsNull)
+            .getOrElse(JsNull),
         )
     }
 

@@ -55,7 +55,7 @@ class ClusterTest extends FunSuite {
             Cluster.Add(WrappedInt(1)),
             Cluster.Add(WrappedInt(2)),
             Cluster.Add(WrappedInt(1)),
-            Cluster.Add(WrappedInt(2))
+            Cluster.Add(WrappedInt(2)),
         ))
 
     cluster1.del(1)

@@ -73,7 +73,7 @@ case class Hook(
           "t" -> clock.estimateTotalTime,
           "s" -> speed.id,
           "c" -> chess.Color(color).map(_.name),
-          "perf" -> perfType.map(_.name)
+          "perf" -> perfType.map(_.name),
       )
       .noNull
 

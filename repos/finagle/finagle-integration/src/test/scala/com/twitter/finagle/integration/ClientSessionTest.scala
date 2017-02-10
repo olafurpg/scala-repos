@@ -23,7 +23,7 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
 
   def testSessionStatus[Req, Rep](
       name: String,
-      sessionFac: (Transport[Req, Rep]) => () => Status
+      sessionFac: (Transport[Req, Rep]) => () => Status,
   ): Unit = {
 
     test(s"$name: session status reflects underlying transport") {

@@ -22,7 +22,7 @@ class DarkTrafficFilter[Req, Rep](darkService: Service[Req, Rep],
   def this(
       darkService: Service[Req, Rep],
       enableSampling: Req => Boolean,
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   ) = this(darkService, enableSampling, statsReceiver, false)
 
   private[this] val scopedStatsReceiver =

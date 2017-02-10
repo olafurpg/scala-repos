@@ -139,7 +139,7 @@ class ExceptionsTest extends FunSuite with MockitoSugar {
     val ex = new NoBrokersAvailableException(
         "/s/cool/story",
         Dtab.base,
-        Dtab.read("/foo=>/$/com.twitter.butt")
+        Dtab.read("/foo=>/$/com.twitter.butt"),
     )
 
     assert(

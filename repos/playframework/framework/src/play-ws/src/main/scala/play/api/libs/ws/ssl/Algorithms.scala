@@ -120,7 +120,7 @@ object Algorithms {
         runHigher = {
           val keyFactory = KeyFactory.getInstance(keyAlgName)
           keyFactory.translateKey(pubk)
-        }
+        },
     )
   }
 

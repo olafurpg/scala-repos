@@ -187,7 +187,7 @@ object Event {
     def data = Json.obj(
         "king" -> Json.arr(king._1.key, king._2.key),
         "rook" -> Json.arr(rook._1.key, rook._2.key),
-        "color" -> color
+        "color" -> color,
     )
   }
 
@@ -199,7 +199,7 @@ object Event {
         .obj(
             "id" -> id,
             "url" -> s"/$id",
-            "cookie" -> cookie
+            "cookie" -> cookie,
         )
         .noNull
     override def only = Some(color)
@@ -210,7 +210,7 @@ object Event {
     def typ = "promotion"
     def data = Json.obj(
         "key" -> pos.key,
-        "pieceClass" -> role.toString.toLowerCase
+        "pieceClass" -> role.toString.toLowerCase,
     )
   }
 
@@ -279,7 +279,7 @@ object Event {
     def typ = "checkCount"
     def data = Json.obj(
         "white" -> white,
-        "black" -> black
+        "black" -> black,
     )
   }
 
@@ -299,7 +299,7 @@ object Event {
             "status" -> status,
             "winner" -> winner,
             "wDraw" -> whiteOffersDraw.option(true),
-            "bDraw" -> blackOffersDraw.option(true)
+            "bDraw" -> blackOffersDraw.option(true),
         )
         .noNull
   }
@@ -310,7 +310,7 @@ object Event {
       Json
         .obj(
             "white" -> white.option(true),
-            "black" -> black.option(true)
+            "black" -> black.option(true),
         )
         .noNull
     override def owner = true

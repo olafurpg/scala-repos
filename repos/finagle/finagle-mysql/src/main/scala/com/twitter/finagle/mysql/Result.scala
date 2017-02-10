@@ -55,7 +55,7 @@ object HandshakeInit extends Decoder[HandshakeInit] {
         Array.concat(salt1, salt2),
         serverCap,
         charset,
-        status
+        status,
     )
   }
 }
@@ -67,7 +67,7 @@ case class HandshakeInit(
     salt: Array[Byte],
     serverCap: Capability,
     charset: Short,
-    status: Short
+    status: Short,
 )
     extends Result
 
@@ -84,7 +84,7 @@ object OK extends Decoder[OK] {
         br.readLengthCodedBinary(),
         br.readUnsignedShort(),
         br.readUnsignedShort(),
-        new String(br.takeRest())
+        new String(br.takeRest()),
     )
   }
 }
@@ -94,7 +94,7 @@ case class OK(
     insertId: Long,
     serverStatus: Int,
     warningCount: Int,
-    message: String
+    message: String,
 )
     extends Result
 
@@ -168,7 +168,7 @@ object Field extends Decoder[Field] {
         length,
         fieldType,
         flags,
-        decimals
+        decimals,
     )
   }
 }
@@ -184,7 +184,7 @@ case class Field(
     displayLength: Int,
     fieldType: Short,
     flags: Short,
-    decimals: Byte
+    decimals: Byte,
 )
     extends Result {
   def id: String = if (name.isEmpty) origName else name
@@ -215,7 +215,7 @@ case class PrepareOK(
     numOfParams: Int,
     warningCount: Int,
     columns: Seq[Field] = Nil,
-    params: Seq[Field] = Nil
+    params: Seq[Field] = Nil,
 )
     extends Result
 
@@ -237,7 +237,7 @@ object ResultSet {
   def apply(isBinaryEncoded: Boolean)(
       header: Packet,
       fieldPackets: Seq[Packet],
-      rowPackets: Seq[Packet]
+      rowPackets: Seq[Packet],
   ): Try[ResultSet] =
     Try(decode(isBinaryEncoded)(header, fieldPackets, rowPackets))
 

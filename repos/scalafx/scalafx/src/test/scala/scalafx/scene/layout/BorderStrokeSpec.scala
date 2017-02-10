@@ -52,6 +52,6 @@ class BorderStrokeSpec
       Color.Blue,
       BorderStrokeStyle.None,
       CornerRadii.Empty,
-      BorderWidths.Default
+      BorderWidths.Default,
   )
 }

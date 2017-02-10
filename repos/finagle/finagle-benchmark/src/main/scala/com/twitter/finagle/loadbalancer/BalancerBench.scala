@@ -41,7 +41,7 @@ class HeapBalancerBench extends StdBenchAnnotations {
       .newBalancer(
           newActivity(numNodes),
           NullStatsReceiver,
-          NoBrokersExc
+          NoBrokersExc,
       )
   }
 
@@ -67,14 +67,14 @@ class P2CBalancerBench extends StdBenchAnnotations {
       .newBalancer(
           newActivity(numNodes),
           NullStatsReceiver,
-          NoBrokersExc
+          NoBrokersExc,
       )
     p2cEwma = Balancers
       .p2cPeakEwma()
       .newBalancer(
           newActivity(numNodes),
           NullStatsReceiver,
-          NoBrokersExc
+          NoBrokersExc,
       )
   }
 
@@ -102,7 +102,7 @@ class ApertureBalancerBench extends StdBenchAnnotations {
       .newBalancer(
           newActivity(numNodes),
           NullStatsReceiver,
-          NoBrokersExc
+          NoBrokersExc,
       )
   }
 

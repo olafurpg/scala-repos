@@ -373,7 +373,7 @@ class KafkaApis(val requestChannel: RequestChannel,
                 if (partitionData.timestamp == OffsetCommitRequest.DEFAULT_TIMESTAMP)
                   defaultExpireTimestamp
                 else offsetRetention + partitionData.timestamp
-              }
+              },
           )
         }
 
@@ -447,7 +447,7 @@ class KafkaApis(val requestChannel: RequestChannel,
             info(
                 s"Closing connection due to error during produce request with correlation id ${request.header.correlationId} " +
                 s"from client id ${request.header.clientId} with ack=0\n" +
-                s"Topic and partition to exceptions: $exceptionsSummary"
+                s"Topic and partition to exceptions: $exceptionsSummary",
             )
             requestChannel.closeConnection(request.processor, request)
           } else {
@@ -903,7 +903,7 @@ class KafkaApis(val requestChannel: RequestChannel,
     val responseHeader = new ResponseHeader(request.header.correlationId)
     val responseBody = new MetadataResponse(
         brokers.map(_.getNode(request.securityProtocol)).asJava,
-        (topicMetadata ++ unauthorizedTopicMetadata).asJava
+        (topicMetadata ++ unauthorizedTopicMetadata).asJava,
     )
     requestChannel.sendResponse(
         new RequestChannel.Response(request,
@@ -1216,7 +1216,7 @@ class KafkaApis(val requestChannel: RequestChannel,
           syncGroupRequest.generationId(),
           syncGroupRequest.memberId(),
           syncGroupRequest.groupAssignment().mapValues(Utils.toArray(_)),
-          sendResponseCallback
+          sendResponseCallback,
       )
     }
   }
@@ -1265,13 +1265,13 @@ class KafkaApis(val requestChannel: RequestChannel,
     val producerQuotaManagerCfg = ClientQuotaManagerConfig(
         quotaBytesPerSecondDefault = cfg.producerQuotaBytesPerSecondDefault,
         numQuotaSamples = cfg.numQuotaSamples,
-        quotaWindowSizeSeconds = cfg.quotaWindowSizeSeconds
+        quotaWindowSizeSeconds = cfg.quotaWindowSizeSeconds,
     )
 
     val consumerQuotaManagerCfg = ClientQuotaManagerConfig(
         quotaBytesPerSecondDefault = cfg.consumerQuotaBytesPerSecondDefault,
         numQuotaSamples = cfg.numQuotaSamples,
-        quotaWindowSizeSeconds = cfg.quotaWindowSizeSeconds
+        quotaWindowSizeSeconds = cfg.quotaWindowSizeSeconds,
     )
 
     val quotaManagers = Map[Short, ClientQuotaManager](
@@ -1284,7 +1284,7 @@ class KafkaApis(val requestChannel: RequestChannel,
             consumerQuotaManagerCfg,
             metrics,
             ApiKeys.FETCH.name,
-            new org.apache.kafka.common.utils.SystemTime)
+            new org.apache.kafka.common.utils.SystemTime),
     )
     quotaManagers
   }

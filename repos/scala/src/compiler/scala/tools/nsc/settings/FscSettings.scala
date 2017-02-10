@@ -47,7 +47,7 @@ class FscSettings(error: String => Unit) extends Settings(error) { outer =>
       server,
       port,
       preferIPv4,
-      idleMins
+      idleMins,
   )
   val isFscSpecific: String => Boolean = fscSpecific map (_.name)
 

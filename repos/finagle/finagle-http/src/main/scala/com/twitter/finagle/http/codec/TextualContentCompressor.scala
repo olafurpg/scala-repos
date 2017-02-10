@@ -16,7 +16,7 @@ private[http] class TextualContentCompressor extends HttpContentCompressor {
 
   private[this] def contentEncoder(
       msg: HttpMessage,
-      acceptEncoding: String
+      acceptEncoding: String,
   ): Option[EncoderEmbedder[ChannelBuffer]] = {
     Option(msg.headers.get(HttpHeaders.Names.CONTENT_TYPE)) collect {
       case ctype if isTextual(ctype) =>

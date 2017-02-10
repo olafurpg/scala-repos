@@ -52,7 +52,7 @@ object LDASuite {
       "learningOffset" -> 1023.0,
       "learningDecay" -> 0.52,
       "subsamplingRate" -> 0.051,
-      "docConcentration" -> Array(2.0)
+      "docConcentration" -> Array(2.0),
   )
 }
 

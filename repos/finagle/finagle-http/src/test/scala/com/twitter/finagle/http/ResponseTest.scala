@@ -11,7 +11,7 @@ class ResponseTest extends FunSuite {
     List(
         Response(),
         Response(Version.Http11, Status.Ok),
-        Response()
+        Response(),
     ).foreach { response =>
       assert(response.version == Version.Http11)
       assert(response.status == Status.Ok)

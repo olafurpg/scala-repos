@@ -132,7 +132,7 @@ class InputFormatInfo(val configuration: Configuration,
       .getSplits(jobConf, jobConf.getNumMapTasks())
       .foreach(
           elem =>
-            retval ++= SplitInfo.toSplitInfo(inputFormatClazz, path, elem)
+            retval ++= SplitInfo.toSplitInfo(inputFormatClazz, path, elem),
       )
 
     retval.toSet

@@ -124,7 +124,7 @@ final class Failure private[finagle](
       flags: Long = flags,
       sources: Map[Failure.Source.Value, Object] = sources,
       stacktrace: Array[StackTraceElement] = stacktrace,
-      logLevel: Level = logLevel
+      logLevel: Level = logLevel,
   ): Failure = new Failure(why, cause, flags, sources, stacktrace, logLevel)
 }
 

@@ -68,7 +68,7 @@ object WebSocket {
       new MessageFlowTransformer[In, NewOut] {
         def transform(flow: Flow[In, NewOut, _]) = {
           self.transform(
-              flow map f
+              flow map f,
           )
         }
       }
@@ -81,7 +81,7 @@ object WebSocket {
       new MessageFlowTransformer[NewIn, Out] {
         def transform(flow: Flow[NewIn, Out, _]) = {
           self.transform(
-              Flow[In] map f via flow
+              Flow[In] map f via flow,
           )
         }
       }
@@ -96,7 +96,7 @@ object WebSocket {
       new MessageFlowTransformer[NewIn, NewOut] {
         def transform(flow: Flow[NewIn, NewOut, _]) = {
           self.transform(
-              Flow[In] map f via flow map g
+              Flow[In] map f via flow map g,
           )
         }
       }

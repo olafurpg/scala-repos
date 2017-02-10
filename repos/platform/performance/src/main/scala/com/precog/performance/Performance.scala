@@ -168,7 +168,7 @@ Measurement overhead:        %10.02f%%
             1 / ts(p90),
             1 / ts(p95),
             1 / ts(p99),
-            baseline * 100.0 / mean
+            baseline * 100.0 / mean,
         ))
   }
   def ptile(p: Double): Int = {
@@ -187,5 +187,5 @@ case class BenchmarkParameters(
     runMillisGoal: Long,
     restBetweenTests: Option[Long] = None,
     gcBetweenTests: Boolean = false,
-    calcOverhead: Boolean = true
+    calcOverhead: Boolean = true,
 )

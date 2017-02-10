@@ -34,7 +34,7 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
           "context[prop2]" -> "value1", // optional
           "anotherProperty1" -> "100",
           "anotherProperty2" -> "optional1", // optional
-          "timestamp" -> "2015-01-02T00:30:12.984Z"
+          "timestamp" -> "2015-01-02T00:30:12.984Z",
       )
 
       // expected converted Event JSON
@@ -66,7 +66,7 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
           "userId" -> "as34smg4",
           "event" -> "do_something",
           "anotherProperty1" -> "100",
-          "timestamp" -> "2015-01-02T00:30:12.984Z"
+          "timestamp" -> "2015-01-02T00:30:12.984Z",
       )
 
       // expected converted Event JSON
@@ -97,7 +97,7 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
           "context[prop2]" -> "value1",
           "anotherPropertyA" -> "4.567", // optional
           "anotherPropertyB" -> "false", // optional
-          "timestamp" -> "2015-01-15T04:20:23.567Z"
+          "timestamp" -> "2015-01-15T04:20:23.567Z",
       )
 
       // expected converted Event JSON
@@ -134,7 +134,7 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
           "context[ip]" -> "1.23.4.56",
           "context[prop1]" -> "2.345",
           "context[prop2]" -> "value1",
-          "timestamp" -> "2015-01-15T04:20:23.567Z"
+          "timestamp" -> "2015-01-15T04:20:23.567Z",
       )
 
       // expected converted Event JSON

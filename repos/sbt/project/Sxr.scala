@@ -12,7 +12,7 @@ object Sxr {
 
   def baseSettings = Seq(
       libraryDependencies +=
-        "org.scala-sbt.sxr" % "sxr_2.10" % "0.3.0" % sxrConf.name
+        "org.scala-sbt.sxr" % "sxr_2.10" % "0.3.0" % sxrConf.name,
   )
   def inSxrSettings = Seq(
       managedClasspath :=
@@ -23,7 +23,7 @@ object Sxr {
       managedClasspath.value.files.filter(_.getName.contains("sxr")).absString,
       scalacOptions += "-Ystop-after:sxr",
       target := target.in(taskGlobal).value / "browse",
-      sxr in taskGlobal <<= sxrTask
+      sxr in taskGlobal <<= sxrTask,
   )
   def taskGlobal = ThisScope.copy(task = Global)
   def sxrTask =

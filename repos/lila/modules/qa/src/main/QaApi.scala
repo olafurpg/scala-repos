@@ -65,7 +65,7 @@ final class QaApi(questionColl: Coll,
 
     def accept(q: Question) = questionColl.update(
         BSONDocument("_id" -> q.id),
-        BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now))
+        BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now)),
     )
 
     def count: Fu[Int] = questionColl.count(None)
@@ -81,7 +81,7 @@ final class QaApi(questionColl: Coll,
                       collection = questionColl,
                       selector = selector,
                       projection = BSONDocument(),
-                      sort = sort
+                      sort = sort,
                   ),
                 currentPage = page,
                 maxPerPage = perPage)
@@ -123,7 +123,7 @@ final class QaApi(questionColl: Coll,
           val newVote = q.vote.add(user.id, v)
           questionColl.update(
               BSONDocument("_id" -> q.id),
-              BSONDocument("$set" -> BSONDocument("vote" -> newVote))
+              BSONDocument("$set" -> BSONDocument("vote" -> newVote)),
           ) inject newVote.some
         }
       }
@@ -143,8 +143,8 @@ final class QaApi(questionColl: Coll,
                 BSONDocument(
                     "$set" -> BSONDocument(
                         "answers" -> BSONInteger(nb),
-                        "updatedAt" -> DateTime.now
-                    )
+                        "updatedAt" -> DateTime.now,
+                    ),
                 ))
         .void
 
@@ -155,7 +155,7 @@ final class QaApi(questionColl: Coll,
     def removeComment(id: QuestionId, c: CommentId) = questionColl.update(
         BSONDocument("_id" -> id),
         BSONDocument(
-            "$pull" -> BSONDocument("comments" -> BSONDocument("id" -> c)))
+            "$pull" -> BSONDocument("comments" -> BSONDocument("id" -> c))),
     )
   }
 
@@ -196,10 +196,10 @@ final class QaApi(questionColl: Coll,
       (question accept q) >> answerColl.update(
           BSONDocument("questionId" -> q.id),
           BSONDocument("$unset" -> BSONDocument("acceptedAt" -> true)),
-          multi = true
+          multi = true,
       ) >> answerColl.update(
           BSONDocument("_id" -> a.id),
-          BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now))
+          BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now)),
       )
 
     def popular(questionId: QuestionId): Fu[List[Answer]] =
@@ -226,7 +226,7 @@ final class QaApi(questionColl: Coll,
           val newVote = a.vote.add(user.id, v)
           answerColl.update(
               BSONDocument("_id" -> a.id),
-              BSONDocument("$set" -> BSONDocument("vote" -> newVote))
+              BSONDocument("$set" -> BSONDocument("vote" -> newVote)),
           ) inject newVote.some
         }
       }

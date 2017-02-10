@@ -4,7 +4,7 @@ import scala.reflect.ClassTag
 class Foo {
   case class R(
       sales: Int,
-      name: String
+      name: String,
   )
 
   def foo = {

@@ -41,7 +41,7 @@ trait NaiveBayesFixture {
           LabeledPoint(OtherFruit, Array(Long, Sweet, NotYellow)),
           LabeledPoint(OtherFruit, Array(NotLong, Sweet, NotYellow)),
           LabeledPoint(OtherFruit, Array(Long, Sweet, Yellow)),
-          LabeledPoint(OtherFruit, Array(NotLong, NotSweet, NotYellow))
+          LabeledPoint(OtherFruit, Array(NotLong, NotSweet, NotYellow)),
       )
     }
   }

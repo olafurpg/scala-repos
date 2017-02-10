@@ -122,7 +122,7 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       paths: Set[Path],
       conf: Configuration,
       creds: Credentials,
-      renewer: Option[String] = None
+      renewer: Option[String] = None,
   ): Unit = {
     if (UserGroupInformation.isSecurityEnabled()) {
       val delegTokenRenewer = renewer.getOrElse(getTokenRenewer(conf))
@@ -488,7 +488,7 @@ object YarnSparkHadoopUtil {
       securityMgr: SecurityManager): Map[ApplicationAccessType, String] = {
     Map[ApplicationAccessType, String](
         ApplicationAccessType.VIEW_APP -> securityMgr.getViewAcls,
-        ApplicationAccessType.MODIFY_APP -> securityMgr.getModifyAcls
+        ApplicationAccessType.MODIFY_APP -> securityMgr.getModifyAcls,
     )
   }
 

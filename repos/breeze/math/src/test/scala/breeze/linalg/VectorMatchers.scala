@@ -23,7 +23,7 @@ trait VectorMatchers {
           "The " + failureMessageSuffix,
           "The " + negatedFailureMessageSuffix,
           "the " + failureMessageSuffix,
-          "the " + negatedFailureMessageSuffix
+          "the " + negatedFailureMessageSuffix,
       )
     }
   }

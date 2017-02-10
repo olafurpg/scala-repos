@@ -114,7 +114,7 @@ class HoconLexer extends LexerBase {
       UnquotedCharsMatcher,
       MultilineStringMatcher,
       QuotedStringMatcher,
-      new RegexTokenMatcher(".".r, BadCharacter, always, identity)
+      new RegexTokenMatcher(".".r, BadCharacter, always, identity),
   )
 
   def isHoconWhitespace(char: Char) =

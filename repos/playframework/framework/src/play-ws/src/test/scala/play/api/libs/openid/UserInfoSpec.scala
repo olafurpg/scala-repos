@@ -85,6 +85,6 @@ object UserInfoSpec extends Specification {
   private def createDefaultResponseWithAttributeExchange =
     Map[String, Seq[String]](
         "openid.ns.ext1" -> "http://openid.net/srv/ax/1.0",
-        "openid.ext1.mode" -> "fetch_response"
+        "openid.ext1.mode" -> "fetch_response",
     ) ++ createDefaultResponse(claimedId, identity, defaultSigned)
 }

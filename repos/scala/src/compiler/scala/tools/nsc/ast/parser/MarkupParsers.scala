@@ -399,7 +399,7 @@ trait MarkupParsers { self: Parsers =>
               ts(0)
             }
         },
-        msg => parser.incompleteInputError(msg)
+        msg => parser.incompleteInputError(msg),
     )
 
     /** @see xmlPattern. resynchronizes after successful parse
@@ -416,7 +416,7 @@ trait MarkupParsers { self: Parsers =>
               tree
             }
         },
-        msg => parser.syntaxError(curOffset, msg)
+        msg => parser.syntaxError(curOffset, msg),
     )
 
     def escapeToScala[A](op: => A, kind: String) = {

@@ -103,7 +103,7 @@ class ShuffleBlockFetcherIteratorSuite
         (remoteBmId,
          remoteBlocks.keys
            .map(blockId => (blockId, 1.asInstanceOf[Long]))
-           .toSeq)
+           .toSeq),
       )
 
     val iterator = new ShuffleBlockFetcherIterator(TaskContext.empty(),
@@ -221,7 +221,7 @@ class ShuffleBlockFetcherIteratorSuite
     val blocks = Map[BlockId, ManagedBuffer](
         ShuffleBlockId(0, 0, 0) -> mock(classOf[ManagedBuffer]),
         ShuffleBlockId(0, 1, 0) -> mock(classOf[ManagedBuffer]),
-        ShuffleBlockId(0, 2, 0) -> mock(classOf[ManagedBuffer])
+        ShuffleBlockId(0, 2, 0) -> mock(classOf[ManagedBuffer]),
     )
 
     // Semaphore to coordinate event sequence in two different threads.

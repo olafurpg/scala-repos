@@ -62,7 +62,7 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                       move,
                       blur,
                       lag.millis,
-                      promise.some
+                      promise.some,
                   ))
               member push ackEvent
           }
@@ -80,7 +80,7 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                       drop,
                       blur,
                       lag.millis,
-                      promise.some
+                      promise.some,
                   ))
           }
         case ("rematch-yes", _) => send(RematchYes(playerId))

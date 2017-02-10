@@ -25,7 +25,7 @@ case class DIMSUMAlgorithmParams(threshold: Double) extends Params
 class DIMSUMModel(
     val similarities: RDD[(Int, SparseVector)],
     val itemStringIntMap: BiMap[String, Int],
-    val items: Map[Int, Item]
+    val items: Map[Int, Item],
 )
     extends IPersistentModel[DIMSUMAlgorithmParams] {
 
@@ -136,7 +136,7 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
     new DIMSUMModel(
         similarities = similarities,
         itemStringIntMap = itemStringIntMap,
-        items = items
+        items = items,
     )
   }
 
@@ -195,7 +195,7 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
       case (i, s) =>
         new ItemScore(
             item = model.itemIntStringMap(i),
-            score = s
+            score = s,
         )
     }.toArray
 

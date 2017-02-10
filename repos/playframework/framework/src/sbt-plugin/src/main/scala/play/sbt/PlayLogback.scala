@@ -18,6 +18,6 @@ object PlayLogback extends AutoPlugin {
   override def projectSettings = Seq(
       libraryDependencies ++= {
         Seq("com.typesafe.play" %% "play-logback" % play.core.PlayVersion.current)
-      }
+      },
   )
 }

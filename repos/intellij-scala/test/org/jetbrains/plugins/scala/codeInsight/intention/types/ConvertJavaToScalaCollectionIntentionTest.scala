@@ -21,7 +21,7 @@ class ConvertJavaToScalaCollectionIntentionTest
         |  val list: java.lang.Iterable = new java.util.ArrayList[String]()
         |  val scalaList = lis<caret>t
         |}
-      """
+      """,
     )
   }
 
@@ -32,7 +32,7 @@ class ConvertJavaToScalaCollectionIntentionTest
         |  val list: java.util.Collection[String] = new java.util.ArrayList[String]()
         |  val scalaList = lis<caret>t
         |}
-      """
+      """,
     )
   }
 
@@ -42,7 +42,7 @@ class ConvertJavaToScalaCollectionIntentionTest
         |class UsesJavaCollections {
         |  val iter = new java.util.ArrayList[String]().itera<caret>tor
         |}
-      """
+      """,
     )
   }
 

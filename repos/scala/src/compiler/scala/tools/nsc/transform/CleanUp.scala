@@ -158,9 +158,9 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
                       (REF(currentRun.runDefinitions.ensureAccessibleMethod) APPLY
                           (methodSymRHS)),
                       cacheAdd,
-                      Return(REF(methodSym))
+                      Return(REF(methodSym)),
                   )
-                }
+                },
             )
         })
       }
@@ -323,7 +323,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
                       args(0), (REF(unboxMethod(IntClass)) APPLY args(1)))
                 case nme.clone_ => REF(arrayCloneMethod) APPLY List(args(0))
               },
-              mustBeUnit = methSym.name == nme.update
+              mustBeUnit = methSym.name == nme.update,
           )
 
           /* A conditional Array call, when we can't determine statically if the argument is
@@ -395,7 +395,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
 
             BLOCK(
                 ValDef(sym, qual0),
-                callAsReflective(mparams map (_.tpe), resType)
+                callAsReflective(mparams map (_.tpe), resType),
             )
           }
         }

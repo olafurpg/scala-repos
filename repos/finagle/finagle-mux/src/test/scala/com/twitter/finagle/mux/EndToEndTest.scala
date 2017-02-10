@@ -152,7 +152,7 @@ class EndToEndTest
             Annotation.ServerRecv(),
             Annotation.BinaryAnnotation("srv/mux/enabled", true),
             Annotation.ServerSend(),
-            Annotation.ClientRecv()
+            Annotation.ClientRecv(),
         ))
 
     Await.result(server.close(), 30.seconds)

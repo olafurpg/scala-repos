@@ -193,7 +193,7 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
       numPartitionsInBM: Int,
       numPartitionsInKinesis: Int,
       testIsBlockValid: Boolean = false,
-      testBlockRemove: Boolean = false
+      testBlockRemove: Boolean = false,
   ): Unit = {
     require(shardIds.size > 1, "Need at least 2 shards to test")
     require(
@@ -233,12 +233,12 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
     // Make sure that the left `numPartitionsInBM` blocks are in block manager, and others are not
     require(
         blockIds.take(numPartitionsInBM).forall(blockManager.get(_).nonEmpty),
-        "Expected blocks not in BlockManager"
+        "Expected blocks not in BlockManager",
     )
 
     require(
         blockIds.drop(numPartitionsInBM).forall(blockManager.get(_).isEmpty),
-        "Unexpected blocks in BlockManager"
+        "Unexpected blocks in BlockManager",
     )
 
     // Make sure that the right sequence `numPartitionsInKinesis` are configured, and others are not
@@ -248,7 +248,7 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
           .forall {
             _.ranges.forall { _.streamName == testUtils.streamName }
           },
-        "Incorrect configuration of RDD, expected ranges not set: "
+        "Incorrect configuration of RDD, expected ranges not set: ",
     )
 
     require(
@@ -257,7 +257,7 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
           .forall {
             _.ranges.forall { _.streamName != testUtils.streamName }
           },
-        "Incorrect configuration of RDD, unexpected ranges set"
+        "Incorrect configuration of RDD, unexpected ranges set",
     )
 
     val rdd = new KinesisBackedBlockRDD[Array[Byte]](

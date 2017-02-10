@@ -1018,7 +1018,7 @@ trait StringLibSpecs[M[+ _]]
           BigDecimal("2e3"),
           BigDecimal("0e9"),
           BigDecimal("2.23532235235235353252352343636953295923"),
-          BigDecimal("1.2e3")
+          BigDecimal("1.2e3"),
       ).only
     }
   }
@@ -1043,7 +1043,7 @@ trait StringLibSpecs[M[+ _]]
           "4",
           "4",
           "3",
-          "4"
+          "4",
       ).only
     }
 
@@ -1093,7 +1093,7 @@ trait StringLibSpecs[M[+ _]]
         Vector("", "", "", "", "", "", "", ""),
         Vector("", ""),
         Vector("", "", "crazy", "", ""),
-        Vector("something", "basically", "reasonable")
+        Vector("something", "basically", "reasonable"),
     )
 
     "quote a regular expression in a split" in {
@@ -1127,7 +1127,7 @@ trait StringLibSpecs[M[+ _]]
           Vector("", ""),
           Vector(","),
           Vector("", "crazy", ""),
-          Vector("something,basically,reasonable")
+          Vector("something,basically,reasonable"),
       )
     }
 

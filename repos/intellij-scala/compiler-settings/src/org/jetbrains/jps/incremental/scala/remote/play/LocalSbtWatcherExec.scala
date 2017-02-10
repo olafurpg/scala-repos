@@ -106,6 +106,6 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
             process.waitFor()
           }
         }),
-        new ProcessListener(consumer, process)
+        new ProcessListener(consumer, process),
     )
 }

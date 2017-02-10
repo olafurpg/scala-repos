@@ -426,7 +426,7 @@ private trait EitherTBindRec[F[_], E]
             // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
             _.fold(e => \/.right(\/.left(e)),
                    _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
-        })(a)
+        })(a),
     )
 }
 

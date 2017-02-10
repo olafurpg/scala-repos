@@ -423,7 +423,7 @@ class OfferTest extends WordSpec with MockitoSugar {
 
       val o = Offer.choose(
           b0.send(123) const { "put!" },
-          b1.recv
+          b1.recv,
       )
 
       val f = o.sync()

@@ -30,7 +30,7 @@ object TimeoutFactory {
           _timeout: Param,
           _timer: param.Timer,
           _label: param.Label,
-          next: ServiceFactory[Req, Rep]
+          next: ServiceFactory[Req, Rep],
       ) = {
         val Param(timeout) = _timeout
         val param.Label(label) = _label

@@ -72,7 +72,7 @@ object TestResultLogger {
     d.copy(
         printStandard = d.printStandard.unless(
               (results, _) => results.events.isEmpty),
-        printNoTests = Null
+        printNoTests = Null,
     )
 
   object Defaults {

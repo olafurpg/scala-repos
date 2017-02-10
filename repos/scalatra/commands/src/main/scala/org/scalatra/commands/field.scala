@@ -146,7 +146,7 @@ class BasicFieldDescriptor[T](
         e => ValidationError(e).failure,
         o =>
           (o.flatMap(convert(_)) orElse defaultValue)
-            .fold(requiredValidationFailure)(_.success)
+            .fold(requiredValidationFailure)(_.success),
     )
     val o = original.fold(_ => None, identity)
     BoundFieldDescriptor(o, conv, this)

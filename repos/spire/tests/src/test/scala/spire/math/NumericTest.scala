@@ -71,6 +71,6 @@ class NumericTest extends FunSuite {
   runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(
       Complex(BigDecimal(-3), BigDecimal(0)),
       Complex(BigDecimal(3), BigDecimal(0)),
-      Complex(BigDecimal(-9), BigDecimal(0))
+      Complex(BigDecimal(-9), BigDecimal(0)),
   )
 }

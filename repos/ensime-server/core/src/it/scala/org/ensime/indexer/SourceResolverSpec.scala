@@ -48,7 +48,7 @@ trait SourceResolverTestUtils {
     resolver
       .resolve(
           PackageName(pkg.split('.').toList),
-          RawSource(Some(file), None)
+          RawSource(Some(file), None),
       )
       .map(fo =>
             fo.pathWithinArchive match {

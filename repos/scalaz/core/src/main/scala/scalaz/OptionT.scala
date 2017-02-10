@@ -15,7 +15,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
         F.bind(self.run) {
           case None => F.point(None: Option[B])
           case Some(z) => f(z).run
-        }
+        },
     )
 
   def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] =
@@ -23,7 +23,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
         F.bind(self.run) {
           case None => F.point(none[B])
           case Some(z) => F.map(f(z))(b => some(b))
-        }
+        },
     )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
@@ -237,7 +237,7 @@ private trait OptionTBindRec[F[_]]
         B.tailrecM[A, Option[B]](a0 =>
               F.map(f(a0).run) {
             _.fold(\/.right[A, Option[B]](None: Option[B]))(_.map(Some.apply))
-        })(a)
+        })(a),
     )
 }
 

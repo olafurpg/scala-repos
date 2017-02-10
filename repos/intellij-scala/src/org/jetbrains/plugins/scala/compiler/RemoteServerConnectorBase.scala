@@ -44,7 +44,7 @@ abstract class RemoteServerConnectorBase(
                   libCanonicalPath + "/jps/sbt-interface.jar!/")),
           getClass.getClassLoader),
       new File(libRoot, "jps"),
-      System.getProperty("java.class.version")
+      System.getProperty("java.class.version"),
   ) match {
     case Left(msg) => throw new IllegalArgumentException(msg)
     case Right(data) => data
@@ -129,7 +129,7 @@ abstract class RemoteServerConnectorBase(
       sourceRoot,
       outputDir,
       worksheetArgs,
-      compilerSettings.sbtIncOptions.asString
+      compilerSettings.sbtIncOptions.asString,
   )
 
   protected def configurationError(message: String) =

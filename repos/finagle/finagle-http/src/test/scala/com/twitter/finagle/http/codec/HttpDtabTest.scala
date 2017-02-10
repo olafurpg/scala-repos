@@ -37,7 +37,7 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
     m.headers.add("Dtab-Local", "/srv/local=>/srv/other,/srv=>/srv#/devel")
     val expected = Dtab.read(
         "/srv#/prod/local/role => /$/fail;" + "/srv => /srv#/staging;" +
-        "/srv/local => /srv/other;" + "/srv => /srv#/devel"
+        "/srv/local => /srv/other;" + "/srv => /srv#/devel",
     )
     assert(HttpDtab.read(m).get() == expected)
   }
@@ -52,7 +52,7 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
     val expected = Dtab.read(
         "/srv => /$/nil;" + "/srv#/prod/local/role => /$/fail;" +
         "/srv => /srv#/staging;" + "/srv/local => /srv/other;" +
-        "/srv => /srv#/devel"
+        "/srv => /srv#/devel",
     )
     assert(HttpDtab.read(m).get() == expected)
   }
@@ -148,7 +148,7 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
         ("X-Dtab-00-A", "/srv#/prod/local/role"),
         ("X-Dtab-00-B", "/$/fail"),
         ("X-Dtab-01-A", "/srv/local"),
-        ("X-Dtab-01-B", "/srv/other")
+        ("X-Dtab-01-B", "/srv/other"),
     )
     val allHeaders = dtabHeaders :+ (("Accept", "application/json"))
 

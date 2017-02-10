@@ -264,7 +264,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         Seq(Row("", "1.abc.com"),
             Row("", null),
             Row("", null),
-            Row(null, null))
+            Row(null, null)),
     )
   }
 
@@ -294,7 +294,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             10,
             21474836470L,
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
   }
 
@@ -363,13 +363,13 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
     // Access elements of a primitive array.
     checkAnswer(
         sql("select arrayOfString[0], arrayOfString[1], arrayOfString[2] from jsonTable"),
-        Row("str1", "str2", null)
+        Row("str1", "str2", null),
     )
 
     // Access an array of null values.
     checkAnswer(
         sql("select arrayOfNull from jsonTable"),
-        Row(Seq(null, null, null, null))
+        Row(Seq(null, null, null, null)),
     )
 
     // Access elements of a BigInteger array (we use DecimalType internally).
@@ -377,25 +377,25 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         sql("select arrayOfBigInteger[0], arrayOfBigInteger[1], arrayOfBigInteger[2] from jsonTable"),
         Row(new java.math.BigDecimal("922337203685477580700"),
             new java.math.BigDecimal("-922337203685477580800"),
-            null)
+            null),
     )
 
     // Access elements of an array of arrays.
     checkAnswer(
         sql("select arrayOfArray1[0], arrayOfArray1[1] from jsonTable"),
-        Row(Seq("1", "2", "3"), Seq("str1", "str2"))
+        Row(Seq("1", "2", "3"), Seq("str1", "str2")),
     )
 
     // Access elements of an array of arrays.
     checkAnswer(
         sql("select arrayOfArray2[0], arrayOfArray2[1] from jsonTable"),
-        Row(Seq(1.0, 2.0, 3.0), Seq(1.1, 2.1, 3.1))
+        Row(Seq(1.0, 2.0, 3.0), Seq(1.1, 2.1, 3.1)),
     )
 
     // Access elements of an array inside a filed with the type of ArrayType(ArrayType).
     checkAnswer(
         sql("select arrayOfArray1[1][1], arrayOfArray2[1][1] from jsonTable"),
-        Row("str2", 2.1)
+        Row("str2", 2.1),
     )
 
     // Access elements of an array of structs.
@@ -405,7 +405,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         Row(Row(true, "str1", null),
             Row(false, null, null),
             Row(null, null, null),
-            null)
+            null),
     )
 
     // Access a struct and fields inside of it.
@@ -413,19 +413,19 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         sql("select struct, struct.field1, struct.field2 from jsonTable"),
         Row(Row(true, new java.math.BigDecimal("92233720368547758070")),
             true,
-            new java.math.BigDecimal("92233720368547758070")) :: Nil
+            new java.math.BigDecimal("92233720368547758070")) :: Nil,
     )
 
     // Access an array field of a struct.
     checkAnswer(
         sql("select structWithArrayFields.field1, structWithArrayFields.field2 from jsonTable"),
-        Row(Seq(4, 5, 6), Seq("str1", "str2"))
+        Row(Seq(4, 5, 6), Seq("str1", "str2")),
     )
 
     // Access elements of an array field of a struct.
     checkAnswer(
         sql("select structWithArrayFields.field1[1], structWithArrayFields.field2[3] from jsonTable"),
-        Row(5, null)
+        Row(5, null),
     )
   }
 
@@ -435,13 +435,13 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
 
     checkAnswer(
         sql("select arrayOfStruct[0].field1, arrayOfStruct[0].field2 from jsonTable"),
-        Row(true, "str1")
+        Row(true, "str1"),
     )
 
     // Getting all values of a specific field from an array of structs.
     checkAnswer(
         sql("select arrayOfStruct.field1, arrayOfStruct.field2 from jsonTable"),
-        Row(Seq(true, false, null), Seq("str1", null, null))
+        Row(Seq(true, false, null), Seq("str1", null, null)),
     )
   }
 
@@ -475,54 +475,54 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
                             1.1,
                             21474836470L,
                             "92233720368547758070",
-                            null) :: Nil
+                            null) :: Nil,
     )
 
     // Number and Boolean conflict: resolve the type as number in this query.
     checkAnswer(
         sql("select num_bool - 10 from jsonTable where num_bool > 11"),
-        Row(2)
+        Row(2),
     )
 
     // Widening to LongType
     checkAnswer(
         sql("select num_num_1 - 100 from jsonTable where num_num_1 > 11"),
-        Row(21474836370L) :: Row(21474836470L) :: Nil
+        Row(21474836370L) :: Row(21474836470L) :: Nil,
     )
 
     checkAnswer(
         sql("select num_num_1 - 100 from jsonTable where num_num_1 > 10"),
-        Row(-89) :: Row(21474836370L) :: Row(21474836470L) :: Nil
+        Row(-89) :: Row(21474836370L) :: Row(21474836470L) :: Nil,
     )
 
     // Widening to DecimalType
     checkAnswer(
         sql("select num_num_2 + 1.3 from jsonTable where num_num_2 > 1.1"),
-        Row(21474836472.2) :: Row(92233720368547758071.3) :: Nil
+        Row(21474836472.2) :: Row(92233720368547758071.3) :: Nil,
     )
 
     // Widening to Double
     checkAnswer(
         sql("select num_num_3 + 1.2 from jsonTable where num_num_3 > 1.1"),
-        Row(101.2) :: Row(21474836471.2) :: Nil
+        Row(101.2) :: Row(21474836471.2) :: Nil,
     )
 
     // Number and String conflict: resolve the type as number in this query.
     checkAnswer(
         sql("select num_str + 1.2 from jsonTable where num_str > 14"),
-        Row(BigDecimal("92233720368547758071.2"))
+        Row(BigDecimal("92233720368547758071.2")),
     )
 
     // Number and String conflict: resolve the type as number in this query.
     checkAnswer(
         sql("select num_str + 1.2 from jsonTable where num_str >= 92233720368547758060"),
-        Row(new java.math.BigDecimal("92233720368547758071.2"))
+        Row(new java.math.BigDecimal("92233720368547758071.2")),
     )
 
     // String and Boolean conflict: resolve the type as string.
     checkAnswer(
         sql("select * from jsonTable where str_bool = 'str1'"),
-        Row("true", 11L, null, 1.1, "13.1", "str1")
+        Row("true", 11L, null, 1.1, "13.1", "str1"),
     )
   }
 
@@ -534,24 +534,24 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
     // Number and Boolean conflict: resolve the type as boolean in this query.
     checkAnswer(
         sql("select num_bool from jsonTable where NOT num_bool"),
-        Row(false)
+        Row(false),
     )
 
     checkAnswer(
         sql("select str_bool from jsonTable where NOT str_bool"),
-        Row(false)
+        Row(false),
     )
 
     // Right now, the analyzer does not know that num_bool should be treated as a boolean.
     // Number and Boolean conflict: resolve the type as boolean in this query.
     checkAnswer(
         sql("select num_bool from jsonTable where num_bool"),
-        Row(true)
+        Row(true),
     )
 
     checkAnswer(
         sql("select str_bool from jsonTable where str_bool"),
-        Row(false)
+        Row(false),
     )
 
     // The plan of the following DSL is
@@ -564,7 +564,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         jsonDF
           .where('num_str >= BigDecimal("92233720368547758060"))
           .select(('num_str + 1.2).as("num")),
-        Row(new java.math.BigDecimal("92233720368547758071.2").doubleValue())
+        Row(new java.math.BigDecimal("92233720368547758071.2").doubleValue()),
     )
 
     // The following test will fail. The type of num_str is StringType.
@@ -575,7 +575,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
     // Number and String conflict: resolve the type as number in this query.
     checkAnswer(
         sql("select num_str + 1.2 from jsonTable where num_str > 13"),
-        Row(BigDecimal("14.3")) :: Row(BigDecimal("92233720368547758071.2")) :: Nil
+        Row(BigDecimal("14.3")) :: Row(BigDecimal("92233720368547758071.2")) :: Nil,
     )
   }
 
@@ -606,7 +606,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
                               "{}",
                               """["str1","str2",33]""",
                               Row("str"),
-                              """{"field":true}""") :: Nil
+                              """{"field":true}""") :: Nil,
     )
   }
 
@@ -642,13 +642,13 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             null) :: Row(null,
                          null,
                          Seq("""{"field":"str"}""", """{"field":1}""")) :: Row(
-            null, null, Seq("1", "2", "3")) :: Nil
+            null, null, Seq("1", "2", "3")) :: Nil,
     )
 
     // Treat an element as a number.
     checkAnswer(
         sql("select array1[0] + 1 from jsonTable where array1 is not null"),
-        Row(2)
+        Row(2),
     )
   }
 
@@ -701,7 +701,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             10,
             21474836470L,
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
   }
 
@@ -739,7 +739,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             "10",
             "21474836470",
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
   }
 
@@ -795,37 +795,37 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
     // Access elements of a primitive array.
     checkAnswer(
         sql("select arrayOfString[0], arrayOfString[1], arrayOfString[2] from jsonTable"),
-        Row("str1", "str2", null)
+        Row("str1", "str2", null),
     )
 
     // Access an array of null values.
     checkAnswer(
         sql("select arrayOfNull from jsonTable"),
-        Row(Seq(null, null, null, null))
+        Row(Seq(null, null, null, null)),
     )
 
     // Access elements of a BigInteger array (we use DecimalType internally).
     checkAnswer(
         sql("select arrayOfBigInteger[0], arrayOfBigInteger[1], arrayOfBigInteger[2] from jsonTable"),
-        Row("922337203685477580700", "-922337203685477580800", null)
+        Row("922337203685477580700", "-922337203685477580800", null),
     )
 
     // Access elements of an array of arrays.
     checkAnswer(
         sql("select arrayOfArray1[0], arrayOfArray1[1] from jsonTable"),
-        Row(Seq("1", "2", "3"), Seq("str1", "str2"))
+        Row(Seq("1", "2", "3"), Seq("str1", "str2")),
     )
 
     // Access elements of an array of arrays.
     checkAnswer(
         sql("select arrayOfArray2[0], arrayOfArray2[1] from jsonTable"),
-        Row(Seq("1", "2", "3"), Seq("1.1", "2.1", "3.1"))
+        Row(Seq("1", "2", "3"), Seq("1.1", "2.1", "3.1")),
     )
 
     // Access elements of an array inside a filed with the type of ArrayType(ArrayType).
     checkAnswer(
         sql("select arrayOfArray1[1][1], arrayOfArray2[1][1] from jsonTable"),
-        Row("str2", "2.1")
+        Row("str2", "2.1"),
     )
 
     // Access elements of an array of structs.
@@ -835,7 +835,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         Row(Row("true", "str1", null),
             Row("false", null, null),
             Row(null, null, null),
-            null)
+            null),
     )
 
     // Access a struct and fields inside of it.
@@ -843,19 +843,19 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         sql("select struct, struct.field1, struct.field2 from jsonTable"),
         Row(Row("true", "92233720368547758070"),
             "true",
-            "92233720368547758070") :: Nil
+            "92233720368547758070") :: Nil,
     )
 
     // Access an array field of a struct.
     checkAnswer(
         sql("select structWithArrayFields.field1, structWithArrayFields.field2 from jsonTable"),
-        Row(Seq("4", "5", "6"), Seq("str1", "str2"))
+        Row(Seq("4", "5", "6"), Seq("str1", "str2")),
     )
 
     // Access elements of an array field of a struct.
     checkAnswer(
         sql("select structWithArrayFields.field1[1], structWithArrayFields.field2[3] from jsonTable"),
-        Row("5", null)
+        Row("5", null),
     )
   }
 
@@ -888,7 +888,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             10,
             21474836470L,
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
   }
 
@@ -916,7 +916,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             10,
             21474836470L,
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
   }
 
@@ -952,7 +952,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             10,
             21474836470L,
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
 
     val jsonDF2 = sqlContext.read.schema(schema).json(primitiveFieldAndType)
@@ -969,7 +969,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             10,
             21474836470L,
             null,
-            "this is a simple string.")
+            "this is a simple string."),
     )
   }
 
@@ -984,12 +984,12 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
     checkAnswer(
         sql("select `map` from jsonWithSimpleMap"),
         Row(Map("a" -> 1)) :: Row(Map("b" -> 2)) :: Row(Map("c" -> 3)) :: Row(
-            Map("c" -> 1, "d" -> 4)) :: Row(Map("e" -> null)) :: Nil
+            Map("c" -> 1, "d" -> 4)) :: Row(Map("e" -> null)) :: Nil,
     )
 
     checkAnswer(
         sql("select `map`['c'] from jsonWithSimpleMap"),
-        Row(null) :: Row(null) :: Row(3) :: Row(1) :: Row(null) :: Nil
+        Row(null) :: Row(null) :: Row(3) :: Row(1) :: Row(null) :: Nil,
     )
 
     val innerStruct = StructType(StructField(
@@ -1008,13 +1008,13 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         Row(Map("a" -> Row(Seq(1, 2, 3, null), null))) :: Row(
             Map("b" -> Row(null, 2))) :: Row(Map("c" -> Row(Seq(), 4))) :: Row(
             Map("c" -> Row(null, 3), "d" -> Row(Seq(null), null))) :: Row(
-            Map("e" -> null)) :: Row(Map("f" -> Row(null, null))) :: Nil
+            Map("e" -> null)) :: Row(Map("f" -> Row(null, null))) :: Nil,
     )
 
     checkAnswer(
         sql("select `map`['a'].field1, `map`['c'].field2 from jsonWithComplexMap"),
         Row(Seq(1, 2, 3, null), null) :: Row(null, null) :: Row(null, 4) :: Row(
-            null, 3) :: Row(null, null) :: Row(null, null) :: Nil
+            null, 3) :: Row(null, null) :: Row(null, null) :: Nil,
     )
   }
 
@@ -1024,14 +1024,14 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
 
     checkAnswer(
         sql("select arrayOfStruct[0].field1, arrayOfStruct[0].field2 from jsonTable"),
-        Row(true, "str1")
+        Row(true, "str1"),
     )
     checkAnswer(
         sql("""
           |select complexArrayOfStruct[0].field1[1].inner2[0], complexArrayOfStruct[1].field2[0][1]
           |from jsonTable
         """.stripMargin),
-        Row("str2", 6)
+        Row("str2", 6),
     )
   }
 
@@ -1044,7 +1044,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
           |select arrayOfArray1[0][0][0], arrayOfArray1[1][0][1], arrayOfArray1[1][1][0]
           |from jsonTable
         """.stripMargin),
-        Row(5, 7, 8)
+        Row(5, 7, 8),
     )
     checkAnswer(
         sql("""
@@ -1052,7 +1052,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
           |arrayOfArray2[1][1][1].inner2[0], arrayOfArray2[2][0][0].inner3[0][0].inner4
           |from jsonTable
         """.stripMargin),
-        Row("str1", Nil, "str4", 2)
+        Row("str1", Nil, "str4", 2),
     )
   }
 
@@ -1068,7 +1068,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         Row("str_a_1", null, null) :: Row("str_a_2", null, null) :: Row(
             null,
             "str_b_3",
-            null) :: Row("str_a_4", "str_b_4", "str_c_4") :: Nil
+            null) :: Row("str_a_4", "str_b_4", "str_c_4") :: Nil,
     )
   }
 
@@ -1104,7 +1104,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       sqlContext.read.option("mode", "DROPMALFORMED").json(corruptRecords)
     checkAnswer(
         jsonDFOne,
-        Row("str_a_4", "str_b_4", "str_c_4") :: Nil
+        Row("str_a_4", "str_b_4", "str_c_4") :: Nil,
     )
     assert(jsonDFOne.schema === schemaOne)
 
@@ -1145,7 +1145,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
                 "str_a_4", "str_b_4", "str_c_4", null) :: Row(null,
                                                               null,
                                                               null,
-                                                              "]") :: Nil
+                                                              "]") :: Nil,
         )
 
         checkAnswer(
@@ -1154,7 +1154,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
               |FROM jsonTable
               |WHERE _unparsed IS NULL
             """.stripMargin),
-            Row("str_a_4", "str_b_4", "str_c_4")
+            Row("str_a_4", "str_b_4", "str_c_4"),
         )
 
         checkAnswer(
@@ -1164,7 +1164,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
               |WHERE _unparsed IS NOT NULL
             """.stripMargin),
             Row("{") :: Row("""{"a":1, b:2}""") :: Row("""{"a":{, b:3}""") :: Row(
-                "]") :: Nil
+                "]") :: Nil,
         )
       }
     }
@@ -1209,7 +1209,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             null,
             null,
             Seq(Seq(null), Seq(Row("2"))),
-            null) :: Row(null, null, null, Seq(Seq(null, Seq(1, 2, 3)))) :: Nil
+            null) :: Row(null, null, null, Seq(Seq(null, Seq(1, 2, 3)))) :: Nil,
     )
   }
 
@@ -1281,7 +1281,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             1.7976931348623157E308,
             10,
             21474836470L,
-            "this is a simple string.")
+            "this is a simple string."),
     )
 
     val complexJsonDF = sqlContext.read.json(complexFieldAndType1)
@@ -1290,13 +1290,13 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
     // Access elements of a primitive array.
     checkAnswer(
         sql("select arrayOfString[0], arrayOfString[1], arrayOfString[2] from complexTable"),
-        Row("str1", "str2", null)
+        Row("str1", "str2", null),
     )
 
     // Access an array of null values.
     checkAnswer(
         sql("select arrayOfNull from complexTable"),
-        Row(Seq(null, null, null, null))
+        Row(Seq(null, null, null, null)),
     )
 
     // Access elements of a BigInteger array (we use DecimalType internally).
@@ -1305,25 +1305,25 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             " from complexTable"),
         Row(new java.math.BigDecimal("922337203685477580700"),
             new java.math.BigDecimal("-922337203685477580800"),
-            null)
+            null),
     )
 
     // Access elements of an array of arrays.
     checkAnswer(
         sql("select arrayOfArray1[0], arrayOfArray1[1] from complexTable"),
-        Row(Seq("1", "2", "3"), Seq("str1", "str2"))
+        Row(Seq("1", "2", "3"), Seq("str1", "str2")),
     )
 
     // Access elements of an array of arrays.
     checkAnswer(
         sql("select arrayOfArray2[0], arrayOfArray2[1] from complexTable"),
-        Row(Seq(1.0, 2.0, 3.0), Seq(1.1, 2.1, 3.1))
+        Row(Seq(1.0, 2.0, 3.0), Seq(1.1, 2.1, 3.1)),
     )
 
     // Access elements of an array inside a filed with the type of ArrayType(ArrayType).
     checkAnswer(
         sql("select arrayOfArray1[1][1], arrayOfArray2[1][1] from complexTable"),
-        Row("str2", 2.1)
+        Row("str2", 2.1),
     )
 
     // Access a struct and fields inside of it.
@@ -1331,20 +1331,20 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
         sql("select struct, struct.field1, struct.field2 from complexTable"),
         Row(Row(true, new java.math.BigDecimal("92233720368547758070")),
             true,
-            new java.math.BigDecimal("92233720368547758070")) :: Nil
+            new java.math.BigDecimal("92233720368547758070")) :: Nil,
     )
 
     // Access an array field of a struct.
     checkAnswer(
         sql("select structWithArrayFields.field1, structWithArrayFields.field2 from complexTable"),
-        Row(Seq(4, 5, 6), Seq("str1", "str2"))
+        Row(Seq(4, 5, 6), Seq("str1", "str2")),
     )
 
     // Access elements of an array field of a struct.
     checkAnswer(
         sql("select structWithArrayFields.field1[1], structWithArrayFields.field2[3] " +
             "from complexTable"),
-        Row(5, null)
+        Row(5, null),
     )
   }
 
@@ -1554,7 +1554,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             .format("json")
             .schema(schema)
             .load(path.getCanonicalPath),
-          expectedResult
+          expectedResult,
       )
     }
   }
@@ -1614,7 +1614,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
               """.stripMargin),
               Row("test", null) :: Row(null, """[1,2,3]""") :: Row(
                   null, """":"test", "a":1}""") :: Row(null, """42""") :: Row(
-                  null, """     ","ian":"test"}""") :: Nil
+                  null, """     ","ian":"test"}""") :: Nil,
           )
         }
       }
@@ -1634,7 +1634,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       val schema = StructType(
           StructField("a",
                       StructType(
-                          StructField("b", StringType) :: Nil
+                          StructField("b", StringType) :: Nil,
                       )) :: Nil)
       val jsonDF = sqlContext.read.schema(schema).json(path)
       assert(jsonDF.count() == 2)
@@ -1728,7 +1728,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
 
       checkAnswer(
           sql("select ts from jsonTable"),
-          Row(java.sql.Timestamp.valueOf("2016-01-02 03:04:05"))
+          Row(java.sql.Timestamp.valueOf("2016-01-02 03:04:05")),
       )
     }
   }

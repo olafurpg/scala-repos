@@ -37,7 +37,7 @@ object PortDefinitionSerializer {
         proto.getNumber,
         proto.getProtocol,
         if (proto.hasName) Some(proto.getName) else None,
-        labels
+        labels,
     )
   }
 }

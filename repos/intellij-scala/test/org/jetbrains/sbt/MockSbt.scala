@@ -33,7 +33,7 @@ trait MockSbt {
     val scalaLibraryJars = Seq(
         TestUtils.getScalaLibraryPath(scala210),
         TestUtils.getScalaCompilerPath(scala210),
-        TestUtils.getScalaReflectPath(scala210)
+        TestUtils.getScalaReflectPath(scala210),
     ).map(new File(_))
     val classesPath =
       (sbtLibraries ++ scalaLibraryJars).map(VfsUtil.getUrlForLibraryRoot)

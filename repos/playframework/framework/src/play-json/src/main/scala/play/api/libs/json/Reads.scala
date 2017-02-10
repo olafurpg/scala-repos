@@ -24,7 +24,7 @@ import reflect.ClassTag
   * Json deserializer: write an implicit to define a deserializer for any type.
   */
 @implicitNotFound(
-    "No Json deserializer found for type ${A}. Try to implement an implicit Reads or Format for this type."
+    "No Json deserializer found for type ${A}. Try to implement an implicit Reads or Format for this type.",
 )
 trait Reads[A] { self =>
 
@@ -222,7 +222,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
         "__VAL__" -> knownValue,
         "__ERR__" -> key,
         "__ARGS__" -> args.foldLeft(JsArray())(
-            (acc: JsArray, arg: JsValue) => acc :+ arg)
+            (acc: JsArray, arg: JsValue) => acc :+ arg),
     )
   }
 

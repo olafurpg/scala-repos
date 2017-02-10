@@ -98,7 +98,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
               ((2, Some(2)), 1),
               ((2, Some(5)), 1),
               ((3, Some(1)), 1),
-              ((3, Some(9)), 1)
+              ((3, Some(9)), 1),
           )
       }
     }.flatMap { _ =>
@@ -176,7 +176,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
           (2, Some(2)),
           (2, Some(5)),
           (3, Some(1)),
-          (3, Some(9))
+          (3, Some(9)),
       )
       val q9 = ts.groupBy(x => x).map(_._1).to[Set]
       val q9b = ts.map(x => x).groupBy(_.*).map(_._1).to[Set]
@@ -238,7 +238,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
     DBIO.seq(
         as.schema.create,
         as += 1,
-        q1.result.map(_ shouldBe Seq((Some(1), 1)))
+        q1.result.map(_ shouldBe Seq((Some(1), 1))),
     )
   }
 
@@ -263,7 +263,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
           Tab("foo", "bar", "bat", 1, 5),
           Tab("foo", "bar", "bat", 2, 6),
           Tab("foo", "quux", "bat", 3, 7),
-          Tab("baz", "quux", "bat", 4, 8)
+          Tab("baz", "quux", "bat", 4, 8),
       )
       q1 = Tabs
         .groupBy(t => (t.col1, t.col2, t.col3))
@@ -381,7 +381,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
         as ++= Seq((1, 10), (2, 20), (3, 20)),
         mark("q1", q1.result).map(_.toSet shouldBe Set(11, 21)),
         mark("q2", q2.result).map(_.toSet shouldBe Set(11, 21)),
-        mark("q3", q3.result).map(_.toSet shouldBe Set(10, 20))
+        mark("q3", q3.result).map(_.toSet shouldBe Set(10, 20)),
     )
   }
 
@@ -446,7 +446,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
             (r =>
                   r == Seq((1, "a"), (3, "c")) ||
                   r == Seq((2, "a"), (3, "c")))),
-        mark("q6", q6.result).map(_ shouldBe 2)
+        mark("q6", q6.result).map(_ shouldBe 2),
     )
   }
 }

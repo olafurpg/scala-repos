@@ -61,7 +61,7 @@ import org.apache.spark.util.Utils
 class SparkILoop(
     private val in0: Option[BufferedReader],
     protected val out: JPrintWriter,
-    val master: Option[String]
+    val master: Option[String],
 )
     extends AnyRef with LoopCommands with SparkILoopInit with Logging {
   def this(in0: BufferedReader, out: JPrintWriter, master: String) =
@@ -397,7 +397,7 @@ class SparkILoop(
       nullary(
           "warnings",
           "show the suppressed warnings from the most recent line which had any",
-          warningsCommand)
+          warningsCommand),
   )
 
   /** Power user commands */
@@ -417,7 +417,7 @@ class SparkILoop(
       "scala.collection.mutable." -> "mutable.",
       "scala.collection.generic." -> "generic.",
       "java.lang." -> "jl.",
-      "scala.runtime." -> "runtime."
+      "scala.runtime." -> "runtime.",
   )
 
   private def importsCommand(line: String): Result = {
@@ -445,7 +445,7 @@ class SparkILoop(
                 idx + 1,
                 handler.importString,
                 statsMsg,
-                foundMsg
+                foundMsg,
             ))
     }
   }
@@ -986,7 +986,7 @@ class SparkILoop(
     else
       try new SparkJLineReader(
           if (settings.noCompletion.value) NoCompletion
-          else new SparkJLineCompletion(intp)
+          else new SparkJLineCompletion(intp),
       ) catch {
         case ex @ (_: Exception | _: NoClassDefFoundError) =>
           echo("Failed to created SparkJLineReader: " + ex +

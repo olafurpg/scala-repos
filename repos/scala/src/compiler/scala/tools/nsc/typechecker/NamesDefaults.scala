@@ -42,7 +42,7 @@ trait NamesDefaults { self: Analyzer =>
       qual: Option[Tree],
       targs: List[Tree],
       vargss: List[List[Tree]],
-      blockTyper: Typer
+      blockTyper: Typer,
   ) {}
 
   private def nameOfNamedArg(arg: Tree) = Some(arg) collect {

@@ -45,7 +45,7 @@ object Play2OldStructureAdapter {
           (SOURCE_DIR,
            new StringParsedValue(data.sourceDirectory.getCanonicalPath)),
           (PROJECT_URI,
-           new StringParsedValue(baseDir.getCanonicalFile.toURI.toString))
+           new StringParsedValue(baseDir.getCanonicalFile.toURI.toString)),
       )
 
     keyValues.map({ case (k, v) => (id, k.name, v) })

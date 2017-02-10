@@ -123,7 +123,7 @@ trait MaxArgs {
       x19: Double,
       x20: Double,
       x21: Double,
-      x22: Double
+      x22: Double,
   ) = x1
 }
 

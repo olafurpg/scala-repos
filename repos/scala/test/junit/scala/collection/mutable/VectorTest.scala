@@ -22,7 +22,7 @@ class VectorTest {
   val ans = List(
       vecs,
       List(smallVec, smsm, smbig),
-      List(bigVec, bigsm, bigbig)
+      List(bigVec, bigsm, bigbig),
   )
 
   @Test

@@ -34,7 +34,7 @@ object ScalaErrorHandling extends PlaySpecification with WsTestClient {
           Environment.simple(mode = mode),
           Configuration.empty,
           new OptionalSourceMapper(None),
-          new Provider[Router] { def get = Router.empty }
+          new Provider[Router] { def get = Router.empty },
       )
       def errorContent(mode: Mode.Mode) =
         contentAsString(errorHandler(mode).onServerError(
@@ -58,14 +58,14 @@ package root {
     def onClientError(
         request: RequestHeader, statusCode: Int, message: String) = {
       Future.successful(
-          Status(statusCode)("A client error occurred: " + message)
+          Status(statusCode)("A client error occurred: " + message),
       )
     }
 
     def onServerError(request: RequestHeader, exception: Throwable) = {
       Future.successful(
           InternalServerError(
-              "A server error occurred: " + exception.getMessage)
+              "A server error occurred: " + exception.getMessage),
       )
     }
   }
@@ -87,7 +87,7 @@ package default {
       env: Environment,
       config: Configuration,
       sourceMapper: OptionalSourceMapper,
-      router: Provider[Router]
+      router: Provider[Router],
   )
       extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
 
@@ -95,13 +95,13 @@ package default {
         request: RequestHeader, exception: UsefulException) = {
       Future.successful(
           InternalServerError(
-              "A server error occurred: " + exception.getMessage)
+              "A server error occurred: " + exception.getMessage),
       )
     }
 
     override def onForbidden(request: RequestHeader, message: String) = {
       Future.successful(
-          Forbidden("You're not allowed to access this resource.")
+          Forbidden("You're not allowed to access this resource."),
       )
     }
   }

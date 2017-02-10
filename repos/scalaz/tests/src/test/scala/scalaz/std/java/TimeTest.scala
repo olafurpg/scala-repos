@@ -18,7 +18,7 @@ object TimeTest extends SpecLite {
       Gen.oneOf(
           gen[Long].map { Duration.ofNanos },
           gen[Long].map { Duration.ofMillis },
-          gen[Int].map { Duration.ofSeconds(_) }
+          gen[Int].map { Duration.ofSeconds(_) },
       ))
 
   implicit val PeriodArbitrary: Arbitrary[Period] = Apply[Arbitrary].apply3(
@@ -28,7 +28,7 @@ object TimeTest extends SpecLite {
       Apply[Gen].apply3(
           Gen.choose(Year.MIN_VALUE, Year.MAX_VALUE),
           Gen.choose(1, 12),
-          Gen.choose(1, 28)
+          Gen.choose(1, 28),
       )(LocalDate.of(_, _, _)))
 
   implicit val LocalTimeArbitrary: Arbitrary[LocalTime] = Arbitrary(
@@ -36,7 +36,7 @@ object TimeTest extends SpecLite {
           Gen.choose(0, 23),
           Gen.choose(0, 59),
           Gen.choose(0, 59),
-          Gen.choose(0, 999999999)
+          Gen.choose(0, 999999999),
       )(LocalTime.of(_, _, _, _)))
 
   implicit val YearArbitrary: Arbitrary[Year] = Arbitrary(
@@ -44,12 +44,12 @@ object TimeTest extends SpecLite {
 
   implicit val YearMonthArbitrary: Arbitrary[YearMonth] = Arbitrary(
       Apply[Gen].apply2(Gen.choose(Year.MIN_VALUE, Year.MAX_VALUE),
-                        Gen.choose(1, 12))(YearMonth.of(_, _))
+                        Gen.choose(1, 12))(YearMonth.of(_, _)),
   )
 
   implicit val MonthDayArbitrary: Arbitrary[MonthDay] = Arbitrary(
       Apply[Gen].apply2(Gen.choose(1, 12), Gen.choose(1, 28))(
-          MonthDay.of(_, _))
+          MonthDay.of(_, _)),
   )
 
   implicit val monthArbitrary: Arbitrary[Month] = Arbitrary(

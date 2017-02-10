@@ -47,7 +47,7 @@ object RouterExample extends App {
           that(path)
             .map(b => adjoin(Inl(b)))
             .orElse(
-                self(path).map(a => adjoin(Inr(Inl(a))))
+                self(path).map(a => adjoin(Inr(Inl(a)))),
             )
       }
   }

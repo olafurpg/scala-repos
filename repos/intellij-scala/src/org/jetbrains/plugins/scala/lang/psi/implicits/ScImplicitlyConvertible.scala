@@ -257,8 +257,8 @@ class ScImplicitlyConvertible(
               .getCachedClass(
                   "scala.Function1",
                   place.getResolveScope,
-                  ScalaPsiManager.ClassCategory.TYPE
-              )
+                  ScalaPsiManager.ClassCategory.TYPE,
+              ),
           ) collect {
           case cl: ScTrait =>
             ScParameterizedType(

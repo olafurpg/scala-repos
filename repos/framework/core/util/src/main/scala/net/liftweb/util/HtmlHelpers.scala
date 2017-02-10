@@ -221,7 +221,7 @@ trait HtmlHelpers extends CssBindImplicits {
           new UnprefixedAttribute(
               "class",
               existingClasses.text.trim + " " + cssClass.trim,
-              removeAttribute("class", existingAttributes)
+              removeAttribute("class", existingAttributes),
           )
         }
 
@@ -251,7 +251,7 @@ trait HtmlHelpers extends CssBindImplicits {
                 processElement(
                     element.copy(attributes = removeAttribute(
                               "id", element.attributes)),
-                    stripDuplicateId _
+                    stripDuplicateId _,
                 )
               } else {
                 ids += id.text

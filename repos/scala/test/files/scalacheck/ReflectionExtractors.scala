@@ -31,7 +31,7 @@ object Test extends Properties("reflection extractors") {
       CONTRAVARIANT,
       DEFAULTPARAM,
       PRESUPER,
-      DEFAULTINIT
+      DEFAULTINIT,
   )
   val genModifiers = for (flag <- genFlag; privateWithin <- genName) yield
     Modifiers(flag, privateWithin, Nil)

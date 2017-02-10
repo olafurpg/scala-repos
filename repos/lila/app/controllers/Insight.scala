@@ -62,7 +62,7 @@ object Insight extends LilaController {
                       Env.user.lightUser) map env.jsonView.chart.apply map {
                     Ok(_)
                   }
-              }
+              },
           )
       }
   }

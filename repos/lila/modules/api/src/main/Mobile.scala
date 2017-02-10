@@ -21,7 +21,7 @@ object Mobile {
         // nobody ever used version 0.
         Old(version = 0,
             deprecatedAt = new DateTime("2014-08-01"),
-            unsupportedAt = new DateTime("2014-12-01"))
+            unsupportedAt = new DateTime("2014-12-01")),
     )
 
     private val PathPattern = """^.+/socket/v(\d+)$""".r

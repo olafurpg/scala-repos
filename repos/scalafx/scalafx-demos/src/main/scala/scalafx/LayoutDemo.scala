@@ -42,7 +42,7 @@ object LayoutDemo extends JFXApp {
     panes = List(
         new TitledPane {
           content = new Label { text = "Hello" }
-        }
+        },
     )
   }
 

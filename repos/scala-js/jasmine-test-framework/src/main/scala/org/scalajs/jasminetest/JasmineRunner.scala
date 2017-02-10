@@ -17,7 +17,7 @@ final class JasmineRunner(
     private[jasminetest] val framework: JasmineFramework,
     val args: Array[String],
     val remoteArgs: Array[String],
-    private[jasminetest] val classLoader: ClassLoader
+    private[jasminetest] val classLoader: ClassLoader,
 )
     extends Runner {
 
@@ -82,7 +82,7 @@ object JasmineRunner {
                                    enumerable = false,
                                    get = { (self: js.Dynamic) =>
                                      self.stackdata && self.stackdata.stack
-                                   }: js.ThisFunction
+                                   }: js.ThisFunction,
                                )
                                .asInstanceOf[js.PropertyDescriptor])
   }

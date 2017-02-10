@@ -1237,7 +1237,7 @@ object Quote {
           "I think crazyhouse improves your standard chess.", "ChessNetwork"),
       new Quote(
           "The biggest tool for chess improvement would be playing against stronger opposition",
-          "Peter Svidler")
+          "Peter Svidler"),
   )
 
   implicit def quoteWriter: OWrites[Quote] = OWrites { q =>

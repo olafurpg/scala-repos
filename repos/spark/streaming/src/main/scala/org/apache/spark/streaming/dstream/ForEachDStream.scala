@@ -34,7 +34,7 @@ import org.apache.spark.streaming.scheduler.Job
 private[streaming] class ForEachDStream[T : ClassTag](
     parent: DStream[T],
     foreachFunc: (RDD[T], Time) => Unit,
-    displayInnerRDDOps: Boolean
+    displayInnerRDDOps: Boolean,
 )
     extends DStream[Unit](parent.ssc) {
 

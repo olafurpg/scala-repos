@@ -60,7 +60,7 @@ object VersionedStore {
     new VersionedBatchStore[K, V, K, (BatchID, V)](
         rootPath,
         versionsToKeep,
-        batcher
+        batcher,
     )({ case (batchID, (k, v)) => (k, (batchID.next, v)) })({
       case (k, (_, v)) => (k, v)
     }) {

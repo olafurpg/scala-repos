@@ -40,22 +40,22 @@ class StandardScalerSuite
     data = Array(
         Vectors.dense(-2.0, 2.3, 0.0),
         Vectors.dense(0.0, -5.1, 1.0),
-        Vectors.dense(1.7, -0.6, 3.3)
+        Vectors.dense(1.7, -0.6, 3.3),
     )
     resWithMean = Array(
         Vectors.dense(-1.9, 3.433333333333, -1.433333333333),
         Vectors.dense(0.1, -3.966666666667, -0.433333333333),
-        Vectors.dense(1.8, 0.533333333333, 1.866666666667)
+        Vectors.dense(1.8, 0.533333333333, 1.866666666667),
     )
     resWithStd = Array(
         Vectors.dense(-1.079898494312, 0.616834091415, 0.0),
         Vectors.dense(0.0, -1.367762550529, 0.590968109266),
-        Vectors.dense(0.917913720165, -0.160913241239, 1.950194760579)
+        Vectors.dense(0.917913720165, -0.160913241239, 1.950194760579),
     )
     resWithBoth = Array(
         Vectors.dense(-1.0259035695965, 0.920781324866, -0.8470542899497),
         Vectors.dense(0.0539949247156, -1.063815317078, -0.256086180682),
-        Vectors.dense(0.9719086448809, 0.143033992212, 1.103140470631)
+        Vectors.dense(0.9719086448809, 0.143033992212, 1.103140470631),
     )
   }
 

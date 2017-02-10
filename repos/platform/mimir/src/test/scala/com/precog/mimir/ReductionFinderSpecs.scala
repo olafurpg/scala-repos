@@ -196,7 +196,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(left -> parent, right -> parent),
           Map(parent -> List(parent)),
           Map(parent -> List(left, right)),
-          Map(parent -> trans.Leaf(trans.Source))
+          Map(parent -> trans.Leaf(trans.Source)),
       )
 
       findReductions(input, evalCtx) mustEqual expectedReductions
@@ -368,9 +368,9 @@ trait ReductionFinderSpecs[M[+ _]]
               (DerefObjectStatic(Leaf(Source), CPathField("height")),
                List(r2.red)),
               (DerefObjectStatic(Leaf(Source), CPathField("weight")),
-               List(r3.red))
+               List(r3.red)),
           ),
-          load
+          load,
       )
 
       val expected = Join(Add,
@@ -413,9 +413,9 @@ trait ReductionFinderSpecs[M[+ _]]
               (DerefObjectStatic(Leaf(Source), CPathField("height")),
                List(r1.red, r2.red)),
               (DerefObjectStatic(Leaf(Source), CPathField("weight")),
-               List(r3.red))
+               List(r3.red)),
           ),
-          load
+          load,
       )
 
       val expected = Join(Add,
@@ -454,9 +454,9 @@ trait ReductionFinderSpecs[M[+ _]]
       val mega = dag.MegaReduce(
           List(
               (DerefObjectStatic(Leaf(Source), CPathField("weight")),
-               List(r1.red, r2.red, r3.red))
+               List(r1.red, r2.red, r3.red)),
           ),
-          load
+          load,
       )
 
       val expected = Join(Add,
@@ -501,9 +501,9 @@ trait ReductionFinderSpecs[M[+ _]]
               (DerefObjectStatic(Leaf(Source), CPathField("height")),
                List(mean)),
               (DerefObjectStatic(Leaf(Source), CPathField("weight")),
-               List(mean))
+               List(mean)),
           ),
-          load
+          load,
       )
 
       val expected = Join(Add,
@@ -667,7 +667,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(),
           Map(),
           Map(),
-          Map()
+          Map(),
       )
 
       findReductions(input, evalCtx) mustEqual expected
@@ -684,7 +684,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(r -> load),
           Map(load -> List(load)),
           Map(load -> List(r)),
-          Map(load -> trans.Leaf(trans.Source))
+          Map(load -> trans.Leaf(trans.Source)),
       )
 
       findReductions(r, evalCtx) mustEqual expected
@@ -703,7 +703,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(r1 -> load, r2 -> load),
           Map(load -> List(load)),
           Map(load -> List(r1, r2)),
-          Map(load -> trans.Leaf(trans.Source))
+          Map(load -> trans.Leaf(trans.Source)),
       )
 
       findReductions(input, evalCtx) mustEqual expected
@@ -720,7 +720,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(r2 -> r1, r1 -> load),
           Map(load -> List(load), r1 -> List(r1)),
           Map(load -> List(r1), r1 -> List(r2)),
-          Map(load -> trans.Leaf(trans.Source), r1 -> trans.Leaf(trans.Source))
+          Map(load -> trans.Leaf(trans.Source), r1 -> trans.Leaf(trans.Source)),
       )
 
       findReductions(r2, evalCtx) mustEqual expected
@@ -740,20 +740,20 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(
               mean -> foo,
               stdDev -> foo,
-              input -> parentCount
+              input -> parentCount,
           ),
           Map(
               foo -> List(foo),
-              parentCount -> List(parentCount)
+              parentCount -> List(parentCount),
           ),
           Map(
               foo -> List(mean, stdDev),
-              parentCount -> List(input)
+              parentCount -> List(input),
           ),
           Map(
               foo -> trans.Leaf(trans.Source),
-              parentCount -> trans.Leaf(trans.Source)
-          )
+              parentCount -> trans.Leaf(trans.Source),
+          ),
       )
 
       findReductions(input, evalCtx) mustEqual expected
@@ -777,7 +777,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(count -> clicks),
           Map(clicks -> List(clicks)),
           Map(clicks -> List(count)),
-          Map(clicks -> trans.Leaf(trans.Source))
+          Map(clicks -> trans.Leaf(trans.Source)),
       )
 
       findReductions(input, evalCtx) mustEqual expected
@@ -796,7 +796,7 @@ trait ReductionFinderSpecs[M[+ _]]
             Map(r -> load),
             Map(load -> List(load)),
             Map(load -> List(r)),
-            Map(load -> trans.Leaf(trans.Source))
+            Map(load -> trans.Leaf(trans.Source)),
         )
 
         findReductions(input, evalCtx) mustEqual expected
@@ -812,7 +812,7 @@ trait ReductionFinderSpecs[M[+ _]]
             Map(r -> load),
             Map(load -> List(load)),
             Map(load -> List(r)),
-            Map(load -> trans.Leaf(trans.Source))
+            Map(load -> trans.Leaf(trans.Source)),
         )
 
         findReductions(input, evalCtx) mustEqual expected
@@ -846,7 +846,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(r -> parent),
           Map(parent -> List(parent)),
           Map(parent -> List(r)),
-          Map(parent -> trans.Leaf(trans.Source))
+          Map(parent -> trans.Leaf(trans.Source)),
       )
 
       findReductions(input, evalCtx) mustEqual expected
@@ -902,7 +902,7 @@ trait ReductionFinderSpecs[M[+ _]]
           Map(r1 -> parent, r2 -> parent),
           Map(parent -> List(parent)),
           Map(parent -> List(r1, r2)),
-          Map(parent -> trans.Leaf(trans.Source))
+          Map(parent -> trans.Leaf(trans.Source)),
       )
 
       findReductions(input, evalCtx) mustEqual expected

@@ -48,7 +48,7 @@ object ActivitySource {
     * Create an ActivitySource for ClassLoader resources.
     */
   def forClassLoaderResources(
-      cl: ClassLoader = ClassLoader.getSystemClassLoader
+      cl: ClassLoader = ClassLoader.getSystemClassLoader,
   ): ActivitySource[Buf] =
     new CachingActivitySource(new ClassLoaderActivitySource(cl))
 
@@ -114,7 +114,7 @@ class CachingActivitySource[T](underlying: ActivitySource[T])
   */
 class FilePollingActivitySource private[exp](
     period: Duration,
-    pool: FuturePool
+    pool: FuturePool,
 )(implicit timer: Timer)
     extends ActivitySource[Buf] {
 

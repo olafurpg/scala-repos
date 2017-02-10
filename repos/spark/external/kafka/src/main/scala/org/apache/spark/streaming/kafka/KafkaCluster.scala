@@ -92,7 +92,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   }
 
   def findLeaders(
-      topicAndPartitions: Set[TopicAndPartition]
+      topicAndPartitions: Set[TopicAndPartition],
   ): Either[Err, Map[TopicAndPartition, (String, Int)]] = {
     val topics = topicAndPartitions.map(_.topic)
     val response = getPartitionMetadata(topics).right
@@ -162,18 +162,18 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   // scalastyle:on
 
   def getLatestLeaderOffsets(
-      topicAndPartitions: Set[TopicAndPartition]
+      topicAndPartitions: Set[TopicAndPartition],
   ): Either[Err, Map[TopicAndPartition, LeaderOffset]] =
     getLeaderOffsets(topicAndPartitions, OffsetRequest.LatestTime)
 
   def getEarliestLeaderOffsets(
-      topicAndPartitions: Set[TopicAndPartition]
+      topicAndPartitions: Set[TopicAndPartition],
   ): Either[Err, Map[TopicAndPartition, LeaderOffset]] =
     getLeaderOffsets(topicAndPartitions, OffsetRequest.EarliestTime)
 
   def getLeaderOffsets(
       topicAndPartitions: Set[TopicAndPartition],
-      before: Long
+      before: Long,
   ): Either[Err, Map[TopicAndPartition, LeaderOffset]] = {
     getLeaderOffsets(topicAndPartitions, before, 1).right.map { r =>
       r.map { kv =>
@@ -191,7 +191,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   def getLeaderOffsets(
       topicAndPartitions: Set[TopicAndPartition],
       before: Long,
-      maxNumOffsets: Int
+      maxNumOffsets: Int,
   ): Either[Err, Map[TopicAndPartition, Seq[LeaderOffset]]] = {
     findLeaders(topicAndPartitions).right.flatMap { tpToLeader =>
       val leaderToTp: Map[(String, Int), Seq[TopicAndPartition]] =
@@ -246,14 +246,14 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   /** Requires Kafka >= 0.8.1.1.  Defaults to the original ZooKeeper backed api version. */
   def getConsumerOffsets(
       groupId: String,
-      topicAndPartitions: Set[TopicAndPartition]
+      topicAndPartitions: Set[TopicAndPartition],
   ): Either[Err, Map[TopicAndPartition, Long]] =
     getConsumerOffsets(groupId, topicAndPartitions, defaultConsumerApiVersion)
 
   def getConsumerOffsets(
       groupId: String,
       topicAndPartitions: Set[TopicAndPartition],
-      consumerApiVersion: Short
+      consumerApiVersion: Short,
   ): Either[Err, Map[TopicAndPartition, Long]] = {
     getConsumerOffsetMetadata(groupId, topicAndPartitions, consumerApiVersion).right.map {
       r =>
@@ -266,7 +266,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   /** Requires Kafka >= 0.8.1.1.  Defaults to the original ZooKeeper backed api version. */
   def getConsumerOffsetMetadata(
       groupId: String,
-      topicAndPartitions: Set[TopicAndPartition]
+      topicAndPartitions: Set[TopicAndPartition],
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] =
     getConsumerOffsetMetadata(
         groupId, topicAndPartitions, defaultConsumerApiVersion)
@@ -274,7 +274,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   def getConsumerOffsetMetadata(
       groupId: String,
       topicAndPartitions: Set[TopicAndPartition],
-      consumerApiVersion: Short
+      consumerApiVersion: Short,
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] = {
     var result = Map[TopicAndPartition, OffsetMetadataAndError]()
     val req = OffsetFetchRequest(
@@ -306,14 +306,14 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   /** Requires Kafka >= 0.8.1.1.  Defaults to the original ZooKeeper backed api version. */
   def setConsumerOffsets(
       groupId: String,
-      offsets: Map[TopicAndPartition, Long]
+      offsets: Map[TopicAndPartition, Long],
   ): Either[Err, Map[TopicAndPartition, Short]] =
     setConsumerOffsets(groupId, offsets, defaultConsumerApiVersion)
 
   def setConsumerOffsets(
       groupId: String,
       offsets: Map[TopicAndPartition, Long],
-      consumerApiVersion: Short
+      consumerApiVersion: Short,
   ): Either[Err, Map[TopicAndPartition, Short]] = {
     val meta = offsets.map { kv =>
       kv._1 -> OffsetAndMetadata(kv._2)
@@ -324,14 +324,14 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   /** Requires Kafka >= 0.8.1.1.  Defaults to the original ZooKeeper backed api version. */
   def setConsumerOffsetMetadata(
       groupId: String,
-      metadata: Map[TopicAndPartition, OffsetAndMetadata]
+      metadata: Map[TopicAndPartition, OffsetAndMetadata],
   ): Either[Err, Map[TopicAndPartition, Short]] =
     setConsumerOffsetMetadata(groupId, metadata, defaultConsumerApiVersion)
 
   def setConsumerOffsetMetadata(
       groupId: String,
       metadata: Map[TopicAndPartition, OffsetAndMetadata],
-      consumerApiVersion: Short
+      consumerApiVersion: Short,
   ): Either[Err, Map[TopicAndPartition, Short]] = {
     var result = Map[TopicAndPartition, Short]()
     val req = OffsetCommitRequest(groupId, metadata, consumerApiVersion)
@@ -387,7 +387,7 @@ object KafkaCluster {
   def checkErrors[T](result: Either[Err, T]): T = {
     result.fold(
         errs => throw new SparkException(errs.mkString("\n")),
-        ok => ok
+        ok => ok,
     )
   }
 

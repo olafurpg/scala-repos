@@ -76,7 +76,7 @@ private class DNSSD {
       regType: String,
       domain: String,
       host: String,
-      port: Int
+      port: Int,
   ): Future[Announcement] = {
     val reply = new Promise[Announcement]
 

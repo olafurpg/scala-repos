@@ -17,7 +17,7 @@ object Runtime {
       classOf[java.lang.Byte] -> classOf[Byte],
       classOf[scala.runtime.BoxedUnit] -> classOf[Unit],
       classOf[java.lang.Boolean] -> classOf[Boolean],
-      classOf[java.lang.String] -> classOf[String]
+      classOf[java.lang.String] -> classOf[String],
   )
 }
 

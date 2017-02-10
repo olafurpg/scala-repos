@@ -55,7 +55,7 @@ object JavaFXAnimation extends JFXApp {
         at(4 s) { rect1.x -> 300d },
         at(3 s) { rect2.y -> 100d tween Interpolator.EaseBoth },
         at(4 s) { rect2.y -> 300d },
-        at(4 s) { rect2.width -> 300d tween Interpolator.EaseBoth }
+        at(4 s) { rect2.width -> 300d tween Interpolator.EaseBoth },
     )
   }
   timeline.play()

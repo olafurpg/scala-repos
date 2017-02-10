@@ -56,7 +56,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
         // `securityProtocol` instead of PLAINTEXT below
         new BrokerEndPoint(server1.config.brokerId,
                            server1.config.hostName,
-                           server1.boundPort(SecurityProtocol.PLAINTEXT))
+                           server1.boundPort(SecurityProtocol.PLAINTEXT)),
     )
   }
 
@@ -245,7 +245,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
           new BrokerEndPoint(x.config.brokerId,
                              if (x.config.hostName.nonEmpty) x.config.hostName
                              else "localhost",
-                             x.boundPort())
+                             x.boundPort()),
     )
 
     // Assert that topic metadata at new brokers is updated correctly

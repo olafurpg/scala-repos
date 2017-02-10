@@ -114,7 +114,7 @@ class ScalaGuiceApplicationBuilderSpec extends PlaySpecification {
       val injector = new GuiceApplicationBuilder()
         .load(
             new play.api.inject.BuiltinModule,
-            bind[Component].to[DefaultComponent]
+            bind[Component].to[DefaultComponent],
         )
         .injector
       // #load-modules

@@ -28,7 +28,7 @@ object Serbench extends Benchmark {
             ("role" -> "Impl") ~
             ("members" -> List(("name" -> "Mark") ~ ("experience" -> 4),
                                ("name" -> "Mary") ~ ("experience" -> 5),
-                               ("name" -> "Nick Noob") ~ ("experience" -> 1)))
+                               ("name" -> "Nick Noob") ~ ("experience" -> 1))),
         ))
   }
 

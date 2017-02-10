@@ -45,7 +45,7 @@ class ObservableIntegerArraySpec
     extends SimpleSFXDelegateSpec[
         jfxc.ObservableIntegerArray, ObservableIntegerArray](
         classOf[jfxc.ObservableIntegerArray],
-        classOf[ObservableIntegerArray]
+        classOf[ObservableIntegerArray],
     ) {
 
   /**

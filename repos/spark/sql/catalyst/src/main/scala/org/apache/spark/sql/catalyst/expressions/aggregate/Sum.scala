@@ -52,7 +52,7 @@ case class Sum(child: Expression) extends DeclarativeAggregate {
   override lazy val aggBufferAttributes = sum :: Nil
 
   override lazy val initialValues: Seq[Expression] = Seq(
-      /* sum = */ Literal.create(null, sumDataType)
+      /* sum = */ Literal.create(null, sumDataType),
   )
 
   override lazy val updateExpressions: Seq[Expression] = {
@@ -60,12 +60,12 @@ case class Sum(child: Expression) extends DeclarativeAggregate {
       Seq(
           /* sum = */
           Coalesce(Seq(Add(Coalesce(Seq(sum, zero)), Cast(child, sumDataType)),
-                       sum))
+                       sum)),
       )
     } else {
       Seq(
           /* sum = */
-          Add(Coalesce(Seq(sum, zero)), Cast(child, sumDataType))
+          Add(Coalesce(Seq(sum, zero)), Cast(child, sumDataType)),
       )
     }
   }
@@ -73,7 +73,7 @@ case class Sum(child: Expression) extends DeclarativeAggregate {
   override lazy val mergeExpressions: Seq[Expression] = {
     Seq(
         /* sum = */
-        Coalesce(Seq(Add(Coalesce(Seq(sum.left, zero)), sum.right), sum.left))
+        Coalesce(Seq(Add(Coalesce(Seq(sum.left, zero)), sum.right), sum.left)),
     )
   }
 

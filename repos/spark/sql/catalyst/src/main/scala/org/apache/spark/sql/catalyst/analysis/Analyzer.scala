@@ -83,7 +83,7 @@ class Analyzer(catalog: Catalog,
           ResolveRelations :: ResolveReferences :: ResolveGroupingAnalytics :: ResolvePivot :: ResolveUpCast :: ResolveSortReferences :: ResolveGenerate :: ResolveFunctions :: ResolveAliases :: ResolveSubquery :: ResolveWindowOrder :: ResolveWindowFrame :: ResolveNaturalAndUsingJoin :: ExtractWindowExpressions :: GlobalAggregates :: ResolveAggregateFunctions :: HiveTypeCoercion.typeCoercionRules ++ extendedResolutionRules: _*),
       Batch("Nondeterministic", Once, PullOutNondeterministic),
       Batch("UDF", Once, HandleNullInputsForUDF),
-      Batch("Cleanup", fixedPoint, CleanupAliases)
+      Batch("Cleanup", fixedPoint, CleanupAliases),
   )
 
   /**
@@ -532,7 +532,7 @@ class Analyzer(catalog: Catalog,
             input = t.input.flatMap {
               case s: Star => s.expand(t.child, resolver)
               case o => o :: Nil
-            }
+            },
         )
 
       // If the aggregate function argument contains Stars, expand it.

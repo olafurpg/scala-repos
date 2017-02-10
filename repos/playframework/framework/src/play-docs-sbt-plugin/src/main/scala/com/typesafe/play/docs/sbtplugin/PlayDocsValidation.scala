@@ -360,7 +360,7 @@ object PlayDocsValidation {
         changedPathFiles.map(f => f._1.name -> f._2.name).toList.sorted,
         codeSampleIssues.toList.sortBy(_.name),
         okFiles.map(_.name).toList.sorted,
-        report.files.size
+        report.files.size,
     )
 
     IO.write(file, html.translationReport(result, version).body)

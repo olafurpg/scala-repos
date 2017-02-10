@@ -211,7 +211,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             cm.retType,
             cm.argTypes,
             false,
-            cm.isDeprecated
+            cm.isDeprecated,
         )
       }
 
@@ -224,7 +224,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
               _.replace("$", "."),
               "(^set|^add|Listener$|ElementListener$)".r.replaceAllIn(_, ""),
               ((s: String) => s.head.toLower + s.tail),
-              "Changed$".r.replaceAllIn(_, "Change")
+              "Changed$".r.replaceAllIn(_, "Change"),
           ).reduce(_ andThen _)
 
           val specificName = transforms(setter)
@@ -248,7 +248,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             androidCallbackMethods.map { icm =>
               if (icm.name == cm.name) icm.copy(hasBody = true) else icm
             },
-            cm.isDeprecated
+            cm.isDeprecated,
         )
       }.filter(_.isSafe)
     }

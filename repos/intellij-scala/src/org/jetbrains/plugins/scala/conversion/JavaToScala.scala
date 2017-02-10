@@ -1044,7 +1044,7 @@ object JavaToScala {
       (PsiModifier.PRIVATE, ModifierType.PRIVATE),
       (PsiModifier.PROTECTED, ModifierType.PROTECTED),
       (PsiModifier.TRANSIENT, ModifierType.TRANSIENT),
-      (PsiModifier.NATIVE, ModifierType.NATIVE)
+      (PsiModifier.NATIVE, ModifierType.NATIVE),
   )
 
   def handleModifierList(owner: PsiModifierListOwner)(

@@ -51,6 +51,6 @@ package object openid {
       "openid.response_nonce" -> "2012-05-25T06:47:55ZEJvRv76xQcWbTG",
       "openid.assoc_handle" -> "AMlYA9VC8_UIj4-y4K_X2E_mdv-123-ABC",
       "openid.signed" -> defaultSigned,
-      "openid.sig" -> "MWRsJZ/9AOMQt9gH6zTZIfIjk6g="
+      "openid.sig" -> "MWRsJZ/9AOMQt9gH6zTZIfIjk6g=",
   )
 }

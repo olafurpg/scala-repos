@@ -37,7 +37,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
   private def createTestDataFrame: DataFrame = {
     Seq(
         (1, 1),
-        (2, 2)
+        (2, 2),
     ).toDF().filter("_1 > 1")
   }
 
@@ -56,7 +56,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         numTasks = 0,
         rddInfos = Nil,
         parentIds = Nil,
-        details = ""
+        details = "",
     )
 
   private def createTaskInfo(taskId: Int, attemptNumber: Int): TaskInfo =
@@ -69,7 +69,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         executorId = "",
         host = "",
         taskLocality = null,
-        speculative = false
+        speculative = false,
     )
 
   private def createTaskMetrics(
@@ -123,7 +123,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
                               time = System.currentTimeMillis(),
                               stageInfos = Seq(
                                     createStageInfo(0, 0),
-                                    createStageInfo(1, 0)
+                                    createStageInfo(1, 0),
                                 ),
                               createProperties(executionId)))
     listener.onStageSubmitted(
@@ -143,7 +143,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
                 (1L,
                  0,
                  0,
-                 createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
+                 createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
             )))
 
     checkAnswer(
@@ -162,7 +162,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
                  0,
                  0,
                  createTaskMetrics(accumulatorUpdates.mapValues(_ * 2))
-                   .accumulatorUpdates())
+                   .accumulatorUpdates()),
             )))
 
     checkAnswer(
@@ -184,7 +184,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
                 (1L,
                  0,
                  1,
-                 createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
+                 createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
             )))
 
     checkAnswer(
@@ -240,7 +240,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
                 (1L,
                  1,
                  0,
-                 createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
+                 createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
             )))
 
     checkAnswer(
@@ -275,7 +275,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkListenerJobEnd(
             jobId = 0,
             time = System.currentTimeMillis(),
-            JobSucceeded
+            JobSucceeded,
         ))
     listener.onOtherEvent(
         SparkListenerSQLExecutionEnd(executionId, System.currentTimeMillis()))
@@ -311,7 +311,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkListenerJobEnd(
             jobId = 0,
             time = System.currentTimeMillis(),
-            JobSucceeded
+            JobSucceeded,
         ))
 
     val executionUIData = listener.executionIdToData(0)
@@ -341,7 +341,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkListenerJobEnd(
             jobId = 0,
             time = System.currentTimeMillis(),
-            JobSucceeded
+            JobSucceeded,
         ))
 
     listener.onJobStart(
@@ -355,7 +355,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkListenerJobEnd(
             jobId = 1,
             time = System.currentTimeMillis(),
-            JobSucceeded
+            JobSucceeded,
         ))
 
     val executionUIData = listener.executionIdToData(0)
@@ -387,7 +387,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkListenerJobEnd(
             jobId = 0,
             time = System.currentTimeMillis(),
-            JobFailed(new RuntimeException("Oops"))
+            JobFailed(new RuntimeException("Oops")),
         ))
 
     val executionUIData = listener.executionIdToData(0)
@@ -476,7 +476,7 @@ class SQLListenerMemoryLeakSuite extends SparkFunSuite {
         for (i <- 0 until 100) {
           val df = Seq(
               (1, 1),
-              (2, 2)
+              (2, 2),
           ).toDF()
           df.collect()
           try {

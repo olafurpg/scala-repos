@@ -398,6 +398,6 @@ object NumericRange {
       Numeric.LongIsIntegral -> Ordering.Long,
       Numeric.FloatAsIfIntegral -> Ordering.Float,
       Numeric.DoubleAsIfIntegral -> Ordering.Double,
-      Numeric.BigDecimalAsIfIntegral -> Ordering.BigDecimal
+      Numeric.BigDecimalAsIfIntegral -> Ordering.BigDecimal,
   )
 }

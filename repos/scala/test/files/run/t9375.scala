@@ -149,7 +149,7 @@ object DeserializeModuleNoConstructor {
         c.N,
         ca,
         cc,
-        c.a
+        c.a,
     )
 
     println(
@@ -186,7 +186,7 @@ object DeserializeModuleNoConstructor {
         c.v -> c,
         c.f() -> c,
         c.a.O -> c.a,
-        c.a.P -> c.a
+        c.a.P -> c.a,
     )
 
     println(
@@ -213,7 +213,7 @@ object DeserializeModuleNoConstructor {
         serializeDeserialize(a),
         serializeDeserialize(a.O).outer.asInstanceOf[A],
         serializeDeserialize(a.P).outer.asInstanceOf[A],
-        serializeDeserialize(a.v).outer.asInstanceOf[A]
+        serializeDeserialize(a.v).outer.asInstanceOf[A],
     )
     for (aSD <- deserializedAs) {
       assert(aSD ne a)

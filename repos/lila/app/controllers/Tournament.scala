@@ -41,7 +41,7 @@ object Tournament extends LilaController {
         api = _ =>
             env.api.fetchVisibleTournaments map { tours =>
             Ok(env scheduleJsonView tours)
-        }
+        },
     )
   }
 
@@ -87,7 +87,7 @@ object Tournament extends LilaController {
                                  socketVersion)
                 } map { Ok(_) }
               }.mon(_.http.response.tournament.show.mobile)
-          } map (_ as JSON)
+          } map (_ as JSON),
     ) map NoCache
   }
 
@@ -152,7 +152,7 @@ object Tournament extends LilaController {
               OptionFuOk(repo enterableById id) { tour =>
               env.api.join(tour.id, me)
               fuccess(Json.obj("ok" -> true))
-          }
+          },
       )
     }
   }

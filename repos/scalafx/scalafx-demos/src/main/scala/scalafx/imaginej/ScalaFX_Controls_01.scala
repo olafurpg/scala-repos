@@ -95,7 +95,7 @@ object ScalaFX_Controls_01 extends JFXApp {
     children = List(
         searchLabel,
         valuesLabel,
-        wrappedLabel
+        wrappedLabel,
     )
   }
   stage = new PrimaryStage {

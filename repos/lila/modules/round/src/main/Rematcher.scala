@@ -23,7 +23,7 @@ private[round] final class Rematcher(messenger: Messenger,
       (game.opponent(color).isOfferingRematch ||
           game.opponent(color).isAi).fold(
           game.next.fold(rematchJoin(pov))(rematchExists(pov)),
-          rematchCreate(pov)
+          rematchCreate(pov),
       )
     case _ => fuccess(Nil)
   }

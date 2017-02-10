@@ -138,7 +138,7 @@ object ReplicaVerificationTool extends Logging {
         topicMetadata =>
           if (topicWhiteListFiler.isTopicAllowed(
                   topicMetadata.topic, excludeInternalTopics = false)) true
-          else false
+          else false,
     )
     val topicPartitionReplicaList: Seq[TopicPartitionReplica] =
       filteredTopicMetadata.flatMap(
@@ -149,8 +149,8 @@ object ReplicaVerificationTool extends Logging {
                         TopicPartitionReplica(
                             topic = topicMetadataResponse.topic,
                             partitionId = partitionMetadata.partitionId,
-                            replicaId = broker.id))
-          )
+                            replicaId = broker.id)),
+          ),
       )
     debug("Selected topic partitions: " + topicPartitionReplicaList)
     val topicAndPartitionsPerBroker: Map[Int, Seq[TopicAndPartition]] =
@@ -179,7 +179,7 @@ object ReplicaVerificationTool extends Logging {
               topicMetadataResponse.partitionsMetadata.map(partitionMetadata =>
                     (new TopicAndPartition(topicMetadataResponse.topic,
                                            partitionMetadata.partitionId),
-                     partitionMetadata.leader.get.id))
+                     partitionMetadata.leader.get.id)),
         )
         .groupBy(_._2)
         .mapValues(topicAndPartitionAndLeaderIds =>

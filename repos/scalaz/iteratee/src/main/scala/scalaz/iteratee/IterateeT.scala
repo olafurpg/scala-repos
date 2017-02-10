@@ -22,7 +22,7 @@ sealed abstract class IterateeT[E, F[_], A] {
 
   def foldT[Z](
       cont: (Input[E] => IterateeT[E, F, A]) => F[Z],
-      done: (=> A, => Input[E]) => F[Z]
+      done: (=> A, => Input[E]) => F[Z],
   )(implicit F: Bind[F]): F[Z] =
     F.bind(value)((s: StepT[E, F, A]) => s(cont, done))
 
@@ -33,7 +33,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     F.bind((this &= enumEofT[E, F]).value)((s: StepT[E, F, A]) =>
           s.fold(
               cont = _ => sys.error("diverging iteratee"),
-              done = (a, _) => F.point(a)
+              done = (a, _) => F.point(a),
         ))
   }
 
@@ -50,8 +50,8 @@ sealed abstract class IterateeT[E, F[_], A] {
                           F.bind(f(a).value)(_.fold(
                                   cont = kk => kk(i).value,
                                   done = (aa, _) =>
-                                      F.point(StepT.sdone[E, F, B](aa, i))
-                              ))
+                                      F.point(StepT.sdone[E, F, B](aa, i)),
+                              )),
               )))
     through(this)
   }
@@ -64,7 +64,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     def step(s: StepT[E, F, A]): IterateeT[EE, F, A] =
       s.fold[IterateeT[EE, F, A]](
           cont = k => cont((in: Input[EE]) => k(in.map(i => f(i))) >>== step),
-          done = (a, i) => done(a, if (i.isEof) eofInput else emptyInput)
+          done = (a, i) => done(a, if (i.isEof) eofInput else emptyInput),
       )
 
     this >>== step
@@ -112,7 +112,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     def step: StepT[E, F, A] => StepT[E, G, A] =
       _.fold(
           cont = k => scont[E, G, A](k andThen loop),
-          done = (a, i) => sdone[E, G, A](a, i)
+          done = (a, i) => sdone[E, G, A](a, i),
       )
     def loop: IterateeT[E, F, A] => IterateeT[E, G, A] =
       i => iterateeT(f(F.map(i.value)(step)))
@@ -135,7 +135,7 @@ sealed abstract class IterateeT[E, F[_], A] {
             k(eofInput) >>== { s =>
             s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
         },
-        done = (a, _) => M0.point(a)
+        done = (a, _) => M0.point(a),
     )
 
     outer(this) flatMap check
@@ -169,7 +169,7 @@ sealed abstract class IterateeT[E, F[_], A] {
         .IterateeTMonadTrans[E]
         .liftM(i.foldT[(Option[(Z, Input[E])], IterateeT[E, F, Z])](
                 cont = k => F.point((None, k(in))),
-                done = (a, x) => F.point((Some((a, x)), done(a, x)))
+                done = (a, x) => F.point((Some((a, x)), done(a, x))),
             ))
     def loop(x: IterateeT[E, F, A], y: IterateeT[E, F, B])(
         in: Input[E]): IterateeT[E, F, (A, B)] = in(
@@ -187,7 +187,7 @@ sealed abstract class IterateeT[E, F[_], A] {
         },
         empty = cont(loop(x, y)),
         eof = (x &= enumEofT[E, F]) flatMap
-          (a => (y &= enumEofT[E, F]) map (b => (a, b)))
+          (a => (y &= enumEofT[E, F]) map (b => (a, b))),
     )
     cont(loop(this, other))
   }

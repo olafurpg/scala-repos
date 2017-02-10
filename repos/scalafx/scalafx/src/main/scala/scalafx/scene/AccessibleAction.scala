@@ -226,7 +226,7 @@ object AccessibleAction
       SetTextSelection,
       SetText,
       SetValue,
-      ShowMenu
+      ShowMenu,
   )
 }
 

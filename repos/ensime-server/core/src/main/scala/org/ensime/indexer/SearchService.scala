@@ -25,10 +25,10 @@ import scala.concurrent.duration._
   */
 class SearchService(
     config: EnsimeConfig,
-    resolver: SourceResolver
+    resolver: SourceResolver,
 )(
     implicit actorSystem: ActorSystem,
-    vfs: EnsimeVFS
+    vfs: EnsimeVFS,
 )
     extends ClassfileIndexer with FileChangeListener with SLF4JLogging {
 
@@ -282,7 +282,7 @@ class SearchService(
   // deletion in both Lucene and H2 is really slow, batching helps
   def deleteInBatches(
       files: List[FileObject],
-      batchSize: Int = 1000
+      batchSize: Int = 1000,
   ): Future[Int] = {
     val removing = files.grouped(batchSize).map(delete)
     Future.sequence(removing).map(_.sum)

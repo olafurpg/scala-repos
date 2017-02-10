@@ -38,6 +38,6 @@ object Ticket543Test extends Build {
             marker.delete()
             if (!exists)
               sys.error("Null or invalid error had been returned previously")
-          }
+          },
         ))
 }

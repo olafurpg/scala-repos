@@ -59,7 +59,7 @@ object ApiCommit {
             x.newPath
         },
         author = ApiPersonIdent.author(commit),
-        committer = ApiPersonIdent.committer(commit)
+        committer = ApiPersonIdent.committer(commit),
     )(repositoryName, urlIsHtmlUrl)
   }
   def forPushPayload(git: Git,

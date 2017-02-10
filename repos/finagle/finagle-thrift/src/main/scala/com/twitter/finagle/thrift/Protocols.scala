@@ -56,7 +56,7 @@ object Protocols {
       strictRead: Boolean = false,
       strictWrite: Boolean = true,
       readLength: Int = 0,
-      statsReceiver: StatsReceiver = DefaultStatsReceiver
+      statsReceiver: StatsReceiver = DefaultStatsReceiver,
   ): TProtocolFactory = {
     if (!optimizedBinarySupported) {
       new TBinaryProtocol.Factory(strictRead, strictWrite, readLength)

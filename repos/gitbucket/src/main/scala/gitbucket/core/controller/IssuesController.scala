@@ -36,24 +36,24 @@ trait IssuesControllerBase extends ControllerBase {
       "content" -> trim(optional(text())),
       "assignedUserName" -> trim(optional(text())),
       "milestoneId" -> trim(optional(number())),
-      "labelNames" -> trim(optional(text()))
+      "labelNames" -> trim(optional(text())),
   )(IssueCreateForm.apply)
 
   val issueTitleEditForm = mapping(
-      "title" -> trim(label("Title", text(required)))
+      "title" -> trim(label("Title", text(required))),
   )(x => x)
   val issueEditForm = mapping(
-      "content" -> trim(optional(text()))
+      "content" -> trim(optional(text())),
   )(x => x)
 
   val commentForm = mapping(
       "issueId" -> label("Issue Id", number()),
-      "content" -> trim(label("Comment", text(required)))
+      "content" -> trim(label("Comment", text(required))),
   )(CommentForm.apply)
 
   val issueStateForm = mapping(
       "issueId" -> label("Issue Id", number()),
-      "content" -> trim(optional(text()))
+      "content" -> trim(optional(text())),
   )(IssueStateForm.apply)
 
   get("/:owner/:repository/issues")(
@@ -292,9 +292,9 @@ trait IssuesControllerBase extends ControllerBase {
                         enableTaskList = true,
                         hasWritePermission = isEditable(x.userName,
                                                         x.repositoryName,
-                                                        x.openedUserName)
-                    )
-                )
+                                                        x.openedUserName),
+                    ),
+                ),
             )
           }
         } else Unauthorized
@@ -324,9 +324,9 @@ trait IssuesControllerBase extends ControllerBase {
                         enableTaskList = true,
                         hasWritePermission = isEditable(x.userName,
                                                         x.repositoryName,
-                                                        x.commentedUserName)
-                    )
-                )
+                                                        x.commentedUserName),
+                    ),
+                ),
             )
           }
         } else Unauthorized

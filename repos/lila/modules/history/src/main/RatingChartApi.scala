@@ -30,7 +30,7 @@ final class RatingChartApi(historyApi: HistoryApi,
           Json.arr("string", "Date"),
           Json.arr("number", "Standard"),
           Json.arr("number", "Opponent Rating"),
-          Json.arr("number", "Average")
+          Json.arr("number", "Average"),
       )
     }
 

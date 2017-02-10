@@ -241,7 +241,7 @@ trait TypeDiagnostics { self: Analyzer =>
                       // should be a cleaner way to do this.
                       if (found.dealiasWiden.toString == tp.dealiasWiden.toString)
                         ""
-                      else " (and %s <: %s)".format(found, tp)
+                      else " (and %s <: %s)".format(found, tp),
                   )
                   val explainDef = {
                     val prepend = if (isJava) "Java-defined " else ""
@@ -375,7 +375,7 @@ trait TypeDiagnostics { self: Analyzer =>
           tp.typeSymbol,
           tp.typeSymbol.owner,
           tp.typeSymbolDirect,
-          tp.typeSymbolDirect.owner
+          tp.typeSymbolDirect.owner,
       )
     }
   }

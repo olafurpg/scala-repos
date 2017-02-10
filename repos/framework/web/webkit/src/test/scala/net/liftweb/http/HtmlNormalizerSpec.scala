@@ -40,7 +40,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             </body>
           </html>,
             "/context-path",
-            false
+            false,
         )
         .nodes
 
@@ -61,7 +61,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             <p>Thingies</p>
             <p>More thingies</p>
           </body>
-        </html>
+        </html>,
       )
     }
 
@@ -86,7 +86,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             </body>
           </html>,
             "/context-path",
-            false
+            false,
         )
 
       List("testJs1",
@@ -113,7 +113,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <myelement id="testid" onevent="doStuff" />,
             "/context-path",
-            false
+            false,
         )
 
       html must ==/(<myelement id="testid" />)
@@ -125,7 +125,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <myelement onevent="doStuff" />,
             "/context-path",
-            false
+            false,
         )
 
       val id = html \@ "id"
@@ -144,7 +144,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             <myelement onevent="doStuff3" />
           </div>,
             "/context-path",
-            false
+            false,
         )
 
       js.toJsCmd must be matching
@@ -170,7 +170,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             <myelement action="javascript:/doStuff4" />
           </div>,
             "/context-path",
-            false
+            false,
         )
 
       (html \ "myelement").map(_ \@ "href").filter(_.nonEmpty) must beEmpty
@@ -196,7 +196,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             <myelement action="doStuff4" />
           </div>,
             "/context-path",
-            false
+            false,
         )
 
       (html \ "myelement").map(_ \@ "href").filter(_.nonEmpty) must_==
@@ -227,7 +227,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             </body>
           </html>,
             "/context-path",
-            false
+            false,
         )
         .nodes
 
@@ -257,7 +257,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             </body>
           </html>,
             "/context-path",
-            false
+            false,
         )
         .nodes
 
@@ -287,7 +287,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             </body>
           </html>,
             "/context-path",
-            false
+            false,
         )
         .nodes
 
@@ -317,7 +317,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             </body>
           </html>,
             "/context-path",
-            false
+            false,
         )
         .nodes
 
@@ -346,7 +346,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               </body>
             </html>,
               "/context-path",
-              false
+              false,
           )
           .nodes
       }
@@ -376,7 +376,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               </body>
             </html>,
               "/context-path",
-              false
+              false,
           )
           .nodes
       }
@@ -406,7 +406,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               </body>
             </html>,
               "/context-path",
-              false
+              false,
           )
           .nodes
       }
@@ -436,7 +436,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               </body>
             </html>,
               "/context-path",
-              false
+              false,
           )
           .nodes
       }

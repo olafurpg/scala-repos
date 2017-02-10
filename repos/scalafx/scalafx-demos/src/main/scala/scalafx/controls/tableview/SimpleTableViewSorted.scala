@@ -38,7 +38,7 @@ object SimpleTableViewSorted extends JFXApp {
       new Person("Peggy", "Sue", "555-6798"),
       new Person("Desmond", "Sue", "555-6798"),
       new Person("Rocky", "Raccoon", "555-8036"),
-      new Person("Molly", "Raccoon", "555-0789")
+      new Person("Molly", "Raccoon", "555-0789"),
   )
 
   stage = new PrimaryStage {

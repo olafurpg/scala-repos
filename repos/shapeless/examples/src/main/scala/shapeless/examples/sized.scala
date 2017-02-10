@@ -66,7 +66,7 @@ object SizedExamples extends App {
     val rows = List(
         List("Types and Programming Languages", "Benjamin Pierce"),
         List("The Implementation of Functional Programming Languages",
-             "Simon Peyton-Jones")
+             "Simon Peyton-Jones"),
     )
 
     for {

@@ -47,7 +47,7 @@ package virtualhost {
           fooRouter,
           errorHandler,
           configuration,
-          filters
+          filters,
       ) {
 
     override def routeRequest(request: RequestHeader) = {

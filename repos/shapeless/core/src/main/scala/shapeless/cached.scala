@@ -109,7 +109,7 @@ class CachedMacros(override val c: whitebox.Context)
           val tree = mkImpl[T](
               (tree,
               actualType) => q"_root_.shapeless.Cached[$actualType]($tree)",
-              q"null.asInstanceOf[_root_.shapeless.Cached[_root_.scala.Nothing]]"
+              q"null.asInstanceOf[_root_.shapeless.Cached[_root_.scala.Nothing]]",
           )
 
           CachedMacros.cache = (tpe -> tree) :: CachedMacros.cache

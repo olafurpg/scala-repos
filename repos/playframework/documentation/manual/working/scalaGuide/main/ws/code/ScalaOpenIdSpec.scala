@@ -38,7 +38,7 @@ object ScalaOpenIdSpec extends PlaySpecification {
 
   def loginPost = Action.async { implicit request =>
     Form(single(
-            "openid" -> nonEmptyText
+            "openid" -> nonEmptyText,
         )).bindFromRequest.fold({ error =>
       Logger.info(s"bad request ${error.toString}")
       Future.successful(BadRequest(error.toString))
@@ -67,7 +67,7 @@ object ScalaOpenIdSpec extends PlaySpecification {
     openIdClient.redirectURL(
         openId,
         routes.Application.openIdCallback.absoluteURL(),
-        Seq("email" -> "http://schema.openid.net/contact/email")
+        Seq("email" -> "http://schema.openid.net/contact/email"),
     )
     //#extended
   }

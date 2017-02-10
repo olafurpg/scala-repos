@@ -56,7 +56,7 @@ object BubbleChartDemo extends JFXApp {
                           (20, 80, 13),
                           (100, 60, 10),
                           (30, 40, 6),
-                          (50, 20, 12)))
+                          (50, 20, 12))),
         )
       }
     }
@@ -69,6 +69,6 @@ object BubbleChartDemo extends JFXApp {
         ObservableBuffer(
             data.map {
           case (x, y, r) => XYChart.Data[Number, Number](x, y, r)
-        })
+        }),
     )
 }

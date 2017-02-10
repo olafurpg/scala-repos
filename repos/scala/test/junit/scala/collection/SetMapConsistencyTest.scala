@@ -404,7 +404,7 @@ class SetMapConsistencyTest {
         () => boxIim,
         () => boxIhm[Int],
         () => boxIlm[Int],
-        () => boxItm[Int]
+        () => boxItm[Int],
     )
     assert(
         maps
@@ -425,7 +425,7 @@ class SetMapConsistencyTest {
         () => boxMtm[Long],
         () => boxMohm[Long],
         () => boxIhm[Long],
-        () => boxIlm[Long]
+        () => boxIlm[Long],
     )
     assert(
         maps
@@ -444,7 +444,7 @@ class SetMapConsistencyTest {
         () => boxMarm[String],
         () => boxJavaM[String],
         () => boxIhm[String],
-        () => boxIlm[String]
+        () => boxIlm[String],
     )
     assert(
         maps
@@ -462,7 +462,7 @@ class SetMapConsistencyTest {
         () => boxMohm[Any],
         () => boxJavaM[Any],
         () => boxIhm[Any],
-        () => boxIlm[Any]
+        () => boxIlm[Any],
     )
     assert(
         maps
@@ -484,7 +484,7 @@ class SetMapConsistencyTest {
         () => boxIbs,
         () => boxIhs[Int],
         () => boxIls[Int],
-        () => boxIts[Int]
+        () => boxIts[Int],
     )
     assert(
         sets
@@ -502,7 +502,7 @@ class SetMapConsistencyTest {
         () => boxJavaS[Any],
         () => boxMhs[Any],
         () => boxIhs[Any],
-        () => boxIls[Any]
+        () => boxIls[Any],
     )
     assert(
         sets

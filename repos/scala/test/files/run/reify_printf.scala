@@ -33,10 +33,10 @@ object Test extends App {
                 NoMods,
                 local,
                 TypeTree(tpe),
-                value
-            )
+                value,
+            ),
         ),
-        Ident(local)
+        Ident(local),
     )
   }
 
@@ -62,11 +62,11 @@ object Test extends App {
           Select(
               Select(
                   Ident(TermName("scala")),
-                  TermName("Predef")
+                  TermName("Predef"),
               ),
-              TermName("print")
+              TermName("print"),
           ),
-          List(ref)
+          List(ref),
       ): Tree
     Block((evals ++ prints).toList, Literal(Constant(())))
   }

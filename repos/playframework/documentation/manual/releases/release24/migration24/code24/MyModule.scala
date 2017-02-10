@@ -15,7 +15,7 @@ package scaladoc {
       def bindings(environment: Environment,
                    configuration: Configuration): Seq[Binding[_]] = {
         Seq(
-            bind[MyComponent].to[MyComponentImpl]
+            bind[MyComponent].to[MyComponentImpl],
         )
       }
     }

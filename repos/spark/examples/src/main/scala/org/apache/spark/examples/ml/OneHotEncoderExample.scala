@@ -39,7 +39,7 @@ object OneHotEncoderExample {
               (2, "c"),
               (3, "a"),
               (4, "a"),
-              (5, "c")
+              (5, "c"),
           ))
       .toDF("id", "category")
 

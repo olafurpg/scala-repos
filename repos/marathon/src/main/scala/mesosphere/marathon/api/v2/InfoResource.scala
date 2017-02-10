@@ -20,7 +20,7 @@ class InfoResource @Inject() (
     leaderInfo: LeaderInfo,
     // format: OFF
     protected val config: MarathonConf
-      with HttpConf with EventConfiguration with HttpEventConfiguration with LeaderProxyConf
+      with HttpConf with EventConfiguration with HttpEventConfiguration with LeaderProxyConf,
 ) extends RestResource {
   // format: ON
 
@@ -49,12 +49,12 @@ class InfoResource @Inject() (
     "zk" -> config.zooKeeperUrl(),
     "zk_timeout" -> config.zooKeeperTimeout(),
     "zk_session_timeout" -> config.zooKeeperSessionTimeout(),
-    "zk_max_versions" -> config.zooKeeperMaxVersions()
+    "zk_max_versions" -> config.zooKeeperMaxVersions(),
   )
 
   private[this] lazy val eventHandlerConfigValues = {
     def httpEventConfig: JsObject = Json.obj(
-      "http_endpoints" -> config.httpEventEndpoints.get
+      "http_endpoints" -> config.httpEventEndpoints.get,
     )
 
     def eventConfig(): JsObject = config.eventSubscriber.get match {
@@ -63,14 +63,14 @@ class InfoResource @Inject() (
     }
 
     Json.obj(
-      "type" -> config.eventSubscriber.get
+      "type" -> config.eventSubscriber.get,
     ) ++ eventConfig
   }
 
   private[this] lazy val httpConfigValues = Json.obj(
     "assets_path" -> config.assetsFileSystemPath.get,
     "http_port" -> config.httpPort.get,
-    "https_port" -> config.httpsPort.get
+    "https_port" -> config.httpsPort.get,
   )
 
   @GET

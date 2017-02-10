@@ -55,12 +55,12 @@ class RetryFilter[Req, Rep](retryPolicy: RetryPolicy[(Req, Try[Rep])],
   def this(
       retryPolicy: RetryPolicy[(Req, Try[Rep])],
       timer: Timer,
-      statsReceiver: StatsReceiver
+      statsReceiver: StatsReceiver,
   ) = this(
       retryPolicy,
       timer,
       statsReceiver,
-      RetryBudget()
+      RetryBudget(),
   )
 
   private[this] val retriesStat = statsReceiver.stat("retries")
@@ -83,7 +83,7 @@ class RetryFilter[Req, Rep](retryPolicy: RetryPolicy[(Req, Try[Rep])],
       req: Req,
       service: Service[Req, Rep],
       policy: RetryPolicy[(Req, Try[Rep])],
-      count: Int = 0
+      count: Int = 0,
   ): Future[Rep] = {
     val svcRep = service(req)
     svcRep.transform { rep =>
@@ -122,11 +122,11 @@ object RetryFilter {
     */
   def apply[Req, Rep](
       backoffs: Stream[Duration],
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   )(
-      shouldRetry: PartialFunction[(Req, Try[Rep]), Boolean]
+      shouldRetry: PartialFunction[(Req, Try[Rep]), Boolean],
   )(
-      implicit timer: Timer
+      implicit timer: Timer,
   ): RetryFilter[Req, Rep] =
     new RetryFilter[Req, Rep](
         RetryPolicy.backoff(backoffs)(shouldRetry), timer, statsReceiver)
@@ -173,12 +173,12 @@ final class RetryExceptionsFilter[Req, Rep](
   def this(
       retryPolicy: RetryPolicy[Try[Nothing]],
       timer: Timer,
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   ) = this(
       retryPolicy,
       timer,
       statsReceiver,
-      RetryBudget()
+      RetryBudget(),
   )
 }
 
@@ -192,11 +192,11 @@ object RetryExceptionsFilter {
     */
   def apply[Req, Rep](
       backoffs: Stream[Duration],
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   )(
-      shouldRetry: PartialFunction[Try[Nothing], Boolean]
+      shouldRetry: PartialFunction[Try[Nothing], Boolean],
   )(
-      implicit timer: Timer
+      implicit timer: Timer,
   ): RetryExceptionsFilter[Req, Rep] =
     new RetryExceptionsFilter[Req, Rep](
         RetryPolicy.backoff(backoffs)(shouldRetry),
@@ -206,7 +206,7 @@ object RetryExceptionsFilter {
   def typeAgnostic(
       retryPolicy: RetryPolicy[Try[Nothing]],
       timer: Timer,
-      statsReceiver: StatsReceiver = NullStatsReceiver
+      statsReceiver: StatsReceiver = NullStatsReceiver,
   ): TypeAgnostic = new TypeAgnostic {
     override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
       new RetryExceptionsFilter[Req, Rep](retryPolicy, timer, statsReceiver)

@@ -77,7 +77,7 @@ class EnsembleAdvancedBarChart extends EnsembleExample {
       data = ObservableBuffer(
           XYChart.Data[String, Number](years(0), 956),
           XYChart.Data[String, Number](years(1), 1665),
-          XYChart.Data[String, Number](years(2), 2450)
+          XYChart.Data[String, Number](years(2), 2450),
       )
     }
 

@@ -429,7 +429,7 @@ abstract class TreeCheckers extends Analyzer {
           def front = List(
               mk[Tree]("tree", tree),
               mk[Position]("position", tree.pos, posstr),
-              mk("with sym", treeSym, signature)
+              mk("with sym", treeSym, signature),
           )
           def tpes = treeTpe match {
             case NoType => Nil

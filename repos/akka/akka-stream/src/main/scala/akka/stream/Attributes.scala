@@ -65,7 +65,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   def getAttribute[T <: Attribute](c: Class[T]): Optional[T] =
     Optional.ofNullable(
         attributeList.foldLeft(
-            null.asInstanceOf[T]
+            null.asInstanceOf[T],
         )((acc, attr) ⇒ if (c.isInstance(attr)) c.cast(attr) else acc))
 
   /**

@@ -42,5 +42,5 @@ case class PullRequest(
     requestRepositoryName: String,
     requestBranch: String,
     commitIdFrom: String,
-    commitIdTo: String
+    commitIdTo: String,
 )

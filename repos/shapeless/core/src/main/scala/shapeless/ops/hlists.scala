@@ -1115,7 +1115,7 @@ object hlist {
 
     implicit def hlistPartition1[
         H, L <: HList, LPrefix <: HList, LSuffix <: HList](
-        implicit p: Aux[L, H, LPrefix, LSuffix]
+        implicit p: Aux[L, H, LPrefix, LSuffix],
     ): Aux[H :: L, H, H :: LPrefix, LSuffix] = new Partition[H :: L, H] {
       type Prefix = H :: LPrefix
       type Suffix = LSuffix
@@ -1127,7 +1127,7 @@ object hlist {
     implicit def hlistPartition2[
         H, L <: HList, U, LPrefix <: HList, LSuffix <: HList](
         implicit p: Aux[L, U, LPrefix, LSuffix],
-        e: U =:!= H
+        e: U =:!= H,
     ): Aux[H :: L, U, LPrefix, H :: LSuffix] = new Partition[H :: L, U] {
       type Prefix = LPrefix
       type Suffix = H :: LSuffix
@@ -1281,7 +1281,7 @@ object hlist {
 
     implicit def hlistFilter[
         L <: HList, U, LPrefix <: HList, LSuffix <: HList](
-        implicit partition: Partition.Aux[L, U, LPrefix, LSuffix]
+        implicit partition: Partition.Aux[L, U, LPrefix, LSuffix],
     ): Aux[L, U, LPrefix] = new Filter[L, U] {
       type Out = LPrefix
 
@@ -1308,7 +1308,7 @@ object hlist {
 
     implicit def hlistFilterNot[
         L <: HList, U, LPrefix <: HList, LSuffix <: HList](
-        implicit partition: Partition.Aux[L, U, LPrefix, LSuffix]
+        implicit partition: Partition.Aux[L, U, LPrefix, LSuffix],
     ): Aux[L, U, LSuffix] = new FilterNot[L, U] {
       type Out = LSuffix
 
@@ -2926,7 +2926,7 @@ object hlist {
         Size <: Nat,
         NModSize <: Nat,
         Before <: HList,
-        After <: HList
+        After <: HList,
     ](implicit length: Length.Aux[L, Size],
       mod: nat.Mod.Aux[N, Size, NModSize],
       split: Split.Aux[L, NModSize, Before, After],
@@ -2981,7 +2981,7 @@ object hlist {
         N <: Nat,
         Size <: Nat,
         NModSize <: Nat,
-        Size_Diff_NModSize <: Nat
+        Size_Diff_NModSize <: Nat,
     ](implicit length: Length.Aux[L, Size],
       mod: nat.Mod.Aux[N, Size, NModSize],
       diff: nat.Diff.Aux[Size, NModSize, Size_Diff_NModSize],

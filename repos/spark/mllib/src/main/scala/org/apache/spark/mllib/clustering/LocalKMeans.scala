@@ -38,7 +38,7 @@ private[mllib] object LocalKMeans extends Logging {
       points: Array[VectorWithNorm],
       weights: Array[Double],
       k: Int,
-      maxIterations: Int
+      maxIterations: Int,
   ): Array[VectorWithNorm] = {
     val rand = new Random(seed)
     val dimensions = points(0).vector.size

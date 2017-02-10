@@ -50,17 +50,17 @@ class UnreachableCodeTest extends ClearAfterClass {
     assertEliminateDead(
         Op(ACONST_NULL),
         Op(ATHROW),
-        Op(RETURN).dead
+        Op(RETURN).dead,
     )
 
     assertEliminateDead(
-        Op(RETURN)
+        Op(RETURN),
     )
 
     assertEliminateDead(
         Op(RETURN),
         Op(ACONST_NULL).dead,
-        Op(ATHROW).dead
+        Op(ATHROW).dead,
     )
   }
 
@@ -70,7 +70,7 @@ class UnreachableCodeTest extends ClearAfterClass {
         // reachable, but removed anyway.
         Op(NOP).dead,
         Op(RETURN),
-        Op(NOP).dead
+        Op(NOP).dead,
     )
   }
 
@@ -81,13 +81,13 @@ class UnreachableCodeTest extends ClearAfterClass {
         Op(ACONST_NULL).dead,
         Op(ATHROW).dead,
         Label(1),
-        Op(RETURN)
+        Op(RETURN),
     )
 
     assertEliminateDead(
         Jump(GOTO, Label(1)),
         Label(1),
-        Op(RETURN)
+        Op(RETURN),
     )
   }
 
@@ -98,7 +98,7 @@ class UnreachableCodeTest extends ClearAfterClass {
         Jump(GOTO, Label(1)).dead,
         // not dead - labels may be referenced from other places in a classfile (eg exceptions table).
         // will need a different opt to get rid of them
-        Label(1)
+        Label(1),
     )
   }
 
@@ -108,7 +108,7 @@ class UnreachableCodeTest extends ClearAfterClass {
         // not dead, visited by data flow analysis.
         Op(ACONST_NULL),
         Op(POP),
-        Op(RETURN)
+        Op(RETURN),
     )
   }
 
@@ -119,7 +119,7 @@ class UnreachableCodeTest extends ClearAfterClass {
         Jump(IFNULL, Label(1)),
         Op(RETURN), // not dead
         Label(1),
-        Op(RETURN)
+        Op(RETURN),
     )
   }
 
@@ -187,13 +187,13 @@ class UnreachableCodeTest extends ClearAfterClass {
   def metaTest(): Unit = {
     assertThrows[AssertionError](
         assertEliminateDead(Op(RETURN).dead),
-        _.contains("Expected: List()\nActual  : List(Op(RETURN))")
+        _.contains("Expected: List()\nActual  : List(Op(RETURN))"),
     )
 
     assertThrows[AssertionError](
         assertEliminateDead(Op(RETURN), Op(RETURN)),
         _.contains(
-            "Expected: List(Op(RETURN), Op(RETURN))\nActual  : List(Op(RETURN))")
+            "Expected: List(Op(RETURN), Op(RETURN))\nActual  : List(Op(RETURN))"),
     )
   }
 

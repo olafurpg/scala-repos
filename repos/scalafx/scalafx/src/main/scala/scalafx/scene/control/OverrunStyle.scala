@@ -76,7 +76,7 @@ object OverrunStyle
       CenterEllipsis,
       CenterWordEllipsis,
       LeadingEllipsis,
-      LeadingWordEllipsis
+      LeadingWordEllipsis,
   )
 }
 

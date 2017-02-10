@@ -103,7 +103,7 @@ class AhcWSClientConfigParser @Inject()(wsClientConfig: WSClientConfig,
         maxNumberOfRedirects = maximumNumberOfRedirects,
         maxRequestRetry = maxRequestRetry,
         disableUrlEncoding = disableUrlEncoding,
-        keepAlive = keepAlive
+        keepAlive = keepAlive,
     )
   }
 }

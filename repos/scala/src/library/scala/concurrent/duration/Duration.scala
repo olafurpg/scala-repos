@@ -86,7 +86,7 @@ object Duration {
       SECONDS -> "s sec second",
       MILLISECONDS -> "ms milli millisecond",
       MICROSECONDS -> "µs micro microsecond",
-      NANOSECONDS -> "ns nano nanosecond"
+      NANOSECONDS -> "ns nano nanosecond",
   )
 
   // TimeUnit => standard label

@@ -19,7 +19,7 @@ class SemanticHighlightingSpec
       config: EnsimeConfig,
       cc: RichCompilerControl,
       content: String,
-      tpes: List[SourceSymbol] = SourceSymbol.allSymbols
+      tpes: List[SourceSymbol] = SourceSymbol.allSymbols,
   ): List[(SourceSymbol, String)] = {
 
     val file = srcFile(config, "abc.scala", contents(content))
@@ -48,7 +48,7 @@ class SemanticHighlightingSpec
               def fun(a: Any) = a match { case x: Test => Unit }
             }
           """,
-          List(ClassSymbol)
+          List(ClassSymbol),
       )
       sds should ===(
           List(
@@ -59,7 +59,7 @@ class SemanticHighlightingSpec
               (ClassSymbol, "X2"),
               (ClassSymbol, "Y"),
               (ClassSymbol, "Any"),
-              (ClassSymbol, "Test")
+              (ClassSymbol, "Test"),
           ))
   }
 
@@ -79,7 +79,7 @@ class SemanticHighlightingSpec
               val e1 = new   X3
             }
           """,
-        List(ConstructorSymbol)
+        List(ConstructorSymbol),
     )
     // TODO It would be better if the "new" was consistent.
     sds should ===(
@@ -87,7 +87,7 @@ class SemanticHighlightingSpec
             (ConstructorSymbol, "X1"),
             (ConstructorSymbol, "new X1(  )"),
             (ConstructorSymbol, "X2"),
-            (ConstructorSymbol, "new   X3")
+            (ConstructorSymbol, "new   X3"),
         ))
   }
 
@@ -105,14 +105,14 @@ class SemanticHighlightingSpec
               def baz { def quux(): Int = { 1 } ; quux() }
             }
           """,
-        List(FunctionCallSymbol)
+        List(FunctionCallSymbol),
     )
     sds should ===(
         List(
             (FunctionCallSymbol, "fun"),
             (FunctionCallSymbol, "foo"),
             (FunctionCallSymbol, "substring"),
-            (FunctionCallSymbol, "quux")
+            (FunctionCallSymbol, "quux"),
         ))
   }
 
@@ -158,7 +158,7 @@ class SemanticHighlightingSpec
               X.Y.goo()
             }
                   """,
-          List(DeprecatedSymbol)
+          List(DeprecatedSymbol),
       )
       sds should ===(
           List(
@@ -172,7 +172,7 @@ class SemanticHighlightingSpec
               (DeprecatedSymbol, "boo"),
               (DeprecatedSymbol, "X"),
               (DeprecatedSymbol, "Y"),
-              (DeprecatedSymbol, "goo")
+              (DeprecatedSymbol, "goo"),
           ))
   }
 
@@ -191,11 +191,11 @@ class SemanticHighlightingSpec
               class BadSubclass extends BadTrait
             }
           """,
-          List(DeprecatedSymbol)
+          List(DeprecatedSymbol),
       )
 
       sds should ===(List(
-              (DeprecatedSymbol, "BadTrait")
+              (DeprecatedSymbol, "BadTrait"),
           ))
   }
 
@@ -209,13 +209,13 @@ class SemanticHighlightingSpec
             import org.scalatest. { Matchers,
                  FunSpec }
             """,
-        List(ImportedNameSymbol)
+        List(ImportedNameSymbol),
     )
     sds should ===(
         List(
             (ImportedNameSymbol, "RangePosition"),
             (ImportedNameSymbol, "Matchers"),
-            (ImportedNameSymbol, "FunSpec")
+            (ImportedNameSymbol, "FunSpec"),
         ))
   }
 
@@ -235,7 +235,7 @@ class SemanticHighlightingSpec
               val d = c.E(1)
             }
           """,
-        List(ObjectSymbol)
+        List(ObjectSymbol),
     )
     sds should ===(
         List(
@@ -244,7 +244,7 @@ class SemanticHighlightingSpec
             (ObjectSymbol, "B"),
             (ObjectSymbol, "D"),
             // TODO two problems there: "c" should be a varField ; E should be highlighted.
-            (ObjectSymbol, "c")
+            (ObjectSymbol, "c"),
         ))
   }
 
@@ -259,12 +259,12 @@ class SemanticHighlightingSpec
               a += 8
             }
           """,
-        List(OperatorFieldSymbol)
+        List(OperatorFieldSymbol),
     )
     // TODO We should highlight the "+="
     sds should ===(List(
             (OperatorFieldSymbol, "+"),
-            (OperatorFieldSymbol, "*")
+            (OperatorFieldSymbol, "*"),
         ))
   }
 
@@ -276,13 +276,13 @@ class SemanticHighlightingSpec
              package com.example
              package other
           """,
-        List(PackageSymbol)
+        List(PackageSymbol),
     )
     sds should ===(
         List(
             (PackageSymbol, "com"),
             (PackageSymbol, "example"),
-            (PackageSymbol, "other")
+            (PackageSymbol, "other"),
         ))
   }
 
@@ -296,14 +296,14 @@ class SemanticHighlightingSpec
               def f(u:  Int, v   :String) = v + u
             }
           """,
-        List(ParamSymbol)
+        List(ParamSymbol),
     )
     sds should ===(
         List(
             (ParamSymbol, "u"),
             (ParamSymbol, "v"),
             (ParamSymbol, "v"),
-            (ParamSymbol, "u")
+            (ParamSymbol, "u"),
         ))
   }
 
@@ -329,7 +329,7 @@ class SemanticHighlightingSpec
               }
             }
           """,
-        List(TraitSymbol)
+        List(TraitSymbol),
     )
     sds should ===(
         List(
@@ -337,7 +337,7 @@ class SemanticHighlightingSpec
             (TraitSymbol, "X3"),
             (TraitSymbol, "X4"),
             (TraitSymbol, "X5[ String]"),
-            (TraitSymbol, "v2 .X6")
+            (TraitSymbol, "v2 .X6"),
         ))
   }
 
@@ -354,7 +354,7 @@ class SemanticHighlightingSpec
               f[Int, String](1, "a")
             }
           """,
-        List(TypeParamSymbol)
+        List(TypeParamSymbol),
     )
     sds should ===(
         List(
@@ -362,7 +362,7 @@ class SemanticHighlightingSpec
             (TypeParamSymbol, "YY"),
             (TypeParamSymbol, "YY"),
             (TypeParamSymbol, "XX"),
-            (TypeParamSymbol, "YY")
+            (TypeParamSymbol, "YY"),
         ))
   }
 
@@ -380,13 +380,13 @@ class SemanticHighlightingSpec
               }
             }
           """,
-        List(ValSymbol)
+        List(ValSymbol),
     )
     sds should ===(
         List(
             (ValSymbol, "u"),
             (ValSymbol, "v"),
-            (ValSymbol, "u")
+            (ValSymbol, "u"),
         ))
   }
 
@@ -405,14 +405,14 @@ class SemanticHighlightingSpec
               println((new Test).v)
             }
           """,
-        List(ValFieldSymbol)
+        List(ValFieldSymbol),
     )
     sds should ===(
         List(
             (ValFieldSymbol, "u"),
             (ValFieldSymbol, "v"),
             (ValFieldSymbol, "u"),
-            (ValFieldSymbol, "v")
+            (ValFieldSymbol, "v"),
         ))
   }
 
@@ -430,13 +430,13 @@ class SemanticHighlightingSpec
               }
             }
           """,
-        List(VarSymbol)
+        List(VarSymbol),
     )
     sds should ===(
         List(
             (VarSymbol, "u"),
             (VarSymbol, "v"),
-            (VarSymbol, "u")
+            (VarSymbol, "u"),
         ))
   }
 
@@ -455,14 +455,14 @@ class SemanticHighlightingSpec
               println((new Test).v)
             }
           """,
-        List(VarFieldSymbol)
+        List(VarFieldSymbol),
     )
     sds should ===(
         List(
             (VarFieldSymbol, "u"),
             (VarFieldSymbol, "v"),
             (VarFieldSymbol, "u"),
-            (VarFieldSymbol, "v")
+            (VarFieldSymbol, "v"),
         ))
   }
 
@@ -482,11 +482,11 @@ class SemanticHighlightingSpec
               println((new Test).v)
             }
           """,
-          List(ValFieldSymbol)
+          List(ValFieldSymbol),
       )
       sds should ===(List(
               (ValFieldSymbol, "u"),
-              (ValFieldSymbol, "v")
+              (ValFieldSymbol, "v"),
           ))
   }
 
@@ -505,10 +505,10 @@ class SemanticHighlightingSpec
               Fubar.value = 1
             }
           """,
-        List(OperatorFieldSymbol)
+        List(OperatorFieldSymbol),
     )
     sds should ===(List(
-            (OperatorFieldSymbol, "value")
+            (OperatorFieldSymbol, "value"),
         ))
   }
 
@@ -520,12 +520,12 @@ class SemanticHighlightingSpec
           """
             package com.  example
           """,
-          List(PackageSymbol)
+          List(PackageSymbol),
       )
       // only part of "example" is highlighted
       sds should ===(List(
               (PackageSymbol, "com"),
-              (PackageSymbol, "example")
+              (PackageSymbol, "example"),
           ))
   }
 
@@ -540,12 +540,12 @@ class SemanticHighlightingSpec
               val x = !(3 == 4)
             }
           """,
-          List(OperatorFieldSymbol)
+          List(OperatorFieldSymbol),
       )
       // Call to foo is missing
       sds should ===(List(
               (OperatorFieldSymbol, "!"),
-              (OperatorFieldSymbol, "==")
+              (OperatorFieldSymbol, "=="),
           ))
   }
 
@@ -563,10 +563,10 @@ class SemanticHighlightingSpec
               val u: Test  = StringToTest("y");
             }
           """,
-          List(ImplicitConversionSymbol)
+          List(ImplicitConversionSymbol),
       )
       sds should ===(List(
-              (ImplicitConversionSymbol, "\"sample\"")
+              (ImplicitConversionSymbol, "\"sample\""),
           ))
   }
 
@@ -586,10 +586,10 @@ class SemanticHighlightingSpec
               val t = zz(1)
             }
           """,
-          List(ImplicitParamsSymbol)
+          List(ImplicitParamsSymbol),
       )
       sds should ===(List(
-              (ImplicitParamsSymbol, "zz(1)")
+              (ImplicitParamsSymbol, "zz(1)"),
           ))
   }
 
@@ -606,11 +606,11 @@ class SemanticHighlightingSpec
               fun(1, 2) + foo(4, 5)
             }
           """,
-          List(FunctionCallSymbol)
+          List(FunctionCallSymbol),
       )
       sds should ===(List(
               (FunctionCallSymbol, "fun"),
-              (FunctionCallSymbol, "foo")
+              (FunctionCallSymbol, "foo"),
           ))
   }
 }

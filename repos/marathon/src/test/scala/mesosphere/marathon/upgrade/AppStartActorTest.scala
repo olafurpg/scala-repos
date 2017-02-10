@@ -49,8 +49,8 @@ class AppStartActorTest
             system.eventStream,
             app,
             2,
-            promise
-        )
+            promise,
+        ),
     )
     watch(ref)
 
@@ -64,8 +64,8 @@ class AppStartActorTest
             host = "",
             ipAddresses = Nil,
             ports = Nil,
-            version = app.version.toString
-        )
+            version = app.version.toString,
+        ),
     )
     system.eventStream.publish(
         MesosStatusUpdateEvent(
@@ -77,8 +77,8 @@ class AppStartActorTest
             host = "",
             ipAddresses = Nil,
             ports = Nil,
-            version = app.version.toString
-        )
+            version = app.version.toString,
+        ),
     )
 
     Await.result(promise.future, 5.seconds)
@@ -101,8 +101,8 @@ class AppStartActorTest
             system.eventStream,
             app,
             2,
-            promise
-        )
+            promise,
+        ),
     )
     watch(ref)
 
@@ -133,8 +133,8 @@ class AppStartActorTest
             system.eventStream,
             app,
             2,
-            promise
-        )
+            promise,
+        ),
     )
     watch(ref)
 
@@ -162,8 +162,8 @@ class AppStartActorTest
             system.eventStream,
             app,
             0,
-            promise
-        )
+            promise,
+        ),
     )
     watch(ref)
 
@@ -187,8 +187,8 @@ class AppStartActorTest
             system.eventStream,
             app,
             0,
-            promise
-        )
+            promise,
+        ),
     )
     watch(ref)
 

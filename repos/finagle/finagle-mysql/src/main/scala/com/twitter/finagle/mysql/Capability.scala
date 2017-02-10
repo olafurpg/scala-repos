@@ -37,7 +37,7 @@ object Capability {
       "CLIENT_TRANSACTIONS" -> Transactions,
       "CLIENT_SECURE_CONNECTION" -> SecureConnection,
       "CLIENT_MULTI_STATEMENTS" -> MultiStatements,
-      "CLIENT_MULTI_RESULTS" -> MultiResults
+      "CLIENT_MULTI_RESULTS" -> MultiResults,
   )
 
   /**
@@ -53,7 +53,7 @@ object Capability {
       Capability.LongPassword,
       Capability.ConnectWithDB,
       Capability.SecureConnection,
-      Capability.LocalFiles
+      Capability.LocalFiles,
   )
 
   def apply(flags: Int*): Capability = {

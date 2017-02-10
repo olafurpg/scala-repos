@@ -248,7 +248,7 @@ tests := load(//%scampaigns)
 histogram('platform) :=
    { platform: 'platform, num: count(tests where tests.platform = 'platform) }
    histogram
-"""
+""",
   )
 
   val testQueries = allQueries

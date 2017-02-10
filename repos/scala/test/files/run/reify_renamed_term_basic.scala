@@ -15,7 +15,7 @@ object Test extends App {
   val expr = reify(
       X.c,
       y,
-      z
+      z,
   )
 
   println(expr.eval)

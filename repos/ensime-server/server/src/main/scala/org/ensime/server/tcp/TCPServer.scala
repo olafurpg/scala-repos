@@ -18,7 +18,7 @@ class TCPServer(
     project: ActorRef,
     broadcaster: ActorRef,
     shutdownOnLastDisconnect: Boolean,
-    preferredPort: Option[Int]
+    preferredPort: Option[Int],
 )
     extends Actor with ActorLogging {
 

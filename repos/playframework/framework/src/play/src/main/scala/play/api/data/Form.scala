@@ -255,7 +255,7 @@ case class Form[T](mapping: Mapping[T],
           .mapValues { errors =>
             errors.map(e =>
                   messages(e.message, e.args.map(a => translateMsgArg(a)): _*))
-          }
+          },
       )
   }
 

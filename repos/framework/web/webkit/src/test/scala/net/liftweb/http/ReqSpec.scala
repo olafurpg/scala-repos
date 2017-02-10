@@ -124,7 +124,7 @@ object ReqSpec extends Specification with XmlMatchers with Mockito {
             1l,
             true,
             () => paramCalcInfo,
-            Map.empty
+            Map.empty,
         )
       }
     }

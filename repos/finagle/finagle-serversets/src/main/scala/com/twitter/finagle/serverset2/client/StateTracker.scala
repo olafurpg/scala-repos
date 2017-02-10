@@ -6,7 +6,7 @@ import com.twitter.util.{Closable, Duration, Future, Time, Timer}
 class StateTracker(
     statsReceiver: StatsReceiver,
     samplePeriod: Duration,
-    timer: Timer
+    timer: Timer,
 )
     extends Closable {
 

@@ -135,7 +135,7 @@ private final class PushApi(
           case Correspondence(d) => s"$d days"
           case c: Clock => c.show
         },
-        c.variant.name
+        c.variant.name,
     ) mkString " • "
   }
 

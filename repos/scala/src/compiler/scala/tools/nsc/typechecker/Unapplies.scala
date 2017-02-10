@@ -147,7 +147,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
                tparams,
                cparamss,
                classtpe,
-               New(classtpe, mmap(cparamss)(gen.paramToArg)))
+               New(classtpe, mmap(cparamss)(gen.paramToArg))),
     )
   }
 
@@ -197,7 +197,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     }, ifNull)(Ident(unapplyParamName))
 
     atPos(cdef.pos.focus)(
-        DefDef(caseMods, method, tparams, List(cparams), resultType, body)
+        DefDef(caseMods, method, tparams, List(cparams), resultType, body),
     )
   }
 
@@ -263,7 +263,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
                  tparams,
                  paramss,
                  TypeTree(),
-                 body)
+                 body),
       )
       Some(copyDefDef)
     }

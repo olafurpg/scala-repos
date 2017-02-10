@@ -50,7 +50,7 @@ private[prediction] case class SetProp(val fields: Map[String, PropTime],
 
     SetProp(
         fields = combinedFields,
-        t = combinedT
+        t = combinedT,
     )
   }
 }
@@ -72,7 +72,7 @@ private[prediction] case class UnsetProp(fields: Map[String, Long])
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
 
     UnsetProp(
-        fields = combinedFields
+        fields = combinedFields,
     )
   }
 }
@@ -88,7 +88,7 @@ private[prediction] case class EventOp(
     val unsetProp: Option[UnsetProp] = None,
     val deleteEntity: Option[DeleteEntity] = None,
     val firstUpdated: Option[DateTime] = None,
-    val lastUpdated: Option[DateTime] = None
+    val lastUpdated: Option[DateTime] = None,
 )
     extends Serializable {
 
@@ -108,7 +108,7 @@ private[prediction] case class EventOp(
         deleteEntity = (deleteEntity ++ that.deleteEntity)
             .reduceOption(_ ++ _),
         firstUpdated = firstUp,
-        lastUpdated = lastUp
+        lastUpdated = lastUp,
     )
   }
 
@@ -144,7 +144,7 @@ private[prediction] case class EventOp(
         PropertyMap(
             fields = f.mapValues(_.d).map(identity),
             firstUpdated = firstUpdated.get,
-            lastUpdated = lastUpdated.get
+            lastUpdated = lastUpdated.get,
         )
       }
     }
@@ -163,7 +163,7 @@ private[prediction] object EventOp {
           EventOp(
               setProp = Some(SetProp(fields = fields, t = t)),
               firstUpdated = Some(e.eventTime),
-              lastUpdated = Some(e.eventTime)
+              lastUpdated = Some(e.eventTime),
           )
         }
       case "$unset" => {
@@ -171,14 +171,14 @@ private[prediction] object EventOp {
           EventOp(
               unsetProp = Some(UnsetProp(fields = fields)),
               firstUpdated = Some(e.eventTime),
-              lastUpdated = Some(e.eventTime)
+              lastUpdated = Some(e.eventTime),
           )
         }
       case "$delete" => {
           EventOp(
               deleteEntity = Some(DeleteEntity(t)),
               firstUpdated = Some(e.eventTime),
-              lastUpdated = Some(e.eventTime)
+              lastUpdated = Some(e.eventTime),
           )
         }
       case _ => {
@@ -199,7 +199,7 @@ private[prediction] object PEventAggregator {
           // within same partition
           seqOp = { case (u, v) => u ++ v },
           // across partition
-          combOp = { case (accu, u) => accu ++ u }
+          combOp = { case (accu, u) => accu ++ u },
       )
       .mapValues(_.toPropertyMap)
       .filter { case (k, v) => v.isDefined }

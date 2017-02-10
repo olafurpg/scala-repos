@@ -32,7 +32,7 @@ class ExchangeSuite extends SparkPlanTest with SharedSQLContext {
     checkAnswer(
         input.toDF(),
         plan => ShuffleExchange(SinglePartition, plan),
-        input.map(Row.fromTuple)
+        input.map(Row.fromTuple),
     )
   }
 

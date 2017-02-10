@@ -95,7 +95,7 @@ class APIKeyValidService[A, B](
   val metadata = AboutMetadata(
       ParameterMetadata('apiKey, None),
       DescriptionMetadata(
-          "A valid Precog API key is required for the use of this service.")
+          "A valid Precog API key is required for the use of this service."),
   )
 }
 
@@ -128,6 +128,6 @@ class APIKeyRequiredService[A, B](
   val metadata = AboutMetadata(
       ParameterMetadata('apiKey, None),
       DescriptionMetadata(
-          "A Precog API key is required for the use of this service.")
+          "A Precog API key is required for the use of this service."),
   )
 }

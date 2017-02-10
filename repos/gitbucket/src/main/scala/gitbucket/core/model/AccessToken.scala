@@ -19,5 +19,5 @@ case class AccessToken(
     accessTokenId: Int = 0,
     userName: String,
     tokenHash: String,
-    note: String
+    note: String,
 )

@@ -34,7 +34,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
         Array(
             Vectors.dense(1.0, 2.0, 6.0),
             Vectors.dense(1.0, 3.0, 0.0),
-            Vectors.dense(1.0, 4.0, 6.0)
+            Vectors.dense(1.0, 4.0, 6.0),
         ))
 
     val center = Vectors.dense(1.0, 3.0, 4.0)
@@ -125,7 +125,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val smallData = Array(
         Vectors.dense(1.0, 2.0, 6.0),
         Vectors.dense(1.0, 3.0, 0.0),
-        Vectors.dense(1.0, 4.0, 6.0)
+        Vectors.dense(1.0, 4.0, 6.0),
     )
     val data = sc.parallelize((1 to 100).flatMap(_ => smallData), 4)
 
@@ -173,7 +173,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
           Vectors.sparse(n, Seq((0, 1.0), (1, 3.0 + x))),
           Vectors.sparse(n, Seq((0, 1.0), (1, 3.0 - x))),
           Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 + x))),
-          Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 - x)))
+          Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 - x))),
       )
     }, 4)
 
@@ -232,7 +232,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
         Vectors.dense(1.0, 3.0, 0.0),
         Vectors.dense(1.0, 4.0, 6.0),
         Vectors.dense(1.0, 0.0, 1.0),
-        Vectors.dense(1.0, 1.0, 1.0)
+        Vectors.dense(1.0, 1.0, 1.0),
     )
     val rdd = sc.parallelize(points)
 
@@ -272,7 +272,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
         Vectors.dense(0.1, 0.0),
         Vectors.dense(9.0, 0.0),
         Vectors.dense(9.0, 0.2),
-        Vectors.dense(9.2, 0.0)
+        Vectors.dense(9.2, 0.0),
     )
     val rdd = sc.parallelize(points, 3)
 
@@ -314,7 +314,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
         Vectors.dense(0.0, 0.0),
         Vectors.dense(1.0, 0.0),
         Vectors.dense(0.0, 1.0),
-        Vectors.dense(1.0, 1.0)
+        Vectors.dense(1.0, 1.0),
     )
     val rdd = sc.parallelize(points, 3)
     // creating an initial model

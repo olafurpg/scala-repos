@@ -118,7 +118,7 @@ class DriverActor(schedulerProps: Props) extends Actor {
                             .newBuilder()
                             .setBegin(10000)
                             .setEnd(20000)))
-                .build()
+                .build(),
             ))
       .build()
   }
@@ -134,7 +134,7 @@ class DriverActor(schedulerProps: Props) extends Actor {
     import context.dispatcher
     periodicOffers = Some(
         context.system.scheduler
-          .schedule(1.second, 1.seconds)(scheduler ! offers)
+          .schedule(1.second, 1.seconds)(scheduler ! offers),
     )
   }
 

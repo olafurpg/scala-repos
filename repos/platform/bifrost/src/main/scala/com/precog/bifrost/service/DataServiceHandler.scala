@@ -121,7 +121,7 @@ class DataServiceHandler[A](
                                         Left(JObject("errors" -> JArray(
                                                     userError.messages.list
                                                       .map(JString(_)): _*)).renderPretty
-                                              .getBytes("UTF-8"))))
+                                              .getBytes("UTF-8")))),
                         )
                     }
                 },
@@ -138,7 +138,7 @@ class DataServiceHandler[A](
                           HttpStatus(HttpStatusCodes.NotFound,
                                      "Could not locate content for path " +
                                      path))
-                }
+                },
             )
           } recover {
             case ex =>

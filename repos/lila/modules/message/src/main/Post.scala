@@ -34,6 +34,6 @@ object Post {
 
   private[message] lazy val tube = JsTube(
       (__.json update readDate('createdAt)) andThen Json.reads[Post],
-      Json.writes[Post].andThen(__.json update writeDate('createdAt))
+      Json.writes[Post].andThen(__.json update writeDate('createdAt)),
   )
 }

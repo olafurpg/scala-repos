@@ -22,7 +22,7 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
     Paginator(
         adapter,
         currentPage = page,
-        maxPerPage = maxPerPage
+        maxPerPage = maxPerPage,
     )
 
   final class UserAdapter(user: User) extends AdapterLike[Bookmark] {

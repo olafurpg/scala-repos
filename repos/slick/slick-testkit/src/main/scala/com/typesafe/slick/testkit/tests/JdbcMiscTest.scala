@@ -25,7 +25,7 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
         t1 += "a",
         t3 += Some("a"),
         t3 += None,
-        (t1 += null.asInstanceOf[String]).failed
+        (t1 += null.asInstanceOf[String]).failed,
     )
   }
 
@@ -68,7 +68,7 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
                       ResultSetConcurrency.Auto,
                       ResultSetHoldability.Auto,
                       null,
-                      0))
+                      0)),
           )
           .withStatementParameters(rsType = ResultSetType.ScrollInsensitive),
         check(
@@ -76,7 +76,7 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
                                             ResultSetConcurrency.Auto,
                                             ResultSetHoldability.Auto,
                                             null,
-                                            0))
+                                            0)),
     )
   }
 
@@ -100,7 +100,7 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
         a1.result.head.map(_ shouldBe 1),
         a1.result.head
           .overrideStatements(a2.result.head.statements)
-          .map(_ shouldBe 2)
+          .map(_ shouldBe 2),
       )
   }
 }

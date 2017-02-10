@@ -12,7 +12,7 @@ class ZkNodeDataCacheTest extends FunSuite {
   def nilZkSession = () => ZkSession.nil
 
   class ZkTestCache(
-      clusterPath: String
+      clusterPath: String,
   )
       extends ZkNodeDataCache[String](clusterPath, "Test", NullStatsReceiver) {
     var parseNodeCalledCount = 0

@@ -67,7 +67,7 @@ private[serverset2] class ServiceDiscoverer(
     varZkSession: Var[ZkSession],
     val statsReceiver: StatsReceiver,
     healthStabilizationEpoch: Epoch,
-    timer: Timer
+    timer: Timer,
 ) {
   import ServiceDiscoverer._
 
@@ -123,7 +123,7 @@ private[serverset2] class ServiceDiscoverer(
       path: String,
       cache: ZkNodeDataCache[Entity],
       readStat: Stat,
-      glob: String
+      glob: String,
   ): Activity[Seq[Entity]] = {
     actZkSession.flatMap {
       case zkSession =>
@@ -144,7 +144,7 @@ private[serverset2] class ServiceDiscoverer(
       parentPath: String,
       paths: Seq[String],
       cache: ZkNodeDataCache[Entity],
-      readStat: Stat
+      readStat: Stat,
   ): Activity[Seq[Entity]] =
     Activity(Var.async[Activity.State[Seq[Entity]]](Activity.Pending) { u =>
       @volatile var closed = false

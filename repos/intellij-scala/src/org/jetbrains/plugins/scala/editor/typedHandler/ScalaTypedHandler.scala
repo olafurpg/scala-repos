@@ -498,7 +498,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
           editor,
           new Condition[PsiFile] {
             def value(t: PsiFile): Boolean = t == file
-          }
+          },
       )
   }
 

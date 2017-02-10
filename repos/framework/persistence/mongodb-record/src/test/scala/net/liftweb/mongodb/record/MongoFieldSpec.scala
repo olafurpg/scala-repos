@@ -66,7 +66,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       example2: A,
       mandatory: MandatoryTypedField[A],
       legacyOptionalBox: Box[MandatoryTypedField[A]],
-      canCheckDefaultValues: Boolean = true
+      canCheckDefaultValues: Boolean = true,
   )(implicit m: scala.reflect.Manifest[A]): Unit = {
 
     def commonBehaviorsForAllFlavors(field: MandatoryTypedField[A]) = {
@@ -253,7 +253,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         rec.mandatoryDateField,
         JsObj(("$dt", Str(nowStr))),
         JObject(List(JField("$dt", JString(nowStr)))),
-        Full(<input name=".*" type="text" tabindex="1" value={nowStr} id="mandatoryDateField_id"></input>)
+        Full(<input name=".*" type="text" tabindex="1" value={nowStr} id="mandatoryDateField_id"></input>),
     )
   }
 
@@ -275,7 +275,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           def toJsCmd = compactRender(json)
         },
         json,
-        Empty
+        Empty,
     )
   }
 
@@ -295,7 +295,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           rec.mandatoryObjectIdField,
           JsObj(("$oid", oid.toString)),
           JObject(List(JField("$oid", JString(oid.toString)))),
-          Full(<input name=".*" type="text" tabindex="1" value={oid.toString} id="mandatoryObjectIdField_id"></input>)
+          Full(<input name=".*" type="text" tabindex="1" value={oid.toString} id="mandatoryObjectIdField_id"></input>),
       )
       rec.mandatoryObjectIdField(oid)
 
@@ -319,7 +319,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         JObject(List(JField("$regex", JString(ptrn.toString)),
                      JField("$flags", JInt(2)))),
         Empty,
-        false
+        false,
     )
   }
 
@@ -337,7 +337,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         rec.mandatoryUUIDField,
         JsObj(("$uuid", Str(uuid.toString))),
         JObject(List(JField("$uuid", JString(uuid.toString)))),
-        Full(<input name=".*" type="text" tabindex="1" value={uuid.toString} id="mandatoryUUIDField_id"></input>)
+        Full(<input name=".*" type="text" tabindex="1" value={uuid.toString} id="mandatoryUUIDField_id"></input>),
     )
   }
 
@@ -368,7 +368,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           rec.mandatoryStringListField,
           JsArray(Str("abc"), Str("def"), Str("ghi")),
           JArray(List(JString("abc"), JString("def"), JString("ghi"))),
-          Empty
+          Empty,
       )
     }
   }
@@ -384,7 +384,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           rec.mandatoryIntListField,
           JsArray(Num(4), Num(5), Num(6)),
           JArray(List(JInt(4), JInt(5), JInt(6))),
-          Empty
+          Empty,
       )
     }
   }
@@ -409,9 +409,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               List(
                   JObject(List(JField("$oid", JString(oid1.toString)))),
                   JObject(List(JField("$oid", JString(oid2.toString)))),
-                  JObject(List(JField("$oid", JString(oid3.toString))))
+                  JObject(List(JField("$oid", JString(oid3.toString)))),
               )),
-          Empty
+          Empty,
       )
     }
   }
@@ -432,10 +432,10 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           JsArray(Str(ptrn1.toString), Str(ptrn2.toString)),
           JArray(List(
                   JsonRegex(ptrn1),
-                  JsonRegex(ptrn2)
+                  JsonRegex(ptrn2),
               )),
           Empty,
-          false
+          false,
       )
     }
   }
@@ -459,9 +459,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           JArray(List(
                   JsonDate(dt1)(MongoListTestRecord.formats),
                   JsonDate(dt2)(MongoListTestRecord.formats),
-                  JsonDate(dt3)(MongoListTestRecord.formats)
+                  JsonDate(dt3)(MongoListTestRecord.formats),
               )),
-          Empty
+          Empty,
       )
     }
   }
@@ -487,9 +487,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               List(
                   JsonUUID(uuid1),
                   JsonUUID(uuid2),
-                  JsonUUID(uuid3)
+                  JsonUUID(uuid3),
               )),
-          Empty
+          Empty,
       )
     }
   }
@@ -513,9 +513,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           JArray(List(
                   JsonDate(dt1.toDate)(MongoListTestRecord.formats),
                   JsonDate(dt2.toDate)(MongoListTestRecord.formats),
-                  JsonDate(dt3.toDate)(MongoListTestRecord.formats)
+                  JsonDate(dt3.toDate)(MongoListTestRecord.formats),
               )),
-          Empty
+          Empty,
       )
     }
   }
@@ -531,7 +531,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           ("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~
           ("mapField" -> (("x" -> "1"))),
           ("intField" -> 2) ~ ("stringField" -> "jsonobj2") ~
-          ("mapField" -> (("x" -> "2")))
+          ("mapField" -> (("x" -> "2"))),
       )
       passBasicTests(lst, lst2, rec.mandatoryMongoJsonObjectListField, Empty)
       passConversionTests(
@@ -541,7 +541,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
             def toJsCmd = compactRender(json)
           },
           json,
-          Empty
+          Empty,
       )
     }
   }
@@ -569,9 +569,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               List(
                   JField("a", JString("abc")),
                   JField("b", JString("def")),
-                  JField("c", JString("ghi"))
+                  JField("c", JString("ghi")),
               )),
-          Empty
+          Empty,
       )
     }
   }
@@ -590,9 +590,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               List(
                   JField("a", JInt(4)),
                   JField("b", JInt(5)),
-                  JField("c", JInt(6))
+                  JField("c", JInt(6)),
               )),
-          Empty
+          Empty,
       )
     }
   }
@@ -629,7 +629,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           rec.mandatoryBsonRecordField,
           srJsExp,
           srJson,
-          Empty
+          Empty,
       )
     }
   }
@@ -680,7 +680,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           rec.mandatoryBsonRecordListField,
           JsArray(sr1JsExp, sr2JsExp),
           JArray(List(sr1Json, sr2Json)),
-          Empty
+          Empty,
       )
     }
   }

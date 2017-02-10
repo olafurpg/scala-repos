@@ -290,8 +290,8 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
                   // i = (i + 1) | 0
                   js.Assign(
                       counter,
-                      or0(js.BinaryOp(JSBinaryOp.+, counter, js.IntLiteral(1))))
-              ))
+                      or0(js.BinaryOp(JSBinaryOp.+, counter, js.IntLiteral(1)))),
+              )),
       )
     }
 
@@ -493,7 +493,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
                       js.StringLiteral("enumerable") -> js.BooleanLiteral(
                           true),
                       js.StringLiteral("writable") -> js.BooleanLiteral(true),
-                      js.StringLiteral("value") -> transformExpr(zeroOf(ftpe))
+                      js.StringLiteral("value") -> transformExpr(zeroOf(ftpe)),
                   ))
               val descriptors =
                 js.ObjectConstr(List(transformedName -> descriptor))
@@ -2005,7 +2005,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
         "floatValue__F" -> "numberFloatValue",
         "doubleValue__D" -> "numberDoubleValue",
         "isNaN__Z" -> "isNaN",
-        "isInfinite__Z" -> "isInfinite"
+        "isInfinite__Z" -> "isInfinite",
     )
 
     def genClassDataOf(cls: ReferenceType)(implicit pos: Position): js.Tree = {

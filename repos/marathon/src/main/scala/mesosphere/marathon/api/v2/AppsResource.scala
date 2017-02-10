@@ -87,7 +87,7 @@ class AppsResource @Inject()(clock: Clock,
               app,
               maybeCounts = Some(TaskCounts.zero),
               maybeTasks = Some(Seq.empty),
-              maybeDeployments = Some(Seq(Identifiable(plan.id)))
+              maybeDeployments = Some(Seq(Identifiable(plan.id))),
           )
 
           maybePostEvent(req, appWithDeployments.app)
@@ -111,7 +111,7 @@ class AppsResource @Inject()(clock: Clock,
             AppInfo.Embed.Counts,
             AppInfo.Embed.Tasks,
             AppInfo.Embed.LastTaskFailure,
-            AppInfo.Embed.Deployments
+            AppInfo.Embed.Deployments,
         )
 
       def transitiveApps(groupId: PathId): Response = {
@@ -238,7 +238,7 @@ class AppsResource @Inject()(clock: Clock,
       val newVersion = clock.now()
       val restartDeployment = result(
           groupManager.updateApp(
-              id.toRootPath, markForRestartingOrThrow, newVersion, force)
+              id.toRootPath, markForRestartingOrThrow, newVersion, force),
       )
 
       deploymentResult(restartDeployment)
@@ -292,7 +292,7 @@ class AppsResource @Inject()(clock: Clock,
         cmd.map(c => AppSelector(_.cmd.exists(containCaseInsensitive(c, _)))),
         id.map(s =>
               AppSelector(app => containCaseInsensitive(s, app.id.toString))),
-        label.map(new LabelSelectorParsers().parsed)
+        label.map(new LabelSelectorParsers().parsed),
     ).flatten
     AppSelector.forall(selectors)
   }

@@ -29,6 +29,6 @@ object Test extends Properties("Regex : Ticket 2460") {
   val tests = List(
       ("numberOfMatch", numberOfMatch),
       ("numberOfGroup", numberOfGroup),
-      ("nameOfGroup", nameOfGroup)
+      ("nameOfGroup", nameOfGroup),
   )
 }

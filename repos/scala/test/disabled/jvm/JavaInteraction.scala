@@ -24,7 +24,7 @@ p.getC() = java.awt.Color[r=255,g=0,b=0]
         "p.x = " + p.x,
         "p.c = " + p.c,
         "p.getX() = " + p.getX(),
-        "p.getC() = " + p.getC()
+        "p.getC() = " + p.getC(),
     ).mkString("\n")
   }
 

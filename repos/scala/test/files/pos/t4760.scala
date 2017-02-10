@@ -8,14 +8,14 @@ class Test {
   //   ^
   // one error found
   def f2 = {
-    import scala._
+    import scala._,
   }
   def f2b = {
     import scala.collection.mutable.{Map => MMap}
   }
   def f(): Unit = {
     locally {
-      import scala.util.Properties.lineSeparator
+      import scala.util.Properties.lineSeparator,
     }
   }
 
@@ -28,6 +28,6 @@ class Test {
     import scala.util._
   }
   1 match {
-    case 1 => import scala.concurrent._
+    case 1 => import scala.concurrent._,
   }
 }

@@ -21,11 +21,11 @@ abstract class ParallelIterableCheck[T](collName: String)
 
   def instances(vals: Seq[Gen[T]]): Gen[Iterable[T]] = oneOf(
       sized(
-          sz => ofSize(vals, sz)
+          sz => ofSize(vals, sz),
       ),
       for (sz <- choose(1000, 2000)) yield ofSize(vals, sz),
       for (sz <- choose(4000, 4001)) yield ofSize(vals, sz),
-      for (sz <- choose(10000, 10001)) yield ofSize(vals, sz)
+      for (sz <- choose(10000, 10001)) yield ofSize(vals, sz),
   )
 
   // used to check if constructed collection is valid

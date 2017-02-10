@@ -170,7 +170,7 @@ package scalaguide.cache {
     import javax.inject.Inject
 
     class Application @Inject()(
-        @NamedCache("session-cache") sessionCache: CacheApi
+        @NamedCache("session-cache") sessionCache: CacheApi,
     )
         extends Controller {}
 //#qualified

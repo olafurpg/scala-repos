@@ -347,7 +347,7 @@ private[serverset2] object ApacheZooKeeper {
         watcher.state,
         statsReceiver,
         5.seconds,
-        config.timer
+        config.timer,
     )
     val zk = (config.sessionId, config.password) match {
       case (Some(id), Some(pw)) =>

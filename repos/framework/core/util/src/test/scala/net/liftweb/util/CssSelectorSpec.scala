@@ -663,7 +663,7 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "substitute multiple Strings by id" in {
       (("#foo" replaceWith "hello") & ("#baz" replaceWith "bye"))(
-          <b><div id="baz">Hello</div><span id="foo"/></b>
+          <b><div id="baz">Hello</div><span id="foo"/></b>,
       ) must_== (NodeSeq fromSeq <b>{Text("bye")}{Text("hello")}</b>)
     }
 

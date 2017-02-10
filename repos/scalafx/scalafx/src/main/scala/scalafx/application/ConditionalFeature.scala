@@ -132,7 +132,7 @@ object ConditionalFeature
       VirtualKeyboard,
       InputTouch,
       InputMultitouch,
-      InputPointer
+      InputPointer,
   )
 }
 

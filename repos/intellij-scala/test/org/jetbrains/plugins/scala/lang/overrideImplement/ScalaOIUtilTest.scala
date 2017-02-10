@@ -56,7 +56,7 @@ class ScalaOIUtilTest extends SimpleTestCase {
         |class T extends PP {
         |  def $bang$bang: Int = 0
         |}
-      """.replace("\r", "").stripMargin
+      """.replace("\r", "").stripMargin,
     )
   }
 
@@ -72,7 +72,7 @@ class ScalaOIUtilTest extends SimpleTestCase {
         |}
         |class T extends B with A {
         |}
-      """.replace("\r", "").stripMargin
+      """.replace("\r", "").stripMargin,
     )
   }
 

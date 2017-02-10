@@ -23,6 +23,6 @@ class ScalaUnwrapDescriptor extends UnwrapDescriptorBase {
       new ScalaElseUnwrapper,
       new ScalaElseRemover,
       new ScalaBracesUnwrapper,
-      new ScalaInterpolatedStringUnwrapper
+      new ScalaInterpolatedStringUnwrapper,
   )
 }

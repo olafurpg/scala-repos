@@ -418,11 +418,11 @@ trait BlockAlignSpec[M[+ _]]
                           DerefObjectStatic(DerefArrayStatic(Leaf(Source),
                                                              CPathIndex(1)),
                                             CPathField("000000")),
-                          "000001")
+                          "000001"),
                   ),
-                  CPathField("000000")
+                  CPathField("000000"),
               ),
-              "000000"
+              "000000",
           ))
 
       val JArray(rjson) = JParser.parseUnsafe("""[
@@ -470,11 +470,11 @@ trait BlockAlignSpec[M[+ _]]
                           DerefObjectStatic(DerefArrayStatic(Leaf(Source),
                                                              CPathIndex(1)),
                                             CPathField("000001")),
-                          "000001")
+                          "000001"),
                   ),
-                  CPathField("000000")
+                  CPathField("000000"),
               ),
-              "000000"
+              "000000",
           ))
 
       val JArray(rjson) =

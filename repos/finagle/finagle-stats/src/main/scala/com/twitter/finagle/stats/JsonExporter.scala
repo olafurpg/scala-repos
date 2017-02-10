@@ -46,7 +46,7 @@ object useCounterDeltas
     extends GlobalFlag[Boolean](
         false,
         "Return deltas for counters instead of absolute values. " +
-        "Provides compatibility with the behavior from 'Ostrich'"
+        "Provides compatibility with the behavior from 'Ostrich'",
     )
 
 object JsonExporter {
@@ -127,7 +127,7 @@ class JsonExporter(registry: Metrics, timer: Timer)
   private[stats] def readBooleanParam(
       params: RequestParamMap,
       name: String,
-      default: Boolean
+      default: Boolean,
   ): Boolean = {
     val vals = params.getAll(name)
     if (vals.nonEmpty)
@@ -153,7 +153,7 @@ class JsonExporter(registry: Metrics, timer: Timer)
   def json(
       pretty: Boolean,
       filtered: Boolean,
-      counterDeltasOn: Boolean = false
+      counterDeltasOn: Boolean = false,
   ): String = {
     val gauges = try registry.sampleGauges().asScala catch {
       case NonFatal(e) =>

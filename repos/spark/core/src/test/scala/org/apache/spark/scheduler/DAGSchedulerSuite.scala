@@ -1319,7 +1319,7 @@ class DAGSchedulerSuite
         Seq(
             (Success, makeMapStatus("hostB", shuffleMapRdd.partitions.length)),
             (Success, makeMapStatus("hostB", shuffleMapRdd.partitions.length)),
-            (Success, makeMapStatus("hostA", shuffleMapRdd.partitions.length))
+            (Success, makeMapStatus("hostA", shuffleMapRdd.partitions.length)),
         ))
 
     // then one executor dies, and a task fails in stage 1
@@ -1384,7 +1384,7 @@ class DAGSchedulerSuite
     // up) and also the newly available stage 1
     val stageToReduceIdxs = Seq(
         0 -> (0 until 3),
-        1 -> (0 until 1)
+        1 -> (0 until 1),
     )
     for {
       (stage, reduceIdxs) <- stageToReduceIdxs
@@ -1442,7 +1442,7 @@ class DAGSchedulerSuite
         Seq(
             (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
             (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
-            (Success, makeMapStatus("hostB", reduceRdd.partitions.length))
+            (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
         ))
 
     // now we should submit stage 1, and the map output from stage 0 should be registered

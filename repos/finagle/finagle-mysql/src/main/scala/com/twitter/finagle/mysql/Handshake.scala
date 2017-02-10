@@ -17,7 +17,7 @@ class IncompatibleServerError(msg: String) extends Exception(msg)
   */
 case object IncompatibleVersion
     extends IncompatibleServerError(
-        "This client is only compatible with MySQL version 4.1 and later"
+        "This client is only compatible with MySQL version 4.1 and later",
     )
 
 /**
@@ -26,7 +26,7 @@ case object IncompatibleVersion
   */
 case object IncompatibleCharset
     extends IncompatibleServerError(
-        "This client is only compatible with UTF-8 and Latin-1 charset encoding"
+        "This client is only compatible with UTF-8 and Latin-1 charset encoding",
     )
 
 object Handshake {
@@ -69,7 +69,7 @@ object Handshake {
         username = u,
         password = p,
         database = db,
-        charset = cs
+        charset = cs,
     )
   }
 }
@@ -104,7 +104,7 @@ case class Handshake(
     database: Option[String] = None,
     clientCap: Capability = Capability.baseCap,
     charset: Short = Utf8_general_ci,
-    maxPacketSize: StorageUnit = 1.gigabyte
+    maxPacketSize: StorageUnit = 1.gigabyte,
 )
     extends (HandshakeInit => Try[HandshakeResponse]) {
   import Capability._
@@ -136,7 +136,7 @@ case class Handshake(
           init.salt,
           init.serverCap,
           charset,
-          maxPacketSize.inBytes.toInt
+          maxPacketSize.inBytes.toInt,
       )
   }
 }

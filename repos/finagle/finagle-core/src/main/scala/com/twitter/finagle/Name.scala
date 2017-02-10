@@ -56,7 +56,7 @@ object Name {
   class Bound private (
       val addr: Var[Addr],
       val id: Any,
-      val path: com.twitter.finagle.Path
+      val path: com.twitter.finagle.Path,
   )
       extends Name with Proxy {
     def self = id

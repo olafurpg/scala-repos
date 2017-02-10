@@ -336,7 +336,7 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
         LabeledPoint(1.0, Vectors.dense(1.0)),
         LabeledPoint(0.0, Vectors.dense(0.0)),
         LabeledPoint(1.0, Vectors.dense(1.0)),
-        LabeledPoint(1.0, Vectors.dense(1.0))
+        LabeledPoint(1.0, Vectors.dense(1.0)),
     )
 
     val badPredict = Seq(Vectors.dense(1.0),

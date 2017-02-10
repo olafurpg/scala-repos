@@ -241,6 +241,6 @@ object NaiveBayesSuite {
     */
   val allParamSettings: Map[String, Any] = Map(
       "predictionCol" -> "myPrediction",
-      "smoothing" -> 0.1
+      "smoothing" -> 0.1,
   )
 }

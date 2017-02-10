@@ -38,7 +38,7 @@ private[http] object ReaderUtils {
       trans: Transport[Any, Any],
       r: Reader,
       // TODO Find a better number for bufSize, e.g. 32KiB - Buf overhead
-      bufSize: Int = Int.MaxValue
+      bufSize: Int = Int.MaxValue,
   ): Future[Unit] = {
     r.read(bufSize) flatMap {
       case None =>

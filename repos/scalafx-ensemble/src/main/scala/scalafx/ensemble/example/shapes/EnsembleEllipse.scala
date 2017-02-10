@@ -53,7 +53,7 @@ class EnsembleEllipse extends EnsembleExample {
           radiusY = 45
           stroke = Color.Black
           fill = Color.White
-        }
+        },
     )
   }
 }

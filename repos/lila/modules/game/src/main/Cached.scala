@@ -54,7 +54,7 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
             .boards(
                 moveStrs = game.pgnMoves,
                 initialFen = initialFen,
-                variant = game.variant
+                variant = game.variant,
             )
             .toOption
             .fold(chess.Division.empty)(chess.Divider.apply)

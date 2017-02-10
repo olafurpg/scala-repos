@@ -80,7 +80,7 @@ case class MetricsSample(version: String,
       "gauges" -> gauges,
       "histograms" -> histograms,
       "meters" -> meters,
-      "timers" -> timers
+      "timers" -> timers,
   )
 }
 

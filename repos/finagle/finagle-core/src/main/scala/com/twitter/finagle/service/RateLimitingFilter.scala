@@ -11,7 +11,7 @@ import com.twitter.finagle.{RefusedByRateLimiter, Service, SimpleFilter}
 class LocalRateLimitingStrategy[Req](
     categorizer: Req => String,
     windowSize: Duration,
-    rate: Int
+    rate: Int,
 )
     extends (Req => Future[Boolean]) {
 
@@ -43,7 +43,7 @@ class LocalRateLimitingStrategy[Req](
   */
 class RateLimitingFilter[Req, Rep](
     strategy: Req => Future[Boolean],
-    statsReceiver: StatsReceiver = NullStatsReceiver
+    statsReceiver: StatsReceiver = NullStatsReceiver,
 )
     extends SimpleFilter[Req, Rep] {
 

@@ -57,7 +57,7 @@ object LiftJavaScriptSpec extends Specification {
             |"logError": function(msg) {},
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
-            |"ajaxOnEnd": function() {}}"""
+            |"ajaxOnEnd": function() {}}""",
         )
       }
     }
@@ -78,7 +78,7 @@ object LiftJavaScriptSpec extends Specification {
               |"logError": function(msg) {},
               |"ajaxOnFailure": function() {alert("$internationalizedMessage");},
               |"ajaxOnStart": function() {},
-              |"ajaxOnEnd": function() {}}"""
+              |"ajaxOnEnd": function() {}}""",
         )
       }
     }
@@ -98,7 +98,7 @@ object LiftJavaScriptSpec extends Specification {
             |"logError": function(msg) {},
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
-            |"ajaxOnEnd": function() {}}"""
+            |"ajaxOnEnd": function() {}}""",
         )
       }
     }
@@ -118,7 +118,7 @@ object LiftJavaScriptSpec extends Specification {
             |"logError": function(msg) {},
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
-            |"ajaxOnEnd": function() {}}"""
+            |"ajaxOnEnd": function() {}}""",
         )
       }
     }
@@ -138,7 +138,7 @@ object LiftJavaScriptSpec extends Specification {
             |"logError": function(msg) {lift.logError(msg);},
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
-            |"ajaxOnEnd": function() {}}"""
+            |"ajaxOnEnd": function() {}}""",
         )
       }
     }
@@ -163,7 +163,7 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-                    "window.lift.init(lift_settings);"
+                    "window.lift.init(lift_settings);",
                 )))
       }
     }
@@ -189,7 +189,7 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-                    "window.lift.init(lift_settings);"
+                    "window.lift.init(lift_settings);",
                 )))
       }
     }
@@ -215,7 +215,7 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {},
             |"mysetting": 99});""",
-                "window.lift.init(lift_settings);"
+                "window.lift.init(lift_settings);",
             ))
       }
     }

@@ -35,7 +35,7 @@ class CrossValidationTest
       LabeledPoint(Label1, Array(Attribute1, Attribute2)),
       LabeledPoint(Label2, Array(NotAttribute1, Attribute2)),
       LabeledPoint(Label3, Array(Attribute1, NotAttribute2)),
-      LabeledPoint(Label4, Array(NotAttribute1, NotAttribute2))
+      LabeledPoint(Label4, Array(NotAttribute1, NotAttribute2)),
   )
 
   val dataCount = labeledPoints.size

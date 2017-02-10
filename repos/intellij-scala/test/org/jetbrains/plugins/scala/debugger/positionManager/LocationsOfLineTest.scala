@@ -17,7 +17,7 @@ class LocationOfLineTest_212
         Set(Loc("Lambdas$", "main", 5),
             Loc("Lambdas$", "Lambdas$$$anonfun$2", 5),
             Loc("Lambdas$", "Lambdas$$$anonfun$3", 5)),
-        Set(Loc("Lambdas$", "Lambdas$$$anonfun$4", 6))
+        Set(Loc("Lambdas$", "Lambdas$$$anonfun$4", 6)),
     )
   }
 
@@ -32,7 +32,7 @@ class LocationOfLineTest_212
         Set(Loc("Multilevel$This$1$$anon$1",
                 "Multilevel$This$1$$anon$1$$$anonfun$1",
                 9)),
-        Set(Loc("Multilevel$", "main", 18))
+        Set(Loc("Multilevel$", "main", 18)),
     )
   }
 }
@@ -63,7 +63,7 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         noLocations,
         Set(Loc("Simple$", "foo", 10)),
         noLocations,
-        noLocations
+        noLocations,
     )
   }
 
@@ -88,7 +88,7 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     checkLocationsOfLine(
         Set(Loc("Bar", "<init>", 14)), //location for constructor is customized
         Set(Loc("Bar", "<init>", 9), Loc("Bar", "s", 9)),
-        Set(Loc("Bar", "foo", 12))
+        Set(Loc("Bar", "foo", 12)),
     )
   }
 
@@ -110,7 +110,7 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         Set(Loc("Lambdas$", "main", 5),
             Loc("Lambdas$$anonfun$main$2", "apply$mcZI$sp", 5),
             Loc("Lambdas$$anonfun$main$3", "apply", 5)),
-        Set(Loc("Lambdas$$anonfun$main$4", "apply", 6))
+        Set(Loc("Lambdas$$anonfun$main$4", "apply", 6)),
     )
   }
 
@@ -135,7 +135,7 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     checkLocationsOfLine(
         Set(Loc("LocalFunction$", "bar$1", 6)),
         Set(Loc("LocalFunction$", "foo$1", 9)),
-        Set(Loc("LocalFunction$", "main", 13))
+        Set(Loc("LocalFunction$", "main", 13)),
     )
   }
 
@@ -169,7 +169,7 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         Set(Loc("Multilevel$This$1$$anon$1", "run", 8)),
         Set(Loc("Multilevel$This$1$$anon$1", "run", 8)),
         Set(Loc("Multilevel$This$1$$anon$1$$anonfun$1", "apply", 9)),
-        Set(Loc("Multilevel$", "main", 18))
+        Set(Loc("Multilevel$", "main", 18)),
     )
   }
 }

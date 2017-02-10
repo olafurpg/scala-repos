@@ -57,7 +57,7 @@ class MetadataCacheTest {
       val host = s"foo-$brokerId"
       Map(
           SecurityProtocol.PLAINTEXT -> new EndPoint(host, 9092),
-          SecurityProtocol.SSL -> new EndPoint(host, 9093)
+          SecurityProtocol.SSL -> new EndPoint(host, 9093),
       )
     }
 

@@ -12,5 +12,5 @@ object Test {
   val u: U = ???
 
   // but we shouldn't let that stop us from treating it as a stable identifier for import
-  import u.emptyValDef.name
+  import u.emptyValDef.name,
 }

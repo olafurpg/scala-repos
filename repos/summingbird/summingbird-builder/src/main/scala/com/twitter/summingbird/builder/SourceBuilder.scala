@@ -73,7 +73,7 @@ object SourceBuilder {
     new SourceBuilder[T](
         Source[PlatformPair, T]((scaldingSource, stormSource)),
         CompletedBuilder.injectionRegistrar[T](eventCodec),
-        newID
+        newID,
     )
   }
 }
@@ -115,7 +115,7 @@ case class SourceBuilder[T : Manifest] private (
           sink.offline.map(new BatchedSinkFromOffline[U](batcher, _)),
           sink.online.map { supplier =>
             new StormSink[U] { lazy val toFn = supplier() }
-          }
+          },
       )
     copy(
         node = node
@@ -123,7 +123,7 @@ case class SourceBuilder[T : Manifest] private (
             .flatMap[T] {
             case Left(t) => Some(t)
             case Right(u) => None
-          }
+          },
       )
   }
 
@@ -134,8 +134,8 @@ case class SourceBuilder[T : Manifest] private (
               sink.offline.map(new BatchedSinkFromOffline[T](batcher, _)),
               sink.online.map { supplier =>
               new StormSink[T] { lazy val toFn = supplier() }
-            }
-          )
+            },
+          ),
     )
 
   def leftJoin[K, V, JoinedValue](service: CompoundService[K, JoinedValue])(
@@ -152,8 +152,8 @@ case class SourceBuilder[T : Manifest] private (
                     service.online.map {
                 fn: Function0[ReadableStore[K, JoinedValue]] =>
                   ReadableServiceFactory(fn)
-              }
-                ))
+              },
+                )),
       )
 
   /** Set's an Option on all nodes ABOVE this point */
@@ -255,6 +255,6 @@ case class SourceBuilder[T : Manifest] private (
         node = node.name(id).merge(other.node.name(other.id)),
         registrar = new IterableRegistrar(registrar, other.registrar),
         id = "merge_" + nextName[T],
-        opts = opts ++ other.opts
+        opts = opts ++ other.opts,
     )
 }

@@ -29,7 +29,7 @@ private[spark] class CartesianPartition(
     @transient private val rdd1: RDD[_],
     @transient private val rdd2: RDD[_],
     s1Index: Int,
-    s2Index: Int
+    s2Index: Int,
 )
     extends Partition {
   var s1 = rdd1.partitions(s1Index)
@@ -82,7 +82,7 @@ private[spark] class CartesianRDD[T : ClassTag, U : ClassTag](
       },
       new NarrowDependency(rdd2) {
         def getParents(id: Int): Seq[Int] = List(id % numPartitionsInRdd2)
-      }
+      },
   )
 
   override def clearDependencies() {

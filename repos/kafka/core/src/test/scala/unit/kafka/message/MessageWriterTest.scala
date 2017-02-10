@@ -128,7 +128,7 @@ class MessageWriterTest extends JUnitSuite {
 
     assertEquals(
         decompress(toArray(expected.payload), SnappyCompressionCodec).toSeq,
-        decompress(toArray(actual.payload), SnappyCompressionCodec).toSeq
+        decompress(toArray(actual.payload), SnappyCompressionCodec).toSeq,
     )
   }
 

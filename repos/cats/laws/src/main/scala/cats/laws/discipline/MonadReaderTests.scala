@@ -31,7 +31,7 @@ trait MonadReaderTests[F[_], R] extends MonadTests[F] {
           "monadReader local ask" -> forAll(laws.monadReaderLocalAsk _),
           "monadReader local pure" -> forAll(laws.monadReaderLocalPure[A] _),
           "monadReader local flatMap" -> forAll(
-              laws.monadReaderLocalFlatMap[A, B] _)
+              laws.monadReaderLocalFlatMap[A, B] _),
       )
     }
   }

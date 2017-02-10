@@ -147,19 +147,19 @@ class ReplicaManager(val config: KafkaConfig,
         def value = {
           getLeaderPartitions().size
         }
-      }
+      },
   )
   val partitionCount = newGauge(
       "PartitionCount",
       new Gauge[Int] {
         def value = allPartitions.size
-      }
+      },
   )
   val underReplicatedPartitions = newGauge(
       "UnderReplicatedPartitions",
       new Gauge[Int] {
         def value = underReplicatedPartitionCount()
-      }
+      },
   )
   val isrExpandRate = newMeter("IsrExpandsPerSec", "expands", TimeUnit.SECONDS)
   val isrShrinkRate = newMeter("IsrShrinksPerSec", "shrinks", TimeUnit.SECONDS)

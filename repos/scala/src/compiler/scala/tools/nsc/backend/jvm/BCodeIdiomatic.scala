@@ -37,7 +37,7 @@ abstract class BCodeIdiomatic extends SubComponent {
 
   val extraProc: Int = GenBCode.mkFlags(
       asm.ClassWriter.COMPUTE_MAXS,
-      if (emitStackMapFrame) asm.ClassWriter.COMPUTE_FRAMES else 0
+      if (emitStackMapFrame) asm.ClassWriter.COMPUTE_FRAMES else 0,
   )
 
   lazy val JavaStringBuilderClassName = jlStringBuilderRef.internalName
@@ -188,7 +188,7 @@ abstract class BCodeIdiomatic extends SubComponent {
           JavaStringBuilderClassName,
           INSTANCE_CONSTRUCTOR_NAME,
           "()V",
-          pos
+          pos,
       )
     }
 
@@ -233,7 +233,7 @@ abstract class BCodeIdiomatic extends SubComponent {
 
       assert(
           from.isNonVoidPrimitiveType && to.isNonVoidPrimitiveType,
-          s"Cannot emit primitive conversion from $from to $to - ${global.currentUnit}"
+          s"Cannot emit primitive conversion from $from to $to - ${global.currentUnit}",
       )
 
       def pickOne(opcs: Array[Int]) {

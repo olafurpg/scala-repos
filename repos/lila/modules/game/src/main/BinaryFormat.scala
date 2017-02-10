@@ -168,7 +168,7 @@ object BinaryFormat {
       val ints =
         Array(
             (castleInt << 4) + (lastMoveInt >> 8),
-            (lastMoveInt & 255)
+            (lastMoveInt & 255),
         ) ++ writeInt24(time) ++ clmt.check.map(posInt)
 
       ByteArray(ints.map(_.toByte))

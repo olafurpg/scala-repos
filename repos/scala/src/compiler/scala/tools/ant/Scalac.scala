@@ -594,7 +594,7 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
             "Compiling source file%s: %s to %s".format(
                 plural(list),
                 list.mkString(", "),
-                getDestination.toString
+                getDestination.toString,
             ))
       else if (!list.isEmpty) {
         val str =

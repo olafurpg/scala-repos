@@ -813,7 +813,7 @@ trait ScalatraBase
       implicit request: HttpServletRequest): String = {
     "%s://%s".format(
         if (needsHttps || isHttps) "https" else "http",
-        serverAuthority
+        serverAuthority,
     )
   }
 

@@ -171,7 +171,7 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
         s"LOAD DATA LOCAL INPATH '$dataFilePath' OVERWRITE INTO TABLE hive_test;" -> "OK",
         "CACHE TABLE hive_test;" -> "",
         "SELECT COUNT(*) FROM hive_test;" -> "5",
-        "DROP TABLE hive_test;" -> "OK"
+        "DROP TABLE hive_test;" -> "OK",
     )
   }
 
@@ -184,13 +184,13 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
         "CREATE DATABASE hive_test_db;" -> "OK",
         "USE hive_test_db;" -> "",
         "CREATE TABLE hive_test(key INT, val STRING);" -> "OK",
-        "SHOW TABLES;" -> "hive_test"
+        "SHOW TABLES;" -> "hive_test",
     )
 
     runCliWithin(2.minute,
                  Seq("--database", "hive_test_db", "-e", "SHOW TABLES;"))(
         "" -> "OK",
-        "" -> "hive_test"
+        "" -> "hive_test",
     )
   }
 
@@ -213,14 +213,14 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
         "INSERT INTO TABLE t1 SELECT key, val FROM sourceTable;" -> "",
         "SELECT count(key) FROM t1;" -> "5",
         "DROP TABLE t1;" -> "OK",
-        "DROP TABLE sourceTable;" -> "OK"
+        "DROP TABLE sourceTable;" -> "OK",
     )
   }
 
   test("SPARK-11188 Analysis error reporting") {
     runCliWithin(timeout = 2.minute,
                  errorResponses = Seq("AnalysisException"))(
-        "select * from nonexistent_table;" -> "Error in query: Table not found: nonexistent_table;"
+        "select * from nonexistent_table;" -> "Error in query: Table not found: nonexistent_table;",
     )
   }
 

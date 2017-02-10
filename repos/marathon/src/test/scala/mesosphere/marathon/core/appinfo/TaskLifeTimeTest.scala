@@ -53,9 +53,9 @@ class TaskLifeTimeTest
         Some(
             TaskLifeTime(
                 averageSeconds = 5.0,
-                medianSeconds = 4.0
-            )
-        )
+                medianSeconds = 4.0,
+            ),
+        ),
     )
   }
 
@@ -70,9 +70,9 @@ class TaskLifeTimeTest
         Some(
             TaskLifeTime(
                 averageSeconds = 5.0,
-                medianSeconds = 4.0
-            )
-        )
+                medianSeconds = 4.0,
+            ),
+        ),
     )
   }
 }

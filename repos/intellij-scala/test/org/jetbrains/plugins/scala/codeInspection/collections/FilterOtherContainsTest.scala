@@ -16,7 +16,7 @@ class FilterOtherContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filter(x => others.contains(x))$END",
         "val others = Set(1,2); Set().filter(x => others.contains(x))",
-        "val others = Set(1,2); Set().intersect(others)"
+        "val others = Set(1,2); Set().intersect(others)",
     )
   }
 
@@ -24,7 +24,7 @@ class FilterOtherContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filter(others.contains(_))$END",
         "val others = Set(1,2); Set().filter(others.contains(_))",
-        "val others = Set(1,2); Set().intersect(others)"
+        "val others = Set(1,2); Set().intersect(others)",
     )
   }
 
@@ -32,7 +32,7 @@ class FilterOtherContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filter(others.contains _)$END",
         "val others = Set(1,2); Set().filter(others.contains(_))",
-        "val others = Set(1,2); Set().intersect(others)"
+        "val others = Set(1,2); Set().intersect(others)",
     )
   }
 
@@ -40,7 +40,7 @@ class FilterOtherContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filter(others contains _)$END",
         "val others = Set(1,2); Set().filter(others contains _)",
-        "val others = Set(1,2); Set().intersect(others)"
+        "val others = Set(1,2); Set().intersect(others)",
     )
   }
 
@@ -48,7 +48,7 @@ class FilterOtherContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filter(others.contains)$END",
         "val others = Set(1,2); Set().filter(others.contains)",
-        "val others = Set(1,2); Set().intersect(others)"
+        "val others = Set(1,2); Set().intersect(others)",
     )
   }
 
@@ -56,7 +56,7 @@ class FilterOtherContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filterNot(x => !others.contains(x))$END",
         "val others = Set(1,2); Set().filterNot(x => !others.contains(x))",
-        "val others = Set(1,2); Set().intersect(others)"
+        "val others = Set(1,2); Set().intersect(others)",
     )
   }
 
@@ -86,7 +86,7 @@ class FilterOtherNotContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filter(x => !others.contains(x))$END",
         "val others = Set(1,2); Set().filter(x => !others.contains(x))",
-        "val others = Set(1,2); Set().diff(others)"
+        "val others = Set(1,2); Set().diff(others)",
     )
   }
 
@@ -94,7 +94,7 @@ class FilterOtherNotContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filterNot(others.contains(_))$END",
         "val others = Set(1,2); Set().filterNot(others.contains(_))",
-        "val others = Set(1,2); Set().diff(others)"
+        "val others = Set(1,2); Set().diff(others)",
     )
   }
 
@@ -102,7 +102,7 @@ class FilterOtherNotContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filterNot(others contains _)$END",
         "val others = Set(1,2); Set().filterNot(others contains _)",
-        "val others = Set(1,2); Set().diff(others)"
+        "val others = Set(1,2); Set().diff(others)",
     )
   }
 
@@ -110,7 +110,7 @@ class FilterOtherNotContainsTest extends OperationsOnCollectionInspectionTest {
     doTest(
         s"val others = Set(1,2); Set().${START}filterNot(others.contains)$END",
         "val others = Set(1,2); Set().filterNot(others.contains)",
-        "val others = Set(1,2); Set().diff(others)"
+        "val others = Set(1,2); Set().diff(others)",
     )
   }
 

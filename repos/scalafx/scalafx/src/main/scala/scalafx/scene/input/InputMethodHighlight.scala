@@ -68,7 +68,7 @@ object InputMethodHighlight
       UnselectedRaw,
       SelectedRaw,
       UnselectedConverted,
-      SelectedConverted
+      SelectedConverted,
   )
 }
 

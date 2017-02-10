@@ -20,7 +20,7 @@ object Test extends AnyRef with App {
         }) +
         (try { x } catch {
               case _: Error => 1;
-            })
+            }),
     );
   }
 

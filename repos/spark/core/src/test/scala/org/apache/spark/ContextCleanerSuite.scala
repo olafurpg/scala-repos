@@ -525,13 +525,13 @@ class CleanerTester(sc: SparkContext,
       assert(
           sc.persistentRdds.contains(rddId),
           "RDD " + rddId +
-          " have not been persisted, cannot start cleaner test"
+          " have not been persisted, cannot start cleaner test",
       )
 
       assert(
           !getRDDBlocks(rddId).isEmpty,
           "Blocks of RDD " + rddId + " cannot be found in block manager, " +
-          "cannot start cleaner test"
+          "cannot start cleaner test",
       )
     }
 
@@ -540,13 +540,13 @@ class CleanerTester(sc: SparkContext,
       assert(
           mapOutputTrackerMaster.containsShuffle(shuffleId),
           "Shuffle " + shuffleId +
-          " have not been registered, cannot start cleaner test"
+          " have not been registered, cannot start cleaner test",
       )
 
       assert(
           !getShuffleBlocks(shuffleId).isEmpty,
           "Blocks of shuffle " + shuffleId +
-          " cannot be found in block manager, " + "cannot start cleaner test"
+          " cannot be found in block manager, " + "cannot start cleaner test",
       )
     }
 
@@ -555,7 +555,7 @@ class CleanerTester(sc: SparkContext,
       assert(
           !getBroadcastBlocks(broadcastId).isEmpty,
           "Blocks of broadcast " + broadcastId +
-          "cannot be found in block manager, " + "cannot start cleaner test"
+          "cannot be found in block manager, " + "cannot start cleaner test",
       )
     }
   }
@@ -569,12 +569,12 @@ class CleanerTester(sc: SparkContext,
     rddIds.foreach { rddId =>
       assert(
           !sc.persistentRdds.contains(rddId),
-          "RDD " + rddId + " was not cleared from sc.persistentRdds"
+          "RDD " + rddId + " was not cleared from sc.persistentRdds",
       )
 
       assert(
           getRDDBlocks(rddId).isEmpty,
-          "Blocks of RDD " + rddId + " were not cleared from block manager"
+          "Blocks of RDD " + rddId + " were not cleared from block manager",
       )
     }
 
@@ -583,13 +583,13 @@ class CleanerTester(sc: SparkContext,
       assert(
           !mapOutputTrackerMaster.containsShuffle(shuffleId),
           "Shuffle " + shuffleId +
-          " was not deregistered from map output tracker"
+          " was not deregistered from map output tracker",
       )
 
       assert(
           getShuffleBlocks(shuffleId).isEmpty,
           "Blocks of shuffle " + shuffleId +
-          " were not cleared from block manager"
+          " were not cleared from block manager",
       )
     }
 
@@ -598,7 +598,7 @@ class CleanerTester(sc: SparkContext,
       assert(
           getBroadcastBlocks(broadcastId).isEmpty,
           "Blocks of broadcast " + broadcastId +
-          " were not cleared from block manager"
+          " were not cleared from block manager",
       )
     }
   }

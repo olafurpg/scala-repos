@@ -65,14 +65,14 @@ object Evaluation1 {
               new EventsSlidingEvalParams(
                   firstTrainingUntilTime = new DateTime(1998, 2, 1, 0, 0),
                   evalDuration = Duration.standardDays(7),
-                  evalCount = 3))
+                  evalCount = 3)),
     )
 
     val engineParams = new EngineParams(
         dataSourceParams = dsp,
         preparatorParams = CommonParams.PreparatorParams,
         algorithmParamsList = Seq(
-              ("mahoutItemBased", CommonParams.MahoutAlgoParams0))
+              ("mahoutItemBased", CommonParams.MahoutAlgoParams0)),
     )
 
     // Evaluator Setting
@@ -80,7 +80,7 @@ object Evaluation1 {
         ratingParams = new BinaryRatingParams(
               actionsMap = Map("rate" -> None), goodThreshold = 3),
         measureType = MeasureType.PrecisionAtK,
-        measureK = 10
+        measureK = 10,
     )
 
     // Run
@@ -89,7 +89,7 @@ object Evaluation1 {
         engine = engine,
         engineParams = engineParams,
         evaluatorClassOpt = Some(classOf[ItemRankDetailedEvaluator]),
-        evaluatorParams = evaluatorParams
+        evaluatorParams = evaluatorParams,
     )
   }
 }
@@ -103,7 +103,7 @@ object Evaluation2 {
         dataSourceParams = CommonParams.CompleteDataSourceParams,
         preparatorParams = CommonParams.PreparatorParams,
         algorithmParamsList = Seq(
-              ("mahoutItemBased", CommonParams.MahoutAlgoParams0))
+              ("mahoutItemBased", CommonParams.MahoutAlgoParams0)),
     )
 
     // Evaluator Setting
@@ -111,7 +111,7 @@ object Evaluation2 {
         ratingParams = new BinaryRatingParams(
               actionsMap = Map("rate" -> None), goodThreshold = 3),
         measureType = MeasureType.PrecisionAtK,
-        measureK = 10
+        measureK = 10,
     )
 
     // Run
@@ -120,7 +120,7 @@ object Evaluation2 {
         engine = engine,
         engineParams = engineParams,
         evaluatorClassOpt = Some(classOf[ItemRankDetailedEvaluator]),
-        evaluatorParams = evaluatorParams
+        evaluatorParams = evaluatorParams,
     )
   }
 }

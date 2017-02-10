@@ -106,14 +106,14 @@ class FastScalac extends Scalac {
           s.outdir,
           s.sourcepath,
           /*fsc*/
-          s.server
+          s.server,
       ) filter (_.value != "") flatMap (x => List(x.name, x.value))
 
     val choiceSettings =
       List(
           /*scalac*/
           s.debuginfo,
-          s.target
+          s.target,
       ) filter (x => x.value != x.default) map
       (x => "%s:%s".format(x.name, x.value))
 
@@ -132,13 +132,13 @@ class FastScalac extends Scalac {
           /*fsc*/
           s.preferIPv4,
           s.reset,
-          s.shutdown
+          s.shutdown,
       ) filter (_.value) map (_.name)
 
     val intSettings =
       List(
           /*fsc*/
-          s.idleMins
+          s.idleMins,
       ) filter (x => x.value != x.default) flatMap
       (x => List(x.name, x.value.toString))
 

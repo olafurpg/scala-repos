@@ -320,7 +320,7 @@ trait PLensFamilyFunctions extends PLensInstances {
     : (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B]) =
     (
         leftPLensFamily compose l,
-        rightPLensFamily compose l
+        rightPLensFamily compose l,
     )
 
   import LazyOption._
@@ -443,7 +443,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   def eitherLens[S, A, B](l: S @?> (A \/ B)): (S @?> A, S @?> B) =
     (
         leftPLens compose l,
-        rightPLens compose l
+        rightPLens compose l,
     )
 
   import LazyOption._
@@ -636,7 +636,7 @@ abstract class PLensInstances {
                         {
                       val (p, q) = c.pos
                       IndexedStore(a => c.put((p, a)): R, q)
-                  }))
+                  })),
         )
     }
 

@@ -228,7 +228,7 @@ trait SValueInstances {
           str = stringOrder,
           bool = boolOrder,
           num = numOrder,
-          nul = EQ
+          nul = EQ,
       )
   }
 
@@ -258,7 +258,7 @@ trait SValueInstances {
         str = stringEqual,
         bool = boolEqual,
         num = numEqual,
-        nul = true
+        nul = true,
     )
   }
 

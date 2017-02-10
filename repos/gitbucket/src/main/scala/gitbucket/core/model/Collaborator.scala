@@ -21,5 +21,5 @@ trait CollaboratorComponent extends TemplateComponent { self: Profile =>
 case class Collaborator(
     userName: String,
     repositoryName: String,
-    collaboratorName: String
+    collaboratorName: String,
 )

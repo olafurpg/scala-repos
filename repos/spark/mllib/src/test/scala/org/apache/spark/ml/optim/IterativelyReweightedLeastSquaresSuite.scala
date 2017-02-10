@@ -44,7 +44,7 @@ class IterativelyReweightedLeastSquaresSuite
             Instance(1.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
             Instance(0.0, 2.0, Vectors.dense(1.0, 2.0)),
             Instance(1.0, 3.0, Vectors.dense(2.0, 1.0)),
-            Instance(0.0, 4.0, Vectors.dense(3.0, 3.0))
+            Instance(0.0, 4.0, Vectors.dense(3.0, 3.0)),
         ),
         2)
     /*
@@ -59,7 +59,7 @@ class IterativelyReweightedLeastSquaresSuite
             Instance(2.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
             Instance(8.0, 2.0, Vectors.dense(1.0, 7.0)),
             Instance(3.0, 3.0, Vectors.dense(2.0, 11.0)),
-            Instance(9.0, 4.0, Vectors.dense(3.0, 13.0))
+            Instance(9.0, 4.0, Vectors.dense(3.0, 13.0)),
         ),
         2)
   }

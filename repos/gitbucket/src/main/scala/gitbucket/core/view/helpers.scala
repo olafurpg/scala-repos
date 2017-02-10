@@ -29,7 +29,7 @@ object helpers
       (1000L * 60 * 60, "hour"),
       (1000L * 60 * 60 * 24, "day"),
       (1000L * 60 * 60 * 24 * 30, "month"),
-      (1000L * 60 * 60 * 24 * 365, "year")
+      (1000L * 60 * 60 * 24 * 365, "year"),
   ).reverse
 
   /**
@@ -108,7 +108,7 @@ object helpers
             enableLineBreaks = enableLineBreaks,
             enableTaskList = enableTaskList,
             hasWritePermission = hasWritePermission,
-            pages = pages
+            pages = pages,
         ))
 
   /**
@@ -394,7 +394,7 @@ object helpers
                    if (pos < m.start)
                      Some(HtmlFormat.escape(text.substring(pos, m.start)))
                    else None,
-                   Some(Html(s"""<a href="${href}">${url}</a>"""))
+                   Some(Html(s"""<a href="${href}">${url}</a>""")),
                ).flatten),
            m.end)
       }

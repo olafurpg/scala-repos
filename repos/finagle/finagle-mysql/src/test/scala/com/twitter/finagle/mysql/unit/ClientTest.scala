@@ -25,7 +25,7 @@ class ClientTest extends FunSuite with MockitoSugar with MustMatchers {
 
     service.requests must equal(List(
             sqlQuery,
-            sqlQuery
+            sqlQuery,
         ).map(QueryRequest(_)))
 
     verify(client, times(2)).query(sqlQuery)

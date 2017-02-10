@@ -292,8 +292,8 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
               _ =>
                 atOwner(origMeth)(
                     localTyper.typedPos(rhs.pos)(
-                        gen.mkForwarder(callPrefix, mmap(vparamss)(_.symbol))
-                    )
+                        gen.mkForwarder(callPrefix, mmap(vparamss)(_.symbol)),
+                    ),
               ))
         case _ =>
           super.transform(tree)

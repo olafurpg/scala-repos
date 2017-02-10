@@ -127,7 +127,7 @@ class ScalaGradleDataServiceTest
         "-language:postfixOps",
         "-language:reflectiveCalls",
         "-no-specialization",
-        "-nowarn"
+        "-nowarn",
     )
 
     val options = new ScalaCompileOptionsData

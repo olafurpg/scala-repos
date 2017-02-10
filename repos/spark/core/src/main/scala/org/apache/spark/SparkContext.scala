@@ -1450,7 +1450,7 @@ class SparkContext(config: SparkConf)
   private[spark] override def requestTotalExecutors(
       numExecutors: Int,
       localityAwareTasks: Int,
-      hostToLocalTaskCount: scala.collection.immutable.Map[String, Int]
+      hostToLocalTaskCount: scala.collection.immutable.Map[String, Int],
   ): Boolean = {
     schedulerBackend match {
       case b: CoarseGrainedSchedulerBackend =>
@@ -1830,7 +1830,7 @@ class SparkContext(config: SparkConf)
         Option(getLocalProperty(CallSite.SHORT_FORM))
           .getOrElse(callSite.shortForm),
         Option(getLocalProperty(CallSite.LONG_FORM))
-          .getOrElse(callSite.longForm)
+          .getOrElse(callSite.longForm),
     )
   }
 

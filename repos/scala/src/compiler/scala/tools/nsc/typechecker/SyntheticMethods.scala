@@ -84,7 +84,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
 
     val synthesizer = new ClassMethodSynthesis(
         clazz0,
-        newTyper(if (reporter.hasErrors) context makeSilent false else context)
+        newTyper(if (reporter.hasErrors) context makeSilent false else context),
     )
     import synthesizer._
 
@@ -166,8 +166,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
               CaseDef(Typed(Ident(nme.WILDCARD), TypeTree(clazz.tpe)),
                       EmptyTree,
                       TRUE),
-              CaseDef(Ident(nme.WILDCARD), EmptyTree, FALSE)
-          )
+              CaseDef(Ident(nme.WILDCARD), EmptyTree, FALSE),
+          ),
       )
     }
 
@@ -202,7 +202,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
 
       thatTest(eqmeth) AND Block(
           ValDef(otherSym, thatCast(eqmeth)),
-          AND(tests: _*)
+          AND(tests: _*),
       )
     }
 
@@ -299,7 +299,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
                 Assign(
                     Ident(accumulator),
                     callStaticsMethod("mix")(Ident(accumulator),
-                                             hashcodeImplementation(acc))
+                                             hashcodeImplementation(acc)),
               ))
         val finish = callStaticsMethod("finalizeHash")(
             Ident(accumulator), Literal(Constant(arity)))
@@ -315,18 +315,18 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
 
     def valueClassMethods = List(
         Any_hashCode -> (() => hashCodeDerivedValueClassMethod),
-        Any_equals -> (() => equalsDerivedValueClassMethod)
+        Any_equals -> (() => equalsDerivedValueClassMethod),
     )
 
     def caseClassMethods = productMethods ++ /*productNMethods ++*/ Seq(
         Object_hashCode -> (() => chooseHashcode),
         Object_toString -> (() => forwardToRuntime(Object_toString)),
-        Object_equals -> (() => equalsCaseClassMethod)
+        Object_equals -> (() => equalsCaseClassMethod),
     )
 
     def valueCaseClassMethods =
       productMethods ++ /*productNMethods ++*/ valueClassMethods ++ Seq(
-          Any_toString -> (() => forwardToRuntime(Object_toString))
+          Any_toString -> (() => forwardToRuntime(Object_toString)),
       )
 
     def caseObjectMethods = productMethods ++ Seq(

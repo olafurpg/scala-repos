@@ -1231,11 +1231,11 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
   def batched[In, Out](
       sizeThreshold: Int,
       timeThreshold: Duration = Duration.Top,
-      sizePercentile: => Float = 1.0f
+      sizePercentile: => Float = 1.0f,
   )(
-      f: Seq[In] => Future[Seq[Out]]
+      f: Seq[In] => Future[Seq[Out]],
   )(
-      implicit timer: Timer
+      implicit timer: Timer,
   ): Batcher[In, Out] = {
     new Batcher[In, Out](new BatchExecutor[In, Out](
             sizeThreshold, timeThreshold, sizePercentile, f))
@@ -1598,7 +1598,7 @@ abstract class Future[+A] extends Awaitable[A] {
     * @see [[handle]]
     */
   def rescue[B >: A](
-      rescueException: PartialFunction[Throwable, Future[B]]
+      rescueException: PartialFunction[Throwable, Future[B]],
   ): Future[B] =
     transform({
       case Throw(t) =>

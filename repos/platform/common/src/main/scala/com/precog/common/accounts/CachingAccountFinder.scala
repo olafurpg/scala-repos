@@ -38,13 +38,13 @@ import scalaz.syntax.monad._
 
 case class CachingAccountFinderSettings(
     byKeyCacheSettings: Seq[Cache.CacheOption[APIKey, AccountId]],
-    byAccountIdCacheSettings: Seq[Cache.CacheOption[AccountId, AccountDetails]]
+    byAccountIdCacheSettings: Seq[Cache.CacheOption[AccountId, AccountDetails]],
 )
 
 object CachingAccountFinderSettings {
   val Default = CachingAccountFinderSettings(
       Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000)),
-      Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000))
+      Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000)),
   )
 }
 

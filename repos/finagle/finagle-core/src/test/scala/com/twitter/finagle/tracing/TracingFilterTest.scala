@@ -48,7 +48,7 @@ class TracingFilterTest
 
   def testAnnotatingTracingFilter(
       prefix: String,
-      mkFilter: String => Filter[Int, Int, Int, Int]
+      mkFilter: String => Filter[Int, Int, Int, Int],
   ): Unit = {
     test(s"$prefix: should trace service name") {
       val services =

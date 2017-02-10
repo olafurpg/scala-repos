@@ -10,7 +10,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 class PreparedData(
     val labeledPoints: RDD[LabeledPoint],
     val gendersMap: Map[String, Double],
-    val educationMap: Map[String, Double]
+    val educationMap: Map[String, Double],
 )
     extends Serializable
 

@@ -75,7 +75,7 @@ private[twitter] object ZipkinTracerTest {
       // We only guarantee successful deserialization for primitive values and
       // Strings, here we test String.
       for (v <- Gen.oneOf(arbitrary[AnyVal], arbitrary[String])) yield
-        BinaryAnnotation("k", v)
+        BinaryAnnotation("k", v),
   )
 
   def genEvent(etype: events.Event.Type): Gen[events.Event] =

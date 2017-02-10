@@ -27,7 +27,7 @@ class SourceTrackingMonitorTest extends FunSuite with MockitoSugar {
         "The 'qux' service " +
         Seq("user", "tweet").mkString(" on behalf of ") +
         " threw an exception",
-        exc
+        exc,
     )
   }
 

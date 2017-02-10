@@ -108,7 +108,7 @@ trait CSRFCommonSpecs extends Specification with PlaySpecification {
     "reject requests with token in body but not in session" in {
       csrfCheckRequest(
           _.withSession("foo" -> "bar")
-            .post(Map("foo" -> "bar", TokenName -> generate))
+            .post(Map("foo" -> "bar", TokenName -> generate)),
       )(_.status must_== errorStatusCode)
     }
 

@@ -54,7 +54,7 @@ final case class Comprehension(
         having = newHaving.headOption,
         distinct = newDistinct.headOption,
         fetch = newFetch.headOption,
-        offset = newOffset.headOption
+        offset = newOffset.headOption,
     )
   }
   def generators = ConstArray((sym, from))
@@ -95,7 +95,7 @@ final case class Comprehension(
           having = h2.orElse(having),
           distinct = distinct2.orElse(distinct),
           fetch = fetch2.orElse(fetch),
-          offset = offset2.orElse(offset)
+          offset = offset2.orElse(offset),
       ) :@ newType
     }
   }

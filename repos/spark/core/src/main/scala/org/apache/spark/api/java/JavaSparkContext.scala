@@ -388,7 +388,7 @@ class JavaSparkContext(val sc: SparkContext)
       inputFormatClass: Class[F],
       keyClass: Class[K],
       valueClass: Class[V],
-      minPartitions: Int
+      minPartitions: Int,
   ): JavaPairRDD[K, V] = {
     implicit val ctagK: ClassTag[K] = ClassTag(keyClass)
     implicit val ctagV: ClassTag[V] = ClassTag(valueClass)
@@ -418,7 +418,7 @@ class JavaSparkContext(val sc: SparkContext)
       conf: JobConf,
       inputFormatClass: Class[F],
       keyClass: Class[K],
-      valueClass: Class[V]
+      valueClass: Class[V],
   ): JavaPairRDD[K, V] = {
     implicit val ctagK: ClassTag[K] = ClassTag(keyClass)
     implicit val ctagV: ClassTag[V] = ClassTag(valueClass)
@@ -438,7 +438,7 @@ class JavaSparkContext(val sc: SparkContext)
       inputFormatClass: Class[F],
       keyClass: Class[K],
       valueClass: Class[V],
-      minPartitions: Int
+      minPartitions: Int,
   ): JavaPairRDD[K, V] = {
     implicit val ctagK: ClassTag[K] = ClassTag(keyClass)
     implicit val ctagV: ClassTag[V] = ClassTag(valueClass)
@@ -458,7 +458,7 @@ class JavaSparkContext(val sc: SparkContext)
       path: String,
       inputFormatClass: Class[F],
       keyClass: Class[K],
-      valueClass: Class[V]
+      valueClass: Class[V],
   ): JavaPairRDD[K, V] = {
     implicit val ctagK: ClassTag[K] = ClassTag(keyClass)
     implicit val ctagV: ClassTag[V] = ClassTag(valueClass)

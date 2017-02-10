@@ -48,7 +48,7 @@ class StopWordsRemoverSuite
               (Seq("a", "the", "an"), Seq()),
               (Seq("A", "The", "AN"), Seq()),
               (Seq(null), Seq(null)),
-              (Seq(), Seq())
+              (Seq(), Seq()),
           ))
       .toDF("raw", "expected")
 
@@ -63,7 +63,7 @@ class StopWordsRemoverSuite
     val dataSet = sqlContext
       .createDataFrame(Seq(
               (Seq("A"), Seq("A")),
-              (Seq("The", "the"), Seq("The"))
+              (Seq("The", "the"), Seq("The")),
           ))
       .toDF("raw", "expected")
 
@@ -79,7 +79,7 @@ class StopWordsRemoverSuite
     val dataSet = sqlContext
       .createDataFrame(Seq(
               (Seq("python", "scala", "a"), Seq()),
-              (Seq("Python", "Scala", "swift"), Seq("swift"))
+              (Seq("Python", "Scala", "swift"), Seq("swift")),
           ))
       .toDF("raw", "expected")
 
@@ -101,7 +101,7 @@ class StopWordsRemoverSuite
       new StopWordsRemover().setInputCol("raw").setOutputCol(outputCol)
     val dataSet = sqlContext
       .createDataFrame(Seq(
-              (Seq("The", "the", "swift"), Seq("swift"))
+              (Seq("The", "the", "swift"), Seq("swift")),
           ))
       .toDF("raw", outputCol)
 

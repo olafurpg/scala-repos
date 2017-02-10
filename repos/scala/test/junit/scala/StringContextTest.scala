@@ -241,7 +241,7 @@ class StringContextTest {
         f"${5: Any}" -> "5",
         f"${5}%s%<d" -> "55",
         f"${3.14}%s,%<f" -> locally"3.14,${"3.140000"}",
-        f"z" -> "z"
+        f"z" -> "z",
     )
 
     for ((f, s) <- ss) assertEquals(s, f)

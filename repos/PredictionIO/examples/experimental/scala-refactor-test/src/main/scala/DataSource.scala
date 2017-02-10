@@ -23,7 +23,7 @@ class DataSource
 
   override def readTraining(sc: SparkContext): TrainingData = {
     new TrainingData(
-        events = sc.parallelize(0 until 100)
+        events = sc.parallelize(0 until 100),
     )
   }
 
@@ -41,7 +41,7 @@ class DataSource
 }
 
 class TrainingData(
-    val events: RDD[Int]
+    val events: RDD[Int],
 )
     extends Serializable {
   override def toString = {

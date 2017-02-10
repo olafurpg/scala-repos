@@ -42,7 +42,7 @@ private class OfferMatcherLaunchTokensActor(
     import context.dispatcher
     periodicSetToken = context.system.scheduler
       .schedule(0.seconds, conf.launchTokenRefreshInterval().millis)(
-        offerMatcherManager.setLaunchTokens(conf.launchTokens())
+        offerMatcherManager.setLaunchTokens(conf.launchTokens()),
     )
   }
 

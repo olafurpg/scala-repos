@@ -73,7 +73,7 @@ trait QuirrelCache extends AST { parser: Parser =>
         Keep("b", boolRe),
         Keep("s", strRe),
         Keep("p", pathRe),
-        Ignore(wordRe)
+        Ignore(wordRe),
     )
 
     def fromString(input: String): (String, IndexedSeq[Binding]) = {

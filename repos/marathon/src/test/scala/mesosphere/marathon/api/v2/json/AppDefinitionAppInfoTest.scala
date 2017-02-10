@@ -18,11 +18,11 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
       tasksStaged = 3,
       tasksRunning = 5,
       tasksHealthy = 4,
-      tasksUnhealthy = 1
+      tasksUnhealthy = 1,
   )
 
   val deployments = Seq(
-      Identifiable("deployment1")
+      Identifiable("deployment1"),
   )
 
   test("app with taskCounts") {
@@ -35,7 +35,7 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
           "tasksStaged" -> 3,
           "tasksRunning" -> 5,
           "tasksHealthy" -> 4,
-          "tasksUnhealthy" -> 1
+          "tasksUnhealthy" -> 1,
       )
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
   }
@@ -47,7 +47,7 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
     Then("the result contains all fields of the app plus the deployments")
     val expectedJson =
       Json.toJson(app).as[JsObject] ++ Json.obj(
-          "deployments" -> Seq(Json.obj("id" -> "deployment1"))
+          "deployments" -> Seq(Json.obj("id" -> "deployment1")),
       )
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
   }
@@ -63,9 +63,9 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
           "tasksStaged" -> 3,
           "tasksRunning" -> 5,
           "tasksHealthy" -> 4,
-          "tasksUnhealthy" -> 1
+          "tasksUnhealthy" -> 1,
       ) ++ Json.obj(
-          "deployments" -> Seq(Json.obj("id" -> "deployment1"))
+          "deployments" -> Seq(Json.obj("id" -> "deployment1")),
       )
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
   }
@@ -83,7 +83,7 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
         host = "srv2.dc43.mesosphere.com",
         timestamp = Timestamp("2015-08-27T15:13:48.386Z"),
         version = Timestamp("2015-08-27T14:13:05.942Z"),
-        slaveId = Some(mesos.SlaveID.newBuilder().setValue("slave34").build())
+        slaveId = Some(mesos.SlaveID.newBuilder().setValue("slave34").build()),
     )
     val extended = AppInfo(app, maybeLastTaskFailure = Some(lastTaskFailure))
 

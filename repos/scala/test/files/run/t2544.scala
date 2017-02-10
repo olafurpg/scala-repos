@@ -7,7 +7,7 @@ object Test {
   def lengthEquiv(result: Int) = println(
       if (result < 0) -1
       else if (result == 0) 0
-      else 1
+      else 1,
   )
 
   def main(args: Array[String]) = {

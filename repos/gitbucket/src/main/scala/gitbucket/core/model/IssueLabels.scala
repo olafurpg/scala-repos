@@ -21,5 +21,5 @@ case class IssueLabel(
     userName: String,
     repositoryName: String,
     issueId: Int,
-    labelId: Int
+    labelId: Int,
 )

@@ -154,7 +154,7 @@ class ErrorPositionSuite
         .getOrElse(sys.error(s"Invalid test. Token $token not in $query"))
       val actualLine = error.line.getOrElse {
         fail(
-            s"line not returned for error '${error.getMessage}' on token $token\n$parseTree"
+            s"line not returned for error '${error.getMessage}' on token $token\n$parseTree",
         )
       }
       assert(actualLine === expectedLineNum, "wrong line")

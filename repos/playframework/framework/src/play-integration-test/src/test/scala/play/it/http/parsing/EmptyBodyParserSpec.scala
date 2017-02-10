@@ -20,7 +20,7 @@ object EmptyBodyParserSpec extends PlaySpecification {
           BodyParsers.parse
             .empty(FakeRequest().withHeaders(
                     contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-            .run(Source.single(bytes))
+            .run(Source.single(bytes)),
         )
     }
 

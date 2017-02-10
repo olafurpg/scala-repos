@@ -144,7 +144,7 @@ object ForwarderService {
                                  else s"localhost:${conf.httpPort()}",
                                conf,
                                conf),
-        leaderModule
+        leaderModule,
     )
     val http = injector.getInstance(classOf[HttpService])
     http

@@ -241,7 +241,7 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
                 "task" -> task.serialize,
                 "nextRun" ->
                 (nextTime.map(_.serialize) getOrElse { JString("never") }),
-                "history" -> reports.toList.serialize
+                "history" -> reports.toList.serialize,
             )
 
             ok(Some(body))

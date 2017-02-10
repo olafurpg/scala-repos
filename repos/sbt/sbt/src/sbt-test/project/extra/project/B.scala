@@ -10,7 +10,7 @@ object B extends Build {
         commands ++= Seq(
             addExtra("add1", addExtra1),
             addExtra("add2", addExtra2),
-            checkExtra
+            checkExtra,
         ))
   def addExtra(name: String, f: (State, Seq[File]) => State) =
     Command.command(name) { s =>

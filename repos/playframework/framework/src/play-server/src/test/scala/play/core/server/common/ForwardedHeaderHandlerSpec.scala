@@ -28,7 +28,7 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: for=192.0.2.43, for=198.51.100.17, for=127.0.0.1
           |Forwarded: for=192.0.2.61;proto=https
           |Forwarded: for=unknown
-        """.stripMargin
+        """.stripMargin,
           ))
       results.length must_== 8
       results(0)._1 must_== ForwardedEntry(Some("_gazonk"), None)
@@ -66,7 +66,7 @@ class ForwardedHeaderHandlerSpec extends Specification {
               """
           |X-Forwarded-For: 192.168.1.1, ::1, [2001:db8:cafe::17], 127.0.0.1
           |X-Forwarded-Proto: https, http, https, http
-        """.stripMargin
+        """.stripMargin,
           ))
       results.length must_== 4
       results(0)._1 must_== ForwardedEntry(Some("192.168.1.1"), Some("https"))

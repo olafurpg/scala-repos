@@ -53,7 +53,7 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
       """ -> "0",
         """case class AAA(s: String, i: Int)
         |AAA("a", 1).toString
-      """ -> "AAA(a,1)"
+      """ -> "AAA(a,1)",
     )
   }
 
@@ -77,7 +77,7 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
         |val a = sqr(12)
         |val b = sqr(1)
         |a + b
-      """ -> "145"
+      """ -> "145",
     )
   }
 
@@ -99,7 +99,7 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
   def testInConstructor(): Unit = {
     evaluateCodeFragments(
         "None.getOrElse(a)" -> "a",
-        "foo().map(_.toUpper)" -> "FOO"
+        "foo().map(_.toUpper)" -> "FOO",
     )
   }
 
@@ -118,7 +118,7 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
         "None.getOrElse(foo())" -> "foo",
         """def bar = "bar"
         |foo() + bar
-      """ -> "foobar"
+      """ -> "foobar",
     )
   }
 }

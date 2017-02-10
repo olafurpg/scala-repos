@@ -379,7 +379,7 @@ object BuiltinCommands {
           "<set>",
           ims,
           arg,
-          LineRange(0, 0)
+          LineRange(0, 0),
       )(cl)
       val setResult =
         if (all) SettingCompletions.setAll(extracted, settings)
