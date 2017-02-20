@@ -567,7 +567,7 @@ private[hive] class HiveQl(conf: ParserConf)
               case Token("TOK_TABLEPROPERTIES", list :: Nil) :: Nil =>
                 tableDesc = tableDesc.withNewStorage(
                   serdeProperties = tableDesc.storage.serdeProperties ++ getProperties(
-                      list))
+                    list))
               case _ =>
             }
 

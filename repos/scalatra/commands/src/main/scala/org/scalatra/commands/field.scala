@@ -112,7 +112,7 @@ class BasicFieldDescriptor[T](
 
     copy(
       validator = validator
-          .flatMap(v => nwValidators.map(v andThen)) orElse nwValidators)
+        .flatMap(v => nwValidators.map(v andThen)) orElse nwValidators)
   }
 
   def copy(name: String = name,

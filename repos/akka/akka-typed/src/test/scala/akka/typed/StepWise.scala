@@ -85,7 +85,7 @@ object StepWise {
 
     def keep(thunk: U ⇒ Unit): Steps[T, U] =
       copy(ops = ThunkV(
-          value ⇒ { thunk.asInstanceOf[Any ⇒ Any](value); value }) :: ops)
+        value ⇒ { thunk.asInstanceOf[Any ⇒ Any](value); value }) :: ops)
 
     def expectMessage[V](timeout: FiniteDuration)(f: (T, U) ⇒ V): Steps[T, V] =
       copy(

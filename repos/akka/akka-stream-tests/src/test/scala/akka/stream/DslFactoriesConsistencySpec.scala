@@ -209,7 +209,7 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
     case m if m.parameterTypes.size > 1 ⇒
       m.copy(name = m.name.filter(Character.isLetter),
              parameterTypes = m.parameterTypes
-                 .dropRight(1) :+ classOf[akka.japi.function.Function[_, _]])
+               .dropRight(1) :+ classOf[akka.japi.function.Function[_, _]])
     case m ⇒ m
   }
 

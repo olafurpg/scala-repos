@@ -333,7 +333,7 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
       // Create mirror maker threads.
       mirrorMakerThreads = (0 until numStreams) map
-          (i => new MirrorMakerThread(mirrorMakerConsumers(i), i))
+        (i => new MirrorMakerThread(mirrorMakerConsumers(i), i))
 
       // Create and initialize message handler
       val customMessageHandlerClass = options.valueOf(messageHandlerOpt)

@@ -514,7 +514,7 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
     val localsForCaptures =
       LocalsList.fromTypes(firstCaptureLocal, capturedTypes)
     closureInit.ownerMethod.maxLocals = firstCaptureLocal +
-        localsForCaptures.size
+      localsForCaptures.size
 
     insertStoreOps(indy, closureInit.ownerMethod, localsForCaptures, _ => None)
     insertLoadOps(indy, closureInit.ownerMethod, localsForCaptures)

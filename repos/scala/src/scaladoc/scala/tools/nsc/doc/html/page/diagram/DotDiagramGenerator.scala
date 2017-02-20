@@ -130,7 +130,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
         thisNode = _thisNode
         nodes = List()
         edges = (thisNode -> superClasses) :: subClasses.map(
-            _ -> List(thisNode))
+          _ -> List(thisNode))
         node2Index =
           (thisNode :: subClasses ::: superClasses ::: incomingImplicits ::: outgoingImplicits).zipWithIndex.toMap
         isInheritanceDiagram = true
@@ -284,7 +284,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
 
     if (!img.equals("")) {
       img = "<TD><IMG SCALE=\"TRUE\" SRC=\"" + settings.outdir.value +
-          "/lib/" + img + "\" /></TD>"
+        "/lib/" + img + "\" /></TD>"
       name = name + " "
     }
     val label =

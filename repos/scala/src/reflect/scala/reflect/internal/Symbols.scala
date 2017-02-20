@@ -1791,7 +1791,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
                   this.infos = infos
                 }
                 _validTo = currentPeriod +
-                    1 // to enable reads from same symbol during info-transform
+                  1 // to enable reads from same symbol during info-transform
                 itr = itr.next
               }
               _validTo =

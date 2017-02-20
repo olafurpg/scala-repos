@@ -328,7 +328,7 @@ trait EvaluatorModule[M[+ _]]
                 _ <- monadState.modify { state =>
                   state.copy(
                     assume = state.assume +
-                        (graph -> (pending.table, pending.sort)))
+                      (graph -> (pending.table, pending.sort)))
                 }
               } yield pending
             }
@@ -918,7 +918,7 @@ trait EvaluatorModule[M[+ _]]
                 _ <- monadState.modify { state =>
                   state.copy(
                     assume = state.assume +
-                        (m -> (wrapped, IdentityOrder.empty)),
+                      (m -> (wrapped, IdentityOrder.empty)),
                     reductions = state.reductions + (m -> rvalue)
                   )
                 }

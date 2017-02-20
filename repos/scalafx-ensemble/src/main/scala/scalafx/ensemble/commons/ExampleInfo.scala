@@ -137,11 +137,11 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
 
     // Append copyright, package, and required imports
     source = "" + "/*\n" + " * Copyright 2013 ScalaFX Project\n" +
-        " * All right reserved.\n" + " */\n" +
-        (if (!originalPackageName.isEmpty)
-           "package " + originalPackageName + "\n"
-         else "") + "\n" + "import scalafx.application.JFXApp\n" +
-        "import scalafx.scene.Scene\n" + source
+      " * All right reserved.\n" + " */\n" +
+      (if (!originalPackageName.isEmpty)
+         "package " + originalPackageName + "\n"
+       else "") + "\n" + "import scalafx.application.JFXApp\n" +
+      "import scalafx.scene.Scene\n" + source
 
     // Remove local imports
     source = source.replaceAll("""import scalafx.ensemble.\S*\s*""", "")

@@ -583,7 +583,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         callsiteClass = callsiteClass,
         argInfos = argInfos,
         callsiteStackHeight = callsiteStackHeight +
-            originalCallsite.callsiteStackHeight
+          originalCallsite.callsiteStackHeight
       )
       originalCallsite.inlinedClones += ClonedCallsite(newCallsite, callsite)
       callGraph.addCallsite(newCallsite)

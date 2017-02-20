@@ -238,7 +238,7 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
       case Some(existingNodeMetrics) ⇒
         copy(
           nodes = nodes - existingNodeMetrics +
-              (existingNodeMetrics merge newNodeMetrics))
+            (existingNodeMetrics merge newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
 

@@ -595,7 +595,7 @@ trait JdbcBackend extends RelationalBackend {
           )
         } else p
       statementParameters = p2 ::
-          (if (statementParameters eq null) Nil else statementParameters)
+        (if (statementParameters eq null) Nil else statementParameters)
     }
 
     def popStatementParameters: Unit = {

@@ -783,7 +783,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       ((((sym.rawflags & symtab.Flags.FINAL) != 0) ||
         isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
         !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
-      )
+    )
 
     // Primitives are "abstract final" to prohibit instantiation
     // without having to provide any implementations, but that is an

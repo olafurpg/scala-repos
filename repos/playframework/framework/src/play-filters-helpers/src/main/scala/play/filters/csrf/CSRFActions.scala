@@ -467,9 +467,9 @@ object CSRFAction {
                                token: Token): RequestHeader = {
     request.copy(
       tags = request.tags ++ Map(
-          Token.NameRequestTag -> token.name,
-          Token.RequestTag -> token.value
-        ))
+        Token.NameRequestTag -> token.name,
+        Token.RequestTag -> token.value
+      ))
   }
 
   private[csrf] def tagRequest[A](request: Request[A],

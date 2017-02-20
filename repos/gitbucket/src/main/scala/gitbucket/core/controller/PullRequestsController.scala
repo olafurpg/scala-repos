@@ -168,25 +168,25 @@ trait PullRequestsControllerBase extends ControllerBase {
                   getCommitStatues(owner, name, pullreq.commitIdTo),
                 branchProtection = branchProtection,
                 branchIsOutOfDate = JGitUtil.getShaByRef(
-                    owner,
-                    name,
-                    pullreq.branch) != Some(pullreq.commitIdFrom),
+                  owner,
+                  name,
+                  pullreq.branch) != Some(pullreq.commitIdFrom),
                 needStatusCheck = context.loginAccount
                   .map { u =>
                     branchProtection.needStatusCheck(u.userName)
                   }
                   .getOrElse(true),
                 hasUpdatePermission = hasWritePermission(
-                    pullreq.requestUserName,
-                    pullreq.requestRepositoryName,
-                    context.loginAccount) && context.loginAccount
-                    .map { u =>
+                  pullreq.requestUserName,
+                  pullreq.requestRepositoryName,
+                  context.loginAccount) && context.loginAccount
+                  .map { u =>
                     !getProtectedBranchInfo(
                       pullreq.requestUserName,
                       pullreq.requestRepositoryName,
                       pullreq.requestBranch).needStatusCheck(u.userName)
                   }
-                    .getOrElse(false),
+                  .getOrElse(false),
                 hasMergePermission = hasMergePermission,
                 commitIdTo = pullreq.commitIdTo
               )

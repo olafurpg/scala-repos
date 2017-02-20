@@ -409,49 +409,49 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setExplaintypes(input: String) {
     explaintypes = Flag toBoolean input orElse buildError(
-        "Unknown explaintypes flag '" + input + "'")
+      "Unknown explaintypes flag '" + input + "'")
   }
 
   /** Set the `deprecation` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setDeprecation(input: String) {
     deprecation = Flag toBoolean input orElse buildError(
-        "Unknown deprecation flag '" + input + "'")
+      "Unknown deprecation flag '" + input + "'")
   }
 
   /** Set the `nobootcp` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setNobootcp(input: String) {
     nobootcp = Flag toBoolean input orElse buildError(
-        "Unknown nobootcp flag '" + input + "'")
+      "Unknown nobootcp flag '" + input + "'")
   }
 
   /** Set the `nowarn` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setNowarn(input: String) {
     nowarn = Flag toBoolean input orElse buildError(
-        "Unknown nowarn flag '" + input + "'")
+      "Unknown nowarn flag '" + input + "'")
   }
 
   /** Set the `optimise` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setOptimise(input: String) {
     optimise = Flag toBoolean input orElse buildError(
-        "Unknown optimisation flag '" + input + "'")
+      "Unknown optimisation flag '" + input + "'")
   }
 
   /** Set the `unchecked` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setUnchecked(input: String) {
     unchecked = Flag toBoolean input orElse buildError(
-        "Unknown unchecked flag '" + input + "'")
+      "Unknown unchecked flag '" + input + "'")
   }
 
   /** Set the `usejavacp` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setUsejavacp(input: String) {
     usejavacp = Flag toBoolean input orElse buildError(
-        "Unknown usejavacp flag '" + input + "'")
+      "Unknown usejavacp flag '" + input + "'")
   }
 
   /** Sets the `failonerror` attribute. Used by [[http://ant.apache.org Ant]].

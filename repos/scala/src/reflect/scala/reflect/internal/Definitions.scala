@@ -1042,7 +1042,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
             (mem =>
                mem.isDeferredNotJavaDefault &&
                  !isUniversalMember(mem)) // TODO: test
-          )
+        )
 
         // if there is only one, it's monomorphic and has a single argument list
         if (deferredMembers.size == 1 &&

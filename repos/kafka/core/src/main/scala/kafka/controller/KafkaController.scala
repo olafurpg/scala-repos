@@ -1745,7 +1745,7 @@ class PartitionsReassignedListener(controller: KafkaController)
     extends IZkDataListener
     with Logging {
   this.logIdent = "[PartitionsReassignedListener on " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
   val zkUtils = controller.controllerContext.zkUtils
   val controllerContext = controller.controllerContext
 
@@ -1801,7 +1801,7 @@ class ReassignedPartitionsIsrChangeListener(controller: KafkaController,
     extends IZkDataListener
     with Logging {
   this.logIdent = "[ReassignedPartitionsIsrChangeListener on controller " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
   val zkUtils = controller.controllerContext.zkUtils
   val controllerContext = controller.controllerContext
 
@@ -1960,7 +1960,7 @@ class PreferredReplicaElectionListener(controller: KafkaController)
     extends IZkDataListener
     with Logging {
   this.logIdent = "[PreferredReplicaElectionListener on " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
   val zkUtils = controller.controllerContext.zkUtils
   val controllerContext = controller.controllerContext
 

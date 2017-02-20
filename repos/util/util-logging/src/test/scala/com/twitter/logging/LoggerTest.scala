@@ -265,16 +265,16 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
             node = "com.twitter",
             level = Some(Level.DEBUG),
             handlers = FileHandler(
-                filename = folderName + "/test.log",
-                rollPolicy = Policy.Never,
-                append = false,
-                level = Some(Level.INFO),
-                formatter = new Formatter(
-                  useFullPackageNames = true,
-                  truncateAt = 1024,
-                  prefix = "%s <HH:mm> %s"
-                )
-              ) :: Nil
+              filename = folderName + "/test.log",
+              rollPolicy = Policy.Never,
+              append = false,
+              level = Some(Level.INFO),
+              formatter = new Formatter(
+                useFullPackageNames = true,
+                truncateAt = 1024,
+                prefix = "%s <HH:mm> %s"
+              )
+            ) :: Nil
           ).apply()
 
           assert(log.getLevel == Level.DEBUG)
@@ -300,13 +300,13 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
             val log: Logger = LoggerFactory(
               node = "com.twitter",
               handlers = SyslogHandler(
-                  formatter = new SyslogFormatter(
-                    serverName = Some("elmo"),
-                    priority = 128
-                  ),
-                  server = "example.com",
-                  port = 212
-                ) :: Nil
+                formatter = new SyslogFormatter(
+                  serverName = Some("elmo"),
+                  priority = 128
+                ),
+                server = "example.com",
+                port = 212
+              ) :: Nil
             ).apply()
 
             assert(log.getHandlers.length == 1)
@@ -329,16 +329,16 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
             LoggerFactory(
               level = Some(Level.INFO),
               handlers = ThrottledHandler(
-                  duration = 60.seconds,
-                  maxToDisplay = 10,
-                  handler = FileHandler(
-                    filename = folderName + "/production.log",
-                    rollPolicy = Policy.SigHup,
-                    formatter = new Formatter(
-                      truncateStackTracesAt = 100
-                    )
+                duration = 60.seconds,
+                maxToDisplay = 10,
+                handler = FileHandler(
+                  filename = folderName + "/production.log",
+                  rollPolicy = Policy.SigHup,
+                  formatter = new Formatter(
+                    truncateStackTracesAt = 100
                   )
-                ) :: Nil
+                )
+              ) :: Nil
             ) :: LoggerFactory(
               node = "w3c",
               level = Some(Level.OFF),
@@ -348,18 +348,18 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
               level = Some(Level.INFO),
               useParents = false,
               handlers = ScribeHandler(
-                  formatter = BareFormatter,
-                  maxMessagesToBuffer = 100,
-                  category = "cuckoo_json"
-                ) :: Nil
+                formatter = BareFormatter,
+                maxMessagesToBuffer = 100,
+                category = "cuckoo_json"
+              ) :: Nil
             ) :: LoggerFactory(
               node = "bad_jobs",
               level = Some(Level.INFO),
               useParents = false,
               handlers = FileHandler(
-                  filename = folderName + "/bad_jobs.log",
-                  rollPolicy = Policy.Never
-                ) :: Nil
+                filename = folderName + "/bad_jobs.log",
+                rollPolicy = Policy.Never
+              ) :: Nil
             ) :: Nil
 
           Logger.configure(factories)

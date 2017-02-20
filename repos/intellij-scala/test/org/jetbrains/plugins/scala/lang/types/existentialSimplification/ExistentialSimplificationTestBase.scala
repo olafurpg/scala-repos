@@ -80,7 +80,7 @@ abstract class ExistentialSimplificationTestBase
       case Failure(msg, elem) =>
         assert(assertion = false,
                message = msg + " :: " +
-                   (elem match {
+                 (elem match {
                    case Some(x) => x.getText
                    case None => "empty element"
                  }))

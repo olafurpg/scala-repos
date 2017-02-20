@@ -233,7 +233,7 @@ private[cluster] final case class ClusterHeartbeatSenderState(
     if (newState.oldReceiversNowUnreachable(node))
       newState.copy(
         oldReceiversNowUnreachable = newState.oldReceiversNowUnreachable -
-            node)
+          node)
     else newState
   }
 

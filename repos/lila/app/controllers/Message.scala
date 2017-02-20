@@ -96,7 +96,7 @@ object Message extends LilaController {
                             user,
                             title,
                             canMessage = canMessage ||
-                                Granter(_.MessageAnyone)(me))
+                              Granter(_.MessageAnyone)(me))
       }
     }
 

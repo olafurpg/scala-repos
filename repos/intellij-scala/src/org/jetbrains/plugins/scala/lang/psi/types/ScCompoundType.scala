@@ -25,7 +25,7 @@ case class ScCompoundType(components: Seq[ScType],
   override def hashCode: Int = {
     if (hash == -1) {
       hash = components.hashCode() +
-          (signatureMap.hashCode() * 31 + typesMap.hashCode()) * 31
+        (signatureMap.hashCode() * 31 + typesMap.hashCode()) * 31
     }
     hash
   }

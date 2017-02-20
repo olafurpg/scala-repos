@@ -165,7 +165,7 @@ object LFib4 {
         c += 1
         c &= 0xFF
         state(c) = state(c) + state((c + 58) & 0xFF) +
-            state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
+          state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
         state(c)
       }
   }

@@ -177,7 +177,7 @@ object Utils {
         aggregateExpressions = aggregateExpressions,
         aggregateAttributes = aggregateAttributes,
         resultExpressions = groupingAttributes ++ distinctAttributes ++ aggregateExpressions
-            .flatMap(_.aggregateFunction.inputAggBufferAttributes),
+          .flatMap(_.aggregateFunction.inputAggBufferAttributes),
         child = child
       )
     }
@@ -198,7 +198,7 @@ object Utils {
         initialInputBufferOffset =
           (groupingAttributes ++ distinctAttributes).length,
         resultExpressions = groupingAttributes ++ distinctAttributes ++ aggregateExpressions
-            .flatMap(_.aggregateFunction.inputAggBufferAttributes),
+          .flatMap(_.aggregateFunction.inputAggBufferAttributes),
         child = partialAggregate
       )
     }

@@ -232,7 +232,7 @@ abstract class TreeGen {
       val needsPackageQualifier =
         ((sym ne null) && qualsym.hasPackageFlag && !(sym.isDefinedInPackage ||
           sym.moduleClass.isDefinedInPackage) // SI-7817 work around strangeness in post-flatten `Symbol#owner`
-        )
+      )
       val pkgQualifier =
         if (needsPackageQualifier) {
           val packageObject = qualsym.packageObject

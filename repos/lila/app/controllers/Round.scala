@@ -79,7 +79,7 @@ object Round extends LilaController with TheftPrevention {
                                     cross = crosstable,
                                     playing = playing,
                                     prefs = ctx.isAuth option
-                                        (Env.pref.forms miniPrefOf ctx.pref)))
+                                      (Env.pref.forms miniPrefOf ctx.pref)))
               }
           }
         }.mon(_.http.response.player.website),

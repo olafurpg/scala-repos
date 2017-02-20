@@ -368,7 +368,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
                           val resultSlot = getLocal(tp.getSize)
                           loadOps = new VarInsnNode(tp.getOpcode(ILOAD),
                                                     resultSlot) :: extraction
-                              .postExtractionAdaptationOps(tp)
+                            .postExtractionAdaptationOps(tp)
                           new VarInsnNode(tp.getOpcode(ISTORE), resultSlot)
                         } else {
                           getPop(tp.getSize)

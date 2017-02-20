@@ -147,11 +147,11 @@ class ScalaTypeParameterInfoHandler
             val refTypes = param.getExtendsList.getReferencedTypes
             if (refTypes.nonEmpty) {
               paramText = paramText + refTypes
-                  .map((typez: PsiType) => {
+                .map((typez: PsiType) => {
                   ScType.presentableText(
                     substitutor.subst(ScType.create(typez, param.getProject)))
                 })
-                  .mkString(" <: ", " with ", "")
+                .mkString(" <: ", " with ", "")
             }
             if (isBold) "<b>" + paramText + "</b>" else paramText
           })
@@ -182,21 +182,21 @@ class ScalaTypeParameterInfoHandler
               case psi.types.Nothing =>
               case tp: ScType =>
                 paramText = paramText + " >: " +
-                    ScType.presentableText(substitutor.subst(tp))
+                  ScType.presentableText(substitutor.subst(tp))
             }
             param.upperBound foreach {
               case psi.types.Any =>
               case tp: ScType =>
                 paramText = paramText + " <: " +
-                    ScType.presentableText(substitutor.subst(tp))
+                  ScType.presentableText(substitutor.subst(tp))
             }
             param.viewBound foreach { (tp: ScType) =>
               paramText = paramText + " <% " +
-                  ScType.presentableText(substitutor.subst(tp))
+                ScType.presentableText(substitutor.subst(tp))
             }
             param.contextBound foreach { (tp: ScType) =>
               paramText = paramText + " : " +
-                  ScType.presentableText(substitutor.subst(tp))
+                ScType.presentableText(substitutor.subst(tp))
             }
             if (isBold) "<b>" + paramText + "</b>" else paramText
           })

@@ -1047,7 +1047,7 @@ private[spark] class Client(val args: ClientArguments,
 
   def setupCredentials(): Unit = {
     loginFromKeytab = args.principal != null ||
-        sparkConf.contains(PRINCIPAL.key)
+      sparkConf.contains(PRINCIPAL.key)
     if (loginFromKeytab) {
       principal = Option(args.principal).orElse(sparkConf.get(PRINCIPAL)).get
       keytab = Option(args.keytab).orElse(sparkConf.get(KEYTAB)).orNull

@@ -27,7 +27,7 @@ private[message] final class DataForm(security: MessageSecurity) {
       )({
         case (username, subject, text) =>
           ThreadData(user = fetchUser(username) err "Unknown username " +
-                         username,
+                       username,
                      subject = subject,
                      text = text)
       })(_.export.some))

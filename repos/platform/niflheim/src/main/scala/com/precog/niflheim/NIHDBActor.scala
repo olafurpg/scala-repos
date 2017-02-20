@@ -452,7 +452,7 @@ private[niflheim] class NIHDBActor private (
       //TODO: LENSES!!!!!!!~
       state.blockState = state.blockState.copy(
         cooked = CookedReader.load(cookedDir, file) :: state.blockState.cooked
-            .filterNot(_.id == id),
+          .filterNot(_.id == id),
         pending = state.blockState.pending - id
       )
 

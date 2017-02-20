@@ -149,7 +149,7 @@ trait MemberLookupBase {
             ((_, container))
         if (syms.isEmpty)
           syms = lookupInTemplate(pos, mbrName, container, OnlyTerm) map
-              ((_, container))
+            ((_, container))
         syms
 
       case tplName :: rest =>

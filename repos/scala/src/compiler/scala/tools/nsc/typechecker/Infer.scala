@@ -568,7 +568,7 @@ trait Infer extends Checkable { self: Analyzer =>
             &&
               (restpe.isWildcard ||
                 !varianceInType(restpe)(tparam).isPositive) // don't retract covariant occurrences
-          )
+        )
 
         buf +=
           ((tparam,

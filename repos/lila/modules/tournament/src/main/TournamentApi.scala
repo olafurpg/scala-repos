@@ -52,8 +52,8 @@ private[tournament] final class TournamentApi(
       system = System.Arena,
       variant = variant,
       position = StartingPosition
-          .byEco(setup.position)
-          .ifTrue(variant.standard) | StartingPosition.initial
+        .byEco(setup.position)
+        .ifTrue(variant.standard) | StartingPosition.initial
     )
     TournamentRepo.insert(tour) >>- join(tour.id, me) inject tour
   }

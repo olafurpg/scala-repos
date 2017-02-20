@@ -30,8 +30,8 @@ trait WSTestRequestBuilding { self: RouteTest ⇒
         HttpResponse(
           StatusCodes.SwitchingProtocols,
           headers = Upgrade(UpgradeProtocol("websocket") :: Nil) :: subprotocol
-              .map(p ⇒ `Sec-WebSocket-Protocol`(p :: Nil))
-              .toList)
+            .map(p ⇒ `Sec-WebSocket-Protocol`(p :: Nil))
+            .toList)
       }
     })
 }

@@ -111,9 +111,9 @@ class ScalaMethodCallFixer extends ScalaFixer {
       endOffset = args.getTextRange.getStartOffset + 1
 
     endOffset = CharArrayUtil.shiftBackward(
-        editor.getDocument.getCharsSequence,
-        endOffset - 1,
-        " \t\n") + 1
+      editor.getDocument.getCharsSequence,
+      endOffset - 1,
+      " \t\n") + 1
     editor.getDocument.insertString(endOffset, ")")
 
     WithReformat(1)

@@ -137,7 +137,7 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         assert(locations.size == 1)
         assert(locations(0).isInstanceOf[ExecutorCacheTaskLocation])
         numReceiversOnExecutor(locations(0)) = numReceiversOnExecutor
-            .getOrElse(locations(0), 0) + 1
+          .getOrElse(locations(0), 0) + 1
     }
     assert(numReceiversOnExecutor === executors.map(_ -> 2).toMap)
   }
@@ -157,7 +157,7 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         locations.foreach { l =>
           assert(l.isInstanceOf[ExecutorCacheTaskLocation])
           numReceiversOnExecutor(l) = numReceiversOnExecutor.getOrElse(l, 0) +
-              1
+            1
         }
     }
     assert(numReceiversOnExecutor === executors.map(_ -> 1).toMap)
@@ -183,7 +183,7 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         executors.foreach { l =>
           assert(l.isInstanceOf[ExecutorCacheTaskLocation])
           numReceiversOnExecutor(l) = numReceiversOnExecutor.getOrElse(l, 0) +
-              1
+            1
         }
     }
     assert(numReceiversOnExecutor === executors.map(_ -> 1).toMap)

@@ -75,8 +75,8 @@ object PresentationUtil {
         }
         param.contextBound foreach { (tp: ScType) =>
           paramText = paramText + " : " + presentationString(
-              ScTypeUtil.stripTypeArgs(substitutor.subst(tp)),
-              substitutor)
+            ScTypeUtil.stripTypeArgs(substitutor.subst(tp)),
+            substitutor)
         }
         paramText
       case param: PsiTypeParameter =>

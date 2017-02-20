@@ -2065,7 +2065,7 @@ class LiftSession(private[http] val _contextPath: String,
     }
 
   liftTagProcessing = LiftRules.liftTagProcessing.toList ::: List(
-      _defaultLiftTagProcessing)
+    _defaultLiftTagProcessing)
 
   private def asNodeSeq(in: Seq[Node]): NodeSeq = in
 

@@ -323,7 +323,7 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
         entityProps = qualifiedCounterProps(typeName),
         settings = settings,
         coordinatorPath = "/user/" +
-            typeName + "Coordinator/singleton/coordinator",
+          typeName + "Coordinator/singleton/coordinator",
         extractEntityId = extractEntityId,
         extractShardId = extractShardId,
         handOffStopMessage = PoisonPill

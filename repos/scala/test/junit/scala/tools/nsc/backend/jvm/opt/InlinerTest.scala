@@ -980,7 +980,7 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(
       newCompiler(extraArgs = InlinerTest.args +
-          " -Yopt-inline-heuristics:everything"))(code)
+        " -Yopt-inline-heuristics:everything"))(code)
     assertInvoke(getSingleMethod(c, "t"), "java/lang/System", "arraycopy")
   }
 

@@ -80,7 +80,7 @@ class TopicDeletionManager(controller: KafkaController,
                              Set.empty)
     extends Logging {
   this.logIdent = "[Topic Deletion Manager " + controller.config.brokerId +
-      "], "
+    "], "
   val controllerContext = controller.controllerContext
   val partitionStateMachine = controller.partitionStateMachine
   val replicaStateMachine = controller.replicaStateMachine

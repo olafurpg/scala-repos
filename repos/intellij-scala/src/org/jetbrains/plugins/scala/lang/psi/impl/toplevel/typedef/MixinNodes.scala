@@ -503,8 +503,8 @@ abstract class MixinNodes {
     var res: ScSubstitutor = ScSubstitutor.empty
     for (tp <- superClass.getTypeParameters) {
       res = res bindT
-          ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-          derived.subst(superSubst.subst(ScalaPsiManager.typeVariable(tp))))
+        ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+        derived.subst(superSubst.subst(ScalaPsiManager.typeVariable(tp))))
     }
     superClass match {
       case td: ScTypeDefinition =>

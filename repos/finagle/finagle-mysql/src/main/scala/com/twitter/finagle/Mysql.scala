@@ -102,11 +102,11 @@ object Mysql
       stack: Stack[ServiceFactory[Request, Result]] = StackClient.newStack
         .replace(ClientTracingFilter.role, MySqlClientTracingFilter.Stackable),
       params: Stack.Params = StackClient.defaultParams + DefaultPool.Param(
-          low = 0,
-          high = 1,
-          bufferSize = 0,
-          idleTime = Duration.Top,
-          maxWaiters = Int.MaxValue) + ProtocolLibrary("mysql"))
+        low = 0,
+        high = 1,
+        bufferSize = 0,
+        idleTime = Duration.Top,
+        maxWaiters = Int.MaxValue) + ProtocolLibrary("mysql"))
       extends StdStackClient[Request, Result, Client]
       with WithSessionPool[Client]
       with WithDefaultLoadBalancer[Client]

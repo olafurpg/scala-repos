@@ -107,7 +107,7 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
       case FileContent.TextCSV =>
         response.copy(
           headers = response.headers + `Content-Type`(text / csv) +
-              `Content-Disposition`(attachment(Some("results.csv"))))
+            `Content-Disposition`(attachment(Some("results.csv"))))
       case _ =>
         response.copy(
           headers = response.headers + `Content-Type`(application / json))

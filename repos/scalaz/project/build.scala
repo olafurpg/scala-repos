@@ -274,15 +274,15 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-        artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
-        packagedArtifacts <<=
-          Classpaths.packaged(Seq(packageDoc in Compile)),
-        unidocProjectFilter in (ScalaUnidoc, unidoc) := {
+      artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
+      packagedArtifacts <<=
+        Classpaths.packaged(Seq(packageDoc in Compile)),
+      unidocProjectFilter in (ScalaUnidoc, unidoc) := {
         jsProjects.foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
       }
-      ) ++ Defaults.packageTaskSettings(
-        packageDoc in Compile,
-        (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
+    ) ++ Defaults.packageTaskSettings(
+      packageDoc in Compile,
+      (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = jvmProjects ++ jsProjects
   )
 
@@ -344,12 +344,12 @@ object build extends Build {
     id = "concurrent",
     base = file("concurrent"),
     settings = standardSettings ++ Seq(
-        name := ConcurrentName,
-        typeClasses := TypeClass.concurrent,
-        osgiExport("scalaz.concurrent"),
-        OsgiKeys.importPackage :=
-          Seq("javax.swing;resolution:=optional", "*")
-      ),
+      name := ConcurrentName,
+      typeClasses := TypeClass.concurrent,
+      osgiExport("scalaz.concurrent"),
+      OsgiKeys.importPackage :=
+        Seq("javax.swing;resolution:=optional", "*")
+    ),
     dependencies = Seq(coreJVM, effectJVM)
   )
 
@@ -383,9 +383,9 @@ object build extends Build {
     base = file("example"),
     dependencies = Seq(coreJVM, iterateeJVM, concurrent),
     settings = standardSettings ++ Seq[Sett](
-        name := "scalaz-example",
-        publishArtifact := false
-      )
+      name := "scalaz-example",
+      publishArtifact := false
+    )
   )
 
   lazy val scalacheckBinding = CrossProject("scalacheck-binding",

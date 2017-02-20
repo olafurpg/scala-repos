@@ -542,7 +542,7 @@ abstract class ClassfileParser {
     while (sym.isClass && !sym.isModuleClass) {
       for (t <- sym.tpe.typeArgs)
         classTParams = classTParams +
-            (t.typeSymbol.name -> t.typeSymbol)
+          (t.typeSymbol.name -> t.typeSymbol)
 
       sym = sym.owner
     }

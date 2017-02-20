@@ -364,7 +364,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
       taskLaunchesInFlight = inFlightTaskOperations.size,
       // don't count tasks that are not launched in the tasksMap
       tasksLaunched = tasksMap.values.count(_.launched.isDefined) -
-          inFlightTaskOperations.size,
+        inFlightTaskOperations.size,
       backOffUntil.getOrElse(clock.now())
     )
   }

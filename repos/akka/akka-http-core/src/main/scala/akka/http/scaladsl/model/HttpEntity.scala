@@ -355,7 +355,7 @@ object HttpEntity {
     override def withSizeLimit(maxBytes: Long): HttpEntity.Default =
       copy(
         data = data withAttributes Attributes(
-            SizeLimit(maxBytes, Some(contentLength))))
+          SizeLimit(maxBytes, Some(contentLength))))
 
     override def withoutSizeLimit: HttpEntity.Default =
       withSizeLimit(SizeLimit.Disabled)

@@ -252,7 +252,7 @@ trait DescriptiveStats {
                   cfor(0)(j => j < dataSize, j => j + 1)(j => {
                     val b = x(j) - mean(j)
                     result(i, j) = result(i, j) +
-                        (a * b / (numRowsD - 1)) //Use
+                      (a * b / (numRowsD - 1)) //Use
                   })
                 })
               }

@@ -149,7 +149,7 @@ object Challenge extends LilaController {
                                              pref.challenge,
                                              follow,
                                              fromCheat = me.engine &&
-                                                 !user.engine)
+                                               !user.engine)
           }
       }
   }

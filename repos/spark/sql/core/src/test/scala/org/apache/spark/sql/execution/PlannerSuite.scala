@@ -487,7 +487,7 @@ class PlannerSuite extends SharedSQLContext {
     val inputPlan = ShuffleExchange(
       finalPartitioning,
       DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
+                       outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
       None
@@ -511,7 +511,7 @@ class PlannerSuite extends SharedSQLContext {
     val inputPlan = ShuffleExchange(
       finalPartitioning,
       DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
+                       outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
       None
@@ -535,7 +535,7 @@ class PlannerSuite extends SharedSQLContext {
     val shuffle = ShuffleExchange(
       finalPartitioning,
       DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
+                       outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
       None

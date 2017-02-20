@@ -89,7 +89,7 @@ class FriendRecommendationDataSource(
           adjArray(srcInternalId) = (destInternalId, data.slice(2, 5).sum) :: List()
         } else {
           adjArray(srcInternalId) = (destInternalId, data.slice(2, 5).sum) :: adjArray(
-              srcInternalId)
+            srcInternalId)
         }
       }
     }

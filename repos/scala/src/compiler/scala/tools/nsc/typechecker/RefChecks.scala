@@ -1021,7 +1021,7 @@ abstract class RefChecks
           if (index >= 0) {
             if (seenTypes(index) forall (tp1 => !(tp1 <:< tp)))
               seenTypes(index) = tp ::
-                  (seenTypes(index) filter (tp1 => !(tp <:< tp1)))
+                (seenTypes(index) filter (tp1 => !(tp <:< tp1)))
           }
         }
         val remaining = tp.parents filterNot seenParents

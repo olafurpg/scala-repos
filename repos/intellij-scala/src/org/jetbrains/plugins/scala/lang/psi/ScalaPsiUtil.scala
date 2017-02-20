@@ -1070,10 +1070,10 @@ object ScalaPsiUtil {
         //implicit conversions
         def addConversions(fromUnderscore: Boolean) {
           res = res ++ expr
-              .getTypeAfterImplicitConversion(
-                expectedOption = expr.smartExpectedType(fromUnderscore),
-                fromUnderscore = fromUnderscore)
-              .importsUsed
+            .getTypeAfterImplicitConversion(
+              expectedOption = expr.smartExpectedType(fromUnderscore),
+              fromUnderscore = fromUnderscore)
+            .importsUsed
         }
         if (ScUnderScoreSectionUtil.isUnderscoreFunction(expr))
           addConversions(fromUnderscore = true)

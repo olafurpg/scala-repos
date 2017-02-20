@@ -105,7 +105,7 @@ private[streaming] class ReceiverSchedulingPolicy {
               numReceiversOnExecutor(executor))
             scheduledLocations(i) += leastScheduledExecutor
             numReceiversOnExecutor(leastScheduledExecutor) = numReceiversOnExecutor(
-                leastScheduledExecutor) + 1
+              leastScheduledExecutor) + 1
           case None =>
             // preferredLocation is an unknown host.
             // Note: There are two cases:

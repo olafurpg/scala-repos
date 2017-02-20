@@ -409,7 +409,7 @@ private[metrics] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
       case Some(existingNodeMetrics) ⇒
         copy(
           nodes = nodes - existingNodeMetrics +
-              (existingNodeMetrics update newNodeMetrics))
+            (existingNodeMetrics update newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
 

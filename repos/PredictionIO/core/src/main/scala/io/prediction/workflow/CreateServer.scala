@@ -645,7 +645,7 @@ class ServerActor[Q, P](val args: ServerConfig,
               lastServingSec =
                 (servingEndTime.getMillis - servingStartTime.getMillis) / 1000.0
               avgServingSec = ((avgServingSec * requestCount) + lastServingSec) /
-                  (requestCount + 1)
+                (requestCount + 1)
               requestCount += 1
 
               respondWithMediaType(`application/json`) {

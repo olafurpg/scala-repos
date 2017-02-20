@@ -5208,7 +5208,7 @@ trait Typers
         val silentResult = silent(
           op = _.typed(fun, mode.forFunMode, funpt),
           reportAmbiguousErrors = !mode.inExprMode &&
-              context.ambiguousErrors,
+            context.ambiguousErrors,
           newtree = if (mode.inExprMode) tree else context.tree
         )
         silentResult match {

@@ -29,7 +29,7 @@ private[video] final class Youtube(url: String,
             Metadata(
               views = ~parseIntOption(entry.statistics.viewCount),
               likes = ~parseIntOption(entry.statistics.likeCount) -
-                  ~parseIntOption(entry.statistics.dislikeCount),
+                ~parseIntOption(entry.statistics.dislikeCount),
               description = entry.snippet.description,
               duration = Some(entry.contentDetails.seconds),
               publishedAt = entry.snippet.publishedAt.flatMap { at =>

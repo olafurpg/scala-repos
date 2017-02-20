@@ -294,8 +294,8 @@ class MergeToComprehensions extends Phase {
               bottomUp = true
             )
             .infer(scope = Type.Scope(
-                j.leftGen -> l2.nodeType.asCollectionType.elementType) +
-                (j.rightGen -> r2.nodeType.asCollectionType.elementType))
+              j.leftGen -> l2.nodeType.asCollectionType.elementType) +
+              (j.rightGen -> r2.nodeType.asCollectionType.elementType))
           logger.debug(s"Transformed `on` clause in Join $ls/$rs:", on2)
           val j2 = j.copy(left = l2, right = r2, on = on2).infer()
           logger.debug(s"Created source from Join $ls/$rs:", j2)

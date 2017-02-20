@@ -502,28 +502,28 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
           case Cmp(field, opr, Full(_), _, dbFunc) =>
             (1 to field.dbColumnCount).foreach { cn =>
               updatedWhat = updatedWhat + whereOrAnd +
-                  dbFunc(
-                    MapperRules.quoteColumnName.vend(
-                      field.dbColumnNames(field.name)(cn - 1))) + " " + opr +
-                  " ? "
+                dbFunc(
+                  MapperRules.quoteColumnName.vend(
+                    field.dbColumnNames(field.name)(cn - 1))) + " " + opr +
+                " ? "
             }
 
           case Cmp(field, opr, _, Full(otherField), dbFunc) =>
             (1 to field.dbColumnCount).foreach { cn =>
               updatedWhat = updatedWhat + whereOrAnd +
-                  dbFunc(MapperRules.quoteColumnName.vend(
-                    field.dbColumnNames(field.name)(cn - 1))) + " " + opr +
-                  " " + MapperRules.quoteColumnName.vend(
-                  otherField.dbColumnNames(otherField.name)(cn - 1))
+                dbFunc(MapperRules.quoteColumnName.vend(
+                  field.dbColumnNames(field.name)(cn - 1))) + " " + opr +
+                " " + MapperRules.quoteColumnName.vend(
+                otherField.dbColumnNames(otherField.name)(cn - 1))
             }
 
           case Cmp(field, opr, Empty, Empty, dbFunc) =>
             (1 to field.dbColumnCount).foreach(
               cn =>
                 updatedWhat = updatedWhat +
-                    whereOrAnd + dbFunc(MapperRules.quoteColumnName.vend(
-                    field.dbColumnNames(field.name)(cn - 1))) + " " +
-                    opr + " ")
+                  whereOrAnd + dbFunc(MapperRules.quoteColumnName.vend(
+                  field.dbColumnNames(field.name)(cn - 1))) + " " +
+                  opr + " ")
 
           // For vals, add "AND $fieldname = ? [OR $fieldname = ?]*" to the query. The number
           // of fields you add onto the query is equal to vals.length
@@ -535,15 +535,15 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
               updatedWhat = updatedWhat + whereOrAnd + " 0 = 1 "
             else
               updatedWhat = updatedWhat + vals
-                  .map(
-                    v =>
-                      MapperRules.quoteColumnName.vend(field._dbColumnNameLC) +
-                      " = ?")
-                  .mkString(whereOrAnd + " (", " OR ", ")")
+                .map(
+                  v =>
+                    MapperRules.quoteColumnName.vend(field._dbColumnNameLC) +
+                    " = ?")
+                .mkString(whereOrAnd + " (", " OR ", ")")
 
           case in: InRaw[A, _] =>
             updatedWhat = updatedWhat + whereOrAnd +
-                (in.rawSql match {
+              (in.rawSql match {
                 case null | "" => " 0 = 1 "
                 case sql =>
                   " " + MapperRules.quoteColumnName.vend(
@@ -552,23 +552,23 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
 
           case (in: InThing[A]) =>
             updatedWhat = updatedWhat + whereOrAnd +
-                MapperRules.quoteColumnName.vend(in.outerField._dbColumnNameLC) +
-                in.inKeyword + "(" + in.innerMeta
-                .addEndStuffs(
-                  in.innerMeta.addFields(
-                    "SELECT " + in.distinct +
-                      MapperRules.quoteColumnName.vend(
-                        in.innerField._dbColumnNameLC) +
-                      " FROM " + MapperRules.quoteTableName.vend(
-                      in.innerMeta._dbTableNameLC) + " ",
-                    false,
-                    in.queryParams,
-                    conn
-                  ),
+              MapperRules.quoteColumnName.vend(in.outerField._dbColumnNameLC) +
+              in.inKeyword + "(" + in.innerMeta
+              .addEndStuffs(
+                in.innerMeta.addFields(
+                  "SELECT " + in.distinct +
+                    MapperRules.quoteColumnName.vend(
+                      in.innerField._dbColumnNameLC) +
+                    " FROM " + MapperRules.quoteTableName.vend(
+                    in.innerMeta._dbTableNameLC) + " ",
+                  false,
                   in.queryParams,
                   conn
-                )
-                ._1 + " ) "
+                ),
+                in.queryParams,
+                conn
+              )
+              ._1 + " ) "
 
           // Executes a subquery with {@code query}
           case BySql(query, _, _ *) =>

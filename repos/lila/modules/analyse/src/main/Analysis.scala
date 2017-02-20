@@ -61,14 +61,13 @@ object Analysis {
     def reads(r: BSON.Reader) = {
       val startPly = r intD "ply"
       val raw = r str "data"
-      Analysis(
-        id = r str "_id",
-        infos = Info
-            .decodeList(raw, startPly) err s"Invalid analysis data $raw",
-        startPly = startPly,
-        uid = r strO "uid",
-        by = r strO "by",
-        date = r date "date")
+      Analysis(id = r str "_id",
+               infos = Info
+                 .decodeList(raw, startPly) err s"Invalid analysis data $raw",
+               startPly = startPly,
+               uid = r strO "uid",
+               by = r strO "by",
+               date = r date "date")
     }
     def writes(w: BSON.Writer, o: Analysis) =
       BSONDocument("_id" -> o.id,

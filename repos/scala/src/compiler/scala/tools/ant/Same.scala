@@ -138,7 +138,7 @@ class Same extends ScalaMatchingTask {
           if (originRemaining == destRemaining)
             for (idx <- 0 until originRemaining)
               equalNow = equalNow &&
-                  (originBuffer(idx) == destBuffer(idx))
+                (originBuffer(idx) == destBuffer(idx))
           else equalNow = false
           originRemaining = originStream.read(originBuffer)
           destRemaining = destStream.read(destBuffer)

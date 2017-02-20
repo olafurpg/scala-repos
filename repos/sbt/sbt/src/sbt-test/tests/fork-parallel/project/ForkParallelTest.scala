@@ -11,11 +11,11 @@ object ForkParallelTest extends Build {
     "root",
     file("."),
     settings = defaultSettings ++ Seq(
-        scalaVersion := "2.9.2",
-        libraryDependencies +=
-          "com.novocode" % "junit-interface" % "0.10" % "test",
-        fork in Test := true,
-        check := {
+      scalaVersion := "2.9.2",
+      libraryDependencies +=
+        "com.novocode" % "junit-interface" % "0.10" % "test",
+      fork in Test := true,
+      check := {
         val nbProc = java.lang.Runtime.getRuntime().availableProcessors()
         if (nbProc < 4) {
           streams.value.log
@@ -31,6 +31,6 @@ object ForkParallelTest extends Build {
           }
         }
       }
-      )
+    )
   )
 }

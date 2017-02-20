@@ -66,7 +66,7 @@ private[spark] class ResultTask[T, U](stageId: Int,
         ByteBuffer.wrap(taskBinary.value),
         Thread.currentThread.getContextClassLoader)
     _executorDeserializeTime = System.currentTimeMillis() -
-        deserializeStartTime
+      deserializeStartTime
 
     metrics = Some(context.taskMetrics)
     func(context, rdd.iterator(partition, context))
