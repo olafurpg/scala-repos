@@ -495,8 +495,8 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     val mantissaBits = bitLength(mantissa3)
     if (_scale < 0) {
       _bitLength = if (mantissaBits == 0) 0 else mantissaBits - _scale
-      if (_bitLength < 64) _smallValue = mantissa3 << (- _scale)
-      else _intVal = new BigInteger(1, mantissa3).shiftLeft(- _scale)
+      if (_bitLength < 64) _smallValue = mantissa3 << (-_scale)
+      else _intVal = new BigInteger(1, mantissa3).shiftLeft(-_scale)
       _scale = 0
     } else if (_scale > 0) {
       def mSum = mantissaBits + LongFivePowsBitLength(_scale)
@@ -1094,7 +1094,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
 
   def negate(): BigDecimal = {
     if (_bitLength < 63 || (_bitLength == 63 && _smallValue != Long.MinValue))
-      valueOf(- _smallValue, _scale)
+      valueOf(-_smallValue, _scale)
     else new BigDecimal(getUnscaledValue.negate(), _scale)
   }
 
@@ -1302,7 +1302,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
       } else {
         val begin = if (getUnscaledValue.signum() < 0) 2 else 1
         val end = intString.length
-        val exponent: Long = - _scale.toLong + end - begin
+        val exponent: Long = -_scale.toLong + end - begin
         val result =
           if (_scale > 0 && exponent >= -6) {
             if (exponent >= 0) {
@@ -1333,7 +1333,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     } else {
       val begin = if (getUnscaledValue.signum() < 0) 2 else 1
       var end = intString.length
-      val exponent0: Long = - _scale.toLong + end - begin
+      val exponent0: Long = -_scale.toLong + end - begin
 
       val result = {
         if ((_scale > 0) && (exponent0 >= -6)) {
@@ -1425,7 +1425,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
 
   def toBigInteger(): BigInteger = {
     if (_scale == 0 || isZero) getUnscaledValue
-    else if (_scale < 0) getUnscaledValue.multiply(powerOf10(- _scale.toLong))
+    else if (_scale < 0) getUnscaledValue.multiply(powerOf10(-_scale.toLong))
     else getUnscaledValue.divide(powerOf10(_scale))
   }
 
@@ -1433,7 +1433,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     if (_scale == 0 || isZero) {
       getUnscaledValue
     } else if (_scale < 0) {
-      getUnscaledValue.multiply(powerOf10(- _scale.toLong))
+      getUnscaledValue.multiply(powerOf10(-_scale.toLong))
     } else {
       // (scale > 0)
       // An optimization before do a heavy division
@@ -1510,7 +1510,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
 
       val mantissa = {
         if (_scale <= 0) {
-          mantissa0.multiply(powerOf10(- _scale))
+          mantissa0.multiply(powerOf10(-_scale))
         } else {
           val powerOfTen: BigInteger = powerOf10(_scale)
           val k = 100 - powerOfTwo.toInt

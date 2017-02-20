@@ -841,7 +841,7 @@ private[akka] final class FunctionRef(override val path: ActorPath,
 
         if (watcheeSelf && !watcherSelf) {
           if (!watchedBy.contains(watcher))
-            if (! _watchedBy.compareAndSet(watchedBy, watchedBy + watcher))
+            if (!_watchedBy.compareAndSet(watchedBy, watchedBy + watcher))
               addWatcher(watchee, watcher) // try again
         } else if (!watcheeSelf && watcherSelf) {
           publish(
@@ -866,7 +866,7 @@ private[akka] final class FunctionRef(override val path: ActorPath,
 
         if (watcheeSelf && !watcherSelf) {
           if (watchedBy.contains(watcher))
-            if (! _watchedBy.compareAndSet(watchedBy, watchedBy - watcher))
+            if (!_watchedBy.compareAndSet(watchedBy, watchedBy - watcher))
               remWatcher(watchee, watcher) // try again
         } else if (!watcheeSelf && watcherSelf) {
           publish(

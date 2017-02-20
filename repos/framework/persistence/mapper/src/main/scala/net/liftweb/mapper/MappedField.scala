@@ -473,7 +473,8 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
       case other => other
     }
 
-    _toForm.map(_.flatMap(mf))
+    _toForm
+      .map(_.flatMap(mf))
       .map(SHtml.ElemAttr.applyToAllElems(_, formElemAttrs))
   }
 

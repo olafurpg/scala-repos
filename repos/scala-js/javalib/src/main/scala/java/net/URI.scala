@@ -36,7 +36,7 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
   private val _scheme = fld(AbsScheme)
 
   private val _schemeSpecificPart = {
-    if (! _isAbsolute) fld(RelSchemeSpecificPart)
+    if (!_isAbsolute) fld(RelSchemeSpecificPart)
     else if (_isOpaque) fld(AbsOpaquePart)
     else fld(AbsHierPart)
   }.get

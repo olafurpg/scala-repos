@@ -421,18 +421,18 @@ class SparkContext(config: SparkConf)
     _conf = config.clone()
     _conf.validateSettings()
 
-    if (! _conf.contains("spark.master")) {
+    if (!_conf.contains("spark.master")) {
       throw new SparkException(
         "A master URL must be set in your configuration")
     }
-    if (! _conf.contains("spark.app.name")) {
+    if (!_conf.contains("spark.app.name")) {
       throw new SparkException(
         "An application name must be set in your configuration")
     }
 
     // System property spark.yarn.app.id must be set if user code ran by AM on a YARN cluster
     if (master == "yarn" && deployMode == "cluster" &&
-        ! _conf.contains("spark.yarn.app.id")) {
+        !_conf.contains("spark.yarn.app.id")) {
       throw new SparkException(
         "Detected yarn cluster mode, but isn't running on a cluster. " +
           "Deployment to YARN is not supported directly by SparkContext. Please use spark-submit.")
@@ -448,12 +448,14 @@ class SparkContext(config: SparkConf)
 
     _conf.set("spark.executor.id", SparkContext.DRIVER_IDENTIFIER)
 
-    _jars = _conf.getOption("spark.jars")
+    _jars = _conf
+      .getOption("spark.jars")
       .map(_.split(","))
       .map(_.filter(_.nonEmpty))
       .toSeq
       .flatten
-    _files = _conf.getOption("spark.files")
+    _files = _conf
+      .getOption("spark.files")
       .map(_.split(","))
       .map(_.filter(_.nonEmpty))
       .toSeq
@@ -535,7 +537,8 @@ class SparkContext(config: SparkConf)
       files.foreach(addFile)
     }
 
-    _executorMemory = _conf.getOption("spark.executor.memory")
+    _executorMemory = _conf
+      .getOption("spark.executor.memory")
       .orElse(Option(System.getenv("SPARK_EXECUTOR_MEMORY")))
       .orElse(Option(System.getenv("SPARK_MEM")).map(warnSparkMem))
       .map(Utils.memoryStringToMb)

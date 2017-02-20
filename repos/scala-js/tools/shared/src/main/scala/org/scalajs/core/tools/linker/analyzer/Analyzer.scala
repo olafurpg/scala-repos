@@ -80,7 +80,7 @@ private final class Analyzer(semantics: Semantics,
   }
 
   private def linkClasses(): Unit = {
-    if (! _classInfos.contains(ir.Definitions.ObjectClass)) {
+    if (!_classInfos.contains(ir.Definitions.ObjectClass)) {
       _errors += MissingJavaLangObjectClass(fromAnalyzer)
     } else {
       try {
@@ -202,7 +202,7 @@ private final class Analyzer(semantics: Semantics,
     def linkClasses(): Unit = {
       if (_linking) throw CyclicDependencyException(this :: Nil)
 
-      if (! _linked) {
+      if (!_linked) {
         _linking = true
         try {
           linkClassesImpl()
