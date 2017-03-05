@@ -63,7 +63,9 @@ abstract class ImplicitsTestBase
     assert(expr != null, "Not specified expression in range to infer type.")
     val implicitConversions = expr.getImplicitConversions(fromUnder = false)
     val res =
-      implicitConversions._1.map(_.name).sorted
+      implicitConversions._1
+        .map(_.name)
+        .sorted
         .mkString("Seq(", ",\n    ", ")") + ",\n" +
         (implicitConversions._2 match {
           case None => "None"

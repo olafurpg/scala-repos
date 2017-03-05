@@ -1098,7 +1098,8 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
 
                   for (col <- mappedColumns) {
                     if (!columnPrimaryKey_?(col._1)) {
-                      val colVal = col._2.invoke(toSave)
+                      val colVal = col._2
+                        .invoke(toSave)
                         .asInstanceOf[MappedField[AnyRef, A]]
                       setPreparedStatementValue(conn,
                                                 st,

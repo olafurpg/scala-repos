@@ -56,11 +56,11 @@ final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
 
   @inline
   private[this] def guard[T](body: => T): T = {
-    if (! _linking.compareAndSet(false, true)) {
+    if (!_linking.compareAndSet(false, true)) {
       throw new IllegalStateException("Linker used concurrently")
     }
 
-    if (! _valid) {
+    if (!_valid) {
       throw new IllegalStateException(
         "Linker is invalid due to a previous exception in a component")
     }

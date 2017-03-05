@@ -52,7 +52,7 @@ trait MongoRefField[RefType <: MongoRecord[RefType], MyType]
     * Get the cacheable referenced object
     */
   def obj = synchronized {
-    if (! _calcedObj) {
+    if (!_calcedObj) {
       _calcedObj = true
       this._obj = find
     }

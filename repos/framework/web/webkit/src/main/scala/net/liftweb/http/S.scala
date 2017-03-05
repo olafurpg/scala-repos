@@ -1530,7 +1530,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * is not already set.
     */
   def addSnippetForClass(cls: String, inst: DispatchSnippet): Unit = {
-    if (! _statefulSnip.is.contains(cls)) {
+    if (!_statefulSnip.is.contains(cls)) {
       inst match {
         case si: StatefulSnippet => si.addName(cls) // addresses
         case _ =>

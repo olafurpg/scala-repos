@@ -562,7 +562,8 @@ case class Model(id: String,
   def setRequired(property: String, required: Boolean): Model = {
     val prop = properties.find(_._1 == property).get
     copy(
-      properties = (property -> prop._2.copy(required = required)) :: properties)
+      properties = (property -> prop._2
+          .copy(required = required)) :: properties)
   }
 }
 
