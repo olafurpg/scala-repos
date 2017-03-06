@@ -75,9 +75,8 @@ object StormLaws {
     }
 
   def memoryPlanWithoutSummer(original: List[Int])(
-      mkJob: (Producer[Memory, Int], Memory#Sink[Int]) => TailProducer[Memory,
-                                                                       Int])
-    : List[Int] = {
+      mkJob: (Producer[Memory, Int],
+              Memory#Sink[Int]) => TailProducer[Memory, Int]): List[Int] = {
     val memory = new Memory
     val outputList = ArrayBuffer[Int]()
     val sink: (Int) => Unit = { x: Int =>
@@ -98,9 +97,8 @@ object StormLaws {
   }
 
   def runWithOutSummer(original: List[Int])(
-      mkJob: (Producer[Storm, Int], Storm#Sink[Int]) => TailProducer[Storm,
-                                                                     Int])
-    : List[Int] = {
+      mkJob: (Producer[Storm, Int],
+              Storm#Sink[Int]) => TailProducer[Storm, Int]): List[Int] = {
     val cluster = new LocalCluster()
 
     val job = mkJob(

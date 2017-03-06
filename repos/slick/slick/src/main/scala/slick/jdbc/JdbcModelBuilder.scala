@@ -315,7 +315,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       *
       * If `ignoreInvalidDefaults = true`, Slick catches scala.MatchError and java.lang.NumberFormatException thrown by
       * this method, logs the message and treats it as no default value for convenience. */
-    def defaultColumnOption: Option[RelationalProfile.ColumnOption.Default[_]] =
+    def defaultColumnOption
+      : Option[RelationalProfile.ColumnOption.Default[_]] =
       rawDefault
         .map(v => (v, tpe))
         .collect {
@@ -339,8 +340,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
           ))
         }
 
-    private def convenientDefault: Option[
-      RelationalProfile.ColumnOption.Default[_]] =
+    private def convenientDefault
+      : Option[RelationalProfile.ColumnOption.Default[_]] =
       try defaultColumnOption
       catch {
         case e: java.lang.NumberFormatException if ignoreInvalidDefaults =>
@@ -363,12 +364,12 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         tpe = tpe,
         nullable = nullable,
         options = Set() ++ dbType.map(SqlProfile.ColumnOption.SqlType) ++
-            (if (autoInc) Some(ColumnOption.AutoInc) else None) ++
-            (if (createPrimaryKeyColumnOption) Some(ColumnOption.PrimaryKey)
-             else None) ++ length.map(
-            RelationalProfile.ColumnOption.Length
-              .apply(_, varying = varying)) ++
-            (if (!autoInc) convenientDefault else None)
+          (if (autoInc) Some(ColumnOption.AutoInc) else None) ++
+          (if (createPrimaryKeyColumnOption) Some(ColumnOption.PrimaryKey)
+           else None) ++ length.map(
+          RelationalProfile.ColumnOption.Length
+            .apply(_, varying = varying)) ++
+          (if (!autoInc) convenientDefault else None)
       )
   }
 

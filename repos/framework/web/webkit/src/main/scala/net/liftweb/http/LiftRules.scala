@@ -300,8 +300,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed before sending the response to client. The functions'
     * result will be ignored.
     */
-  val beforeSend = RulesSeq[(BasicResponse, HTTPResponse,
-                             List[(String, String)], Box[Req]) => Any]
+  val beforeSend = RulesSeq[
+    (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
 
   private[this] lazy val defaultSecurityRules = SecurityRules()
 
@@ -346,7 +346,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * A method that returns a function to create migratory sessions.  If you want migratory sessions for your
     * application, <code>LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions</code>
     */
-  def sessionCreatorForMigratorySessions: (HTTPSession, String) => LiftSession = {
+  def sessionCreatorForMigratorySessions
+    : (HTTPSession, String) => LiftSession = {
     case (httpSession, contextPath) =>
       new LiftSession(contextPath, httpSession.sessionId, Full(httpSession))
       with MigratorySession
@@ -468,9 +469,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /**
     * A factory that will vend comet creators
     */
-  val cometCreationFactory: FactoryMaker[
-    CometCreationInfo => Box[LiftCometActor]] = new FactoryMaker(
-    () => noComet _) {}
+  val cometCreationFactory
+    : FactoryMaker[CometCreationInfo => Box[LiftCometActor]] =
+    new FactoryMaker(() => noComet _) {}
 
   /**
     * Should codes that represent entities be converted to XML
@@ -486,7 +487,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val statelessReqTest = RulesSeq[StatelessReqTestPF]
 
-  val statelessSession: FactoryMaker[Req => LiftSession with StatelessSession] =
+  val statelessSession
+    : FactoryMaker[Req => LiftSession with StatelessSession] =
     new FactoryMaker(
       (req: Req) =>
         new LiftSession(req.contextPath, Helpers.nextFuncName, Empty)
@@ -496,8 +498,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed after the response is sent to client. The functions' result
     * will be ignored.
     */
-  val afterSend = RulesSeq[(BasicResponse, HTTPResponse,
-                            List[(String, String)], Box[Req]) => Any]
+  val afterSend = RulesSeq[
+    (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
 
   /**
     * Calculate the Comet Server (by default, the server that
@@ -527,7 +529,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Req and Accept header
     */
   @volatile
-  var determineContentType: PartialFunction[(Box[Req], Box[String]), String] = {
+  var determineContentType
+    : PartialFunction[(Box[Req], Box[String]), String] = {
     case (_, Full(accept))
         if this.useXhtmlMimeType &&
           accept.toLowerCase.contains("application/xhtml+xml") =>
@@ -1113,8 +1116,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     () => PartialFunction[(Locale, List[String]), Box[NodeSeq]]] =
     new FactoryMaker(
       () =>
-        (() =>
-           Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
+        (
+            () =>
+              Map.empty: PartialFunction[(Locale, List[String]),
+                                         Box[NodeSeq]])) {}
 
   /**
     * There may be times when you want to entirely control the templating process.  You can insert a function
@@ -1605,7 +1610,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     )
 
   @volatile
-  var defaultHeaders: PartialFunction[(NodeSeq, Req), List[(String, String)]] = {
+  var defaultHeaders
+    : PartialFunction[(NodeSeq, Req), List[(String, String)]] = {
     case _ =>
       val d = Helpers.nowAsInternetDate
 
@@ -1634,11 +1640,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * convertResponse is a PartialFunction that reduces a given Tuple4 into a
     * LiftResponse that can then be sent to the browser.
     */
-  var convertResponse: PartialFunction[(Any,
-                                        List[(String, String)],
-                                        List[HTTPCookie],
-                                        Req),
-                                       LiftResponse] = {
+  var convertResponse
+    : PartialFunction[(Any, List[(String, String)], List[HTTPCookie], Req),
+                      LiftResponse] = {
     case (r: LiftResponse, _, _, _) => r
     case (ns: Group, headers, cookies, req) =>
       cvt(ns, headers, cookies, req, 200)
@@ -1882,8 +1886,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * level.
     */
   @volatile
-  var contentSecurityPolicyViolationReport: (ContentSecurityPolicyViolation) => Box[
-    LiftResponse] = { violation =>
+  var contentSecurityPolicyViolationReport
+    : (ContentSecurityPolicyViolation) => Box[LiftResponse] = { violation =>
     logger.warn(
       s"""Content security policy violation reported on page
        | '${violation.documentUri}' from referrer '${violation.referrer}':
@@ -2016,7 +2020,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * to create an on-disk version
     */
   @volatile
-  var handleMimeFile: (String, String, String, InputStream) => FileParamHolder =
+  var handleMimeFile
+    : (String, String, String, InputStream) => FileParamHolder =
     (fieldName, contentType, fileName, inputStream) =>
       new InMemFileParamHolder(fieldName,
                                contentType,

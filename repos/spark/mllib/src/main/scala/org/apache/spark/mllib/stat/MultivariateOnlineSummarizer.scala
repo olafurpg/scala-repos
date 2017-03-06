@@ -105,7 +105,7 @@ class MultivariateOnlineSummarizer
         val prevMean = localCurrMean(index)
         val diff = value - prevMean
         localCurrMean(index) = prevMean + weight * diff /
-            (localNnz(index) + weight)
+          (localNnz(index) + weight)
         localCurrM2n(index) += weight * (value - localCurrMean(index)) * diff
         localCurrM2(index) += weight * value * value
         localCurrL1(index) += weight * math.abs(value)

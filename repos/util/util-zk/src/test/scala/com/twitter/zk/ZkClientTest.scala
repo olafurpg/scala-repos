@@ -817,16 +817,16 @@ class ZkClientTest extends WordSpec with MockitoSugar {
 
       val treeChildren =
         treeRoot +: ('a' to 'e')
-          .map { c =>
-            ZNode.Children(treeRoot(c.toString), new Stat, 'a' to c map {
-              _.toString
-            })
+        .map { c =>
+          ZNode.Children(treeRoot(c.toString), new Stat, 'a' to c map {
+            _.toString
+          })
+        }
+        .flatMap { z =>
+          z +: z.children.map { c =>
+            ZNode.Children(c, new Stat, Nil)
           }
-          .flatMap { z =>
-            z +: z.children.map { c =>
-              ZNode.Children(c, new Stat, Nil)
-            }
-          }
+        }
 
       // Lay out node updates for the tree: Add a 'z' node to all nodes named 'a'
       val updateTree = treeChildren.collect {

@@ -323,8 +323,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
   /**
     * This is the monadic version of readLast, returns the BatchID actually on disk
     */
-  final def planReadLast: PlannerOutput[(BatchID,
-                                         FlowProducer[TypedPipe[(K, V)]])] =
+  final def planReadLast
+    : PlannerOutput[(BatchID, FlowProducer[TypedPipe[(K, V)]])] =
     for {
       batches <- timeSpanToBatches
       tsMode <- getState[FactoryInput]

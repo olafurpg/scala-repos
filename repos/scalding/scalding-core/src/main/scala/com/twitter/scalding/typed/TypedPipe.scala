@@ -1063,8 +1063,8 @@ class TypedPipeInst[T] private[scalding] (@transient inpipe: Pipe,
     * If this TypedPipeInst represents a Source that was opened with no
     * filtering or mapping
     */
-  private[scalding] def openIfHead: Option[
-    (Tap[_, _, _], Fields, FlatMapFn[T])] =
+  private[scalding] def openIfHead
+    : Option[(Tap[_, _, _], Fields, FlatMapFn[T])] =
     // Keep this local
     if (inpipe.getPrevious.isEmpty) {
       val srcs = localFlowDef.getSources

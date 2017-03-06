@@ -318,8 +318,8 @@ object CacheIvy {
   }
   import L4._
 
-  implicit def inlineWithExcludesIC: InputCache[
-    InlineConfigurationWithExcludes] = wrapIn
+  implicit def inlineWithExcludesIC
+    : InputCache[InlineConfigurationWithExcludes] = wrapIn
   implicit def inlineIC: InputCache[InlineConfiguration] = wrapIn
   implicit def moduleConfIC: InputCache[ModuleConfiguration] = wrapIn
 

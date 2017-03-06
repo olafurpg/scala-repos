@@ -44,8 +44,8 @@ object Append {
       def appendValues(a: List[T], b: List[V]): List[T] =
         a :::
           (b map { x =>
-            (x: T)
-          })
+          (x: T)
+        })
       def appendValue(a: List[T], b: V): List[T] = a :+ (b: T)
     }
   implicit def appendString: Value[String, String] =

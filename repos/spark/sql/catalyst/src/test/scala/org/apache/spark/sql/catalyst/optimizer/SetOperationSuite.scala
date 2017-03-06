@@ -28,11 +28,11 @@ class SetOperationSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
-        "Union Pushdown",
-        Once,
-        CombineUnions,
-        SetOperationPushDown,
-        PruneFilters) :: Nil
+      "Union Pushdown",
+      Once,
+      CombineUnions,
+      SetOperationPushDown,
+      PruneFilters) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

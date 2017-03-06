@@ -11,7 +11,7 @@ case class Y(final var x: Int,
 object Test {
   val y = Y(0, "", true, new {})
   val unapp: Option[(Int, String, Boolean, Any)] = // was (Int, Boolean, String, Any) !!
-  Y.unapply(y)
+    Y.unapply(y)
 
   val Y(a, b, c, d) = y
   List(a: Int, b: String, c: Boolean, d: Any)

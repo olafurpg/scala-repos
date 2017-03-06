@@ -105,8 +105,8 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
       with Logging {
     import SchedulingActor._
 
-    private[this] final implicit val scheduleOrder: Ordering[(DateTime,
-                                                              ScheduledTask)] =
+    private[this] final implicit val scheduleOrder
+      : Ordering[(DateTime, ScheduledTask)] =
       Ordering.by(_._1.getMillis)
 
     private[this] implicit val M: Monad[Future] = new FutureMonad(

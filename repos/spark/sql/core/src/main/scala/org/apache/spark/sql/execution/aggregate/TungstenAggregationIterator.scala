@@ -85,7 +85,8 @@ class TungstenAggregationIterator(
     aggregateAttributes: Seq[Attribute],
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
-    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (() => MutableProjection),
+    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (
+        () => MutableProjection),
     originalInputAttributes: Seq[Attribute],
     inputIter: Iterator[InternalRow],
     testFallbackStartsAt: Option[Int],
@@ -235,8 +236,8 @@ class TungstenAggregationIterator(
 
   // The iterator created from hashMap. It is used to generate output rows when we
   // are using hash-based aggregation.
-  private[this] var aggregationBufferMapIterator: KVIterator[UnsafeRow,
-                                                             UnsafeRow] = null
+  private[this] var aggregationBufferMapIterator
+    : KVIterator[UnsafeRow, UnsafeRow] = null
 
   // Indicates if aggregationBufferMapIterator still has key-value pairs.
   private[this] var mapIteratorHasNext: Boolean = false

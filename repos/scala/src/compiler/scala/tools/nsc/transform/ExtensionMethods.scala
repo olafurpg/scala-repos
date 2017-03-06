@@ -314,8 +314,8 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
             case Some(defns) =>
               defns.toList map
                 (defn =>
-                   atOwner(md.symbol)(
-                     localTyper.typedPos(md.pos.focus)(defn.duplicate)))
+                  atOwner(md.symbol)(
+                    localTyper.typedPos(md.pos.focus)(defn.duplicate)))
             case _ => Nil
           }
           if (extraStats.isEmpty) md

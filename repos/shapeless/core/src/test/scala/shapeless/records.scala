@@ -41,7 +41,7 @@ class RecordTests {
   def testGet {
     val r1 =
       (intField1 ->> 23) :: (stringField1 ->> "foo") :: (boolField1 ->> true) ::
-        (doubleField1 ->> 2.0) :: HNil
+      (doubleField1 ->> 2.0) :: HNil
 
     val v1 = r1.get(intField1)
     typed[Int](v1)
@@ -64,7 +64,7 @@ class RecordTests {
   def testGetLiterals {
     val r1 =
       ("intField1" ->> 23) :: ("stringField1" ->> "foo") ::
-        ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
+      ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
 
     val v1 = r1.get("intField1")
     typed[Int](v1)
@@ -100,7 +100,7 @@ class RecordTests {
   def testAt {
     val r1 =
       (intField1 ->> 23) :: (stringField1 ->> "foo") :: (boolField1 ->> true) ::
-        (doubleField1 ->> 2.0) :: HNil
+      (doubleField1 ->> 2.0) :: HNil
 
     val v1 = r1.at(0)
     typed[Int](v1)
@@ -178,7 +178,7 @@ class RecordTests {
   def testAtLiterals {
     val r1 =
       ("intField1" ->> 23) :: ("stringField1" ->> "foo") ::
-        ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
+      ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
 
     val v1 = r1.at(0)
     typed[Int](v1)
@@ -201,7 +201,7 @@ class RecordTests {
   def testUpdate {
     val r1 =
       (intField1 ->> 23) :: (stringField1 ->> "foo") :: (boolField1 ->> true) ::
-        (doubleField1 ->> 2.0) :: HNil
+      (doubleField1 ->> 2.0) :: HNil
 
     val r2 = r1.updated(intField1, 7)
     val v1 = r2.get(intField1)
@@ -240,7 +240,7 @@ class RecordTests {
   def testUpdateLiteral {
     val r1 =
       ("intField1" ->> 23) :: ("stringField1" ->> "foo") ::
-        ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
+      ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
 
     val r2 = r1.updated("intField1", 7)
     val v1 = r2.get("intField1")
@@ -290,7 +290,7 @@ class RecordTests {
   def testConcatenate {
     val r1 =
       (intField1 ->> 23) :: (stringField1 ->> "foo") :: (boolField1 ->> true) ::
-        (doubleField1 ->> 2.0) :: HNil
+      (doubleField1 ->> 2.0) :: HNil
 
     val r2 = (intField2 ->> 13) :: (stringField2 ->> "bar") :: r1
 
@@ -307,7 +307,7 @@ class RecordTests {
   def testConcatenateLiteral {
     val r1 =
       ("intField1" ->> 23) :: ("stringField1" ->> "foo") ::
-        ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
+      ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
 
     val r2 = ("intField2" ->> 13) :: ("stringField2" ->> "bar") :: r1
 
@@ -372,7 +372,7 @@ class RecordTests {
   def testRemove {
     val r1 =
       (intField1 ->> 23) :: (stringField1 ->> "foo") :: (boolField1 ->> true) ::
-        (doubleField1 ->> 2.0) :: HNil
+      (doubleField1 ->> 2.0) :: HNil
 
     val rm1 = r1.remove(intField1)
     typed[(Int,
@@ -452,7 +452,7 @@ class RecordTests {
   def testRemoveLiteral {
     val r1 =
       ("intField1" ->> 23) :: ("stringField1" ->> "foo") ::
-        ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
+      ("boolField1" ->> true) :: ("doubleField1" ->> 2.0) :: HNil
 
     val rm1 = r1.remove("intField1")
     typed[(Int,
@@ -845,7 +845,7 @@ class RecordTests {
 
     val rs =
       ("first" ->> Some(2)) :: ("second" ->> Some(true)) ::
-        ("third" ->> Option.empty[String]) :: HNil
+      ("third" ->> Option.empty[String]) :: HNil
 
     {
       val f = rs.fields
@@ -887,7 +887,7 @@ class RecordTests {
 
     val rs =
       ("first" ->> Some(2)) :: ("second" ->> Some(true)) ::
-        ("third" ->> Option.empty[String]) :: HNil
+      ("third" ->> Option.empty[String]) :: HNil
 
     {
       val m = rs.toMap

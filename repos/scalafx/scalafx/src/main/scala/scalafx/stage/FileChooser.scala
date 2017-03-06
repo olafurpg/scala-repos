@@ -125,7 +125,8 @@ class FileChooser(
 
   /** This property is used to pre-select the extension filter for the next displayed dialog
     * and to read the user-selected extension filter from the dismissed dialog. */
-  def selectedExtensionFilter: ObjectProperty[jfxs.FileChooser.ExtensionFilter] =
+  def selectedExtensionFilter
+    : ObjectProperty[jfxs.FileChooser.ExtensionFilter] =
     delegate.selectedExtensionFilterProperty
   def selectedExtensionFilter_=(v: ExtensionFilter) {
     ObjectProperty.fillProperty[jfxs.FileChooser.ExtensionFilter](

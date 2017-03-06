@@ -232,7 +232,7 @@ abstract class TreeGen {
       val needsPackageQualifier =
         ((sym ne null) && qualsym.hasPackageFlag && !(sym.isDefinedInPackage ||
           sym.moduleClass.isDefinedInPackage) // SI-7817 work around strangeness in post-flatten `Symbol#owner`
-        )
+      )
       val pkgQualifier =
         if (needsPackageQualifier) {
           val packageObject = qualsym.packageObject
@@ -478,15 +478,15 @@ abstract class TreeGen {
     val fieldDefs =
       vparamss.flatten map
         (vd => {
-           val field =
-             copyValDef(vd)(mods = vd.mods &~ DEFAULTPARAM, rhs = EmptyTree)
-           // Prevent overlapping of `field` end's position with default argument's start position.
-           // This is needed for `Positions.Locator(pos).traverse` to return the correct tree when
-           // the `pos` is a point position with all its values equal to `vd.rhs.pos.start`.
-           if (field.pos.isRange && vd.rhs.pos.isRange)
-             field.pos = field.pos.withEnd(vd.rhs.pos.start - 1)
-           field
-         })
+          val field =
+            copyValDef(vd)(mods = vd.mods &~ DEFAULTPARAM, rhs = EmptyTree)
+          // Prevent overlapping of `field` end's position with default argument's start position.
+          // This is needed for `Positions.Locator(pos).traverse` to return the correct tree when
+          // the `pos` is a point position with all its values equal to `vd.rhs.pos.start`.
+          if (field.pos.isRange && vd.rhs.pos.isRange)
+            field.pos = field.pos.withEnd(vd.rhs.pos.start - 1)
+          field
+        })
 
     global.Template(parents,
                     self,

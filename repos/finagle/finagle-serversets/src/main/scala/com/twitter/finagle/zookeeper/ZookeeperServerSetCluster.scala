@@ -108,7 +108,8 @@ class ZookeeperServerSetCluster(serverSet: ServerSet,
         Map[String, InetSocketAddress]()
   ): Unit = joinServerSet(address, endpoints)
 
-  def snap: (Seq[SocketAddress], Future[Spool[Cluster.Change[SocketAddress]]]) =
+  def snap
+    : (Seq[SocketAddress], Future[Spool[Cluster.Change[SocketAddress]]]) =
     synchronized {
       (underlyingSet.toSeq, changes)
     }

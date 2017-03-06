@@ -229,9 +229,9 @@ object UserRepo {
           case _ => none
         }) ifFalse ai
       ).flatten.map(_ -> 1) ::: List(
-        totalTime map (s"${F.playTime}.total" -> _),
-        tvTime map (s"${F.playTime}.tv" -> _)
-      ).flatten
+      totalTime map (s"${F.playTime}.total" -> _),
+      tvTime map (s"${F.playTime}.tv" -> _)
+    ).flatten
 
     $update($select(id), $incBson(incs: _*))
   }

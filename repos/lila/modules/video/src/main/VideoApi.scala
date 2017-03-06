@@ -55,13 +55,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         "score" -> BSONDocument("$meta" -> "textScore"))
       Paginator(
         adapter = new BSONAdapter[Video](
-            collection = videoColl,
-            selector = BSONDocument(
-              "$text" -> BSONDocument("$search" -> q)
-            ),
-            projection = textScore,
-            sort = textScore
-          ) mapFutureList videoViews(user),
+          collection = videoColl,
+          selector = BSONDocument(
+            "$text" -> BSONDocument("$search" -> q)
+          ),
+          projection = textScore,
+          sort = textScore
+        ) mapFutureList videoViews(user),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -96,11 +96,11 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
     def popular(user: Option[User], page: Int): Fu[Paginator[VideoView]] =
       Paginator(
         adapter = new BSONAdapter[Video](
-            collection = videoColl,
-            selector = BSONDocument(),
-            projection = BSONDocument(),
-            sort = BSONDocument("metadata.likes" -> -1)
-          ) mapFutureList videoViews(user),
+          collection = videoColl,
+          selector = BSONDocument(),
+          projection = BSONDocument(),
+          sort = BSONDocument("metadata.likes" -> -1)
+        ) mapFutureList videoViews(user),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -112,13 +112,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       else
         Paginator(
           adapter = new BSONAdapter[Video](
-              collection = videoColl,
-              selector = BSONDocument(
-                "tags" -> BSONDocument("$all" -> tags)
-              ),
-              projection = BSONDocument(),
-              sort = BSONDocument("metadata.likes" -> -1)
-            ) mapFutureList videoViews(user),
+            collection = videoColl,
+            selector = BSONDocument(
+              "tags" -> BSONDocument("$all" -> tags)
+            ),
+            projection = BSONDocument(),
+            sort = BSONDocument("metadata.likes" -> -1)
+          ) mapFutureList videoViews(user),
           currentPage = page,
           maxPerPage = maxPerPage
         )
@@ -128,13 +128,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                  page: Int): Fu[Paginator[VideoView]] =
       Paginator(
         adapter = new BSONAdapter[Video](
-            collection = videoColl,
-            selector = BSONDocument(
-              "author" -> author
-            ),
-            projection = BSONDocument(),
-            sort = BSONDocument("metadata.likes" -> -1)
-          ) mapFutureList videoViews(user),
+          collection = videoColl,
+          selector = BSONDocument(
+            "author" -> author
+          ),
+          projection = BSONDocument(),
+          sort = BSONDocument("metadata.likes" -> -1)
+        ) mapFutureList videoViews(user),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -248,8 +248,8 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                 }
               val list =
                 tags.take(max - missing.size) ::: missing.flatMap { t =>
-                  all find (_.tag == t)
-                }
+                all find (_.tag == t)
+              }
               list.sortBy { t =>
                 if (filterTags contains t.tag) Int.MinValue
                 else -t.nb

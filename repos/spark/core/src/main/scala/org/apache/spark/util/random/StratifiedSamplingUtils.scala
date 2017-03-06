@@ -82,9 +82,8 @@ private[spark] object StratifiedSamplingUtils extends Logging {
                      fractions: Map[K, Double],
                      rng: RandomDataGenerator,
                      counts: Option[Map[K, Long]])
-    : (mutable.Map[K, AcceptanceResult], (K, V)) => mutable.Map[
-      K,
-      AcceptanceResult] = {
+    : (mutable.Map[K, AcceptanceResult],
+       (K, V)) => mutable.Map[K, AcceptanceResult] = {
     val delta = 5e-5
     (result: mutable.Map[K, AcceptanceResult], item: (K, V)) =>
       {
@@ -142,10 +141,9 @@ private[spark] object StratifiedSamplingUtils extends Logging {
   /**
     * Returns the function used combine results returned by seqOp from different partitions.
     */
-  def getCombOp[K]: (mutable.Map[K, AcceptanceResult],
-                     mutable.Map[K, AcceptanceResult]) => mutable.Map[
-    K,
-    AcceptanceResult] = {
+  def getCombOp[K]: (
+      mutable.Map[K, AcceptanceResult],
+      mutable.Map[K, AcceptanceResult]) => mutable.Map[K, AcceptanceResult] = {
     (result1: mutable.Map[K, AcceptanceResult],
      result2: mutable.Map[K, AcceptanceResult]) =>
       {

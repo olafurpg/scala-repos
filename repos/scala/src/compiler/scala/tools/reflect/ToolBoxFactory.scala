@@ -84,7 +84,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val typed =
           expr filter
             (t =>
-               t.tpe != null && t.tpe != NoType && !t.isInstanceOf[TypeTree])
+              t.tpe != null && t.tpe != NoType && !t.isInstanceOf[TypeTree])
         if (!typed.isEmpty)
           throw ToolBoxError(
             "reflective toolbox has failed: cannot operate on trees that are already typed")
@@ -114,15 +114,15 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           scala.collection.mutable.LinkedHashMap[FreeTermSymbol, TermName]()
         freeTerms foreach
           (ft => {
-             var name = ft.name.toString
-             val namesakes =
-               freeTerms takeWhile (_ != ft) filter
-                 (ft2 => ft != ft2 && ft.name == ft2.name)
-             if (namesakes.length > 0)
-               name += ("$" + (namesakes.length + 1))
-             freeTermNames +=
-               (ft -> newTermName(name + nme.REIFY_FREE_VALUE_SUFFIX))
-           })
+            var name = ft.name.toString
+            val namesakes =
+              freeTerms takeWhile (_ != ft) filter
+                (ft2 => ft != ft2 && ft.name == ft2.name)
+            if (namesakes.length > 0)
+              name += ("$" + (namesakes.length + 1))
+            freeTermNames +=
+              (ft -> newTermName(name + nme.REIFY_FREE_VALUE_SUFFIX))
+          })
         val expr = new Transformer {
           override def transform(tree: Tree): Tree =
             if (tree.hasSymbolField && tree.symbol.isFreeTerm) {
@@ -218,8 +218,8 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             dummies1 map (_.symbol),
             dummies1 map
               (dummy =>
-                 SingleType(NoPrefix,
-                            invertedIndex(dummy.symbol.name.toTermName))))
+                SingleType(NoPrefix,
+                           invertedIndex(dummy.symbol.name.toTermName))))
             .traverse(result)
           result
         })

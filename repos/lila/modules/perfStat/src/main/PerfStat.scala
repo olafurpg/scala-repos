@@ -130,7 +130,7 @@ case class Count(all: Int,
       berserk = berserk + pov.player.berserk.fold(1, 0),
       opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
       seconds = seconds +
-          (pov.game.durationSeconds match {
+        (pov.game.durationSeconds match {
           case s if s > 3 * 60 * 60 => 0
           case s => s
         }),
@@ -177,11 +177,11 @@ case class Results(results: List[Result]) {
     pov.opponent.rating.ifTrue(pov.game.rated).fold(this) { opInt =>
       copy(
         results = (Result(
-            opInt,
-            UserId(~pov.opponent.userId),
-            pov.game.updatedAtOrCreatedAt,
-            pov.game.id
-          ) :: results).sortBy(_.opInt * comp) take Results.nb)
+          opInt,
+          UserId(~pov.opponent.userId),
+          pov.game.updatedAtOrCreatedAt,
+          pov.game.id
+        ) :: results).sortBy(_.opInt * comp) take Results.nb)
     }
 }
 object Results {

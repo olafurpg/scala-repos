@@ -57,8 +57,8 @@ object DBColumnTransformer {
     Definition(sqlType + sizeStr + defStr + preparedCol.nullable.toStr)
   }
 
-  private def defaultColumnMutator: PartialFunction[DBColumnDefinition,
-                                                    DBColumnDefinition] = {
+  private def defaultColumnMutator
+    : PartialFunction[DBColumnDefinition, DBColumnDefinition] = {
     case t @ DBColumnDefinition(BIGINT, _, _, None, _, _) =>
       t.copy(sizeOpt = Some(20))
     case t @ DBColumnDefinition(INT, _, _, None, _, _) =>

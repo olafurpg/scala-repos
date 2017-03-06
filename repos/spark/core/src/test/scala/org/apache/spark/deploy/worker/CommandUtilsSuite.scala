@@ -79,11 +79,11 @@ class CommandUtilsSuite
     // auth is set to false
     conf.set(SecurityManager.SPARK_AUTH_CONF, "false")
     cmd = CommandUtils invokePrivate buildLocalCommand(
-        command,
-        new SecurityManager(conf),
-        (t: String) => t,
-        Seq(),
-        Map())
+      command,
+      new SecurityManager(conf),
+      (t: String) => t,
+      Seq(),
+      Map())
     assert(
       !cmd.javaOpts.exists(
         _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))
@@ -92,11 +92,11 @@ class CommandUtilsSuite
     // auth is set to true
     conf.set(SecurityManager.SPARK_AUTH_CONF, "true")
     cmd = CommandUtils invokePrivate buildLocalCommand(
-        command,
-        new SecurityManager(conf),
-        (t: String) => t,
-        Seq(),
-        Map())
+      command,
+      new SecurityManager(conf),
+      (t: String) => t,
+      Seq(),
+      Map())
     assert(
       !cmd.javaOpts.exists(
         _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))

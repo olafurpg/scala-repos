@@ -72,9 +72,9 @@ object PluginDiscovery {
     import Paths._
     val files =
       writeDescriptor(names.plugins, dir, Plugins) :: writeDescriptor(
-        names.autoPlugins,
-        dir,
-        AutoPlugins) :: writeDescriptor(names.builds, dir, Builds) :: Nil
+      names.autoPlugins,
+      dir,
+      AutoPlugins) :: writeDescriptor(names.builds, dir, Builds) :: Nil
     files.flatMap(_.toList)
   }
 

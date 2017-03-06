@@ -50,9 +50,9 @@ import scalaz.effect.IO
 class DataServiceHandler[A](
     platform: Platform[Future, Slice, StreamT[Future, Slice]])(
     implicit M: Monad[Future])
-    extends CustomHttpService[A,
-                              (APIKey, Path) => Future[
-                                HttpResponse[ByteChunk]]]
+    extends CustomHttpService[
+      A,
+      (APIKey, Path) => Future[HttpResponse[ByteChunk]]]
     with Logging {
 
   val service = (request: HttpRequest[A]) =>

@@ -40,8 +40,8 @@ private[simul] final class SimulRepo(simulColl: Coll) {
         status = r.get[Status]("status"),
         wins = r boolO "wins",
         hostColor = r
-            .strO("hostColor")
-            .flatMap(chess.Color.apply) | chess.White
+          .strO("hostColor")
+          .flatMap(chess.Color.apply) | chess.White
       )
     def writes(w: BSON.Writer, o: SimulPairing) =
       BSONDocument("player" -> o.player,

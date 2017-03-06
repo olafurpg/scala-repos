@@ -43,52 +43,51 @@ class InterpolatedStringEnterHandler extends EnterHandlerDelegateAdapter {
 
     Option(element) foreach
       (a =>
-         if (Set(
-               tINTERPOLATED_STRING,
-               tINTERPOLATED_STRING_ESCAPE,
-               tINTERPOLATED_STRING_END).contains(a.getNode.getElementType)) {
-           a.getParent.getFirstChild.getNode match {
-             case b: ASTNode
-                 if b.getElementType == tINTERPOLATED_STRING_ID ||
-                   b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE ||
-                   b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE =>
-               if (a.getNode.getElementType == tINTERPOLATED_STRING_ESCAPE) {
-                 if (caretOffset.get - a.getTextOffset == 1) modifyOffset(1)
-               } else {
-                 val lexer =
-                   new StringLiteralLexer(StringLiteralLexer.NO_QUOTE_CHAR,
-                                          a.getNode.getElementType)
-                 lexer.start(a.getText, 0, a.getTextLength)
+        if (Set(tINTERPOLATED_STRING,
+                tINTERPOLATED_STRING_ESCAPE,
+                tINTERPOLATED_STRING_END).contains(a.getNode.getElementType)) {
+          a.getParent.getFirstChild.getNode match {
+            case b: ASTNode
+                if b.getElementType == tINTERPOLATED_STRING_ID ||
+                  b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE ||
+                  b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE =>
+              if (a.getNode.getElementType == tINTERPOLATED_STRING_ESCAPE) {
+                if (caretOffset.get - a.getTextOffset == 1) modifyOffset(1)
+              } else {
+                val lexer =
+                  new StringLiteralLexer(StringLiteralLexer.NO_QUOTE_CHAR,
+                                         a.getNode.getElementType)
+                lexer.start(a.getText, 0, a.getTextLength)
 
-                 do {
-                   if (lexer.getTokenStart +
-                         a.getTextOffset < caretOffset.get &&
-                       caretOffset.get() < lexer.getTokenEnd +
-                         a.getTextOffset) {
-                     if (StringEscapesTokenTypes.STRING_LITERAL_ESCAPES
-                           .contains(lexer.getTokenType)) {
-                       modifyOffset(
-                         lexer.getTokenEnd + a.getTextOffset -
-                           caretOffset.get())
-                     }
-                   }
-                 } while (caretOffset.get() > lexer.getTokenEnd +
-                   a.getTextOffset &&
-                   (lexer.advance(), lexer.getTokenType != null)._2)
-               }
+                do {
+                  if (lexer.getTokenStart +
+                        a.getTextOffset < caretOffset.get &&
+                      caretOffset.get() < lexer.getTokenEnd +
+                        a.getTextOffset) {
+                    if (StringEscapesTokenTypes.STRING_LITERAL_ESCAPES
+                          .contains(lexer.getTokenType)) {
+                      modifyOffset(
+                        lexer.getTokenEnd + a.getTextOffset -
+                          caretOffset.get())
+                    }
+                  }
+                } while (caretOffset.get() > lexer.getTokenEnd +
+                  a.getTextOffset &&
+                  (lexer.advance(), lexer.getTokenType != null)._2)
+              }
 
-               extensions.inWriteAction {
-                 if (isMLString(a.getParent)) return Result.Continue
+              extensions.inWriteAction {
+                if (isMLString(a.getParent)) return Result.Continue
 
-                 caretOffset.set(caretOffset.get + 3)
-                 caretAdvance.set(b.getTextLength + 1)
-                 editor.getDocument.insertString(offset,
-                                                 "\" +" + b.getText + "\"")
-               }
-               return Result.Continue
-             case _ =>
-           }
-         })
+                caretOffset.set(caretOffset.get + 3)
+                caretAdvance.set(b.getTextLength + 1)
+                editor.getDocument.insertString(offset,
+                                                "\" +" + b.getText + "\"")
+              }
+              return Result.Continue
+            case _ =>
+          }
+        })
 
     Result.Continue
   }

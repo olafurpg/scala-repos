@@ -163,7 +163,7 @@ class CommandSpec extends Specification {
 
         afterBinding {
           _fullname = a.validation.toOption.get + " " +
-              lower.validation.toOption.get
+            lower.validation.toOption.get
         }
       }
 

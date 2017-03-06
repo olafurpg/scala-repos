@@ -436,8 +436,8 @@ object SparseVector
 //    }
 //  }
 
-  implicit def canTransposeComplex: CanTranspose[SparseVector[Complex],
-                                                 CSCMatrix[Complex]] = {
+  implicit def canTransposeComplex
+    : CanTranspose[SparseVector[Complex], CSCMatrix[Complex]] = {
     new CanTranspose[SparseVector[Complex], CSCMatrix[Complex]] {
       def apply(from: SparseVector[Complex]) = {
         val transposedMtx: CSCMatrix[Complex] =

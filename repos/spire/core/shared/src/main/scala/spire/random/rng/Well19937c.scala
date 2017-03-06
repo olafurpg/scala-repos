@@ -86,8 +86,8 @@ final class Well19937c protected[random] (state: Array[Int], i0: Int)
 
     state(i) = z1 ^ z2
     state(vrm1(i)) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(
-        21,
-        state(i))
+      21,
+      state(i))
     i = vrm1(i)
 
     // Matsumoto-Kurita tempering to get a ME (maximally equidistributed) generator

@@ -446,10 +446,10 @@ abstract class ScalaPrimitives {
     else
       alts foreach
         (s =>
-           addPrimitive(s, s.info.paramTypes match {
-             case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
-             case _ => code
-           }))
+          addPrimitive(s, s.info.paramTypes match {
+            case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
+            case _ => code
+          }))
   }
 
   def isCoercion(code: Int): Boolean = (code >= B2B) && (code <= D2D)

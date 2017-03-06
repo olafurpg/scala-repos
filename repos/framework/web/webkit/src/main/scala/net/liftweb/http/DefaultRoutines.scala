@@ -29,7 +29,8 @@ import util._
   * public?  So, we can document the default behaviors.
   */
 object DefaultRoutines {
-  private val resourceMap: LRUMap[(String, List[String]), Box[ResourceBundle]] =
+  private val resourceMap
+    : LRUMap[(String, List[String]), Box[ResourceBundle]] =
     new LRUMap(2000)
 
   private def rawResBundle(loc: Locale,

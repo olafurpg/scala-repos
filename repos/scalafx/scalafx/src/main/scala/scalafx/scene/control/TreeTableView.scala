@@ -580,8 +580,8 @@ object TreeTableView {
     *
     * @since 8.0
     */
-  def classCssMetaData: mutable.Buffer[
-    jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
+  def classCssMetaData
+    : mutable.Buffer[jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
     jfxsc.PopupControl.getClassCssMetaData
 }
 
@@ -663,8 +663,8 @@ class TreeTableView[S](
     * TreeTableView, as well as inspect which rows have been selected by the user. Note that it has a generic type that
     * must match the type of the TreeTableView itself.
     */
-  def selectionModel: ObjectProperty[
-    jfxsc.TreeTableView.TreeTableViewSelectionModel[S]] =
+  def selectionModel
+    : ObjectProperty[jfxsc.TreeTableView.TreeTableViewSelectionModel[S]] =
     delegate.selectionModelProperty
   def selectionModel_=(v: TreeTableView.TreeTableViewSelectionModel[S]): Unit = {
     selectionModel() = v
@@ -674,8 +674,8 @@ class TreeTableView[S](
     * The FocusModel provides the API through which it is possible to control focus on zero or one rows of the
     * TreeTableView. Generally the default implementation should be more than sufficient.
     */
-  def focusModel: ObjectProperty[
-    jfxsc.TreeTableView.TreeTableViewFocusModel[S]] =
+  def focusModel
+    : ObjectProperty[jfxsc.TreeTableView.TreeTableViewFocusModel[S]] =
     delegate.focusModelProperty
   def focusModel_=(v: TreeTableView.TreeTableViewFocusModel[S]): Unit = {
     focusModel() = v
@@ -722,8 +722,8 @@ class TreeTableView[S](
     * available as static functions in the TableView class: [[TreeTableView#UNCONSTRAINED_RESIZE_POLICY]] and
     * [[TreeTableView#CONSTRAINED_RESIZE_POLICY]].
     */
-  def columnResizePolicy: ObjectProperty[
-    TreeTableView.ResizeFeatures[S] => Boolean] =
+  def columnResizePolicy
+    : ObjectProperty[TreeTableView.ResizeFeatures[S] => Boolean] =
     ObjectProperty((features: TreeTableView.ResizeFeatures[S]) =>
       delegate.columnResizePolicyProperty.value.call(features))
   def columnResizePolicy_=(
@@ -812,8 +812,9 @@ class TreeTableView[S](
     * The sort order list contains the columns that have been added to it either programmatically or via a user clicking
     * on the headers themselves.
     */
-  def comparator: ReadOnlyObjectProperty[
-    java.util.Comparator[jfxsc.TreeItem[S]]] = delegate.comparatorProperty
+  def comparator
+    : ReadOnlyObjectProperty[java.util.Comparator[jfxsc.TreeItem[S]]] =
+    delegate.comparatorProperty
 
   /** The sort policy specifies how sorting in this TreeTableView should be performed. For example, a basic sort policy
     * may just recursively sort the children of the root tree item, whereas a more advanced sort policy may call to a

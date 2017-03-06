@@ -941,7 +941,8 @@ private[spark] class BlockManager(executorId: String,
     doPut(blockId, level, tellMaster = tellMaster, keepReadLock = keepReadLock) {
       putBlockInfo =>
         val startTimeMs = System.currentTimeMillis
-        var iteratorFromFailedMemoryStorePut: Option[PartiallyUnrolledIterator] =
+        var iteratorFromFailedMemoryStorePut
+          : Option[PartiallyUnrolledIterator] =
           None
         // Size of the block in bytes
         var size = 0L

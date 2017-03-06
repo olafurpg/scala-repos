@@ -306,8 +306,8 @@ final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
     *
     * @return A [[RunnableGraph]] that materializes to a Processor when run() is called on it.
     */
-  def toProcessor: RunnableGraph[
-    Processor[In @uncheckedVariance, Out @uncheckedVariance]] =
+  def toProcessor
+    : RunnableGraph[Processor[In @uncheckedVariance, Out @uncheckedVariance]] =
     Source
       .asSubscriber[In]
       .via(this)

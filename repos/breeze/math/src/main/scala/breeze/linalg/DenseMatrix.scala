@@ -947,8 +947,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canTransposeComplex: CanTranspose[DenseMatrix[Complex],
-                                                 DenseMatrix[Complex]] = {
+  implicit def canTransposeComplex
+    : CanTranspose[DenseMatrix[Complex], DenseMatrix[Complex]] = {
     new CanTranspose[DenseMatrix[Complex], DenseMatrix[Complex]] {
       def apply(from: DenseMatrix[Complex]) = {
         new DenseMatrix(data = from.data map { _.conjugate },
@@ -1217,13 +1217,14 @@ object DenseMatrix
   //  implicit val setMM_F: OpSet]  = new SetDMDMOp[Float.InPlaceImpl2[DenseMatrix[Float], DenseMatrix[Float]]
   //  implicit val setMM_I: OpSet]  = new SetDMDMOp[Int.InPlaceImpl2[DenseMatrix[Int], DenseMatrix[Int]]
 
-  implicit val setMV_D: OpSet.InPlaceImpl2[DenseMatrix[Double],
-                                           DenseVector[Double]] =
+  implicit val setMV_D
+    : OpSet.InPlaceImpl2[DenseMatrix[Double], DenseVector[Double]] =
     new SetDMDVOp[Double]();
-  implicit val setMV_F: OpSet.InPlaceImpl2[DenseMatrix[Float],
-                                           DenseVector[Float]] =
+  implicit val setMV_F
+    : OpSet.InPlaceImpl2[DenseMatrix[Float], DenseVector[Float]] =
     new SetDMDVOp[Float]();
-  implicit val setMV_I: OpSet.InPlaceImpl2[DenseMatrix[Int], DenseVector[Int]] =
+  implicit val setMV_I
+    : OpSet.InPlaceImpl2[DenseMatrix[Int], DenseVector[Int]] =
     new SetDMDVOp[Int]();
 
   // There's a bizarre error specializing float's here.

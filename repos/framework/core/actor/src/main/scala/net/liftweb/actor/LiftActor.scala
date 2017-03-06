@@ -61,15 +61,15 @@ object LAScheduler extends LAScheduler with Loggable {
       import java.util.concurrent._
 
       private val es = // Executors.newFixedThreadPool(threadPoolSize)
-      new ThreadPoolExecutor(threadPoolSize,
-                             maxThreadPoolSize,
-                             60,
-                             TimeUnit.SECONDS,
-                             blockingQueueSize match {
-                               case Full(x) =>
-                                 new ArrayBlockingQueue(x)
-                               case _ => new LinkedBlockingQueue
-                             })
+        new ThreadPoolExecutor(threadPoolSize,
+                               maxThreadPoolSize,
+                               60,
+                               TimeUnit.SECONDS,
+                               blockingQueueSize match {
+                                 case Full(x) =>
+                                   new ArrayBlockingQueue(x)
+                                 case _ => new LinkedBlockingQueue
+                               })
 
       def execute(f: () => Unit): Unit =
         es.execute(new Runnable {

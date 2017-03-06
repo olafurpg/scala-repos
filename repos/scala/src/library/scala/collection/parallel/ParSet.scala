@@ -31,8 +31,8 @@ trait ParSet[T]
 
   //protected[this] override def newCombiner: Combiner[T, ParSet[T]] = ParSet.newCombiner[T]
 
-  override def companion: GenericCompanion[ParSet] with GenericParCompanion[
-    ParSet] = ParSet
+  override def companion
+    : GenericCompanion[ParSet] with GenericParCompanion[ParSet] = ParSet
 
   override def stringPrefix = "ParSet"
 }

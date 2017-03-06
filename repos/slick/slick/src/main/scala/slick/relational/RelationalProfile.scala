@@ -117,10 +117,10 @@ trait RelationalProfile
 
   class FastPathExtensionMethods[M <: ResultConverterDomain, T, P](
       val mp: MappedProjection[T, P]) {
-    def fastPath(
-        fpf: (TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
-                M,
-                T])): MappedProjection[T, P] = mp.genericFastPath {
+    def fastPath(fpf: (
+        TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
+          M,
+          T])): MappedProjection[T, P] = mp.genericFastPath {
       case tm @ TypeMappingResultConverter(_: ProductResultConverter[_, _],
                                            _,
                                            _) =>
@@ -268,7 +268,8 @@ trait RelationalTypesComponent { self: RelationalProfile =>
         jt: BaseColumnType[B]): BaseColumnType[A] =
       MappedColumnType.base[A, B](iso.map, iso.comap)
     implicit def booleanColumnType: BaseColumnType[Boolean]
-    implicit def bigDecimalColumnType: BaseColumnType[BigDecimal] with NumericTypedType
+    implicit def bigDecimalColumnType
+      : BaseColumnType[BigDecimal] with NumericTypedType
     implicit def byteColumnType: BaseColumnType[Byte] with NumericTypedType
     implicit def charColumnType: BaseColumnType[Char]
     implicit def doubleColumnType: BaseColumnType[Double] with NumericTypedType

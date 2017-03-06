@@ -49,8 +49,8 @@ object CanFilterBPBS {
   /** Use via implicit delegate syntax filterBP(x: DenseVector) and filterBS(x: DenseVector)
     *
     */
-  implicit val dvDouble1DFilterBPBS: CanFilterBPBS[DenseVector[Double],
-                                                   DenseVector[Double]] = {
+  implicit val dvDouble1DFilterBPBS
+    : CanFilterBPBS[DenseVector[Double], DenseVector[Double]] = {
     new CanFilterBPBS[DenseVector[Double], DenseVector[Double]] {
       def apply(data: DenseVector[Double],
                 omega: (Double, Double),
@@ -87,8 +87,8 @@ object CanFilterLPHP {
   /** Use via implicit delegate syntax filterLP(x: DenseVector) and filterHP(x: DenseVector)
     *
     */
-  implicit val dvDouble1DFilterLPHP: CanFilterLPHP[DenseVector[Double],
-                                                   DenseVector[Double]] = {
+  implicit val dvDouble1DFilterLPHP
+    : CanFilterLPHP[DenseVector[Double], DenseVector[Double]] = {
     new CanFilterLPHP[DenseVector[Double], DenseVector[Double]] {
       def apply(data: DenseVector[Double],
                 omega: Double,

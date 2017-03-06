@@ -352,14 +352,15 @@ class SparseOptimizationSpaceTest_Double
     Arbitrary(Arbitrary.arbitrary[Double].map(_ % 1E100)))
   implicit val arbVals = Arbitrary(
     genAS flatMap
-      (activeSize =>
-         Gen.listOfN[(Int, Int, Double)](
-           activeSize,
-           Arbitrary.arbitrary[(Int, Int, Double)])))
+      (
+          activeSize =>
+            Gen.listOfN[(Int, Int, Double)](
+              activeSize,
+              Arbitrary.arbitrary[(Int, Int, Double)])))
   def addToBuilder(bldr: CSCMatrix.Builder[Double], v: (Int, Int, Double)) =
     bldr.add(v._1, v._2, v._3)
-  override implicit def genTripleM: Arbitrary[
-    (CSCMatrix[Double], CSCMatrix[Double], CSCMatrix[Double])] = {
+  override implicit def genTripleM
+    : Arbitrary[(CSCMatrix[Double], CSCMatrix[Double], CSCMatrix[Double])] = {
     Arbitrary {
       val xb = new CSCMatrix.Builder[Double](N, N)
       val yb = new CSCMatrix.Builder[Double](N, N)

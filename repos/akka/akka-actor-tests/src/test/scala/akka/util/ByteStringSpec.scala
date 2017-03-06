@@ -828,8 +828,11 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     "function like a VectorBuilder" when {
       "adding various contents using ++= and +=" in {
         check {
-          (array1: Array[Byte], array2: Array[Byte], bs1: ByteString,
-           bs2: ByteString, bs3: ByteString) ⇒
+          (array1: Array[Byte],
+           array2: Array[Byte],
+           bs1: ByteString,
+           bs2: ByteString,
+           bs3: ByteString) ⇒
             likeVecBld { builder ⇒
               builder ++= array1
               bs1 foreach { b ⇒

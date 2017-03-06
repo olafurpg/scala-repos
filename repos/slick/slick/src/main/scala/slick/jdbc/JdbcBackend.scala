@@ -569,8 +569,8 @@ trait JdbcBackend extends RelationalBackend {
   }
 
   trait JdbcActionContext extends BasicActionContext {
-    private[JdbcBackend] var statementParameters: List[
-      JdbcBackend.StatementParameters] = null
+    private[JdbcBackend] var statementParameters
+      : List[JdbcBackend.StatementParameters] = null
 
     def pushStatementParameters(p: JdbcBackend.StatementParameters): Unit = {
       val p2 =
@@ -595,7 +595,7 @@ trait JdbcBackend extends RelationalBackend {
           )
         } else p
       statementParameters = p2 ::
-          (if (statementParameters eq null) Nil else statementParameters)
+        (if (statementParameters eq null) Nil else statementParameters)
     }
 
     def popStatementParameters: Unit = {

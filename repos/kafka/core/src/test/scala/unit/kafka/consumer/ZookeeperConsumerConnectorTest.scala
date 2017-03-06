@@ -562,12 +562,13 @@ class ZookeeperConsumerConnectorTest
     var beforeReleasingPartitionsCalled: Boolean = false
     var beforeStartingFetchersCalled: Boolean = false
     var consumerId: String = "";
-    var partitionOwnership: java.util.Map[String,
-                                          java.util.Set[java.lang.Integer]] =
+    var partitionOwnership
+      : java.util.Map[String, java.util.Set[java.lang.Integer]] =
       null
-    var globalPartitionOwnership: java.util.Map[
-      String,
-      java.util.Map[java.lang.Integer, ConsumerThreadId]] = null
+    var globalPartitionOwnership
+      : java.util.Map[String,
+                      java.util.Map[java.lang.Integer, ConsumerThreadId]] =
+      null
 
     override def beforeReleasingPartitions(
         partitionOwnership: java.util.Map[String,

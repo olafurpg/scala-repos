@@ -39,7 +39,8 @@ abstract class AggregationIterator(
     aggregateAttributes: Seq[Attribute],
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
-    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (() => MutableProjection))
+    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (
+        () => MutableProjection))
     extends Iterator[UnsafeRow]
     with Logging {
 
@@ -152,8 +153,8 @@ abstract class AggregationIterator(
   }
 
   // All imperative AggregateFunctions.
-  protected[this] val allImperativeAggregateFunctions: Array[
-    ImperativeAggregate] = allImperativeAggregateFunctionPositions
+  protected[this] val allImperativeAggregateFunctions
+    : Array[ImperativeAggregate] = allImperativeAggregateFunctionPositions
     .map(aggregateFunctions)
     .map(_.asInstanceOf[ImperativeAggregate])
 

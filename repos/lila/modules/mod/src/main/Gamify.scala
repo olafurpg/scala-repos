@@ -77,8 +77,8 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
     AsyncCache
       .single[Leaderboards](
         f = mixedLeaderboard(DateTime.now minusDays 1, none) zip mixedLeaderboard(
-            DateTime.now minusWeeks 1,
-            none) zip mixedLeaderboard(DateTime.now minusMonths 1, none) map {
+          DateTime.now minusWeeks 1,
+          none) zip mixedLeaderboard(DateTime.now minusMonths 1, none) map {
           case ((daily, weekly), monthly) =>
             Leaderboards(daily, weekly, monthly)
         },

@@ -256,10 +256,10 @@ object CanConvolve extends SerializableLogging {
       }
     }
 
-  implicit val correlateLoopNoOverhangRangeInt: CanCorrelateNoOverhang[
-    DenseVector[Int],
-    DenseVector[Int],
-    DenseVector[Int]] =
+  implicit val correlateLoopNoOverhangRangeInt
+    : CanCorrelateNoOverhang[DenseVector[Int],
+                             DenseVector[Int],
+                             DenseVector[Int]] =
     new CanCorrelateNoOverhang[DenseVector[Int],
                                DenseVector[Int],
                                DenseVector[Int]] {

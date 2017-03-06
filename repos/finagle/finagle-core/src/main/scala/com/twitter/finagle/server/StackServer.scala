@@ -55,7 +55,7 @@ object StackServer {
 
     stk.push(Role.serverDestTracing,
              ((next: ServiceFactory[Req, Rep]) =>
-                new ServerDestTracingProxy[Req, Rep](next)))
+               new ServerDestTracingProxy[Req, Rep](next)))
     stk.push(TimeoutFilter.serverModule)
     // The DeadlineFilter is pushed after the stats filters so stats are
     // recorded for the request. If a server processing deadline is set in
@@ -74,7 +74,7 @@ object StackServer {
     stk.push(ExceptionSourceFilter.module)
     stk.push(Role.jvmTracing,
              ((next: ServiceFactory[Req, Rep]) =>
-                newJvmFilter[Req, Rep]() andThen next))
+               newJvmFilter[Req, Rep]() andThen next))
     stk.push(ServerStatsFilter.module)
     stk.push(Role.protoTracing, identity[ServiceFactory[Req, Rep]](_))
     stk.push(ServerTracingFilter.module)

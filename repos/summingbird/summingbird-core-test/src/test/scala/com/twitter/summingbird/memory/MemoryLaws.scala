@@ -110,10 +110,9 @@ class MemoryLaws extends WordSpec {
                                   V: Monoid: Arbitrary: Equiv] = {
     val platform = new Memory
     val finalStore: Memory#Store[K, V] = MutableMap.empty[K, V]
-    val storeAndService: Memory#Store[K, JoinedU] with Memory#Service[
-      K,
-      JoinedU] = new MutableHashMap[K, JoinedU]()
-    with MemoryService[K, JoinedU]
+    val storeAndService
+      : Memory#Store[K, JoinedU] with Memory#Service[K, JoinedU] =
+      new MutableHashMap[K, JoinedU]() with MemoryService[K, JoinedU]
     val sourceMaker = Memory.toSource[T](_)
     val items1 = sample[List[T]]
     val items2 = sample[List[T]]

@@ -143,12 +143,13 @@ sealed trait TupleInstances1 extends TupleInstances0 {
     }
 
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit val tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[
-    Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
-    override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
-    def copoint[A](p: Tuple1[A]) = p._1
-    def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
-  }
+  implicit val tuple1Instance
+    : Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] =
+    new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
+      override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
+      def copoint[A](p: Tuple1[A]) = p._1
+      def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
+    }
 
   /** Product BindRec */
   implicit def tuple2BindRec[A1: Semigroup]: BindRec[(A1, ?)] =

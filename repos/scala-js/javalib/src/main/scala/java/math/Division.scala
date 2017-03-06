@@ -374,7 +374,7 @@ private[math] object Division {
       while (i >= 0) {
         if (res(i) != modulusDigits(i)) {
           doSub = (res(i) != 0) &&
-              ((res(i) & UINT_MAX) > (modulusDigits(i) & UINT_MAX))
+            ((res(i) & UINT_MAX) > (modulusDigits(i) & UINT_MAX))
           //force break
           i = 0
         }

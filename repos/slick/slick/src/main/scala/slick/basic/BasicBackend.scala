@@ -523,11 +523,8 @@ trait BasicBackend { self =>
     private[BasicBackend] var streamState: AnyRef = null
 
     /** The streaming action which may need to be continued with the suspended state */
-    private[BasicBackend] var streamingAction: SynchronousDatabaseAction[
-      _,
-      _ <: NoStream,
-      This,
-      _ <: Effect] = null
+    private[BasicBackend] var streamingAction
+      : SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect] = null
 
     @volatile private[this] var cancelRequested = false
 

@@ -35,7 +35,7 @@ class KafkaRequestHandler(id: Int,
     extends Runnable
     with Logging {
   this.logIdent = "[Kafka Request Handler " + id + " on Broker " + brokerId +
-      "], "
+    "], "
 
   def run() {
     while (true) {

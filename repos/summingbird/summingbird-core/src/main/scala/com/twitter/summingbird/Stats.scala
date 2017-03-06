@@ -99,9 +99,8 @@ object JobCounters {
     }
   }
 
-  private val registeredCountersForJob: ConcurrentHashMap[JobId,
-                                                          ParHashSet[(Group,
-                                                                      Name)]] =
+  private val registeredCountersForJob
+    : ConcurrentHashMap[JobId, ParHashSet[(Group, Name)]] =
     new ConcurrentHashMap[JobId, ParHashSet[(Group, Name)]]()
 
   def getCountersForJob(jobID: JobId): Option[Seq[(Group, Name)]] =

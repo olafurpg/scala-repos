@@ -542,16 +542,16 @@ private[scalajs] final class ScalaJSClassEmitter(
 
                 if (isAncestorOfString)
                   test = test ||
-                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                        "string"))
+                    (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                      "string"))
                 if (isAncestorOfHijackedNumberClass)
                   test = test ||
-                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                        "number"))
+                    (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                      "number"))
                 if (isAncestorOfBoxedBooleanClass)
                   test = test ||
-                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                        "boolean"))
+                    (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                      "boolean"))
 
                 !(!test)
             })

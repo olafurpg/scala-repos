@@ -103,9 +103,8 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       * when we need subpackages of a given package or its classes, we traverse once and cache only packages.
       * Classes for given package can be then easily loaded when they are needed.
       */
-    private lazy val cachedPackages: collection.mutable.HashMap[
-      String,
-      PackageFileInfo] = {
+    private lazy val cachedPackages
+      : collection.mutable.HashMap[String, PackageFileInfo] = {
       val packages = collection.mutable.HashMap[String, PackageFileInfo]()
 
       def getSubpackages(dir: AbstractFile): List[AbstractFile] =

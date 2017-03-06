@@ -55,9 +55,9 @@ class MongoRecordSpec extends Specification with MongoTestKit {
     val rec = MongoFieldTypeTestRecord.createRecord
     val allExpectedFieldNames: List[String] =
       "_id" :: "mandatoryMongoCaseClassField" :: (for {
-        typeName <- "Date JsonObject ObjectId UUID".split(" ")
-        flavor <- "mandatory legacyOptional".split(" ")
-      } yield flavor + typeName + "Field").toList
+      typeName <- "Date JsonObject ObjectId UUID".split(" ")
+      flavor <- "mandatory legacyOptional".split(" ")
+    } yield flavor + typeName + "Field").toList
 
     "introspect only the expected fields" in {
       rec

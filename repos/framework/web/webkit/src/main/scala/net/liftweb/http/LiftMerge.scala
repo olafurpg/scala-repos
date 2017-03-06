@@ -281,14 +281,14 @@ private[http] trait LiftMerge { self: LiftSession =>
         if (stateful_? && (autoIncludeComet || LiftRules.enableLiftGC)) {
           ("data-lift-gc" -> RenderVersion.get) ::
             (if (autoIncludeComet) {
-               ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList
-                 .map {
-                   case CometVersionPair(guid, version) =>
-                     (s"data-lift-comet-$guid" -> version.toString)
-                 }
-             } else {
-               Nil
-             })
+             ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList
+               .map {
+                 case CometVersionPair(guid, version) =>
+                   (s"data-lift-comet-$guid" -> version.toString)
+               }
+           } else {
+             Nil
+           })
         } else {
           Nil
         }

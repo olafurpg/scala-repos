@@ -158,10 +158,10 @@ object WebSocketHandler {
   /**
     * Handles the protocol failures by gracefully closing the connection.
     */
-  private def handleProtocolFailures: Flow[RawMessage, Message, _] => Flow[
-    Either[Message, RawMessage],
-    Message,
-    _] = {
+  private def handleProtocolFailures
+    : Flow[RawMessage, Message, _] => Flow[Either[Message, RawMessage],
+                                           Message,
+                                           _] = {
     AkkaStreams.bypassWith(
       Flow[Either[Message, RawMessage]].transform(
         () =>

@@ -1178,7 +1178,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
 
             (sliceIndex,
              openedJdbmState.copy(indices = openedJdbmState.indices +
-                                      (indexMapKey -> sliceIndex),
+                                    (indexMapKey -> sliceIndex),
                                   insertCount = count))
         } map {
           case (index, jdbmState) =>
@@ -1196,7 +1196,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
               count = index.count + (newInsertCount - jdbmState.insertCount))
 
             jdbmState.copy(indices = jdbmState.indices +
-                               (indexMapKey -> newIndex),
+                             (indexMapKey -> newIndex),
                            insertCount = newInsertCount)
         } getOrElse {
           // sort k/vslice and shove into SortedSlice.
@@ -1215,7 +1215,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                                         vslice0.size)
 
           jdbmState.copy(indices = jdbmState.indices +
-                             (indexMapKey -> sortedSlice),
+                           (indexMapKey -> sortedSlice),
                          insertCount = 0)
         }
       }

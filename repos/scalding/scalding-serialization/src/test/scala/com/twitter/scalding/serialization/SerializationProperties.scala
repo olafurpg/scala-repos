@@ -67,7 +67,8 @@ object SerializationProperties extends Properties("SerializationProperties") {
 
   class IntTryWrapperClass(val x: Int)
 
-  implicit val myTryIntWrapperOrdSer: OrderedSerialization[IntTryWrapperClass] =
+  implicit val myTryIntWrapperOrdSer
+    : OrderedSerialization[IntTryWrapperClass] =
     OrderedSerialization.viaTryTransform[IntTryWrapperClass, Int](_.x, {
       x: Int =>
         Success(new IntTryWrapperClass(x))

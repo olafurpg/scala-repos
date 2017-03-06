@@ -81,7 +81,7 @@ private[sql] class SessionState(ctx: SQLContext) {
     new Analyzer(catalog, functionRegistry, conf) {
       override val extendedResolutionRules =
         python.ExtractPythonUDFs :: PreInsertCastAndRename :: DataSourceAnalysis ::
-          (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
+        (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
 
       override val extendedCheckRules = Seq(datasources.PreWriteCheck(catalog))
     }

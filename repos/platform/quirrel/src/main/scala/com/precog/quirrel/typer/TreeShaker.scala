@@ -158,12 +158,11 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     case e @ NullLit(_) => (e, Set(), Set(), Set())
 
     case ObjectDef(loc, props) => {
-      val mapped: Vector[
-        (String,
-         (Expr,
-          Set[(Identifier, NameBinding)],
-          Set[(TicId, VarBinding)],
-          Set[Error]))] =
+      val mapped: Vector[(String,
+                          (Expr,
+                           Set[(Identifier, NameBinding)],
+                           Set[(TicId, VarBinding)],
+                           Set[Error]))] =
         props map {
           case (key, value) => (key, performShake(value))
         }

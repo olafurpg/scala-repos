@@ -125,7 +125,8 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
   def this(config: WSClientConfig) =
     this(AhcWSClientConfig(wsClientConfig = config))
 
-  protected val addCustomSettings: DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
+  protected val addCustomSettings
+    : DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
     identity
 
   /**

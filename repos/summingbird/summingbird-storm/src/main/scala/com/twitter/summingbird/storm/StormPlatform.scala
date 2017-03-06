@@ -289,7 +289,8 @@ abstract class Storm(options: Map[String, Options],
               .format(summer.store))
       }
 
-    val wrappedStore: MergeableStoreFactory[ExecutorKeyType, ExecutorValueType] =
+    val wrappedStore
+      : MergeableStoreFactory[ExecutorKeyType, ExecutorValueType] =
       MergeableStoreFactoryAlgebra.wrapOnlineFactory(supplier)
 
     val anchorTuples = getOrElse(stormDag, node, AnchorTuples.default)
@@ -316,10 +317,10 @@ abstract class Storm(options: Map[String, Options],
         List((ts, (k, (optiV, v))))
     }
 
-    val flatmapOp: FlatMapOperation[(ExecutorKeyType,
-                                     (Option[ExecutorValueType],
-                                      ExecutorValueType)),
-                                    ExecutorOutputType] =
+    val flatmapOp
+      : FlatMapOperation[(ExecutorKeyType,
+                          (Option[ExecutorValueType], ExecutorValueType)),
+                         ExecutorOutputType] =
       FlatMapOperation.apply(storeBaseFMOp)
 
     val sinkBolt = BaseBolt(

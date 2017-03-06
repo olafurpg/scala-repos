@@ -311,8 +311,8 @@ class TableView[S](
     *   tableView.columnResizePolicy = TableView.UnconstrainedResizePolicy
     * }}}
     */
-  def columnResizePolicy: ObjectProperty[
-    TableView.ResizeFeatures[S] => Boolean] =
+  def columnResizePolicy
+    : ObjectProperty[TableView.ResizeFeatures[S] => Boolean] =
     ObjectProperty((features: TableView.ResizeFeatures[S]) =>
       delegate.columnResizePolicyProperty.value.call(features))
   def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean) {
@@ -399,8 +399,8 @@ class TableView[S](
     * The SelectionModel provides the API through which it is possible to select single or multiple items within a
     * TableView, as well as inspect which items have been selected by the user.
     */
-  def selectionModel: ObjectProperty[
-    jfxsc.TableView.TableViewSelectionModel[S]] =
+  def selectionModel
+    : ObjectProperty[jfxsc.TableView.TableViewSelectionModel[S]] =
     delegate.selectionModelProperty
   def selectionModel_=(v: TableView.TableViewSelectionModel[S]) {
     selectionModel() = v
@@ -440,8 +440,8 @@ class TableView[S](
   /**
     * Called when there's a request to scroll an index into view using `scrollTo(int)` or `scrollTo(Object)`
     */
-  def onScrollTo: ObjectProperty[
-    jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]] =
+  def onScrollTo
+    : ObjectProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]] =
     delegate.onScrollToProperty
   def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
     ObjectProperty
@@ -465,8 +465,8 @@ class TableView[S](
   }
 
   /** Called when there's a request to sort the control. */
-  def onSort: ObjectProperty[
-    jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]] =
+  def onSort
+    : ObjectProperty[jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]] =
     delegate.onSortProperty
   def onSort_=(v: jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]) {
     ObjectProperty
@@ -481,8 +481,8 @@ class TableView[S](
   }
 
   /** The sort policy specifies how sorting in this TableView should be performed. */
-  def sortPolicy: ObjectProperty[
-    jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]] =
+  def sortPolicy
+    : ObjectProperty[jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]] =
     delegate.sortPolicyProperty
   def sortPolicy_=(v: jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]) {
     ObjectProperty

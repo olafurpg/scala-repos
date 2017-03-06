@@ -83,16 +83,17 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
     EitherT(M point \/-(response))
   }
 
-  private val urlMap: Map[
-    String,
-    Request[String] => EitherT[M, HttpClientError, Response[String]]] = Map(
-    "http://wrapper" -> (wrapper(_)),
-    "http://echo" -> (echo(_)),
-    "http://options" -> (options(_)),
-    "http://misbehave" -> (misbehave(_)),
-    "http://empty" -> (empty(_)),
-    "http://server-error" -> (serverError(_))
-  )
+  private val urlMap
+    : Map[String,
+          Request[String] => EitherT[M, HttpClientError, Response[String]]] =
+    Map(
+      "http://wrapper" -> (wrapper(_)),
+      "http://echo" -> (echo(_)),
+      "http://options" -> (options(_)),
+      "http://misbehave" -> (misbehave(_)),
+      "http://empty" -> (empty(_)),
+      "http://server-error" -> (serverError(_))
+    )
 
   final class HttpClient(baseUrl: String) extends HttpClientLike {
     def execute(request: Request[String])

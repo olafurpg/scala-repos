@@ -108,8 +108,8 @@ object Http
   }
 
   // Only record payload sizes when streaming is disabled.
-  private[this] val nonChunkedPayloadSize: Stackable[
-    ServiceFactory[Request, Response]] =
+  private[this] val nonChunkedPayloadSize
+    : Stackable[ServiceFactory[Request, Response]] =
     new Stack.Module2[param.Streaming,
                       Stats,
                       ServiceFactory[Request, Response]] {
@@ -141,7 +141,7 @@ object Http
   case class Client(
       stack: Stack[ServiceFactory[Request, Response]] = Client.stack,
       params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
-          "http"))
+        "http"))
       extends StdStackClient[Request, Response, Client]
       with WithSessionPool[Client]
       with WithDefaultLoadBalancer[Client] {
@@ -259,7 +259,7 @@ object Http
   case class Server(
       stack: Stack[ServiceFactory[Request, Response]] = Server.stack,
       params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
-          "http"))
+        "http"))
       extends StdStackServer[Request, Response, Server] {
 
     protected type In = Any

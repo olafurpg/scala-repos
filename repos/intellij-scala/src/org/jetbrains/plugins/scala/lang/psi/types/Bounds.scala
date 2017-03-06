@@ -527,7 +527,7 @@ object Bounds {
         case aliasDef: ScTypeAliasDefinition
             if s.aliasesMap.get(aliasDef.name) == None =>
           run = run bindA
-              (aliasDef.name, { () =>
+            (aliasDef.name, { () =>
               aliasDef.aliasedType(TypingContext.empty).getOrAny
             })
         case _ =>

@@ -188,7 +188,7 @@ class IRs[U <: Universe with Singleton](val uni: U) {
           // println(s"$notTransient")
           if (notTransient) {
             val symOpt = //tpe.declaration(preSym.name)
-            filteredAccessors.find(_.name == preSym.name)
+              filteredAccessors.find(_.name == preSym.name)
             symOpt match {
               case None => false
               case Some(sym) =>

@@ -12,8 +12,8 @@ trait SortedSets { self: BaseClient =>
   private[this] def parseMBulkReply(
       withScores: JBoolean
   ): PartialFunction[Reply, Future[Either[ZRangeResults, Seq[ChannelBuffer]]]] = {
-    val parse: PartialFunction[Reply,
-                               Either[ZRangeResults, Seq[ChannelBuffer]]] = {
+    val parse
+      : PartialFunction[Reply, Either[ZRangeResults, Seq[ChannelBuffer]]] = {
       case MBulkReply(messages) => withScoresHelper(withScores)(messages)
       case EmptyMBulkReply() => withScoresHelper(withScores)(Nil)
     }

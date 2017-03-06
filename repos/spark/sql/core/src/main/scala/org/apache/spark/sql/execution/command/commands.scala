@@ -434,8 +434,8 @@ case class DescribeFunction(functionName: String, isExtended: Boolean)
       case Some(info) =>
         val result =
           Row(s"Function: ${info.getName}") :: Row(
-            s"Class: ${info.getClassName}") :: Row(
-            s"Usage: ${replaceFunctionName(info.getUsage(), info.getName)}") :: Nil
+          s"Class: ${info.getClassName}") :: Row(
+          s"Usage: ${replaceFunctionName(info.getUsage(), info.getName)}") :: Nil
 
         if (isExtended) {
           result :+ Row(

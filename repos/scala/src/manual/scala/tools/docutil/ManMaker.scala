@@ -43,19 +43,19 @@ class ManMaker extends Task {
 
     command foreach
       (cmd => {
-         val classname = "scala.man1." + cmd
+        val classname = "scala.man1." + cmd
 
-         val htmlFileName =
-           htmlout.get.getPath + File.separator + cmd + ".html"
-         val htmlFile = new java.io.FileOutputStream(htmlFileName)
-         EmitHtml.emitHtml(classname, htmlFile)
+        val htmlFileName =
+          htmlout.get.getPath + File.separator + cmd + ".html"
+        val htmlFile = new java.io.FileOutputStream(htmlFileName)
+        EmitHtml.emitHtml(classname, htmlFile)
 
-         val manFileName =
-           manout.get.getPath + File.separator + "man1" + File.separator +
-             cmd + ".1"
-         val manFile = new FileOutputStream(manFileName)
-         EmitManPage.emitManPage(classname, manFile)
-       })
+        val manFileName =
+          manout.get.getPath + File.separator + "man1" + File.separator +
+            cmd + ".1"
+        val manFile = new FileOutputStream(manFileName)
+        EmitManPage.emitManPage(classname, manFile)
+      })
   }
 }
 

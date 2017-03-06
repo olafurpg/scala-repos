@@ -120,7 +120,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       val password = "password"
 
       val response = //#auth-request
-      ws.url(url).withAuth(user, password, WSAuthScheme.BASIC).get()
+        ws.url(url).withAuth(user, password, WSAuthScheme.BASIC).get()
       //#auth-request
 
       await(response).status must_== 200
@@ -128,7 +128,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
     "allow following redirects" in withSimpleServer { ws =>
       val response = //#redirects
-      ws.url(url).withFollowRedirects(true).get()
+        ws.url(url).withFollowRedirects(true).get()
       //#redirects
 
       await(response).status must_== 200
@@ -136,7 +136,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
     "allow setting a query string" in withSimpleServer { ws =>
       val response = //#query-string
-      ws.url(url).withQueryString("paramKey" -> "paramValue").get()
+        ws.url(url).withQueryString("paramKey" -> "paramValue").get()
       //#query-string
 
       await(response).status must_== 200
@@ -144,7 +144,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
     "allow setting headers" in withSimpleServer { ws =>
       val response = //#headers
-      ws.url(url).withHeaders("headerKey" -> "headerValue").get()
+        ws.url(url).withHeaders("headerKey" -> "headerValue").get()
       //#headers
 
       await(response).status must_== 200
@@ -153,9 +153,9 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
     "allow setting the content type" in withSimpleServer { ws =>
       val xmlString = "<foo></foo>"
       val response = //#content-type
-      ws.url(url)
-        .withHeaders("Content-Type" -> "application/xml")
-        .post(xmlString)
+        ws.url(url)
+          .withHeaders("Content-Type" -> "application/xml")
+          .post(xmlString)
       //#content-type
 
       await(response).status must_== 200
@@ -163,7 +163,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
     "allow setting the virtual host" in withSimpleServer { ws =>
       val response = //#virtual-host
-      ws.url(url).withVirtualHost("192.168.1.1").get()
+        ws.url(url).withVirtualHost("192.168.1.1").get()
       //#virtual-host
 
       await(response).status must_== 200
@@ -171,7 +171,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
     "allow setting the request timeout" in withSimpleServer { ws =>
       val response = //#request-timeout
-      ws.url(url).withRequestTimeout(5000.millis).get()
+        ws.url(url).withRequestTimeout(5000.millis).get()
       //#request-timeout
 
       await(response).status must_== 200
@@ -184,7 +184,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
           Action(BodyParsers.parse.urlFormEncoded)(r => Ok(r.body("key").head))
       } { ws =>
         val response = //#url-encoded
-        ws.url(url).post(Map("key" -> Seq("value")))
+          ws.url(url).post(Map("key" -> Seq("value")))
         //#url-encoded
 
         await(response).body must_== "value"
@@ -197,7 +197,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       } { ws =>
         import play.api.mvc.MultipartFormData._
         val response = //#multipart-encoded
-        ws.url(url).post(Source.single(DataPart("key", "value")))
+          ws.url(url).post(Source.single(DataPart("key", "value")))
         //#multipart-encoded
 
         await(response).body must_== "value"

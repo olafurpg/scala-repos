@@ -108,7 +108,8 @@ trait ProvenanceChecker extends parser.AST with Binder {
       if (values.isEmpty) {
         (ValueProvenance, (Set(), Set()))
       } else {
-        val provenances: Vector[(Provenance, Set[ProvConstraint], Set[Error])] =
+        val provenances
+          : Vector[(Provenance, Set[ProvConstraint], Set[Error])] =
           values map { expr =>
             (expr.provenance, Set[ProvConstraint](), Set[Error]())
           }

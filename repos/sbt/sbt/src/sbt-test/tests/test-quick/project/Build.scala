@@ -8,8 +8,8 @@ object B extends Build {
     "root",
     file("."),
     settings = defaultSettings ++ Seq(
-        libraryDependencies +=
-          "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-        parallelExecution in test := false
-      ))
+      libraryDependencies +=
+        "org.scalatest" %% "scalatest" % "1.9.1" % "test",
+      parallelExecution in test := false
+    ))
 }

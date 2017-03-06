@@ -95,7 +95,7 @@ trait IssuesControllerBase extends ControllerBase {
             getIssueLabels(owner, name, issueId.toInt),
             (getCollaborators(owner, name) :::
               (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-               else List(owner))).sorted,
+             else List(owner))).sorted,
             getMilestonesWithIssueCount(owner, name),
             getLabels(owner, name),
             hasWritePermission(owner, name, context.loginAccount),
@@ -111,7 +111,7 @@ trait IssuesControllerBase extends ControllerBase {
         html.create(
           (getCollaborators(owner, name) :::
             (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-             else List(owner))).sorted,
+           else List(owner))).sorted,
           getMilestones(owner, name),
           getLabels(owner, name),
           hasWritePermission(owner, name, context.loginAccount),

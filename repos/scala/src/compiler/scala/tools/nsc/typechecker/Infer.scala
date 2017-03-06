@@ -568,7 +568,7 @@ trait Infer extends Checkable { self: Analyzer =>
             &&
               (restpe.isWildcard ||
                 !varianceInType(restpe)(tparam).isPositive) // don't retract covariant occurrences
-          )
+        )
 
         buf +=
           ((tparam,
@@ -703,11 +703,12 @@ trait Infer extends Checkable { self: Analyzer =>
       case OverloadedType(pre, alts) =>
         // followApply may return an OverloadedType (tpe is a value type with multiple `apply` methods)
         alts exists
-          (alt =>
-             isApplicableBasedOnArity(pre memberType alt,
-                                      argsCount,
-                                      varargsStar,
-                                      tuplingAllowed))
+          (
+              alt =>
+                isApplicableBasedOnArity(pre memberType alt,
+                                         argsCount,
+                                         varargsStar,
+                                         tuplingAllowed))
       case _ =>
         val paramsCount = tpe.params.length
         // simpleMatch implies we're not using defaults
@@ -927,7 +928,7 @@ trait Infer extends Checkable { self: Analyzer =>
         case OverloadedType(pre, alts) =>
           alts exists
             (alt =>
-               isApplicable(undetparams, pre memberType alt, argtpes0, pt))
+              isApplicable(undetparams, pre memberType alt, argtpes0, pt))
         case ExistentialType(_, qtpe) =>
           isApplicable(undetparams, qtpe, argtpes0, pt)
         case mt @ MethodType(_, _) =>
@@ -1635,10 +1636,11 @@ trait Infer extends Checkable { self: Analyzer =>
         case Nil => Nil
         case names =>
           eligible filter
-            (m =>
-               names forall
-                 (name =>
-                    m.info.params exists (p => paramMatchesName(p, name))))
+            (
+                m =>
+                  names forall
+                    (name =>
+                      m.info.params exists (p => paramMatchesName(p, name))))
       }
       if (eligible.isEmpty || eligible.tail.isEmpty) eligible
       else
@@ -1652,10 +1654,10 @@ trait Infer extends Checkable { self: Analyzer =>
             // TODO: should we really allow tupling here?? (If we don't, this is the only call-site with `tuplingAllowed = true`)
             eligible filter
               (alt =>
-                 isApplicableBasedOnArity(alt.tpe,
-                                          argtpes.length,
-                                          varargsStar,
-                                          tuplingAllowed = true))
+                isApplicableBasedOnArity(alt.tpe,
+                                         argtpes.length,
+                                         varargsStar,
+                                         tuplingAllowed = true))
         }
     }
 

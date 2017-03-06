@@ -66,17 +66,17 @@ object StyleConverter {
       enumClass: Class[E]): StyleConverter[String, _ <: Enum[_]] =
     new StyleConverter(jfxcss.StyleConverter.getEnumConverter(enumClass))
 
-  def fontConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]],
-                                    javafx.scene.text.Font] =
+  def fontConverter
+    : StyleConverter[Array[jfxcss.ParsedValue[_, _]], javafx.scene.text.Font] =
     new StyleConverter(jfxcss.StyleConverter.getFontConverter)
 
-  def insetsConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]],
-                                      javafx.geometry.Insets] =
+  def insetsConverter
+    : StyleConverter[Array[jfxcss.ParsedValue[_, _]], javafx.geometry.Insets] =
     new StyleConverter(jfxcss.StyleConverter.getInsetsConverter)
 
-  def paintConverter: StyleConverter[
-    jfxcss.ParsedValue[_, javafx.scene.paint.Paint],
-    javafx.scene.paint.Paint] =
+  def paintConverter
+    : StyleConverter[jfxcss.ParsedValue[_, javafx.scene.paint.Paint],
+                     javafx.scene.paint.Paint] =
     new StyleConverter(jfxcss.StyleConverter.getPaintConverter)
 
   /**

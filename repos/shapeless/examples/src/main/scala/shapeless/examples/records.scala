@@ -42,7 +42,7 @@ object RecordExamples extends App {
   val book =
     ("author" ->> "Benjamin Pierce") ::
       ("title" ->> "Types and Programming Languages") :: ("id" ->> 262162091) ::
-        ("price" ->> 44.11) :: HNil
+    ("price" ->> 44.11) :: HNil
 
   printBook(book)
 

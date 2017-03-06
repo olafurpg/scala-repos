@@ -48,9 +48,11 @@ class MarathonHealthCheckManager @Inject()(
   protected[this] case class ActiveHealthCheck(healthCheck: HealthCheck,
                                                actor: ActorRef)
 
-  protected[this] var appHealthChecks: RWLock[
-    mutable.Map[PathId, Map[Timestamp, Set[ActiveHealthCheck]]]] = RWLock(
-    mutable.Map.empty.withDefaultValue(Map.empty.withDefaultValue(Set.empty)))
+  protected[this] var appHealthChecks
+    : RWLock[mutable.Map[PathId, Map[Timestamp, Set[ActiveHealthCheck]]]] =
+    RWLock(
+      mutable.Map.empty
+        .withDefaultValue(Map.empty.withDefaultValue(Set.empty)))
 
   override def list(appId: PathId): Set[HealthCheck] =
     listActive(appId).map(_.healthCheck)

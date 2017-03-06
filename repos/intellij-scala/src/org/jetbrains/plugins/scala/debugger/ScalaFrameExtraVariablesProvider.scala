@@ -227,11 +227,11 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
           }
         }
         scopes.foreach { scope =>
-          helper.processElementsWithWord(
-            processor,
-            scope,
-            named.name,
-            UsageSearchContext.IN_CODE, /*caseSensitive =*/ true)
+          helper.processElementsWithWord(processor,
+                                         scope,
+                                         named.name,
+                                         UsageSearchContext.IN_CODE,
+                                         /*caseSensitive =*/ true)
         }
         !used
       }

@@ -215,8 +215,8 @@ class DefaultEventHandler[K, V](
         // postpone the failure until the send operation, so that requests for other brokers are handled correctly
         val leaderBrokerId = brokerPartition.leaderBrokerIdOpt.getOrElse(-1)
 
-        var dataPerBroker: HashMap[TopicAndPartition,
-                                   Seq[KeyedMessage[K, Message]]] = null
+        var dataPerBroker
+          : HashMap[TopicAndPartition, Seq[KeyedMessage[K, Message]]] = null
         ret.get(leaderBrokerId) match {
           case Some(element) =>
             dataPerBroker = element.asInstanceOf[

@@ -139,7 +139,7 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
 
     val producer2 = TestUtils.createProducer[String, String](
       brokerList = "localhost:80," +
-          TestUtils.getBrokerListStrFromServers(Seq(server1)),
+        TestUtils.getBrokerListStrFromServers(Seq(server1)),
       encoder = classOf[StringEncoder].getName,
       keyEncoder = classOf[StringEncoder].getName
     )

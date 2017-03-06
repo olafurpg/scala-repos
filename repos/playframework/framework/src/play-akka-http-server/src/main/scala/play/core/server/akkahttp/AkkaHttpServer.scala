@@ -59,11 +59,11 @@ class AkkaHttpServer(config: ServerConfig,
     // Listen for incoming connections and handle them with the `handleRequest` method.
 
     // TODO: pass in Inet.SocketOption, ServerSettings and LoggerAdapter params?
-    val serverSource: Source[Http.IncomingConnection,
-                             Future[Http.ServerBinding]] = Http().bind(
-      interface = config.address,
-      port = port,
-      connectionContext = connectionContext)
+    val serverSource
+      : Source[Http.IncomingConnection, Future[Http.ServerBinding]] =
+      Http().bind(interface = config.address,
+                  port = port,
+                  connectionContext = connectionContext)
 
     val connectionSink: Sink[Http.IncomingConnection, _] = Sink.foreach {
       connection: Http.IncomingConnection =>

@@ -196,7 +196,8 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
   def currentRecord: UnsafeRow = unsafeProjection(currentRow)
 
   // Converters for each field.
-  private val fieldConverters: Array[Converter with HasParentContainerUpdater] = {
+  private val fieldConverters
+    : Array[Converter with HasParentContainerUpdater] = {
     parquetType.getFields.asScala
       .zip(catalystType)
       .zipWithIndex

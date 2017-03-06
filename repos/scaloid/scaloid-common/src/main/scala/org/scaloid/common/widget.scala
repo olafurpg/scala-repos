@@ -3462,8 +3462,9 @@ trait TraitShareActionProvider[This <: android.widget.ShareActionProvider]
   }
 
   @inline
-  def onShareTargetSelected(f: (android.widget.ShareActionProvider,
-                                android.content.Intent) => Boolean): This = {
+  def onShareTargetSelected(
+      f: (android.widget.ShareActionProvider,
+          android.content.Intent) => Boolean): This = {
     basis.setOnShareTargetSelectedListener(
       new android.widget.ShareActionProvider.OnShareTargetSelectedListener {
         def onShareTargetSelected(p1: android.widget.ShareActionProvider,
@@ -3896,8 +3897,12 @@ trait TraitExpandableListView[This <: android.widget.ExpandableListView]
   @inline def selectedPosition = basis.getSelectedPosition
 
   @inline
-  def onChildClick(f: (android.widget.ExpandableListView, android.view.View,
-                       Int, Int, Long) => Boolean): This = {
+  def onChildClick(
+      f: (android.widget.ExpandableListView,
+          android.view.View,
+          Int,
+          Int,
+          Long) => Boolean): This = {
     basis.setOnChildClickListener(
       new android.widget.ExpandableListView.OnChildClickListener {
         def onChildClick(p1: android.widget.ExpandableListView,
@@ -3922,8 +3927,11 @@ trait TraitExpandableListView[This <: android.widget.ExpandableListView]
   }
 
   @inline
-  def onGroupClick(f: (android.widget.ExpandableListView, android.view.View,
-                       Int, Long) => Boolean): This = {
+  def onGroupClick(
+      f: (android.widget.ExpandableListView,
+          android.view.View,
+          Int,
+          Long) => Boolean): This = {
     basis.setOnGroupClickListener(
       new android.widget.ExpandableListView.OnGroupClickListener {
         def onGroupClick(p1: android.widget.ExpandableListView,
@@ -8067,8 +8075,11 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
   }
 
   @inline
-  def onItemLongClick(f: (android.widget.AdapterView[_], android.view.View,
-                          Int, Long) => Boolean): This = {
+  def onItemLongClick(
+      f: (android.widget.AdapterView[_],
+          android.view.View,
+          Int,
+          Long) => Boolean): This = {
     basis.setOnItemLongClickListener(
       new android.widget.AdapterView.OnItemLongClickListener {
         def onItemLongClick(p1: android.widget.AdapterView[_],
@@ -13196,8 +13207,11 @@ trait TraitWebView[This <: android.webkit.WebView]
 
   @inline
   def onDownloadStart[U](
-      f: (java.lang.String, java.lang.String, java.lang.String,
-          java.lang.String, Long) => U): This = {
+      f: (java.lang.String,
+          java.lang.String,
+          java.lang.String,
+          java.lang.String,
+          Long) => U): This = {
     basis.setDownloadListener(new android.webkit.DownloadListener {
       def onDownloadStart(p1: java.lang.String,
                           p2: java.lang.String,

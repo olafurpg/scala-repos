@@ -135,7 +135,7 @@ object Auth extends LilaController {
               case true =>
                 lila.mon.user.register.website()
                 val email = env.emailAddress
-                    .validate(data.email) err s"Invalid email ${data.email}"
+                  .validate(data.email) err s"Invalid email ${data.email}"
                 UserRepo
                   .create(data.username,
                           data.password,

@@ -170,8 +170,8 @@ object CreateEntityQuickFix {
           case None =>
             val parentBl = PsiTreeUtil.getParentOfType(
               th,
-              classOf[ScExtendsBlock], /*strict = */ true, /*stopAt = */ classOf[
-                ScTemplateDefinition])
+              classOf[ScExtendsBlock], /*strict = */ true,
+              /*stopAt = */ classOf[ScTemplateDefinition])
             if (parentBl != null) Success(parentBl)
             else
               Failure(

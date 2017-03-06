@@ -96,7 +96,7 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |<caret>
         |}"""
     val result = //no action
-    """class A extends JavaClass {
+      """class A extends JavaClass {
         |
         |}"""
     runTest(javaText, scalaText, result)

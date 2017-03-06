@@ -542,7 +542,7 @@ abstract class ClassfileParser {
     while (sym.isClass && !sym.isModuleClass) {
       for (t <- sym.tpe.typeArgs)
         classTParams = classTParams +
-            (t.typeSymbol.name -> t.typeSymbol)
+          (t.typeSymbol.name -> t.typeSymbol)
 
       sym = sym.owner
     }
@@ -1234,8 +1234,8 @@ abstract class ClassfileParser {
     def add(entry: InnerClassEntry): Unit = {
       inners get entry.externalName foreach
         (existing =>
-           devWarning(
-             s"Overwriting inner class entry! Was $existing, now $entry"))
+          devWarning(
+            s"Overwriting inner class entry! Was $existing, now $entry"))
       inners(entry.externalName) = entry
     }
     def innerSymbol(externalName: Name): Symbol =

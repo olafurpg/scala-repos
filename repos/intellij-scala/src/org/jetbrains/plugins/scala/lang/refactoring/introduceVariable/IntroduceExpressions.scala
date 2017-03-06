@@ -132,18 +132,18 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
                 .getInstance()
                 .INTRODUCE_VARIABLE_EXPLICIT_TYPE)
             val selectedType = if (needExplicitType) types(0) else null
-            val introduceRunnable: Computable[
-              SmartPsiElementPointer[PsiElement]] = introduceVariable(
-              startOffset,
-              endOffset,
-              file,
-              editor,
-              expr,
-              occurrences,
-              suggestedNames(0),
-              selectedType,
-              replaceAll,
-              asVar)
+            val introduceRunnable
+              : Computable[SmartPsiElementPointer[PsiElement]] =
+              introduceVariable(startOffset,
+                                endOffset,
+                                file,
+                                editor,
+                                expr,
+                                occurrences,
+                                suggestedNames(0),
+                                selectedType,
+                                replaceAll,
+                                asVar)
             CommandProcessor.getInstance.executeCommand(
               project,
               new Runnable {

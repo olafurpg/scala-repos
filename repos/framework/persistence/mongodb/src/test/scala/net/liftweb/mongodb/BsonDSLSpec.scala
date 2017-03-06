@@ -73,8 +73,8 @@ object BsonDSLSpec extends Specification {
         Pattern.compile(
           "^Mongo1",
           Pattern.MULTILINE | Pattern.CASE_INSENSITIVE) :: Pattern.compile(
-          "^Mongo2",
-          Pattern.CASE_INSENSITIVE) :: Pattern.compile("^Mongo3") :: Nil
+        "^Mongo2",
+        Pattern.CASE_INSENSITIVE) :: Pattern.compile("^Mongo3") :: Nil
       val qry: JObject = ("ptrns" -> ptrnList)
       val dbo: DBObject = JObjectParser.parse(qry)(DefaultFormats)
       val ptrnList2: List[Pattern] = dbo

@@ -1002,13 +1002,13 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
 
     val allJs =
       globalJs ::: {
-        postPageJs ::: cometJs ::: _jsToAppend.is.toList match {
-          case Nil =>
-            Nil
-          case loadJs =>
-            List(OnLoad(loadJs))
-        }
+      postPageJs ::: cometJs ::: _jsToAppend.is.toList match {
+        case Nil =>
+          Nil
+        case loadJs =>
+          List(OnLoad(loadJs))
       }
+    }
 
     if (clearAfterReading) {
       _globalJsToAppend(ListBuffer())
@@ -1554,8 +1554,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   private[http] def unsetSnippetForClass(cls: String): Unit =
     _statefulSnip.set(_statefulSnip.is - cls)
 
-  private var _queryAnalyzer: List[
-    (Box[Req], Long, List[(String, Long)]) => Any] = Nil
+  private var _queryAnalyzer
+    : List[(Box[Req], Long, List[(String, Long)]) => Any] = Nil
 
   /**
     * Add a query analyzer (passed queries for analysis or logging). The analyzer

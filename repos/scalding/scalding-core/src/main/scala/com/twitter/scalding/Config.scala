@@ -379,8 +379,8 @@ trait Config extends Serializable {
   def clearFlowStepStrategies: Config =
     this.-(Config.FlowStepStrategies)
 
-  def getFlowStepStrategies: List[
-    Try[(Mode, Config) => FlowStepStrategy[JobConf]]] =
+  def getFlowStepStrategies
+    : List[Try[(Mode, Config) => FlowStepStrategy[JobConf]]] =
     get(Config.FlowStepStrategies).toIterable
       .flatMap(s => StringUtility.fastSplit(s, ","))
       .map(flowStepStrategiesSerializer.invert(_))

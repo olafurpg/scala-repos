@@ -34,11 +34,11 @@ class ConstantFoldingSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("AnalysisNodes", Once, EliminateSubqueryAliases) :: Batch(
-        "ConstantFolding",
-        Once,
-        OptimizeIn,
-        ConstantFolding,
-        BooleanSimplification) :: Nil
+      "ConstantFolding",
+      Once,
+      OptimizeIn,
+      ConstantFolding,
+      BooleanSimplification) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

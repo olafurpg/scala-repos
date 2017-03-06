@@ -82,8 +82,8 @@ trait Consumer extends Actor with CamelSupport {
     * return a custom route definition handler. The [[akka.dispatch.Mapper]] is not allowed to close over 'this', meaning it is
     * not allowed to refer to the actor instance itself, since that can easily cause concurrent shared state issues.
     */
-  def getRouteDefinitionHandler: Mapper[RouteDefinition,
-                                        ProcessorDefinition[_]] =
+  def getRouteDefinitionHandler
+    : Mapper[RouteDefinition, ProcessorDefinition[_]] =
     identityRouteMapper
 }
 

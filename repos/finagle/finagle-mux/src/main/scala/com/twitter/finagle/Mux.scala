@@ -75,7 +75,7 @@ object Mux
   case class Client(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Client.stack,
       params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
-          "mux"))
+        "mux"))
       extends StdStackClient[mux.Request, mux.Response, Client]
       with WithDefaultLoadBalancer[Client] {
 
@@ -137,7 +137,7 @@ object Mux
   case class Server(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Server.stack,
       params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
-          "mux"))
+        "mux"))
       extends StdStackServer[mux.Request, mux.Response, Server] {
 
     protected def copy1(

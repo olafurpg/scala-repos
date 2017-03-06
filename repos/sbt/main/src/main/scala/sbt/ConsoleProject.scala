@@ -22,7 +22,7 @@ object ConsoleProject {
     val cpImports = new Imports(extracted, state)
     val bindings =
       ("currentState" -> state) :: ("extracted" -> extracted) ::
-        ("cpHelpers" -> cpImports) :: Nil
+      ("cpHelpers" -> cpImports) :: Nil
     val unit = extracted.currentUnit
     val localOnly = false
     val lock = None

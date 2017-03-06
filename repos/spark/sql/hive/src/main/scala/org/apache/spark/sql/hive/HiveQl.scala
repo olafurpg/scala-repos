@@ -567,7 +567,7 @@ private[hive] class HiveQl(conf: ParserConf)
               case Token("TOK_TABLEPROPERTIES", list :: Nil) :: Nil =>
                 tableDesc = tableDesc.withNewStorage(
                   serdeProperties = tableDesc.storage.serdeProperties ++ getProperties(
-                      list))
+                    list))
               case _ =>
             }
 
@@ -617,8 +617,8 @@ private[hive] class HiveQl(conf: ParserConf)
                        // TODO: Need to support other types of (in/out)put
                        Token(script, Nil) :: Token("TOK_SERDE",
                                                    outputSerdeClause) :: Token(
-                         "TOK_RECORDREADER",
-                         readerClause) :: outputClause) :: Nil) =>
+                       "TOK_RECORDREADER",
+                       readerClause) :: outputClause) :: Nil) =>
       val (output, schemaLess) = outputClause match {
         case Token("TOK_ALIASLIST", aliases) :: Nil =>
           (aliases.map {

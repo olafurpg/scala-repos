@@ -114,8 +114,8 @@ class CounterOps_IntTest
   val space = Counter.space[Int, Int]
 
   val N = 30
-  def genTriple: Arbitrary[
-    (Counter[Int, Int], Counter[Int, Int], Counter[Int, Int])] = {
+  def genTriple
+    : Arbitrary[(Counter[Int, Int], Counter[Int, Int], Counter[Int, Int])] = {
     implicitly
   }
 

@@ -301,11 +301,11 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     * this node.  When `rule` does not apply to a given node it is left unchanged.
     * @param rule the function used to transform this nodes children
     */
-  protected def transformChildren(rule: PartialFunction[BaseType, BaseType],
-                                  nextOperation: (BaseType, PartialFunction[
-                                                    BaseType,
-                                                    BaseType]) => BaseType)
-    : BaseType = {
+  protected def transformChildren(
+      rule: PartialFunction[BaseType, BaseType],
+      nextOperation: (
+          BaseType,
+          PartialFunction[BaseType, BaseType]) => BaseType): BaseType = {
     var changed = false
     val newArgs = productIterator.map {
       case arg: TreeNode[_] if containsChild(arg) =>

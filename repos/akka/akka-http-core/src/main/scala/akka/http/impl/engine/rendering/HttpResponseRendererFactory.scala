@@ -57,9 +57,8 @@ private[http] class HttpResponseRendererFactory(
   // split out so we can stabilize by overriding in tests
   protected def currentTimeMillis(): Long = System.currentTimeMillis()
 
-  def renderer: Flow[ResponseRenderingContext,
-                     ResponseRenderingOutput,
-                     NotUsed] =
+  def renderer
+    : Flow[ResponseRenderingContext, ResponseRenderingOutput, NotUsed] =
     Flow.fromGraph(HttpResponseRenderer)
 
   object HttpResponseRenderer

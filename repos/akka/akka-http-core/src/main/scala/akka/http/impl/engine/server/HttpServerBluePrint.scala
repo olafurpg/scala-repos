@@ -205,8 +205,9 @@ private[http] object HttpServerBluePrint {
             case StreamedEntityCreator(creator) ⇒ streamRequestEntity(creator)
           }
 
-        def streamRequestEntity(creator: (Source[ParserOutput.RequestOutput,
-                                                 NotUsed]) => RequestEntity)
+        def streamRequestEntity(
+            creator: (
+                Source[ParserOutput.RequestOutput, NotUsed]) => RequestEntity)
           : RequestEntity = {
           // stream incoming chunks into the request entity until we reach the end of it
           // and then toggle back to "idle"
@@ -425,7 +426,7 @@ private[http] object HttpServerBluePrint {
       HttpResponse(
         StatusCodes.ServiceUnavailable,
         entity = "The server was not able " +
-            "to produce a timely response to your request.\r\nPlease try again in a short while!"
+          "to produce a timely response to your request.\r\nPlease try again in a short while!"
       )
     //#
 

@@ -17,6 +17,7 @@ class ScalaSpellcheckingStrategy extends SpellcheckingStrategy {
     super.getTokenizer(element)
   }
 
-  private final val myLiteralExpressionTokenizer: ScLiteralExpressionTokenizer =
+  private final val myLiteralExpressionTokenizer
+    : ScLiteralExpressionTokenizer =
     new ScLiteralExpressionTokenizer
 }

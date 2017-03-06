@@ -50,6 +50,7 @@ class JavaJournalPerfSpec(config: Config) extends JournalPerfSpec(config) {
       System.out.println(message)
   }
 
-  override protected def supportsRejectingNonSerializableObjects: CapabilityFlag =
+  override protected def supportsRejectingNonSerializableObjects
+    : CapabilityFlag =
     CapabilityFlag.on
 }

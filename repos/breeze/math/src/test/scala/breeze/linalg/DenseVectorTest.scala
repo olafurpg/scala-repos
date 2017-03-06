@@ -574,8 +574,8 @@ class DenseVectorOps_IntTest
   val space = DenseVector.space[Int]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-    (DenseVector[Int], DenseVector[Int], DenseVector[Int])] = {
+  implicit def genTriple
+    : Arbitrary[(DenseVector[Int], DenseVector[Int], DenseVector[Int])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Int].map { _ % 1000 }

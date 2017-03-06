@@ -77,7 +77,8 @@ trait PsiClassFake extends PsiClass with PsiReferenceList {
   def findMethodsAndTheirSubstitutors: List[Pair[PsiMethod, PsiSubstitutor]] =
     Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
 
-  def getAllMethodsAndTheirSubstitutors: List[Pair[PsiMethod, PsiSubstitutor]] =
+  def getAllMethodsAndTheirSubstitutors
+    : List[Pair[PsiMethod, PsiSubstitutor]] =
     Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
 
   def findInnerClassByName(name: String, checkBases: Boolean): PsiClass = null

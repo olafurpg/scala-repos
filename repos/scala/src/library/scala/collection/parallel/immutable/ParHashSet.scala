@@ -47,8 +47,9 @@ class ParHashSet[T] private[immutable] (private[this] val trie: HashSet[T])
 
   def this() = this(HashSet.empty[T])
 
-  override def companion: GenericCompanion[ParHashSet] with GenericParCompanion[
-    ParHashSet] = ParHashSet
+  override def companion
+    : GenericCompanion[ParHashSet] with GenericParCompanion[ParHashSet] =
+    ParHashSet
 
   override def empty: ParHashSet[T] = new ParHashSet[T]
 

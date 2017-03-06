@@ -29,11 +29,12 @@ class SubSource[+Out, +Mat](
                                scaladsl.RunnableGraph[Mat]]) {
 
   /** Converts this Flow to its Scala DSL counterpart */
-  def asScala: scaladsl.SubFlow[
-    Out,
-    Mat,
-    scaladsl.Source[Out, Mat]#Repr,
-    scaladsl.RunnableGraph[Mat]] @uncheckedVariance = delegate
+  def asScala
+    : scaladsl.SubFlow[Out,
+                       Mat,
+                       scaladsl.Source[Out, Mat]#Repr,
+                       scaladsl.RunnableGraph[Mat]] @uncheckedVariance =
+    delegate
 
   /**
     * Flatten the sub-flows back into the super-source by performing a merge

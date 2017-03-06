@@ -102,8 +102,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
   private[clustering] var docConcentration: Double = 0
   private[clustering] var topicConcentration: Double = 0
   private[clustering] var checkpointInterval: Int = 10
-  private var graphCheckpointer: PeriodicGraphCheckpointer[TopicCounts,
-                                                           TokenCount] = null
+  private var graphCheckpointer
+    : PeriodicGraphCheckpointer[TopicCounts, TokenCount] = null
 
   /**
     * Compute bipartite term/doc graph.
@@ -187,9 +187,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
     val alpha = docConcentration
 
     val N_k = globalTopicTotals
-    val sendMsg: EdgeContext[TopicCounts,
-                             TokenCount,
-                             (Boolean, TopicCounts)] => Unit =
+    val sendMsg
+      : EdgeContext[TopicCounts, TokenCount, (Boolean, TopicCounts)] => Unit =
       (edgeContext) => {
         // Compute N_{wj} gamma_{wjk}
         val N_wj = edgeContext.attr
@@ -207,8 +206,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
       }
     // The Boolean is a hack to detect whether we could modify the values in-place.
     // TODO: Add zero/seqOp/combOp option to aggregateMessages. (SPARK-5438)
-    val mergeMsg: ((Boolean, TopicCounts), (Boolean, TopicCounts)) => (Boolean,
-                                                                       TopicCounts) =
+    val mergeMsg: ((Boolean, TopicCounts),
+                   (Boolean, TopicCounts)) => (Boolean, TopicCounts) =
       (m0, m1) => {
         val sum =
           if (m0._1) {

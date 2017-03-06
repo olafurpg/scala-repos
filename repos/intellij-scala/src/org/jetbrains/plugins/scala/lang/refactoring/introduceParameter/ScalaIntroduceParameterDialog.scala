@@ -224,7 +224,8 @@ class ScalaIntroduceParameterDialog(project: Project,
     panel
   }
 
-  private def introducedParamTableItem: Option[ScalaParameterTableModelItem] = {
+  private def introducedParamTableItem
+    : Option[ScalaParameterTableModelItem] = {
     parameterItems.find(_.parameter.isIntroducedParameter)
   }
 

@@ -2,9 +2,10 @@ package scalaz
 package std
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[
-    Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[
-    Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream]
+  implicit val streamInstance
+    : Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[
+      Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[
+      Stream] = new Traverse[Stream] with MonadPlus[Stream]
   with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream]
   with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init

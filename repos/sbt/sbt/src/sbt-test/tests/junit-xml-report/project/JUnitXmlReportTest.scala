@@ -18,11 +18,11 @@ object JUnitXmlReportTest extends Build {
     "root",
     file("."),
     settings = defaultSettings ++ Seq(
-        scalaVersion := "2.9.2",
-        libraryDependencies +=
-          "com.novocode" % "junit-interface" % "0.10" % "test",
-        // TODO use matchers instead of sys.error
-        checkReport := {
+      scalaVersion := "2.9.2",
+      libraryDependencies +=
+        "com.novocode" % "junit-interface" % "0.10" % "test",
+      // TODO use matchers instead of sys.error
+      checkReport := {
         val oneSecondReport = XML.loadFile(oneSecondReportFile)
         if (oneSecondReport.label != "testsuite")
           sys.error("Report should have a root <testsuite> element.")
@@ -43,12 +43,12 @@ object JUnitXmlReportTest extends Build {
 
         // TODO check console output is in the report
       },
-        checkNoReport := {
+      checkNoReport := {
         if (file(oneSecondReportFile).exists())
           sys.error(oneSecondReportFile + " should not exist")
         if (file(failingReportFile).exists())
           sys.error(failingReportFile + " should not exist")
       }
-      )
+    )
   )
 }

@@ -807,7 +807,8 @@ object PathBindable {
   /**
     * This is used by the Java RouterBuilder DSL.
     */
-  private[play] lazy val pathBindableRegister: Map[Class[_], PathBindable[_]] = {
+  private[play] lazy val pathBindableRegister
+    : Map[Class[_], PathBindable[_]] = {
     def register[T](implicit pb: PathBindable[T], ct: ClassTag[T]) =
       ct.runtimeClass -> pb
     Map(

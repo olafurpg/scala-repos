@@ -301,7 +301,8 @@ private class ReplicaBuffer(
                                         10000,
                                         100000,
                                         ReplicaVerificationTool.clientId)
-      val initialOffsetMap: Map[TopicAndPartition, PartitionOffsetRequestInfo] =
+      val initialOffsetMap
+        : Map[TopicAndPartition, PartitionOffsetRequestInfo] =
         topicAndPartitions
           .map(topicAndPartition =>
             topicAndPartition -> PartitionOffsetRequestInfo(initialOffsetTime,

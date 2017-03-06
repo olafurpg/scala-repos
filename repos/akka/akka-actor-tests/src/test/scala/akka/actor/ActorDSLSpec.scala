@@ -42,8 +42,8 @@ class ActorDSLSpec extends AkkaSpec {
     "support watch" in {
       //#watch
       val target = // some actor
-      //#watch
-      actor(new Act {})
+        //#watch
+        actor(new Act {})
       //#watch
       val i = inbox()
       i watch target

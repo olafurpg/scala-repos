@@ -54,8 +54,10 @@ trait DAG extends Instructions {
     import dag._
 
     val adjustMemotable = mutable.Map[(Int, DepGraph), DepGraph]()
-    implicit val M: Traverse[({ type λ[α] = Either[StackError, α] })#λ] with Monad[
-      ({ type λ[α] = Either[StackError, α] })#λ] = eitherMonad[StackError]
+    implicit val M
+      : Traverse[({ type λ[α] = Either[StackError, α] })#λ] with Monad[({
+        type λ[α] = Either[StackError, α]
+      })#λ] = eitherMonad[StackError]
 
     def loop(loc: Line,
              roots: List[Either[BucketSpec, DepGraph]],
@@ -541,7 +543,8 @@ trait DAG extends Instructions {
     /** The set of available value-sorted keys. */
     def valueKeys: Set[Int]
 
-    def isSingleton: Boolean //true implies that the node is a singleton; false doesn't imply anything
+    def isSingleton
+      : Boolean //true implies that the node is a singleton; false doesn't imply anything
 
     def containsSplitArg: Boolean
 

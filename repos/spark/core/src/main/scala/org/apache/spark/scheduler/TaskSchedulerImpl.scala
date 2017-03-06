@@ -418,7 +418,8 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       accumUpdates: Array[(Long, Seq[AccumulableInfo])],
       blockManagerId: BlockManagerId): Boolean = {
     // (taskId, stageId, stageAttemptId, accumUpdates)
-    val accumUpdatesWithTaskIds: Array[(Long, Int, Int, Seq[AccumulableInfo])] =
+    val accumUpdatesWithTaskIds
+      : Array[(Long, Int, Int, Seq[AccumulableInfo])] =
       synchronized {
         accumUpdates.flatMap {
           case (id, updates) =>

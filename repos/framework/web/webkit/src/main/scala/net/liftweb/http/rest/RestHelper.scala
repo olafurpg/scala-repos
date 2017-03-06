@@ -403,9 +403,8 @@ trait RestHelper extends LiftRules.DispatchPF {
   /**
     * The default way to convert a JsonXmlAble into JSON or XML
     */
-  protected implicit lazy val convertJsonXmlAble: PartialFunction[
-    (JsonXmlSelect, JsonXmlAble, Req),
-    LiftResponse] = {
+  protected implicit lazy val convertJsonXmlAble
+    : PartialFunction[(JsonXmlSelect, JsonXmlAble, Req), LiftResponse] = {
     case (JsonSelect, obj, _) => Extraction.decompose(obj)
 
     case (XmlSelect, obj, _) =>
@@ -436,9 +435,8 @@ trait RestHelper extends LiftRules.DispatchPF {
     * An implicit conversion that converts AutoJsonXmlAble into
     * JSON or XML
     */
-  protected implicit lazy val convertAutoJsonXmlAble: PartialFunction[
-    (JsonXmlSelect, AutoJsonXmlAble, Req),
-    LiftResponse] = {
+  protected implicit lazy val convertAutoJsonXmlAble
+    : PartialFunction[(JsonXmlSelect, AutoJsonXmlAble, Req), LiftResponse] = {
     case (JsonSelect, AutoJsonXmlAble(obj), _) =>
       Extraction.decompose(obj)
     case (XmlSelect, AutoJsonXmlAble(obj), _) =>

@@ -1034,8 +1034,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
               // is only used for comparing age of current cluster members (Member.isOlderThan)
               val youngest = localGossip.youngestMember
               upNumber = 1 +
-                  (if (youngest.upNumber == Int.MaxValue) 0
-                   else youngest.upNumber)
+                (if (youngest.upNumber == Int.MaxValue) 0
+                 else youngest.upNumber)
             } else {
               upNumber += 1
             }

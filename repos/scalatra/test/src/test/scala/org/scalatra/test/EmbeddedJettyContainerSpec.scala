@@ -18,7 +18,7 @@ class EmbeddedJettyContainerSpec
     new HttpServlet {
       override def doGet(req: HttpServletRequest, res: HttpServletResponse) = {
         val hasDefault = getServletContext
-            .getNamedDispatcher("default") != null
+          .getNamedDispatcher("default") != null
         res.addHeader("X-Has-Default-Servlet", hasDefault.toString)
         res.getWriter.print("Hello, world")
       }

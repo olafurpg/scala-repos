@@ -577,7 +577,7 @@ abstract class LambdaLift extends InfoTransform {
     val prependFree =
       (!sym.isConstructor // this condition is redundant for now. It will be needed if we remove the second condition in 2.12.x
         && (settings.Ydelambdafy.value == "method" && sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
-      )
+    )
     if (prependFree) free ::: original
     else original ::: free
   }

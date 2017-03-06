@@ -3,8 +3,9 @@ package std
 package math
 
 trait BigInts {
-  implicit val bigIntInstance: Monoid[BigInt] with Enum[BigInt] with Show[
-    BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
+  implicit val bigIntInstance
+    : Monoid[BigInt] with Enum[BigInt] with Show[BigInt] = new Monoid[BigInt]
+  with Enum[BigInt] with Show[BigInt] {
     override def shows(f: BigInt) = f.toString
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2

@@ -1040,9 +1040,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
             (excludedFlags = BridgeAndPrivateFlags,
             requiredFlags = METHOD) filter
             (mem =>
-               mem.isDeferredNotJavaDefault &&
-                 !isUniversalMember(mem)) // TODO: test
-          )
+              mem.isDeferredNotJavaDefault &&
+                !isUniversalMember(mem)) // TODO: test
+        )
 
         // if there is only one, it's monomorphic and has a single argument list
         if (deferredMembers.size == 1 &&
@@ -1904,8 +1904,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       lazy val Scala_Java8_CompatPackage_JFunction =
         (0 to MaxFunctionArity).toArray map
           (i =>
-             getMemberIfDefined(Scala_Java8_CompatPackage.moduleClass,
-                                TypeName("JFunction" + i)))
+            getMemberIfDefined(Scala_Java8_CompatPackage.moduleClass,
+                               TypeName("JFunction" + i)))
     }
   }
 }

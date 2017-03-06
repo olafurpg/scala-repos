@@ -28,8 +28,8 @@ class VectorBuilderTest extends FunSuite with Checkers {
     assert(vb.toHashVector === HashVector[Double](7.0, 1.0, 3.0))
   }
 
-  implicit def genPair: Arbitrary[(VectorBuilder[Double],
-                                   VectorBuilder[Double])] = {
+  implicit def genPair
+    : Arbitrary[(VectorBuilder[Double], VectorBuilder[Double])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Double].map { _ % 1E3 }

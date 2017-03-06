@@ -529,11 +529,11 @@ class Eval(target: Option[File]) {
           }
           messages += (severityName + lineMessage + ": " + message) ::
             (if (pos.isDefined) {
-               pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-                 (" " * (pos.column - 1) + "^") :: Nil
-             } else {
-               Nil
-             })
+             pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
+               (" " * (pos.column - 1) + "^") :: Nil
+           } else {
+             Nil
+           })
         }
 
         def displayPrompt {

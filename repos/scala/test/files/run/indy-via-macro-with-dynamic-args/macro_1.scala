@@ -26,7 +26,7 @@ object Macro {
                               typeOf[java.util.regex.Matcher]))
       val bootstrapArgTrees: List[Tree] =
         Literal(Constant(bootstrapMethod)).setType(NoType) :: bootstrapArgs
-          .asInstanceOf[List[Tree]]
+        .asInstanceOf[List[Tree]]
       val result = ApplyDynamic(
         Ident(dummySymbol).setType(dummySymbol.info),
         bootstrapArgTrees ::: dynArgs.asInstanceOf[List[Tree]])

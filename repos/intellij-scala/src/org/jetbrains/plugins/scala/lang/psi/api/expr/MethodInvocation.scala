@@ -464,11 +464,11 @@ object MethodInvocation {
   def unapply(invocation: MethodInvocation) =
     Some(invocation.getInvokedExpr, invocation.argumentExpressions)
 
-  private val APPLICABILITY_PROBLEMS_VAR_KEY: Key[
-    (Long, Seq[ApplicabilityProblem])] =
+  private val APPLICABILITY_PROBLEMS_VAR_KEY
+    : Key[(Long, Seq[ApplicabilityProblem])] =
     Key.create("applicability.problems.var.key")
-  private val MATCHED_PARAMETERS_VAR_KEY: Key[
-    (Long, Seq[(Parameter, ScExpression)])] =
+  private val MATCHED_PARAMETERS_VAR_KEY
+    : Key[(Long, Seq[(Parameter, ScExpression)])] =
     Key.create("matched.parameter.var.key")
   private val IMPORTS_USED_KEY: Key[(Long, collection.Set[ImportUsed])] =
     Key.create("imports.used.method.invocation.key")

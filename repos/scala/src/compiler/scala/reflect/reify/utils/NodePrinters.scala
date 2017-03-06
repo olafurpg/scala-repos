@@ -75,12 +75,12 @@ trait NodePrinters { self: Utils =>
       rtree = rtree drop 2
       rtree = rtree takeWhile (_ != "    }")
       rtree = rtree map
-          (s0 => {
-           var s = s0
-           mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
-           s = s.replace(nme.MIRROR_PREFIX.toString, "")
-           s.trim
-         })
+        (s0 => {
+          var s = s0
+          mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
+          s = s.replace(nme.MIRROR_PREFIX.toString, "")
+          s.trim
+        })
 
       val printout = scala.collection.mutable.ListBuffer[String]()
       printout += universe.trim

@@ -661,8 +661,8 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
   **/
 trait DenseVector_SpecialOps extends DenseVectorOps { this: DenseVector.type =>
 
-  implicit val canAddIntoF: OpAdd.InPlaceImpl2[DenseVector[Float],
-                                               DenseVector[Float]] = {
+  implicit val canAddIntoF
+    : OpAdd.InPlaceImpl2[DenseVector[Float], DenseVector[Float]] = {
     new OpAdd.InPlaceImpl2[DenseVector[Float], DenseVector[Float]] {
       def apply(a: DenseVector[Float], b: DenseVector[Float]) = {
         canSaxpy(a, 1.0f, b)
@@ -714,8 +714,8 @@ trait DenseVector_SpecialOps extends DenseVectorOps { this: DenseVector.type =>
     BinaryRegistry[Vector[Float], Vector[Float], OpAdd.type, Vector[Float]]]
     .register(canAddF)
 
-  implicit val canSubIntoF: OpSub.InPlaceImpl2[DenseVector[Float],
-                                               DenseVector[Float]] = {
+  implicit val canSubIntoF
+    : OpSub.InPlaceImpl2[DenseVector[Float], DenseVector[Float]] = {
     new OpSub.InPlaceImpl2[DenseVector[Float], DenseVector[Float]] {
       def apply(a: DenseVector[Float], b: DenseVector[Float]) = {
         canSaxpy(a, -1.0f, b)
@@ -731,10 +731,10 @@ trait DenseVector_SpecialOps extends DenseVectorOps { this: DenseVector.type =>
     pureFromUpdate_Float(canSubIntoF)
   }
 
-  implicit val canDot_DV_DV_Float: breeze.linalg.operators.OpMulInner.Impl2[
-    DenseVector[Float],
-    DenseVector[Float],
-    Float] = {
+  implicit val canDot_DV_DV_Float
+    : breeze.linalg.operators.OpMulInner.Impl2[DenseVector[Float],
+                                               DenseVector[Float],
+                                               Float] = {
     new breeze.linalg.operators.OpMulInner.Impl2[DenseVector[Float],
                                                  DenseVector[Float],
                                                  Float] {

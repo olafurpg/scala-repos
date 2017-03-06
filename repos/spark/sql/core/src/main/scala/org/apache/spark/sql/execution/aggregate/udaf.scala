@@ -389,7 +389,8 @@ private[sql] case class ScalaUDAF(children: Seq[Expression],
   private[this] lazy val inputToScalaConverters: Any => Any =
     CatalystTypeConverters.createToScalaConverter(childrenSchema)
 
-  private[this] lazy val bufferValuesToCatalystConverters: Array[Any => Any] = {
+  private[this] lazy val bufferValuesToCatalystConverters
+    : Array[Any => Any] = {
     aggBufferSchema.fields.map { field =>
       CatalystTypeConverters.createToCatalystConverter(field.dataType)
     }
@@ -415,7 +416,8 @@ private[sql] case class ScalaUDAF(children: Seq[Expression],
   }
 
   // This buffer is only used at executor side.
-  private[this] lazy val mutableAggregateBuffer: MutableAggregationBufferImpl = {
+  private[this] lazy val mutableAggregateBuffer
+    : MutableAggregationBufferImpl = {
     new MutableAggregationBufferImpl(aggBufferSchema,
                                      bufferValuesToCatalystConverters,
                                      bufferValuesToScalaConverters,

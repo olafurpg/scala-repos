@@ -120,11 +120,11 @@ class MigrationClientTest
       val client1 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient
         .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient
@@ -153,11 +153,11 @@ class MigrationClientTest
       val client1 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient
         .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient
@@ -193,11 +193,11 @@ class MigrationClientTest
       val client1 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient
         .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient
@@ -235,11 +235,11 @@ class MigrationClientTest
       val client1 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient
         .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient
@@ -272,11 +272,11 @@ class MigrationClientTest
       val client1 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient
         .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient

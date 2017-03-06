@@ -244,7 +244,8 @@ object MemberStatus {
   /**
     * INTERNAL API
     */
-  private[cluster] val allowedTransitions: Map[MemberStatus, Set[MemberStatus]] =
+  private[cluster] val allowedTransitions
+    : Map[MemberStatus, Set[MemberStatus]] =
     Map(
       Joining -> Set(WeaklyUp, Up, Down, Removed),
       WeaklyUp -> Set(Up, Down, Removed),

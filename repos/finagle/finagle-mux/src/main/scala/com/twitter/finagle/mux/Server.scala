@@ -400,8 +400,8 @@ private[finagle] object Processor
     extends Filter[Message, Message, Request, Response] {
   import Message._
 
-  private[this] val ContextsToBufs: ((ChannelBuffer, ChannelBuffer)) => ((Buf,
-                                                                          Buf)) = {
+  private[this] val ContextsToBufs
+    : ((ChannelBuffer, ChannelBuffer)) => ((Buf, Buf)) = {
     case (k, v) =>
       (ChannelBufferBuf.Owned(k.duplicate),
        ChannelBufferBuf.Owned(v.duplicate))

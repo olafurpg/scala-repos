@@ -159,17 +159,17 @@ class InlineWarningTest extends ClearAfterClass {
     // no warnings here
     compileClasses(
       newCompiler(extraArgs = InlineWarningTest.argsNoWarn +
-          " -Yopt-warnings:none"))(scalaCode, List((javaCode, "A.java")))
+        " -Yopt-warnings:none"))(scalaCode, List((javaCode, "A.java")))
 
     c = 0
     compileClasses(
       newCompiler(extraArgs = InlineWarningTest.argsNoWarn +
-          " -Yopt-warnings:no-inline-mixed"))(scalaCode,
-                                              List((javaCode, "A.java")),
-                                              allowMessage = i => {
-                                                c += 1;
-                                                warns.exists(i.msg contains _)
-                                              })
+        " -Yopt-warnings:no-inline-mixed"))(scalaCode,
+                                            List((javaCode, "A.java")),
+                                            allowMessage = i => {
+                                              c += 1;
+                                              warns.exists(i.msg contains _)
+                                            })
     assert(c == 2, c)
   }
 

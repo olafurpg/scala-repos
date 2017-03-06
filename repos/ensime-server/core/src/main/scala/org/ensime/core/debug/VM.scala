@@ -288,8 +288,8 @@ class VM(val mode: VmMode,
         while (tpe != null) {
           var i = -1
           fields = tpe
-              .fields()
-              .map { f =>
+            .fields()
+            .map { f =>
               i += 1
               val value = obj.getValue(f)
               DebugClassField(
@@ -299,7 +299,7 @@ class VM(val mode: VmMode,
                 valueSummary(value)
               )
             }
-              .toList ++ fields
+            .toList ++ fields
           tpe = tpe.superclass
         }
         fields

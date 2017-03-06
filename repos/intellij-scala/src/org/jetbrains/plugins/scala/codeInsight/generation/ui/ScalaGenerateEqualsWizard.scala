@@ -89,12 +89,12 @@ private class ScalaGenerateEqualsWizardBuilder(aClass: PsiClass,
   protected def getClassFields = classFields
   protected def getFieldsToHashCode: HashMap[ScNamedElement, ScalaMemberInfo] =
     fieldsToHashCode
-  protected def getEqualsPanel: AbstractMemberSelectionPanel[ScNamedElement,
-                                                             ScalaMemberInfo] =
+  protected def getEqualsPanel
+    : AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo] =
     equalsPanel
-  protected def getHashCodePanel: AbstractMemberSelectionPanel[
-    ScNamedElement,
-    ScalaMemberInfo] = hashCodePanel
+  protected def getHashCodePanel
+    : AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo] =
+    hashCodePanel
 
   protected def updateHashCodeMemberInfos(
       equalsMemberInfos: util.Collection[ScalaMemberInfo]) {
@@ -123,9 +123,8 @@ private class ScalaGenerateEqualsWizardBuilder(aClass: PsiClass,
 
   protected def getFieldsToNonNull: HashMap[ScNamedElement, ScalaMemberInfo] =
     null
-  protected def getNonNullPanel: AbstractMemberSelectionPanel[
-    ScNamedElement,
-    ScalaMemberInfo] = null
+  protected def getNonNullPanel
+    : AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo] = null
   protected def updateNonNullMemberInfos(
       equalsMemberInfos: util.Collection[ScalaMemberInfo]) {}
 }

@@ -951,9 +951,9 @@ trait Printers extends api.Printers { self: SymbolTable =>
             case DefDef(_, _, _, _, _, Block(ctBody, _)) =>
               val earlyDefs =
                 treeInfo.preSuperFields(ctBody) ::: body.filter {
-                  case td: TypeDef => treeInfo.isEarlyDef(td)
-                  case _ => false
-                }
+                case td: TypeDef => treeInfo.isEarlyDef(td)
+                case _ => false
+              }
               if (earlyDefs.nonEmpty) {
                 print("{")
                 printColumn(earlyDefs, "", ";", "")

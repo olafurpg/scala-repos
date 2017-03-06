@@ -725,10 +725,10 @@ class SparkIMain(initialSettings: Settings,
     showCodeIfDebugging(line) // as we're about to lose our // show
     line.lines map
       (s =>
-         s indexOf "//" match {
-           case -1 => s
-           case idx => s take idx
-         }) mkString "\n"
+        s indexOf "//" match {
+          case -1 => s
+          case idx => s take idx
+        }) mkString "\n"
   }
 
   private def safePos(t: Tree, alt: Int): Int =
@@ -759,17 +759,17 @@ class SparkIMain(initialSettings: Settings,
     logDebug(
       trees map
         (t => {
-           // [Eugene to Paul] previously it just said `t map ...`
-           // because there was an implicit conversion from Tree to a list of Trees
-           // however Martin and I have removed the conversion
-           // (it was conflicting with the new reflection API),
-           // so I had to rewrite this a bit
-           val subs = t collect { case sub => sub }
-           subs map
-             (t0 =>
-                "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                  "\n") mkString ""
-         }) mkString "\n"
+          // [Eugene to Paul] previously it just said `t map ...`
+          // because there was an implicit conversion from Tree to a list of Trees
+          // however Martin and I have removed the conversion
+          // (it was conflicting with the new reflection API),
+          // so I had to rewrite this a bit
+          val subs = t collect { case sub => sub }
+          subs map
+            (t0 =>
+              "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                "\n") mkString ""
+        }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied

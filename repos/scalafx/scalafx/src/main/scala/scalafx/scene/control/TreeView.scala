@@ -220,8 +220,8 @@ class TreeView[T](
   /**
     * Called when there's a request to scroll an index into view using `scrollTo(Int)`
     */
-  def onScrollTo: ObjectProperty[
-    jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]] =
+  def onScrollTo
+    : ObjectProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]] =
     delegate.onScrollToProperty
   def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
     ObjectProperty
@@ -248,8 +248,8 @@ class TreeView[T](
   /**
     *
     */
-  def selectionModel: ObjectProperty[
-    jfxsc.MultipleSelectionModel[jfxsc.TreeItem[T]]] =
+  def selectionModel
+    : ObjectProperty[jfxsc.MultipleSelectionModel[jfxsc.TreeItem[T]]] =
     delegate.selectionModelProperty
   def selectionModel_=(v: MultipleSelectionModel[jfxsc.TreeItem[T]]) {
     selectionModel() = v

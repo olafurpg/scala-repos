@@ -1145,7 +1145,7 @@ object ScalaRefactoringUtil {
             ScalaTokenTypes.KEYWORDS.contains(prevElemType)
           }
         shift = pars.getTextRange.getStartOffset -
-            inner.getTextRange.getStartOffset + (if (afterWord) 1 else 0)
+          inner.getTextRange.getStartOffset + (if (afterWord) 1 else 0)
         document.replaceString(textRange.getStartOffset,
                                textRange.getEndOffset,
                                (if (afterWord) " " else "") + newString)

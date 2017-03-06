@@ -45,7 +45,7 @@ trait ScopeAnnotator {
 
       val complexClashes =
         clashesOf(jointTerms ::: objects) ::: clashesOf(types ::: caseClasses) ::: clashesOf(
-          jointTerms ::: caseClasses)
+        jointTerms ::: caseClasses)
 
       val clashes = (complexClashes.distinct diff clashesOf(parameters))
 

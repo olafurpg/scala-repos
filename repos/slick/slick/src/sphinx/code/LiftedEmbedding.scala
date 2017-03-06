@@ -26,7 +26,7 @@ object LiftedEmbedding extends App {
     val coffees: List[Coffee] = //...
 
 //#plaintypes
-    Nil
+      Nil
 //#plaintypes
     val l = coffees.filter(_.price > 8.0).map(_.name)
     //                       ^       ^          ^
@@ -445,9 +445,9 @@ object LiftedEmbedding extends App {
 
       {
         //#compiled2
-        val userPaged = Compiled(
-          (d: ConstColumn[Long], t: ConstColumn[Long]) =>
-            users.drop(d).take(t))
+        val userPaged = Compiled((d: ConstColumn[Long],
+                                  t: ConstColumn[Long]) =>
+          users.drop(d).take(t))
 
         val usersAction1 = userPaged(2, 1).result
         val usersAction2 = userPaged(1, 3).result

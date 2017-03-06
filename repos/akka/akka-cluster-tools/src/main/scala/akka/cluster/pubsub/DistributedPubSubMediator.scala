@@ -773,7 +773,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     registry +=
       (selfAddress -> bucket.copy(version = v,
                                   content = bucket.content +
-                                      (key -> ValueHolder(v, valueOption))))
+                                    (key -> ValueHolder(v, valueOption))))
   }
 
   def getCurrentTopics(): Set[String] = {

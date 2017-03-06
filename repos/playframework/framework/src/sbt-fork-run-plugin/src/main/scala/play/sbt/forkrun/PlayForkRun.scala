@@ -99,7 +99,7 @@ object PlayForkRun extends AutoPlugin {
       classpath = (managedClasspath in ForkRun).value.files,
       baseDirectory = (baseDirectory in ThisBuild).value,
       configKey = thisProjectRef.value.project + "/" +
-          playForkConfig.key.label,
+        playForkConfig.key.label,
       logLevel = ((logLevel in (Compile, run)) ?? Level.Info).value,
       logSbtEvents = playForkLogSbtEvents.value,
       shutdownTimeout = playForkShutdownTimeout.value
@@ -146,9 +146,9 @@ object PlayForkRun extends AutoPlugin {
       targetDirectory = target.value,
       pollInterval = pollInterval.value,
       notifyKey = thisProjectRef.value.project + "/" +
-          playForkNotifyStart.key.label,
+        playForkNotifyStart.key.label,
       reloadKey = thisProjectRef.value.project + "/" +
-          playForkReload.key.label,
+        playForkReload.key.label,
       compileTimeout = playForkCompileTimeout.value.toMillis,
       mainClass = (mainClass in (Compile, run)).value.get
     )

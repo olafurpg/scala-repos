@@ -45,7 +45,8 @@ object CaseClassOrderedBuf {
     def freshT(id: String) = newTermName(c.fresh(id))
 
     val dispatcher = buildDispatcher
-    val elementData: List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
+    val elementData
+      : List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
       outerType.declarations
         .collect {
           case m: MethodSymbol if m.isCaseAccessor => m

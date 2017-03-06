@@ -185,8 +185,9 @@ object CoGroup {
         rightGroup))
 
     CoGroup(
-      func.asInstanceOf[(Any, Iterator[Any], Iterator[Any]) => TraversableOnce[
-        Any]],
+      func.asInstanceOf[(Any,
+                         Iterator[Any],
+                         Iterator[Any]) => TraversableOnce[Any]],
       encoderFor[Key].fromRowExpression,
       encoderFor[Left].fromRowExpression,
       encoderFor[Right].fromRowExpression,

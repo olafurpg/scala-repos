@@ -67,7 +67,7 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("1D data") {
     val points =
       Vectors.sparse(1, Array.empty, Array.empty) +: (1 until 8).map(i =>
-        Vectors.dense(i))
+      Vectors.dense(i))
     val data = sc.parallelize(points, 2)
     val bkm = new BisectingKMeans().setK(4).setMaxIterations(1).setSeed(1L)
     // The clusters should be

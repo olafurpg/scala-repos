@@ -923,9 +923,10 @@ abstract class RDD[T: ClassTag](
   def zipPartitions[B: ClassTag, C: ClassTag, D: ClassTag, V: ClassTag](
       rdd2: RDD[B],
       rdd3: RDD[C],
-      rdd4: RDD[D])(
-      f: (Iterator[T], Iterator[B], Iterator[C], Iterator[D]) => Iterator[V])
-    : RDD[V] = withScope {
+      rdd4: RDD[D])(f: (Iterator[T],
+                        Iterator[B],
+                        Iterator[C],
+                        Iterator[D]) => Iterator[V]): RDD[V] = withScope {
     zipPartitions(rdd2, rdd3, rdd4, preservesPartitioning = false)(f)
   }
 
@@ -1235,13 +1236,13 @@ abstract class RDD[T: ClassTag](
         throw new SparkException(
           "countByValueApprox() does not support arrays")
       }
-      val countPartition: (TaskContext, Iterator[T]) => OpenHashMap[T, Long] = {
-        (ctx, iter) =>
-          val map = new OpenHashMap[T, Long]
-          iter.foreach { t =>
-            map.changeValue(t, 1L, _ + 1L)
-          }
-          map
+      val countPartition
+        : (TaskContext, Iterator[T]) => OpenHashMap[T, Long] = { (ctx, iter) =>
+        val map = new OpenHashMap[T, Long]
+        iter.foreach { t =>
+          map.changeValue(t, 1L, _ + 1L)
+        }
+        map
       }
       val evaluator =
         new GroupedCountEvaluator[T](partitions.length, confidence)

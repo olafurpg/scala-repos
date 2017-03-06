@@ -230,13 +230,13 @@ case class Game(
         Event.Move(_, situation, state, clockEvent, updated.crazyData),
         Event.Drop(_, situation, state, clockEvent, updated.crazyData)
       ) :: {
-        // abstraction leak, I know.
-        (updated.variant.threeCheck && situation.check) ?? List(
-          Event.CheckCount(
-            white = updated.checkCount.white,
-            black = updated.checkCount.black
-          ))
-      }.toList
+      // abstraction leak, I know.
+      (updated.variant.threeCheck && situation.check) ?? List(
+        Event.CheckCount(
+          white = updated.checkCount.white,
+          black = updated.checkCount.black
+        ))
+    }.toList
 
     Progress(this, updated, events)
   }

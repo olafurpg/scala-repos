@@ -96,9 +96,9 @@ case class Timer(timeoutTickMs: Int = 100,
             val timedCallback = () => callback(value)
             // Lazy implementation for now.
             futures = futures + futures
-                .get(waitTime)
-                .map(current => (waitTime, timedCallback :: current))
-                .getOrElse((waitTime, List(timedCallback)))
+              .get(waitTime)
+              .map(current => (waitTime, timedCallback :: current))
+              .getOrElse((waitTime, List(timedCallback)))
         }
         Future.async(listen)
       } else {

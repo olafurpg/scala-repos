@@ -26,8 +26,9 @@ object Supervision {
   case class SupervisorConfig(
       restartStrategy: FaultHandlingStrategy,
       worker: List[Server],
-      maxRestartsHandler: (ActorRef,
-                           MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = {
+      maxRestartsHandler: (
+          ActorRef,
+          MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = {
         (aRef, max) =>
           ()
       })

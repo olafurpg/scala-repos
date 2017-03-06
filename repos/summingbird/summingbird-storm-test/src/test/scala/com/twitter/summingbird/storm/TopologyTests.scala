@@ -75,9 +75,9 @@ class TopologyTests extends WordSpec {
     * supplied list of integers and the testFn defined above.
     */
   def funcToPlan(
-      mkJob: (Producer[Storm, Int], Storm#Store[Int, Int]) => TailProducer[
-        Storm,
-        Any]): StormTopology = {
+      mkJob: (Producer[Storm, Int],
+              Storm#Store[Int, Int]) => TailProducer[Storm, Any])
+    : StormTopology = {
     val original = sample[List[Int]]
 
     val job = mkJob(

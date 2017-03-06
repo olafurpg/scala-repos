@@ -268,7 +268,10 @@ package scala.collection.mutable {
     }
 
     property("+=") = forAll {
-      (map: mutable.TreeMap[K, V], k: K, v: V, from: Option[K],
+      (map: mutable.TreeMap[K, V],
+       k: K,
+       v: V,
+       from: Option[K],
        until: Option[K]) =>
         val oldSize = map.size
         val containedKeyBefore = map.contains(k)
@@ -284,7 +287,9 @@ package scala.collection.mutable {
     }
 
     property("++=") = forAll {
-      (map: mutable.TreeMap[K, V], entries: Seq[(K, V)], from: Option[K],
+      (map: mutable.TreeMap[K, V],
+       entries: Seq[(K, V)],
+       from: Option[K],
        until: Option[K]) =>
         val mapView = map.rangeImpl(from, until)
         mapView ++= entries
@@ -310,7 +315,9 @@ package scala.collection.mutable {
     }
 
     property("--=") = forAll {
-      (map: mutable.TreeMap[K, V], ks: Seq[K], from: Option[K],
+      (map: mutable.TreeMap[K, V],
+       ks: Seq[K],
+       from: Option[K],
        until: Option[K]) =>
         val mapView = map.rangeImpl(from, until)
         mapView --= ks

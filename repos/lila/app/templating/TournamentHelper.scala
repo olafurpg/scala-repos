@@ -49,8 +49,8 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
         "Marathon" -> icon('\\'),
         "SuperBlitz" -> icon(lila.rating.PerfType.Blitz.iconChar)
       ) ::: lila.rating.PerfType.leaderboardable.map { pt =>
-        pt.name -> icon(pt.iconChar)
-      }
+      pt.name -> icon(pt.iconChar)
+    }
     def apply(name: String) = Html {
       replacements.foldLeft(name) {
         case (n, (from, to)) => n.replace(from, to)

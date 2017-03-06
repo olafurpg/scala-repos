@@ -55,8 +55,8 @@ class ScalaCalleeMethodsTreeStructure(project: Project,
       .getTargetElement
       .asInstanceOf[PsiMethod]
     val baseClass: PsiClass = baseMethod.containingClass
-    val methodToDescriptorMap: mutable.HashMap[PsiMethod,
-                                               CallHierarchyNodeDescriptor] =
+    val methodToDescriptorMap
+      : mutable.HashMap[PsiMethod, CallHierarchyNodeDescriptor] =
       new mutable.HashMap[PsiMethod, CallHierarchyNodeDescriptor]
     val result: ArrayBuffer[CallHierarchyNodeDescriptor] =
       new ArrayBuffer[CallHierarchyNodeDescriptor]

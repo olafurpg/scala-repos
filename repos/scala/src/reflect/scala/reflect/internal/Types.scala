@@ -559,8 +559,8 @@ trait Types
     def dealiasWidenChain: List[Type] =
       this ::
         (if (this ne widen) widen.dealiasWidenChain
-         else if (this ne betaReduce) betaReduce.dealiasWidenChain
-         else Nil)
+       else if (this ne betaReduce) betaReduce.dealiasWidenChain
+       else Nil)
 
     /** Performs a single step of beta-reduction on types.
       *  Given:
@@ -4258,8 +4258,8 @@ trait Types
        else
          tp1.baseClasses forall
            (bc =>
-              tp2.baseTypeIndex(bc) < 0 ||
-                isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
+             tp2.baseTypeIndex(bc) < 0 ||
+               isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
 
     check(tp1, tp2) && check(tp2, tp1)
   }

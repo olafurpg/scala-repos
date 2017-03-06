@@ -258,7 +258,8 @@ class TreeTableColumn[S, T](
     *
     * Finally, there are a number of pre-built cell factories available in the javafx.scene.control.cell package.
     */
-  def cellFactory: ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
+  def cellFactory
+    : ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
     ObjectProperty((column: TreeTableColumn[S, T]) =>
       new TreeTableCell(delegate.cellFactoryProperty.getValue.call(column)))
 

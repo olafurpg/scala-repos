@@ -733,70 +733,72 @@ class LiftServlet extends Loggable {
       // A Right[LAFuture] indicates a future we need to *wait* on,
       // meaning we will return the result of whatever satisfies the
       // future.
-      val nextAction: Either[LAFuture[Box[LiftResponse]],
-                             LAFuture[Box[LiftResponse]]] = versionInfo match {
-        case Full(AjaxVersionInfo(_, handlerVersion, pendingRequests)) =>
-          val renderVersion = RenderVersion.get
+      val nextAction
+        : Either[LAFuture[Box[LiftResponse]], LAFuture[Box[LiftResponse]]] =
+        versionInfo match {
+          case Full(AjaxVersionInfo(_, handlerVersion, pendingRequests)) =>
+            val renderVersion = RenderVersion.get
 
-          liftSession.withAjaxRequests { currentAjaxRequests =>
-            // Create a new future, put it in the request list, and return
-            // the associated info with the future that needs to be
-            // satisfied by the current request handler.
-            def newRequestInfo = {
-              val info = AjaxRequestInfo(handlerVersion,
-                                         new LAFuture[Box[LiftResponse]],
-                                         millis)
+            liftSession.withAjaxRequests { currentAjaxRequests =>
+              // Create a new future, put it in the request list, and return
+              // the associated info with the future that needs to be
+              // satisfied by the current request handler.
+              def newRequestInfo = {
+                val info = AjaxRequestInfo(handlerVersion,
+                                           new LAFuture[Box[LiftResponse]],
+                                           millis)
 
-              val existing =
-                currentAjaxRequests.getOrElseUpdate(renderVersion, Nil)
-              currentAjaxRequests += (renderVersion -> (info :: existing))
+                val existing =
+                  currentAjaxRequests.getOrElseUpdate(renderVersion, Nil)
+                currentAjaxRequests += (renderVersion -> (info :: existing))
 
-              info
-            }
+                info
+              }
 
-            val infoList = currentAjaxRequests.get(renderVersion)
-            val (requestInfo, result) = infoList
-              .flatMap { entries =>
-                entries.find(_.requestVersion == handlerVersion).map { entry =>
-                  (entry, Right(entry.responseFuture))
+              val infoList = currentAjaxRequests.get(renderVersion)
+              val (requestInfo, result) = infoList
+                .flatMap { entries =>
+                  entries.find(_.requestVersion == handlerVersion).map {
+                    entry =>
+                      (entry, Right(entry.responseFuture))
+                  }
                 }
-              }
-              .getOrElse {
-                val entry = newRequestInfo
+                .getOrElse {
+                  val entry = newRequestInfo
 
-                (entry, Left(entry.responseFuture))
+                  (entry, Left(entry.responseFuture))
+                }
+
+              // If there are no other pending requests, we can
+              // invalidate all the render version's AJAX entries except
+              // for the current one, as the client is no longer looking
+              // to retry any of them.
+              if (pendingRequests == 0) {
+                // Satisfy anyone waiting on futures for invalid
+                // requests with a failure.
+                for {
+                  list <- infoList
+                  entry <- list if entry.requestVersion != handlerVersion
+                } {
+                  entry.responseFuture.satisfy(
+                    net.liftweb.common.Failure("Request no longer pending."))
+                }
+
+                currentAjaxRequests += (renderVersion -> List(requestInfo))
               }
 
-            // If there are no other pending requests, we can
-            // invalidate all the render version's AJAX entries except
-            // for the current one, as the client is no longer looking
-            // to retry any of them.
-            if (pendingRequests == 0) {
-              // Satisfy anyone waiting on futures for invalid
-              // requests with a failure.
-              for {
-                list <- infoList
-                entry <- list if entry.requestVersion != handlerVersion
-              } {
-                entry.responseFuture.satisfy(
-                  net.liftweb.common.Failure("Request no longer pending."))
-              }
-
-              currentAjaxRequests += (renderVersion -> List(requestInfo))
+              result
             }
 
-            result
-          }
-
-        case _ =>
-          // Create a future that processes the ajax response
-          // immediately. This runs if we don't have a handler
-          // version, which happens in cases like AJAX requests for
-          // Lift GC that don't go through the de-duping pipeline.
-          // Because we always return a Left here, the ajax processing
-          // always runs for this type of request.
-          Left(new LAFuture[Box[LiftResponse]])
-      }
+          case _ =>
+            // Create a future that processes the ajax response
+            // immediately. This runs if we don't have a handler
+            // version, which happens in cases like AJAX requests for
+            // Lift GC that don't go through the de-duping pipeline.
+            // Because we always return a Left here, the ajax processing
+            // always runs for this type of request.
+            Left(new LAFuture[Box[LiftResponse]])
+        }
 
       val ret: Box[LiftResponse] = nextAction match {
         case Left(future) =>
@@ -1031,19 +1033,18 @@ class LiftServlet extends Loggable {
     def fixHeaders(headers: List[(String, String)]) =
       headers map
         ((v) =>
-           v match {
-             case ("Location", uri) =>
-               val u = request
-               (v._1,
-                ((for (updated <- Full(
-                         (if (!LiftRules.excludePathFromContextPathRewriting
-                                .vend(uri)) u.contextPath
-                          else "") + uri).filter(ignore =>
-                         uri.startsWith("/"));
-                       rwf <- URLRewriter.rewriteFunc)
-                  yield rwf(updated)) openOr uri))
-             case _ => v
-           })
+          v match {
+            case ("Location", uri) =>
+              val u = request
+              (v._1,
+               ((for (updated <- Full(
+                        (if (!LiftRules.excludePathFromContextPathRewriting
+                               .vend(uri)) u.contextPath
+                         else "") + uri).filter(ignore => uri.startsWith("/"));
+                      rwf <- URLRewriter.rewriteFunc)
+                 yield rwf(updated)) openOr uri))
+            case _ => v
+          })
 
     def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
       val acceptHeader = for (innerReq <- Box.legacyNullTest(req.request);

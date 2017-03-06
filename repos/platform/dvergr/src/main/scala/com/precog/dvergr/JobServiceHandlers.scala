@@ -55,9 +55,9 @@ import scalaz._
 class ListJobsHandler(jobs: JobManager[Future])(implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       Success(request.parameters get 'apiKey map { apiKey =>
         jobs.listJobs(apiKey) map { jobs =>
@@ -82,9 +82,9 @@ class CreateJobHandler(jobs: JobManager[Future],
                        clock: Clock)(implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       request.content map { contentM =>
         Success(contentM flatMap { content =>
@@ -149,9 +149,9 @@ class CreateJobHandler(jobs: JobManager[Future],
 class GetJobHandler(jobs: JobManager[Future])(implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       request.parameters.get('jobId) map { jobId =>
         Success(jobs.findJob(jobId) map {
@@ -173,9 +173,9 @@ class GetJobStatusHandler(jobs: JobManager[Future])(
     implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       request.parameters.get('jobId) map { jobId =>
         Success(jobs.getStatus(jobId) map
@@ -203,9 +203,9 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
     implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       (for {
         contentM <- request.content
@@ -270,9 +270,9 @@ class ListChannelsHandler(jobs: JobManager[Future])(
     implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       Success(request.parameters get 'jobId map { jobId =>
         jobs.listChannels(jobId) map { channels =>
@@ -296,9 +296,9 @@ class AddMessageHandler(jobs: JobManager[Future])(
     implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       (for {
         jobId <- request.parameters get 'jobId
@@ -330,9 +330,9 @@ class ListMessagesHandler(jobs: JobManager[Future])(
     implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       (for {
         jobId <- request.parameters get 'jobId
@@ -375,9 +375,9 @@ class GetJobStateHandler(jobs: JobManager[Future])(
     implicit ctx: ExecutionContext)
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       Success(request.parameters get 'jobId map { jobId =>
         jobs.findJob(jobId) map {
@@ -436,9 +436,9 @@ class PutJobStateHandler(jobs: JobManager[Future])(
     }
   }
 
-  val service: HttpRequest[Future[JValue]] => Validation[
-    NotServed,
-    Future[HttpResponse[JValue]]] =
+  val service
+    : HttpRequest[Future[JValue]] => Validation[NotServed,
+                                                Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       Success((for {
         jobId <- request.parameters get 'jobId
@@ -533,9 +533,9 @@ class CreateResultHandler(jobs: JobManager[Future])(
     extends CustomHttpService[ByteChunk, Future[HttpResponse[ByteChunk]]] {
   private implicit val M = new FutureMonad(ctx)
 
-  val service: HttpRequest[ByteChunk] => Validation[
-    NotServed,
-    Future[HttpResponse[ByteChunk]]] =
+  val service
+    : HttpRequest[ByteChunk] => Validation[NotServed,
+                                           Future[HttpResponse[ByteChunk]]] =
     (request: HttpRequest[ByteChunk]) => {
       Success((for {
         jobId <- request.parameters get 'jobId
@@ -574,9 +574,9 @@ class GetResultHandler(jobs: JobManager[Future])(
     extends CustomHttpService[ByteChunk, Future[HttpResponse[ByteChunk]]] {
   private implicit val M = new FutureMonad(ctx)
 
-  val service: HttpRequest[ByteChunk] => Validation[
-    NotServed,
-    Future[HttpResponse[ByteChunk]]] =
+  val service
+    : HttpRequest[ByteChunk] => Validation[NotServed,
+                                           Future[HttpResponse[ByteChunk]]] =
     (request: HttpRequest[ByteChunk]) => {
       Success(request.parameters get 'jobId map { jobId =>
         jobs.findJob(jobId) flatMap {

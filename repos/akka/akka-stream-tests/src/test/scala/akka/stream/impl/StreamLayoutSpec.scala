@@ -187,8 +187,8 @@ class StreamLayoutSpec extends AkkaSpec {
       "starting from a Flow" in {
         val g =
           Flow fromGraph Fusing.aggressive(
-            (1 to tooDeepForStack).foldLeft(Flow[Int])((f, i) ⇒
-              f.map(identity)))
+            (1 to tooDeepForStack).foldLeft(Flow[Int])(
+              (f, i) ⇒ f.map(identity)))
         val (mat, fut) =
           g.runWith(Source.single(42).mapMaterializedValue(_ ⇒ 1), Sink.seq)
         mat should ===(1)

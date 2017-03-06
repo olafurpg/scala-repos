@@ -164,7 +164,8 @@ trait EitherInstances extends EitherInstances0 {
     }
 
   /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
-  val FirstLeftProjectionIso2: λ[(α, β) => LeftProjection[α, β] @@ First] <~~> Either =
+  val FirstLeftProjectionIso2
+    : λ[(α, β) => LeftProjection[α, β] @@ First] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => LeftProjection[α, β] @@ First],
                              Either] {
       def to[A, B](fa: LeftProjection[A, B] @@ First) = Tag.unwrap(fa).e
@@ -172,7 +173,8 @@ trait EitherInstances extends EitherInstances0 {
     }
 
   /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
-  val LastLeftProjectionIso2: λ[(α, β) => LeftProjection[α, β] @@ Last] <~~> Either =
+  val LastLeftProjectionIso2
+    : λ[(α, β) => LeftProjection[α, β] @@ Last] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => LeftProjection[α, β] @@ Last], Either] {
       def to[A, B](fa: LeftProjection[A, B] @@ Last) = Tag.unwrap(fa).e
       def from[A, B](ga: Either[A, B]) = Last(ga.left)
@@ -200,7 +202,8 @@ trait EitherInstances extends EitherInstances0 {
     }
 
   /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
-  val FirstRightProjectionIso2: λ[(α, β) => RightProjection[α, β] @@ First] <~~> Either =
+  val FirstRightProjectionIso2
+    : λ[(α, β) => RightProjection[α, β] @@ First] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => RightProjection[α, β] @@ First],
                              Either] {
       def to[A, B](fa: RightProjection[A, B] @@ First) = Tag.unwrap(fa).e
@@ -208,7 +211,8 @@ trait EitherInstances extends EitherInstances0 {
     }
 
   /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
-  val LastRightProjectionIso2: λ[(α, β) => RightProjection[α, β] @@ Last] <~~> Either =
+  val LastRightProjectionIso2
+    : λ[(α, β) => RightProjection[α, β] @@ Last] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => RightProjection[α, β] @@ Last],
                              Either] {
       def to[A, B](fa: RightProjection[A, B] @@ Last) = Tag.unwrap(fa).e

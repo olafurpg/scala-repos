@@ -42,26 +42,26 @@ class MetricsCollectorSpec
         val merged12 =
           sample2 flatMap
             (latest ⇒
-               sample1 collect {
-                 case peer if latest sameAs peer ⇒
-                   val m = peer :+ latest
-                   m.value should ===(latest.value)
-                   m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                   m
-               })
+              sample1 collect {
+                case peer if latest sameAs peer ⇒
+                  val m = peer :+ latest
+                  m.value should ===(latest.value)
+                  m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                  m
+              })
 
         val sample3 = collector.sample.metrics
         val sample4 = collector.sample.metrics
         val merged34 =
           sample4 flatMap
             (latest ⇒
-               sample3 collect {
-                 case peer if latest sameAs peer ⇒
-                   val m = peer :+ latest
-                   m.value should ===(latest.value)
-                   m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                   m
-               })
+              sample3 collect {
+                case peer if latest sameAs peer ⇒
+                  val m = peer :+ latest
+                  m.value should ===(latest.value)
+                  m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                  m
+              })
       }
     }
   }

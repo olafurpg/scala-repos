@@ -27,8 +27,8 @@ trait ParSet[T]
     with ParSetLike[T, ParSet[T], scala.collection.immutable.Set[T]] { self =>
   override def empty: ParSet[T] = ParHashSet[T]()
 
-  override def companion: GenericCompanion[ParSet] with GenericParCompanion[
-    ParSet] = ParSet
+  override def companion
+    : GenericCompanion[ParSet] with GenericParCompanion[ParSet] = ParSet
 
   override def stringPrefix = "ParSet"
 

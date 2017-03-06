@@ -426,7 +426,7 @@ private[spark] class MemoryStore(conf: SparkConf,
       if (success) {
         val taskAttemptId = currentTaskAttemptId()
         unrollMemoryMap(taskAttemptId) = unrollMemoryMap
-            .getOrElse(taskAttemptId, 0L) + memory
+          .getOrElse(taskAttemptId, 0L) + memory
       }
       success
     }

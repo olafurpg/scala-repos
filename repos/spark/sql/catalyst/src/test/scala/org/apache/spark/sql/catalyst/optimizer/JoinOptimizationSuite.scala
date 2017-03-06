@@ -32,18 +32,18 @@ class JoinOptimizationSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
-        "Filter Pushdown",
-        FixedPoint(100),
-        CombineFilters,
-        PushPredicateThroughProject,
-        BooleanSimplification,
-        ReorderJoin,
-        PushPredicateThroughJoin,
-        PushPredicateThroughGenerate,
-        PushPredicateThroughAggregate,
-        ColumnPruning,
-        CollapseProject
-      ) :: Nil
+      "Filter Pushdown",
+      FixedPoint(100),
+      CombineFilters,
+      PushPredicateThroughProject,
+      BooleanSimplification,
+      ReorderJoin,
+      PushPredicateThroughJoin,
+      PushPredicateThroughGenerate,
+      PushPredicateThroughAggregate,
+      ColumnPruning,
+      CollapseProject
+    ) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

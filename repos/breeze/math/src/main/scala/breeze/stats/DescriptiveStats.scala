@@ -210,14 +210,14 @@ trait DescriptiveStats {
   }
 
   object covmat extends UFunc {
-    implicit val matrixCovariance: Impl[DenseMatrix[Double],
-                                        DenseMatrix[Double]] =
+    implicit val matrixCovariance
+      : Impl[DenseMatrix[Double], DenseMatrix[Double]] =
       new Impl[DenseMatrix[Double], DenseMatrix[Double]] {
         def apply(data: DenseMatrix[Double]) = cov(data)
       }
 
-    implicit val sequenceCovariance: Impl[Seq[DenseVector[Double]],
-                                          DenseMatrix[Double]] =
+    implicit val sequenceCovariance
+      : Impl[Seq[DenseVector[Double]], DenseMatrix[Double]] =
       new Impl[Seq[DenseVector[Double]], DenseMatrix[Double]] {
         /*
          * We roughly follow the two_pass_covariance algorithm from here: http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance
@@ -252,7 +252,7 @@ trait DescriptiveStats {
                   cfor(0)(j => j < dataSize, j => j + 1)(j => {
                     val b = x(j) - mean(j)
                     result(i, j) = result(i, j) +
-                        (a * b / (numRowsD - 1)) //Use
+                      (a * b / (numRowsD - 1)) //Use
                   })
                 })
               }

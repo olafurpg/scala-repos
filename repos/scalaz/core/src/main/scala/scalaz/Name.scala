@@ -119,9 +119,10 @@ object Need {
 }
 
 object Value {
-  implicit val value: Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[
-    Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[
-    Value] with Cozip[Value] = new Monad[Value] with BindRec[Value]
+  implicit val value
+    : Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[
+      Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[
+      Value] with Cozip[Value] = new Monad[Value] with BindRec[Value]
   with Comonad[Value] with Distributive[Value] with Traverse1[Value]
   with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] {
     override def foldMap1[A, B: Semigroup](fa: Value[A])(f: A => B) =

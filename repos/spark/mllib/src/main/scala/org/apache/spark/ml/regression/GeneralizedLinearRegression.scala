@@ -376,7 +376,8 @@ object GeneralizedLinearRegression
       * The reweight function used to update offsets and weights
       * at each iteration of [[IterativelyReweightedLeastSquares]].
       */
-    val reweightFunc: (Instance, WeightedLeastSquaresModel) => (Double, Double) = {
+    val reweightFunc
+      : (Instance, WeightedLeastSquaresModel) => (Double, Double) = {
       (instance: Instance, model: WeightedLeastSquaresModel) =>
         {
           val eta = model.predict(instance.features)

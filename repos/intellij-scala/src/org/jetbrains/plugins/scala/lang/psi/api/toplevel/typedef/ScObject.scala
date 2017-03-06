@@ -50,7 +50,8 @@ trait ScObject
     * @return returns every time the same result, even after modification
     *         so it's reaonable to use it only for Predef and scala classes
     */
-  def getHardParameterlessSignatures: TypeDefinitionMembers.ParameterlessNodes.Map
+  def getHardParameterlessSignatures
+    : TypeDefinitionMembers.ParameterlessNodes.Map
 
   /**
     * @return returns every time the same result, even after modification

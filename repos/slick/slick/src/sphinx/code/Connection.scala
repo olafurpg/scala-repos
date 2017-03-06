@@ -88,9 +88,9 @@ object Connection extends App {
       // Use Akka Streams for more elaborate stream processing.
       //#stream
       val f = //#stream
-      p.foreach { s =>
-        println(s"Element: $s")
-      }
+        p.foreach { s =>
+          println(s"Element: $s")
+        }
       //#stream
       Await.result(f, Duration.Inf)
     };

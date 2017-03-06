@@ -43,9 +43,9 @@ object ParseKey extends Properties("Key parser test") {
 
       ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
         ("Current: " + structure.current) |: parse(structure, string) {
-          case Left(err) => false
-          case Right(sk) => sk.scope.project == Select(structure.current)
-        }
+        case Left(err) => false
+        case Right(sk) => sk.scope.project == Select(structure.current)
+      }
     }
 
   property("An unspecified task axis resolves to Global") =
@@ -72,10 +72,10 @@ object ParseKey extends Properties("Key parser test") {
 
       ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
         ("Expected configuration: " +
-          resolvedConfig.map(_.name)) |: parse(structure, string) {
-          case Right(sk) => sk.scope.config == resolvedConfig
-          case Left(err) => false
-        }
+        resolvedConfig.map(_.name)) |: parse(structure, string) {
+        case Right(sk) => sk.scope.config == resolvedConfig
+        case Left(err) => false
+      }
     }
 
   lazy val structureDefinedKey: Gen[StructureKeyMask] = structureKeyMask { s =>

@@ -114,6 +114,7 @@ trait DefaultContentTypeOfs {
   /**
     * Default content type for empty responses (no content type).
     */
-  implicit def contentTypeOf_EmptyContent: ContentTypeOf[Results.EmptyContent] =
+  implicit def contentTypeOf_EmptyContent
+    : ContentTypeOf[Results.EmptyContent] =
     ContentTypeOf[Results.EmptyContent](None)
 }

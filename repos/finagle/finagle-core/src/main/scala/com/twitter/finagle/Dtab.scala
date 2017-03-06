@@ -237,9 +237,8 @@ object Dtab {
   /** Scala collection plumbing required to build new dtabs */
   def newBuilder: DtabBuilder = new DtabBuilder
 
-  implicit val canBuildFrom: CanBuildFrom[TraversableOnce[Dentry],
-                                          Dentry,
-                                          Dtab] =
+  implicit val canBuildFrom
+    : CanBuildFrom[TraversableOnce[Dentry], Dentry, Dtab] =
     new CanBuildFrom[TraversableOnce[Dentry], Dentry, Dtab] {
       def apply(_ign: TraversableOnce[Dentry]): DtabBuilder = newBuilder
       def apply(): DtabBuilder = newBuilder

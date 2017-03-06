@@ -948,7 +948,8 @@ private[hive] trait HiveInspectors {
         TypeInfoFactory.decimalTypeInfo,
         getDecimalWritable(value))
 
-  private def getPrimitiveNullWritableConstantObjectInspector: ObjectInspector =
+  private def getPrimitiveNullWritableConstantObjectInspector
+    : ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
         TypeInfoFactory.voidTypeInfo,

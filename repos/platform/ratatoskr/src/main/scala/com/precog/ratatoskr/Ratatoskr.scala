@@ -342,7 +342,7 @@ object KafkaTools extends Command {
       }
 
       trackedAccounts = trackedAccounts ++
-          (byAccount.keySet -- trackedAccounts)
+        (byAccount.keySet -- trackedAccounts)
       slices += (timestamp -> byAccount)
     }
 

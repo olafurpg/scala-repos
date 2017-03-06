@@ -429,8 +429,8 @@ object Concurrent {
 
             case in =>
               if (!busy.single()) {
-                val readyOrNot: Future[
-                  Either[Iteratee[E, Iteratee[E, A]], Unit]] =
+                val readyOrNot
+                  : Future[Either[Iteratee[E, Iteratee[E, A]], Unit]] =
                   Future.firstCompletedOf(
                     Seq(
                       inner
@@ -482,8 +482,8 @@ object Concurrent {
   def unicast[E](onStart: Channel[E] => Unit,
                  onComplete: => Unit = (),
                  onError: (String, Input[E]) => Unit =
-                   (_: String, _: Input[E]) =>
-                     ())(implicit ec: ExecutionContext) = new Enumerator[E] {
+                   (_: String, _: Input[E]) => ())(
+      implicit ec: ExecutionContext) = new Enumerator[E] {
     implicit val pec = ec.prepare()
 
     import scala.concurrent.stm.Ref
@@ -632,8 +632,9 @@ object Concurrent {
       val interested: List[(Iteratee[E, _], Promise[Iteratee[E, _]])] =
         iteratees.single.swap(List())
 
-      val commitReady: Ref[
-        List[(Int, (Iteratee[E, _], Promise[Iteratee[E, _]]))]] = Ref(List())
+      val commitReady
+        : Ref[List[(Int, (Iteratee[E, _], Promise[Iteratee[E, _]]))]] = Ref(
+        List())
 
       val commitDone: Ref[List[Int]] = Ref(List())
 

@@ -78,8 +78,8 @@ class VectorOps_DoubleTest
   val space = Vector.space[Double]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-    (Vector[Double], Vector[Double], Vector[Double])] = {
+  implicit def genTriple
+    : Arbitrary[(Vector[Double], Vector[Double], Vector[Double])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
@@ -113,8 +113,8 @@ class VectorOps_FloatTest
 
   override val TOL: Double = 1E-2
   val N = 30
-  implicit def genTriple: Arbitrary[
-    (Vector[Float], Vector[Float], Vector[Float])] = {
+  implicit def genTriple
+    : Arbitrary[(Vector[Float], Vector[Float], Vector[Float])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Float].map { _ % 1000f }
@@ -152,7 +152,8 @@ class VectorOps_IntTest extends TensorSpaceTestBase[Vector[Int], Int, Int] {
   val space = Vector.space[Int]
 
   val N = 30
-  implicit def genTriple: Arbitrary[(Vector[Int], Vector[Int], Vector[Int])] = {
+  implicit def genTriple
+    : Arbitrary[(Vector[Int], Vector[Int], Vector[Int])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Int].map { _ % 1000 }
@@ -191,8 +192,8 @@ class VectorOps_ComplexTest
   val space = Vector.space[Complex]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-    (Vector[Complex], Vector[Complex], Vector[Complex])] = {
+  implicit def genTriple
+    : Arbitrary[(Vector[Complex], Vector[Complex], Vector[Complex])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Complex]

@@ -303,9 +303,9 @@ class Generic1Tests {
     val ihc = the[IsHCons1[L, TC1, TC2]]
     val l: L[Int] =
       23 :: 13 :: "foo" :: (7, 13) :: List(Some(5)) :: Some(11) :: List(
-        1,
-        2,
-        3) :: HNil
+      1,
+      2,
+      3) :: HNil
 
     val (hd, tl) = ihc.unpack(l)
 

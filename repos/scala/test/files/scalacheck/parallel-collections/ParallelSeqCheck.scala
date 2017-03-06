@@ -39,8 +39,8 @@ abstract class ParallelSeqCheck[T](collName: String)
     for (inst <- instances(values); s <- choose(0, inst.size))
       yield (inst, fromSeq(inst), s);
 
-  def collectionPairsWithModifiedWithLengths: Gen[
-    (Seq[T], CollType, ParSeq[T], Int)] =
+  def collectionPairsWithModifiedWithLengths
+    : Gen[(Seq[T], CollType, ParSeq[T], Int)] =
     for (inst <- instances(values); s <- choose(0, inst.size);
          updateStart <- choose(0, inst.size); howMany <- choose(0, inst.size))
       yield {
@@ -65,7 +65,8 @@ abstract class ParallelSeqCheck[T](collName: String)
       (inst, parcoll, parcollsliced)
     }
 
-  def collectionTripletsWith2Indices: Gen[(Seq[T], CollType, Seq[T], Int, Int)] =
+  def collectionTripletsWith2Indices
+    : Gen[(Seq[T], CollType, Seq[T], Int, Int)] =
     for (inst <- instances(values); f <- choose(0, inst.size);
          s <- choose(0, inst.size - f);
          third <- instances(values); sliceStart <- choose(0, inst.size);
@@ -190,7 +191,7 @@ abstract class ParallelSeqCheck[T](collName: String)
         ("start with self" |: s.startsWith(s) == coll.startsWith(coll)) &&
         ("tails correspond" |:
           (s.length == 0 ||
-          s.startsWith(s.tail, 1) == coll.startsWith(coll.tail, 1))) &&
+        s.startsWith(s.tail, 1) == coll.startsWith(coll.tail, 1))) &&
         ("with each other" |: coll.startsWith(s)) &&
         ("modified" |: s.startsWith(collmodif) == coll.startsWith(collmodif)) &&
         ("modified2" |: s.startsWith(collmodif, pos) == coll
@@ -256,7 +257,7 @@ abstract class ParallelSeqCheck[T](collName: String)
               .patch(from, fromSeq(Nil), repl)) &&
             ("with one" |:
               (s.length == 0 || s.patch(from, List(s(0)), 1) == coll
-                .patch(from, fromSeq(List(coll(0))), 1)))
+              .patch(from, fromSeq(List(coll(0))), 1)))
       }
 
   if (!isCheckingViews)
