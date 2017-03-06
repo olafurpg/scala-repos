@@ -106,8 +106,8 @@ object LiftSession {
     */
   var onEndServicing: List[(LiftSession, Req, Box[LiftResponse]) => Unit] = Nil
 
-  @volatile private var constructorCache: Map[(Class[_], Box[Class[_]]),
-                                              Box[ConstructorType]] = Map()
+  @volatile private var constructorCache
+    : Map[(Class[_], Box[Class[_]]), Box[ConstructorType]] = Map()
 
   private[http] def constructFrom[T](session: LiftSession,
                                      pp: Box[ParamPair],
@@ -199,7 +199,7 @@ object LiftSession {
               terminal,
               LiftRules.buildPackage("snippet").map(_ + packageSuffix) :::
                 (("lift.app.snippet" + packageSuffix) ::
-                  ("net.liftweb.builtin.snippet" + packageSuffix) :: Nil)
+                ("net.liftweb.builtin.snippet" + packageSuffix) :: Nil)
             )
           }
         )
@@ -384,8 +384,8 @@ class LiftSession(private[http] val _contextPath: String,
   private val functionOwnerRemovalListeners =
     LiftSession.onFunctionOwnersRemoved
 
-  @volatile private[http] var notices: Seq[
-    (NoticeType.Value, NodeSeq, Box[String])] = Nil
+  @volatile private[http] var notices
+    : Seq[(NoticeType.Value, NodeSeq, Box[String])] = Nil
 
   private case class CometId(cometType: String, cometName: Box[String])
 
@@ -423,8 +423,8 @@ class LiftSession(private[http] val _contextPath: String,
   private var ajaxRequests =
     scala.collection.mutable.Map[String, List[AjaxRequestInfo]]()
 
-  private[http] def withAjaxRequests[T](
-      fn: (scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
+  private[http] def withAjaxRequests[T](fn: (
+      scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
     ajaxRequests.synchronized { fn(ajaxRequests) }
   }
 
@@ -2065,7 +2065,7 @@ class LiftSession(private[http] val _contextPath: String,
     }
 
   liftTagProcessing = LiftRules.liftTagProcessing.toList ::: List(
-      _defaultLiftTagProcessing)
+    _defaultLiftTagProcessing)
 
   private def asNodeSeq(in: Seq[Node]): NodeSeq = in
 

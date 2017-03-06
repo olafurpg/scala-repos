@@ -71,7 +71,8 @@ object TaskOp {
       oldTask: Option[Task] = None)
       extends TaskOp {
 
-    override lazy val offerOperations: Iterable[MesosProtos.Offer.Operation] = {
+    override lazy val offerOperations
+      : Iterable[MesosProtos.Offer.Operation] = {
       val (withDisk, withoutDisk) = resources.partition(_.hasDisk)
       val reservationsForDisks = withDisk.map(_.toBuilder.clearDisk().build())
 

@@ -113,16 +113,16 @@ object VersionUtil {
       Versions(canonicalV, mavenV, osgiV, sha, date, release)
     }
 
-  private lazy val generateVersionPropertiesFileImpl: Def.Initialize[
-    Task[File]] = Def.task {
+  private lazy val generateVersionPropertiesFileImpl
+    : Def.Initialize[Task[File]] = Def.task {
     writeProps(
       versionProperties.value.toMap +
         ("copyright.string" -> copyrightString.value),
       (resourceManaged in Compile).value / s"${thisProject.value.id}.properties")
   }
 
-  private lazy val generateBuildCharacterPropertiesFileImpl: Def.Initialize[
-    Task[File]] = Def.task {
+  private lazy val generateBuildCharacterPropertiesFileImpl
+    : Def.Initialize[Task[File]] = Def.task {
     writeProps(
       versionProperties.value.toMap,
       (baseDirectory in ThisBuild).value / "buildcharacter.properties")

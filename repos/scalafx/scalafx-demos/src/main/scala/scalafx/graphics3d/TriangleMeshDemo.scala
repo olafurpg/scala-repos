@@ -186,29 +186,10 @@ object TriangleMeshDemo extends JFXApp {
      * below.
      */
     mesh.faces = Array(
-      0,
-      0,
-      1,
-      1,
-      2,
-      2, // Base face, face 0. (Vertex points 0, 1, 2, tex-coords 0, 1, 2)
-      1,
-      1,
-      0,
-      0,
-      3,
-      3, // Right face, face 1. (Vertex points 1, 0, 3, tex-coords 1, 0, 3)
-      2,
-      2,
-      1,
-      1,
-      3,
-      4, // Front face, face 2. (Vertex points 2, 1, 3, tex-coords 2, 1, 4)
-      0,
-      0,
-      2,
-      2,
-      3,
+      0, 0, 1, 1, 2, 2, // Base face, face 0. (Vertex points 0, 1, 2, tex-coords 0, 1, 2)
+      1, 1, 0, 0, 3, 3, // Right face, face 1. (Vertex points 1, 0, 3, tex-coords 1, 0, 3)
+      2, 2, 1, 1, 3, 4, // Front face, face 2. (Vertex points 2, 1, 3, tex-coords 2, 1, 4)
+      0, 0, 2, 2, 3,
       5 // Left face, face 3. (Vertex points 0, 2, 3, tex-coords 0, 2, 3)
     )
 

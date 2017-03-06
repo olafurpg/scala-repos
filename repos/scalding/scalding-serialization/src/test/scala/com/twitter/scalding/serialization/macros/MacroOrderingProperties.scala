@@ -121,8 +121,8 @@ object TestCC {
       } yield t
     }
 
-  implicit def arbitraryTestSealedAbstractClass: Arbitrary[
-    TestSealedAbstractClass] = Arbitrary {
+  implicit def arbitraryTestSealedAbstractClass
+    : Arbitrary[TestSealedAbstractClass] = Arbitrary {
     for {
       testSealedAbstractClass <- Gen.oneOf(A, B)
     } yield testSealedAbstractClass

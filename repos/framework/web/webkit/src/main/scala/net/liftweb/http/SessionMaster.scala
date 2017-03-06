@@ -64,22 +64,22 @@ object SessionMaster extends LiftActor with Loggable {
     * to call to destroy the session.
     */
   @volatile
-  var sessionCheckFuncs: List[
-    (Map[String, SessionInfo], SessionInfo => Unit) => Unit] =
+  var sessionCheckFuncs
+    : List[(Map[String, SessionInfo], SessionInfo => Unit) => Unit] =
     ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) => {
-       val now = millis
+      val now = millis
 
-       for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
-         if (now - session.lastServiceTime > session.inactivityLength ||
-             session.markedForTermination) {
-           logger.info(" Session " + id + " expired")
-           destroyer(info)
-         } else {
-           session.doCometActorCleanup()
-           session.cleanupUnseenFuncs()
-         }
-       }
-     }) :: Nil
+      for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
+        if (now - session.lastServiceTime > session.inactivityLength ||
+            session.markedForTermination) {
+          logger.info(" Session " + id + " expired")
+          destroyer(info)
+        } else {
+          session.doCometActorCleanup()
+          session.cleanupUnseenFuncs()
+        }
+      }
+    }) :: Nil
 
   def getSession(req: Req, otherId: Box[String]): Box[LiftSession] = {
     val dead = otherId.map(killedSessions.containsKey(_)) openOr false

@@ -38,12 +38,8 @@ class TypedStaticQueryTest {
         dc.db.run(
           DBIO.seq(
             s1.map { list1 =>
-              val typedList1: Vector[(Int,
-                                      String,
-                                      String,
-                                      String,
-                                      String,
-                                      String)] = list1
+              val typedList1
+                : Vector[(Int, String, String, String, String, String)] = list1
               assertEquals(Vector(
                              (150,
                               "The High Ground",
@@ -62,7 +58,8 @@ class TypedStaticQueryTest {
               assertEquals("coffee", cof1)
             },
             s4.map { list4 =>
-              val hlist1Typed: Int :: String :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: HNil =
+              val hlist1Typed
+                : Int :: String :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: HNil =
                 list4.head
               assertEquals(
                 1 :: "2" :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 :: 10 :: 11 :: 12 :: 13 :: 14 :: 15 :: 16 :: 17 :: 18 :: 19 :: 20 :: 21 :: 22 :: 23 :: HNil,

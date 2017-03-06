@@ -121,20 +121,21 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
     // Everything other than case clauses is treated uniformly.
 
     // Is the expression a block containing a single expression?
-    val oneLinerBlock: Option[
-      (ScBlockExpr, ScExpression, CommentsAroundElement)] = expr.flatMap {
-      case blk: ScBlockExpr =>
-        blk.statements match {
-          case Seq(x: ScExpression) =>
-            val comments =
-              IntentionUtil.collectComments(x, onElementLine = true)
-            if (!IntentionUtil.hasOtherComments(blk, comments))
-              Some((blk, x, comments))
-            else None
-          case _ => None
-        }
-      case _ => None
-    }
+    val oneLinerBlock
+      : Option[(ScBlockExpr, ScExpression, CommentsAroundElement)] =
+      expr.flatMap {
+        case blk: ScBlockExpr =>
+          blk.statements match {
+            case Seq(x: ScExpression) =>
+              val comments =
+                IntentionUtil.collectComments(x, onElementLine = true)
+              if (!IntentionUtil.hasOtherComments(blk, comments))
+                Some((blk, x, comments))
+              else None
+            case _ => None
+          }
+        case _ => None
+      }
 
     // Create the action to unwrap that block.
     oneLinerBlock.map {

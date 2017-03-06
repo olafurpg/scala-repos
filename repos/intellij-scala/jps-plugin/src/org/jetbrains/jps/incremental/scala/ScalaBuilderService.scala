@@ -28,7 +28,8 @@ class ScalaBuilderService extends BuilderService {
   })
 
   @NotNull
-  override def createModuleLevelBuilders: util.List[_ <: ModuleLevelBuilder] = {
+  override def createModuleLevelBuilders
+    : util.List[_ <: ModuleLevelBuilder] = {
     util.Arrays.asList[ModuleLevelBuilder](
       new IdeaIncrementalBuilder(BuilderCategory.SOURCE_PROCESSOR),
       new IdeaIncrementalBuilder(BuilderCategory.OVERWRITING_TRANSLATOR),

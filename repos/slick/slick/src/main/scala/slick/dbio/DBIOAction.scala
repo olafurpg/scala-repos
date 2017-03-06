@@ -599,9 +599,8 @@ trait SynchronousDatabaseAction[
             .run(context)
           (r1, r2)
         }
-        override def nonFusedEquivalentAction: DBIOAction[(R, R2),
-                                                          NoStream,
-                                                          E with E2] =
+        override def nonFusedEquivalentAction
+          : DBIOAction[(R, R2), NoStream, E with E2] =
           superZip(a)
       }
     case a => superZip(a)

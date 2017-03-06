@@ -194,7 +194,7 @@ object LSMR extends SerializableLogging {
           f":: convtest1: $test1%.2g <? $rtol%.2g :: convtest2: $test2%.2g <? $atol%.2g")
 
       converged = normr == 0.0 || (iter >= maxIter) || (test1 < rtol) ||
-          (test2 < atol)
+        (test2 < atol)
     }
 
     x

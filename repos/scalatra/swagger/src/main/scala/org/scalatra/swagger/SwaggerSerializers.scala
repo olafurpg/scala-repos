@@ -70,7 +70,8 @@ object SwaggerSerializers {
       new SwaggerFormats {
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
-        override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
+        override val parameterNameReader
+          : org.json4s.reflect.ParameterNameReader =
           self.parameterNameReader
         override val typeHints: TypeHints = self.typeHints
         override val customSerializers: List[Serializer[_]] =
@@ -87,7 +88,8 @@ object SwaggerSerializers {
       new SwaggerFormats {
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
-        override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
+        override val parameterNameReader
+          : org.json4s.reflect.ParameterNameReader =
           self.parameterNameReader
         override val typeHints: TypeHints = self.typeHints + extraHints
         override val customSerializers: List[Serializer[_]] =
@@ -104,7 +106,8 @@ object SwaggerSerializers {
       new SwaggerFormats {
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
-        override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
+        override val parameterNameReader
+          : org.json4s.reflect.ParameterNameReader =
           self.parameterNameReader
         override val typeHints: TypeHints = self.typeHints
         override val customSerializers: List[Serializer[_]] =
@@ -121,7 +124,8 @@ object SwaggerSerializers {
     override def withDouble: SwaggerFormats = new SwaggerFormats {
       override val dateFormat: DateFormat = self.dateFormat
       override val typeHintFieldName: String = self.typeHintFieldName
-      override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
+      override val parameterNameReader
+        : org.json4s.reflect.ParameterNameReader =
         self.parameterNameReader
       override val typeHints: TypeHints = self.typeHints
       override val customSerializers: List[Serializer[_]] =
@@ -137,7 +141,8 @@ object SwaggerSerializers {
     override def withBigDecimal: SwaggerFormats = new SwaggerFormats {
       override val dateFormat: DateFormat = self.dateFormat
       override val typeHintFieldName: String = self.typeHintFieldName
-      override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
+      override val parameterNameReader
+        : org.json4s.reflect.ParameterNameReader =
         self.parameterNameReader
       override val typeHints: TypeHints = self.typeHints
       override val customSerializers: List[Serializer[_]] =
@@ -154,7 +159,8 @@ object SwaggerSerializers {
       new SwaggerFormats {
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
-        override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
+        override val parameterNameReader
+          : org.json4s.reflect.ParameterNameReader =
           self.parameterNameReader
         override val typeHints: TypeHints = hints
         override val customSerializers: List[Serializer[_]] =

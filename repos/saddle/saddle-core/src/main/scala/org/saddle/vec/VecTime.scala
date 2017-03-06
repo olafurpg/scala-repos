@@ -92,8 +92,8 @@ class VecTime(val times: Vec[Long],
 
   def foldLeftWhile[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, DateTime) => B)(cond: (B, DateTime) => Boolean) =
-    times.foldLeftWhile(init)((a, b) => f(a, l2t(b)))((a, b) =>
-      cond(a, l2t(b)))
+    times.foldLeftWhile(init)((a, b) => f(a, l2t(b)))(
+      (a, b) => cond(a, l2t(b)))
 
   def zipMap[@spec(Boolean, Int, Long, Double) B: ST,
              @spec(Boolean, Int, Long, Double) C: ST](other: Vec[B])(

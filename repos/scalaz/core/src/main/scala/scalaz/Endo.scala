@@ -47,8 +47,9 @@ sealed abstract class EndoInstances {
     def append(f1: Endo[A], f2: => Endo[A]) = f1 compose f2
     def zero = Endo.idEndo
   }
-  implicit val endoInstances: Zip[Endo] with Unzip[Endo] with InvariantFunctor[
-    Endo] = new Zip[Endo] with Unzip[Endo] with InvariantFunctor[Endo] {
+  implicit val endoInstances
+    : Zip[Endo] with Unzip[Endo] with InvariantFunctor[Endo] = new Zip[Endo]
+  with Unzip[Endo] with InvariantFunctor[Endo] {
     def xmap[A, B](fa: Endo[A], f: A => B, g: B => A) =
       Endo.endo(g andThen fa.run andThen f)
 

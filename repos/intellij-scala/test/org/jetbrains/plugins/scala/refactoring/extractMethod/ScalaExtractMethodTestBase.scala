@@ -70,7 +70,7 @@ abstract class ScalaExtractMethodTestBase
       case e: Exception =>
         assert(assertion = false,
                message = e.getMessage + "\n" +
-                   e.getStackTrace.map(_.toString).mkString("  \n"))
+                 e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 
     val text = lastPsi.getText

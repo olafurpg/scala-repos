@@ -116,8 +116,8 @@ object ScaladocAction {
                                    "Generate Scaladoc") {
     override def checkConfiguration() {}
 
-    override def getConfigurationEditor: SettingsEditor[
-      _ <: ScaladocRunConfiguration] =
+    override def getConfigurationEditor
+      : SettingsEditor[_ <: ScaladocRunConfiguration] =
       new SettingsEditor[ScaladocRunConfiguration]() {
         override def createEditor(): JComponent = dialog.createCenterPanel()
 

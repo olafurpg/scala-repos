@@ -1587,7 +1587,7 @@ trait ContextErrors { self: Analyzer =>
                else
                  boxedClass get sym map
                    (boxed =>
-                      sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
+                     sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
                       |methods inherited from Object are rendered ambiguous.  This is to avoid
                       |a blanket implicit which would convert any ${sym.fullName} to any AnyRef.
                       |You may wish to use a type ascription: `x: ${boxed.fullName}`.""") getOrElse "")

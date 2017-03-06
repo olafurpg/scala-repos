@@ -118,9 +118,9 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
 
   // Mapping of application IDs to their metadata, in descending end time order. Apps are inserted
   // into the map in order, so the LinkedHashMap maintains the correct ordering.
-  @volatile private var applications: mutable.LinkedHashMap[
-    String,
-    FsApplicationHistoryInfo] = new mutable.LinkedHashMap()
+  @volatile private var applications
+    : mutable.LinkedHashMap[String, FsApplicationHistoryInfo] =
+    new mutable.LinkedHashMap()
 
   val fileToAppInfo = new mutable.HashMap[Path, FsApplicationAttemptInfo]()
 

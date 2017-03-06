@@ -219,7 +219,7 @@ private[mutable] abstract class ParHashSetCombiner[T](
       while (null != curEntry) {
         if (curEntry == newEntry) return 0
         h = h +
-            1 // we *do not* do `(h + 1) % table.length` here, because we'll never overflow!!
+          1 // we *do not* do `(h + 1) % table.length` here, because we'll never overflow!!
         if (h >= comesBefore) return -1
         curEntry = table(h)
       }

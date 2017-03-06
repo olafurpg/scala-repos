@@ -77,7 +77,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
                   boundClass = getBoundClass(state),
                   fromType = fromType,
                   isAccessible = isAccessible(constr, ref) &&
-                      accessible
+                    accessible
               )))
           }
         case ta: ScTypeAliasDeclaration =>
@@ -123,7 +123,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
                       boundClass = getBoundClass(state),
                       fromType = fromType,
                       isAccessible = isAccessible(constr, ref) &&
-                          accessible
+                        accessible
                   )))
               }
             case _ =>

@@ -1004,7 +1004,7 @@ class CheckpointSuite
         rdd.count()
         // Check the two state RDDs are both checkpointed
         rddsCheckpointed = stateRDDs.size == 2 &&
-            stateRDDs.forall(_.isCheckpointed)
+          stateRDDs.forall(_.isCheckpointed)
       }
     ssc.start()
     batchCounter.waitUntilBatchesCompleted(1, 10000)

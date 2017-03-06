@@ -106,7 +106,8 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
   // nesting, etc, so this lets us customize our notion of "size" for each structure:
 
   // These collections should all be empty once Spark is idle (no active stages / jobs):
-  private[spark] def getSizesOfActiveStateTrackingCollections: Map[String, Int] = {
+  private[spark] def getSizesOfActiveStateTrackingCollections
+    : Map[String, Int] = {
     Map(
       "activeStages" -> activeStages.size,
       "activeJobs" -> activeJobs.size,

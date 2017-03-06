@@ -112,8 +112,8 @@ object PairingSystem extends AbstractPairingSystem {
           case (a, b) =>
             // lower is better
             i = i + Math.abs(a.rank - b.rank) * 1000 +
-                Math.abs(a.player.rating - b.player.rating) +
-                justPlayedTogether(a.player.userId, b.player.userId).?? {
+              Math.abs(a.player.rating - b.player.rating) +
+              justPlayedTogether(a.player.userId, b.player.userId).?? {
                 if (veryMuchJustPlayedTogether(a.player.userId,
                                                b.player.userId))
                   9000 * 1000

@@ -40,9 +40,9 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val p = new Promise[Unit]
     val s =
       () +:: {
-        if (p.setDone()) of(())
-        else AsyncStream.empty[Unit]
-      }
+      if (p.setDone()) of(())
+      else AsyncStream.empty[Unit]
+    }
     assert(toSeq(s) == toSeq(s))
   }
 
@@ -101,9 +101,9 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val p = new Promise[Unit]
     val s =
       () +:: {
-        p.setDone()
-        undefined: AsyncStream[Unit]
-      }
+      p.setDone()
+      undefined: AsyncStream[Unit]
+    }
 
     s.map(x => 0)
     assert(!p.isDefined)
@@ -157,10 +157,10 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
       var once = 0
       val s: AsyncStream[Int] =
         2 +:: {
-          once = once + 1
-          if (once > 1) throw new Exception("evaluated more than once")
-          AsyncStream.of(1)
-        }
+        once = once + 1
+        if (once > 1) throw new Exception("evaluated more than once")
+        AsyncStream.of(1)
+      }
 
       val ss = ops(s)
       ss.foreach(_ => ())

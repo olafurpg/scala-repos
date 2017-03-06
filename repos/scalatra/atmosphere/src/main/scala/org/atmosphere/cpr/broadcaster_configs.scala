@@ -7,7 +7,8 @@ import org.scalatra.atmosphere.{RedisScalatraBroadcaster, ScalatraBroadcaster}
 trait BroadcasterConf {
   def broadcasterClass: Class[_ <: ScalatraBroadcaster]
   def uri: URI
-  def extraSetup: Broadcaster => Unit // To perform optional plugin-specific Broadcaster setup
+  def extraSetup
+    : Broadcaster => Unit // To perform optional plugin-specific Broadcaster setup
 }
 
 /**

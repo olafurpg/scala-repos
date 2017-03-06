@@ -157,9 +157,8 @@ object BitVector extends BitVectorOps {
       }
     }
 
-  implicit def canTraverseKeyValuePairs: CanTraverseKeyValuePairs[BitVector,
-                                                                  Int,
-                                                                  Boolean] =
+  implicit def canTraverseKeyValuePairs
+    : CanTraverseKeyValuePairs[BitVector, Int, Boolean] =
     new CanTraverseKeyValuePairs[BitVector, Int, Boolean] {
       def isTraversableAgain(from: BitVector): Boolean = true
 

@@ -37,7 +37,8 @@ package object rearranger {
     "SCALA_SPLIT_BY_EXPRESSIONS"
   val SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS_UI =
     "Split into unarrangeable blocks by expressions"
-  val SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS: ArrangementSettingsToken =
+  val SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS
+    : ArrangementSettingsToken =
     StdArrangementSettingsToken.token(
       SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS_ID,
       SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS_UI,

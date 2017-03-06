@@ -52,8 +52,8 @@ trait Uncompilable {
   def templates =
     symbols filter
       (x =>
-         x.isClass || x.isTrait ||
-           x == AnyRefClass /* which is now a type alias */ ) toSet
+        x.isClass || x.isTrait ||
+          x == AnyRefClass /* which is now a type alias */ ) toSet
   def comments = {
     if (settings.debug || settings.verbose)
       inform(

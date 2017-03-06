@@ -728,15 +728,15 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     kids.foreach(_.validate)
   }
 
-  private[sitemap] def testParentAccess: Either[Boolean,
-                                                Box[() => LiftResponse]] =
+  private[sitemap] def testParentAccess
+    : Either[Boolean, Box[() => LiftResponse]] =
     _parent match {
       case Full(p) => p.testAccess
       case _ => Left(true)
     }
 
-  override private[sitemap] def testAccess: Either[Boolean,
-                                                   Box[() => LiftResponse]] =
+  override private[sitemap] def testAccess
+    : Either[Boolean, Box[() => LiftResponse]] =
     loc.testAccess
 
   def toMenu = this

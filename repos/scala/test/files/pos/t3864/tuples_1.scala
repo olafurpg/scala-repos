@@ -647,7 +647,25 @@ trait Tuples {
   trait Tuple20W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
       extends EnrichedType[
         Tuple20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]] {
-    def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
+    def fold[Z](f: => (A,
+                       B,
+                       C,
+                       D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
                        T) => Z): Z = {
       import value._;
       f(_1,
@@ -841,8 +859,28 @@ trait Tuples {
                                    S,
                                    T,
                                    U]] {
-    def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
-                       T, U) => Z): Z = {
+    def fold[Z](
+        f: => (A,
+               B,
+               C,
+               D,
+               E,
+               F,
+               G,
+               H,
+               I,
+               J,
+               K,
+               L,
+               M,
+               N,
+               O,
+               P,
+               Q,
+               R,
+               S,
+               T,
+               U) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -1066,7 +1104,27 @@ trait Tuples {
                 U,
                 V]] {
     def fold[Z](
-        f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
+        f: => (A,
+               B,
+               C,
+               D,
+               E,
+               F,
+               G,
+               H,
+               I,
+               J,
+               K,
+               L,
+               M,
+               N,
+               O,
+               P,
+               Q,
+               R,
+               S,
+               T,
+               U,
                V) => Z): Z = {
       import value._;
       f(_1,

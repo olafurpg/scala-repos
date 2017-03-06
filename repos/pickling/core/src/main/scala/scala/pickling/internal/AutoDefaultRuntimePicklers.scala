@@ -46,8 +46,8 @@ trait RuntimePicklerRegistryHelper extends PicklerRegistry {
     }
   }
 
-  def tuplePicklerGenerator: AppliedType => Pickler[(Any, Any)] with Unpickler[
-    (Any, Any)] = { tpe =>
+  def tuplePicklerGenerator
+    : AppliedType => Pickler[(Any, Any)] with Unpickler[(Any, Any)] = { tpe =>
     // TODO - Actually extract the tpe of the internal things.
     val tag = FastTypeTag.apply(internal.currentMirror, tpe.toString)
     new Tuple2RTPickler()

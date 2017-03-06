@@ -35,28 +35,17 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readChar`") {
         val stream = newStream(
-          0x00,
-          0x48, // H
-          0x00,
-          0xF6, // ö
-          0x00,
-          0x6C, // l
-          0x00,
-          0x6C, // l
-          0x00,
-          0xF6, // ö
-          0x00,
-          0x20, // [space]
-          0x00,
-          0x57, // W
-          0x01,
-          0x03, // ă
-          0x00,
-          0x72, // r
-          0x02,
-          0x34, // ȴ
-          0x01,
-          0x11, // đ
+          0x00, 0x48, // H
+          0x00, 0xF6, // ö
+          0x00, 0x6C, // l
+          0x00, 0x6C, // l
+          0x00, 0xF6, // ö
+          0x00, 0x20, // [space]
+          0x00, 0x57, // W
+          0x01, 0x03, // ă
+          0x00, 0x72, // r
+          0x02, 0x34, // ȴ
+          0x01, 0x11, // đ
           0x56 // dangling
         )
         var res = ""
@@ -70,72 +59,12 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readDouble`") {
         val stream = newStream(
-          0x3f,
-          0xe6,
-          0x66,
-          0x66,
-          0x66,
-          0x66,
-          0x66,
-          0x66,
-          0x41,
-          0x15,
-          0x19,
-          0x20,
-          0x45,
-          0x8d,
-          0x9b,
-          0x5f,
-          0xc0,
-          0xab,
-          0x20,
-          0x22,
-          0x75,
-          0x25,
-          0x46,
-          0x0b,
-          0x7f,
-          0xf8,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x7f,
-          0xf0,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0xc0,
-          0x1c,
-          0x0d,
-          0xca,
-          0x65,
-          0xea,
-          0x3f,
-          0xa4,
-          0xff,
-          0xf0,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
+          0x3f, 0xe6, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x41, 0x15, 0x19,
+          0x20, 0x45, 0x8d, 0x9b, 0x5f, 0xc0, 0xab, 0x20, 0x22, 0x75, 0x25,
+          0x46, 0x0b, 0x7f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f,
+          0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x1c, 0x0d, 0xca,
+          0x65, 0xea, 0x3f, 0xa4, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00,
+          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
           0x01 // dangling
         )
 
@@ -152,38 +81,9 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readFloat`") {
         val stream = newStream(
-          0xbf,
-          0x80,
-          0x00,
-          0x00,
-          0x45,
-          0x8e,
-          0x9c,
-          0x83,
-          0x80,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x00,
-          0x7f,
-          0xc0,
-          0x00,
-          0x00,
-          0x7f,
-          0x80,
-          0x00,
-          0x00,
-          0xbb,
-          0x03,
-          0x12,
-          0x6f,
-          0xff,
-          0x80,
-          0x00,
-          0x00,
+          0xbf, 0x80, 0x00, 0x00, 0x45, 0x8e, 0x9c, 0x83, 0x80, 0x00, 0x00,
+          0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xc0, 0x00, 0x00, 0x7f, 0x80,
+          0x00, 0x00, 0xbb, 0x03, 0x12, 0x6f, 0xff, 0x80, 0x00, 0x00,
           0xff // dangling
         )
 
@@ -199,38 +99,10 @@ object DataInputStreamTest extends JasmineTest {
       }
 
       it("should provide `readInt`") {
-        val stream = newStream(0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x7f,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xfc,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x53,
-                               0x00,
-                               0x00,
-                               0x89,
-                               0xa2,
-                               0xff,
-                               0xfe,
-                               0x82,
-                               0xfd,
-                               0x80,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x01)
+        val stream = newStream(0x00, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xff, 0xff,
+          0xff, 0xff, 0xff, 0xfc, 0x00, 0x00, 0x00, 0x53, 0x00, 0x00, 0x89,
+          0xa2, 0xff, 0xfe, 0x82, 0xfd, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+          0x00, 0x01)
 
         expect(stream.readInt()).toBe(0)
         expect(stream.readInt()).toBe(Int.MaxValue)
@@ -244,70 +116,13 @@ object DataInputStreamTest extends JasmineTest {
       }
 
       it("should provide `readLong`") {
-        val stream = newStream(0x00,
-                               0x01,
-                               0xf0,
-                               0xec,
-                               0x59,
-                               0x0c,
-                               0x70,
-                               0x9a,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xfe,
-                               0x10,
-                               0xd5,
-                               0x5e,
-                               0x7f,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0x80,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0xff,
-                               0x79,
-                               0x24,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x00,
-                               0x2f)
+        val stream = newStream(0x00, 0x01, 0xf0, 0xec, 0x59, 0x0c, 0x70, 0x9a,
+          0xff, 0xff, 0xff, 0xff, 0xfe, 0x10, 0xd5, 0x5e, 0x7f, 0xff, 0xff,
+          0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+          0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80,
+          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
+          0xff, 0xff, 0x79, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+          0x2f)
 
         expect(stream.readLong() == 546372873646234L).toBeTruthy
         expect(stream.readLong() == -32451234L).toBeTruthy
@@ -322,23 +137,8 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readShort`") {
         val stream = newStream(
-          0x01,
-          0xc5,
-          0xff,
-          0xd5,
-          0x7f,
-          0xff,
-          0x18,
-          0xb0,
-          0x00,
-          0x00,
-          0x80,
-          0x00,
-          0xfe,
-          0xa6,
-          0x00,
-          0x22,
-          0x01 // dangling
+          0x01, 0xc5, 0xff, 0xd5, 0x7f, 0xff, 0x18, 0xb0, 0x00, 0x00, 0x80,
+          0x00, 0xfe, 0xa6, 0x00, 0x22, 0x01 // dangling
         )
 
         expect(stream.readShort()).toBe(453)
@@ -363,23 +163,8 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readUnsignedShort`") {
         val stream = newStream(
-          0xfe,
-          0x4c,
-          0x00,
-          0x00,
-          0x18,
-          0xee,
-          0x0d,
-          0xed,
-          0x00,
-          0x2b,
-          0x01,
-          0xce,
-          0x01,
-          0x56,
-          0x64,
-          0x2b,
-          0x01 // dangling
+          0xfe, 0x4c, 0x00, 0x00, 0x18, 0xee, 0x0d, 0xed, 0x00, 0x2b, 0x01,
+          0xce, 0x01, 0x56, 0x64, 0x2b, 0x01 // dangling
         )
 
         expect(stream.readUnsignedShort()).toBe(65100)
@@ -452,44 +237,10 @@ object DataInputStreamTest extends JasmineTest {
       }
 
       it("should provide `readUTF`") {
-        val stream = newStream(0x00,
-                               0x10,
-                               0x48,
-                               0xc3,
-                               0xb6,
-                               0x6c,
-                               0x6c,
-                               0xc3,
-                               0xb6,
-                               0x20,
-                               0x57,
-                               0xc4,
-                               0x83,
-                               0x72,
-                               0xc8,
-                               0xb4,
-                               0xc4,
-                               0x91,
-                               0x00,
-                               0x0d,
-                               0x70,
-                               0x6f,
-                               0x6f,
-                               0x20,
-                               0x2d,
-                               0x3e,
-                               0x20,
-                               0xed,
-                               0xa0,
-                               0xbd,
-                               0xed,
-                               0xb2,
-                               0xa9,
-                               0x00,
-                               0x03,
-                               0xe6,
-                               0x84,
-                               0x9b)
+        val stream = newStream(0x00, 0x10, 0x48, 0xc3, 0xb6, 0x6c, 0x6c, 0xc3,
+          0xb6, 0x20, 0x57, 0xc4, 0x83, 0x72, 0xc8, 0xb4, 0xc4, 0x91, 0x00,
+          0x0d, 0x70, 0x6f, 0x6f, 0x20, 0x2d, 0x3e, 0x20, 0xed, 0xa0, 0xbd,
+          0xed, 0xb2, 0xa9, 0x00, 0x03, 0xe6, 0x84, 0x9b)
 
         expect(stream.readUTF).toEqual("Höllö Wărȴđ")
         expect(stream.readUTF).toEqual("poo -> 💩")

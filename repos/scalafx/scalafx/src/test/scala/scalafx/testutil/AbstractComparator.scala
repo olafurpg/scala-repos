@@ -208,9 +208,9 @@ private[testutil] trait AbstractComparator extends Assertions {
       if (useStatic)(b => b) else (b => !b)
     val isAcceptable: Method => Boolean =
       (m =>
-         isPublicMethod(m) &&
-           staticIndicator(Modifier.isStatic(m.getModifiers)) &&
-           !isSpecialMethodName(m.getName))
+        isPublicMethod(m) &&
+          staticIndicator(Modifier.isStatic(m.getModifiers)) &&
+          !isSpecialMethodName(m.getName))
 
     cls.getDeclaredMethods.filter(isAcceptable).sortWith(nameComparator).toList
   }

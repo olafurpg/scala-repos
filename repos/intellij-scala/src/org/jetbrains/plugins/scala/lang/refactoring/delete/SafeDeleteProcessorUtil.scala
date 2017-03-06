@@ -171,8 +171,8 @@ object SafeDeleteProcessorUtil {
                                                      isReferenceInImport))
       }
     }
-    val methodToReferences: util.HashMap[PsiNamedElement,
-                                         util.Collection[PsiReference]] =
+    val methodToReferences
+      : util.HashMap[PsiNamedElement, util.Collection[PsiReference]] =
       new util.HashMap[PsiNamedElement, util.Collection[PsiReference]]
     for (overridingMethod <- overridingMethods) {
       val overridingReferences: util.Collection[PsiReference] =
@@ -223,8 +223,8 @@ object SafeDeleteProcessorUtil {
       originalReferences: util.Collection[PsiReference],
       usages: util.List[UsageInfo],
       allElementsToDelete: Array[PsiElement]): Condition[PsiElement] = {
-    val constructorsToRefs: util.HashMap[PsiMethod,
-                                         util.Collection[PsiReference]] =
+    val constructorsToRefs
+      : util.HashMap[PsiMethod, util.Collection[PsiReference]] =
       new util.HashMap[PsiMethod, util.Collection[PsiReference]]
     val newConstructors: util.HashSet[PsiMethod] = new util.HashSet[PsiMethod]
     if (isTheOnlyEmptyDefaultConstructor(constructor)) return null
@@ -241,7 +241,8 @@ object SafeDeleteProcessorUtil {
             getOverridingConstructorOfSuperCall(reference.getElement)
           if (overridingConstructor != null &&
               !constructorsToRefs.containsKey(overridingConstructor)) {
-            val overridingConstructorReferences: util.Collection[PsiReference] =
+            val overridingConstructorReferences
+              : util.Collection[PsiReference] =
               referenceSearch(overridingConstructor).findAll
             constructorsToRefs
               .put(overridingConstructor, overridingConstructorReferences)
@@ -526,7 +527,8 @@ object SafeDeleteProcessorUtil {
                                                              parameter,
                                                              true) {
                     override def deleteElement() {
-                      val javadocMethodReference: PsiDocMethodOrFieldRef#MyReference =
+                      val javadocMethodReference
+                        : PsiDocMethodOrFieldRef#MyReference =
                         element.getReference
                           .asInstanceOf[PsiDocMethodOrFieldRef#MyReference]
                       if (javadocMethodReference != null) {

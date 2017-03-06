@@ -28,17 +28,17 @@ object GettingStartedOverview extends App {
 //#quick-schema
 
   val f1 = //#quick-query
-  Database
-    .forURL("jdbc:h2:mem:test1", driver = "org.h2.Driver")
-    .run(
+    Database
+      .forURL("jdbc:h2:mem:test1", driver = "org.h2.Driver")
+      .run(
 //#quick-query
-      coffees.schema.create andThen //#quick-query
-        (for (c <- coffees; if c.price < 10.0) yield c.name).result
+        coffees.schema.create andThen //#quick-query
+          (for (c <- coffees; if c.price < 10.0) yield c.name).result
 //#quick-query
-        andThen //#quick-query
-          // or
-          coffees.filter(_.price < 10.0).map(_.name).result
-    )
+          andThen //#quick-query
+            // or
+            coffees.filter(_.price < 10.0).map(_.name).result
+      )
 //#quick-query
   Await.result(f1, Duration.Inf)
 

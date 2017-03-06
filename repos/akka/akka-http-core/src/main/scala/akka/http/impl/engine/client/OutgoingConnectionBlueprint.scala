@@ -81,9 +81,8 @@ private[http] object OutgoingConnectionBlueprint {
 
         val terminationMerge = b.add(TerminationMerge)
 
-        val requestRendering: Flow[RequestRenderingContext,
-                                   ByteString,
-                                   NotUsed] = {
+        val requestRendering
+          : Flow[RequestRenderingContext, ByteString, NotUsed] = {
           val requestRendererFactory =
             new HttpRequestRendererFactory(userAgentHeader,
                                            requestHeaderSizeHint,

@@ -45,16 +45,20 @@ object V2TestFormats {
     Json.reads[DeploymentSuccess]
   implicit lazy val DeploymentFailedReads: Reads[DeploymentFailed] =
     Json.reads[DeploymentFailed]
-  implicit lazy val MesosStatusUpdateEventReads: Reads[MesosStatusUpdateEvent] =
+  implicit lazy val MesosStatusUpdateEventReads
+    : Reads[MesosStatusUpdateEvent] =
     Json.reads[MesosStatusUpdateEvent]
-  implicit lazy val MesosFrameworkMessageEventReads: Reads[
-    MesosFrameworkMessageEvent] = Json.reads[MesosFrameworkMessageEvent]
-  implicit lazy val SchedulerDisconnectedEventReads: Reads[
-    SchedulerDisconnectedEvent] = Json.reads[SchedulerDisconnectedEvent]
-  implicit lazy val SchedulerRegisteredEventWritesReads: Reads[
-    SchedulerRegisteredEvent] = Json.reads[SchedulerRegisteredEvent]
-  implicit lazy val SchedulerReregisteredEventWritesReads: Reads[
-    SchedulerReregisteredEvent] = Json.reads[SchedulerReregisteredEvent]
+  implicit lazy val MesosFrameworkMessageEventReads
+    : Reads[MesosFrameworkMessageEvent] =
+    Json.reads[MesosFrameworkMessageEvent]
+  implicit lazy val SchedulerDisconnectedEventReads
+    : Reads[SchedulerDisconnectedEvent] =
+    Json.reads[SchedulerDisconnectedEvent]
+  implicit lazy val SchedulerRegisteredEventWritesReads
+    : Reads[SchedulerRegisteredEvent] = Json.reads[SchedulerRegisteredEvent]
+  implicit lazy val SchedulerReregisteredEventWritesReads
+    : Reads[SchedulerReregisteredEvent] =
+    Json.reads[SchedulerReregisteredEvent]
 
   implicit lazy val eventSubscribersReads: Reads[EventSubscribers] = Reads {
     subscribersJson =>

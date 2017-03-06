@@ -93,7 +93,7 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
                                 .getBytes(Utf8)
                             val suffix =
                               " }".getBytes(Utf8) :: StreamT
-                                .empty[Future, Array[Byte]]
+                              .empty[Future, Array[Byte]]
 
                             val chunks = Right(prefix :: (data ++ suffix))
                             HttpResponse[ByteChunk](OK, headers, Some(chunks))

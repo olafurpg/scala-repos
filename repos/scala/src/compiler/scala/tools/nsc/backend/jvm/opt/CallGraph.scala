@@ -70,7 +70,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
   def addCallsite(callsite: Callsite): Unit = {
     val methodCallsites = callsites(callsite.callsiteMethod)
     callsites(callsite.callsiteMethod) = methodCallsites +
-        (callsite.callsiteInstruction -> callsite)
+      (callsite.callsiteInstruction -> callsite)
   }
 
   def containsCallsite(callsite: Callsite): Boolean =
@@ -89,7 +89,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
   def addClosureInstantiation(closureInit: ClosureInstantiation) = {
     val methodClosureInits = closureInstantiations(closureInit.ownerMethod)
     closureInstantiations(closureInit.ownerMethod) = methodClosureInits +
-        (closureInit.lambdaMetaFactoryCall.indy -> closureInit)
+      (closureInit.lambdaMetaFactoryCall.indy -> closureInit)
   }
 
   def addClass(classNode: ClassNode): Unit = {
@@ -393,13 +393,13 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
           //     method to enable inlining.
           CallsiteInfo(
             safeToInline = canInlineFromSource && isStaticallyResolved &&
-                // (1)
-                !isAbstract &&
-                !BytecodeUtils.isConstructor(calleeMethodNode) &&
-                !BytecodeUtils.isNativeMethod(calleeMethodNode) &&
-                !BytecodeUtils.hasCallerSensitiveAnnotation(calleeMethodNode),
+              // (1)
+              !isAbstract &&
+              !BytecodeUtils.isConstructor(calleeMethodNode) &&
+              !BytecodeUtils.isNativeMethod(calleeMethodNode) &&
+              !BytecodeUtils.hasCallerSensitiveAnnotation(calleeMethodNode),
             safeToRewrite = canInlineFromSource &&
-                isRewritableTraitCall, // (2)
+              isRewritableTraitCall, // (2)
             canInlineFromSource = canInlineFromSource,
             annotatedInline = methodInlineInfo.annotatedInline,
             annotatedNoInline = methodInlineInfo.annotatedNoInline,
@@ -637,7 +637,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                   (samArgType, instArgType) =>
                     samArgType == instArgType || isReference(samArgType) &&
                       isReference(instArgType)) // (3)
-              )
+            )
 
             if (isIndyLambda)
               Some((indy, samMethodType, implMethod, instantiatedMethodType))

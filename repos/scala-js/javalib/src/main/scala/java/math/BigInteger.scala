@@ -834,9 +834,9 @@ class BigInteger extends Number with Comparable[BigInteger] {
     @tailrec
     def loop(): Unit = if (bytesLen > highBytes) {
       digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-          (byteValues(bytesLen - 2) & 0xFF) << 8 |
-          (byteValues(bytesLen - 3) & 0xFF) << 16 |
-          (byteValues(bytesLen - 4) & 0xFF) << 24
+        (byteValues(bytesLen - 2) & 0xFF) << 8 |
+        (byteValues(bytesLen - 3) & 0xFF) << 16 |
+        (byteValues(bytesLen - 4) & 0xFF) << 24
       bytesLen -= 4
       if (digits(i) != 0) {
         digits(i) = -digits(i)
@@ -844,9 +844,9 @@ class BigInteger extends Number with Comparable[BigInteger] {
         i += 1
         while (bytesLen > highBytes) {
           digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-              (byteValues(bytesLen - 2) & 0xFF) << 8 |
-              (byteValues(bytesLen - 3) & 0xFF) << 16 |
-              (byteValues(bytesLen - 4) & 0xFF) << 24
+            (byteValues(bytesLen - 2) & 0xFF) << 8 |
+            (byteValues(bytesLen - 3) & 0xFF) << 16 |
+            (byteValues(bytesLen - 4) & 0xFF) << 24
           bytesLen -= 4
           digits(i) = ~digits(i)
           i += 1
@@ -885,9 +885,9 @@ class BigInteger extends Number with Comparable[BigInteger] {
     var i = 0
     while (bytesLen > highBytes) {
       digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-          (byteValues(bytesLen - 2) & 0xFF) << 8 |
-          (byteValues(bytesLen - 3) & 0xFF) << 16 |
-          (byteValues(bytesLen - 4) & 0xFF) << 24
+        (byteValues(bytesLen - 2) & 0xFF) << 8 |
+        (byteValues(bytesLen - 3) & 0xFF) << 16 |
+        (byteValues(bytesLen - 4) & 0xFF) << 24
       bytesLen = bytesLen - 4
       i += 1
     }

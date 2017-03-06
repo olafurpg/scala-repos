@@ -36,8 +36,8 @@ private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
   }
 
   private def poolTable(
-      makeRow: (Schedulable, HashMap[String, HashMap[Int, StageInfo]]) => Seq[
-        Node],
+      makeRow: (Schedulable,
+                HashMap[String, HashMap[Int, StageInfo]]) => Seq[Node],
       rows: Seq[Schedulable]): Seq[Node] = {
     <table class="table table-bordered table-striped table-condensed sortable table-fixed">
       <thead>

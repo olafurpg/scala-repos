@@ -28,8 +28,8 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
     val exc = new TestException {}
 
     val namer = new Namer {
-      var acts: Map[Path,
-                    (Activity[NameTree[Path]], Witness[Try[NameTree[Path]]])] =
+      var acts
+        : Map[Path, (Activity[NameTree[Path]], Witness[Try[NameTree[Path]]])] =
         Map.empty
 
       def contains(path: String) = acts contains Path.read(path)

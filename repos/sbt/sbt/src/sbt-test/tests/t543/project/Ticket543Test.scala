@@ -13,11 +13,11 @@ object Ticket543Test extends Build {
     "root",
     file("."),
     settings = defaultSettings ++ Seq(
-        libraryDependencies +=
-          "org.scalatest" %% "scalatest" % "1.8" % "test",
-        scalaVersion := "2.9.2",
-        fork := true,
-        testListeners += new TestReportListener {
+      libraryDependencies +=
+        "org.scalatest" %% "scalatest" % "1.8" % "test",
+      scalaVersion := "2.9.2",
+      fork := true,
+      testListeners += new TestReportListener {
         def testEvent(event: TestEvent): Unit = {
           for (e <- event.detail.filter(
                  _.status == sbt.testing.Status.Failure)) {
@@ -33,12 +33,12 @@ object Ticket543Test extends Build {
         def endGroup(name: String, t: Throwable): Unit = ()
         def endGroup(name: String, result: TestResult.Value): Unit = ()
       },
-        check := {
+      check := {
         val exists = marker.exists
         marker.delete()
         if (!exists)
           sys.error("Null or invalid error had been returned previously")
       }
-      )
+    )
   )
 }

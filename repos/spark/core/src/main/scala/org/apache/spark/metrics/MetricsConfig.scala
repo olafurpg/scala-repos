@@ -35,7 +35,8 @@ private[spark] class MetricsConfig(conf: SparkConf) extends Logging {
   private val DEFAULT_METRICS_CONF_FILENAME = "metrics.properties"
 
   private[metrics] val properties = new Properties()
-  private[metrics] var propertyCategories: mutable.HashMap[String, Properties] =
+  private[metrics] var propertyCategories
+    : mutable.HashMap[String, Properties] =
     null
 
   private def setDefaultProperties(prop: Properties) {

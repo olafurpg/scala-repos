@@ -1,7 +1,8 @@
 import java.util.AbstractMap.{SimpleImmutableEntry => SIE}
 
 object A {
-  val immutEntry: /*start*/ java.util.AbstractMap.SimpleImmutableEntry /*end*/ =
+  val immutEntry
+    : /*start*/ java.util.AbstractMap.SimpleImmutableEntry /*end*/ =
     null
 }
 

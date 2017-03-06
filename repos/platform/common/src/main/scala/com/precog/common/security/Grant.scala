@@ -85,7 +85,7 @@ object Grant extends Logging {
 
   val schemaV1 =
     "grantId" :: "name" :: "description" :: ("issuerKey" ||| "(undefined)") :: "parentIds" :: "permissions" ::
-      ("createdAt" ||| new Instant(0L)) :: "expirationDate" :: HNil
+    ("createdAt" ||| new Instant(0L)) :: "expirationDate" :: HNil
 
   val decomposerV1: Decomposer[Grant] =
     decomposerV[Grant](schemaV1, Some("1.0".v))

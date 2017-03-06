@@ -274,8 +274,8 @@ class TcpConnectionSpec extends AkkaSpec("""
         val writer = TestProbe()
         val compoundWrite =
           Write(ByteString("test1"), Ack(1)) +: Write(ByteString("test2")) +: Write(
-            ByteString.empty,
-            Ack(3)) +: Write(ByteString("test4"), Ack(4))
+          ByteString.empty,
+          Ack(3)) +: Write(ByteString("test4"), Ack(4))
 
         // reply to write commander with Ack
         val buffer = ByteBuffer.allocate(100)

@@ -66,7 +66,8 @@ trait Mapper[A <: Mapper[A]]
 
   def connectionIdentifier = dbConnectionIdentifier openOr calcDbId
 
-  def dbCalculateConnectionIdentifier: PartialFunction[A, ConnectionIdentifier] =
+  def dbCalculateConnectionIdentifier
+    : PartialFunction[A, ConnectionIdentifier] =
     Map.empty
 
   private def calcDbId =
@@ -359,8 +360,8 @@ trait BaseKeyedMapper extends BaseMapper {
   type TheKeyType
   type KeyedMapperType <: KeyedMapper[TheKeyType, KeyedMapperType]
 
-  def primaryKeyField: MappedField[TheKeyType, MapperType] with IndexedField[
-    TheKeyType]
+  def primaryKeyField
+    : MappedField[TheKeyType, MapperType] with IndexedField[TheKeyType]
 
   /**
     * Delete the model from the RDBMS
@@ -455,8 +456,8 @@ trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
   type TheKeyType = KeyType
   type KeyedMapperType = OwnerType
 
-  def primaryKeyField: MappedField[KeyType, OwnerType] with IndexedField[
-    KeyType]
+  def primaryKeyField
+    : MappedField[KeyType, OwnerType] with IndexedField[KeyType]
   def getSingleton: KeyedMetaMapper[KeyType, OwnerType];
 
   override def comparePrimaryKeys(other: OwnerType) =

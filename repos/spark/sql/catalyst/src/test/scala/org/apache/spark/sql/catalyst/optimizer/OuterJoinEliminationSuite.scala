@@ -28,10 +28,10 @@ class OuterJoinEliminationSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
-        "Outer Join Elimination",
-        Once,
-        OuterJoinElimination,
-        PushPredicateThroughJoin) :: Nil
+      "Outer Join Elimination",
+      Once,
+      OuterJoinElimination,
+      PushPredicateThroughJoin) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

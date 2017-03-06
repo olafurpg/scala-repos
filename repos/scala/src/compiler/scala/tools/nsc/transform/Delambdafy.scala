@@ -179,11 +179,9 @@ abstract class Delambdafy
           targetCaptureParams.map(param =>
             methSym
               .newSyntheticValueParam(param.tpe, param.name.toTermName)) ::: map2(
-            targetFunctionParams,
-            functionParamTypes)(
-            (param, tp) =>
-              methSym.newSyntheticValueParam(boxedType(tp),
-                                             param.name.toTermName))
+          targetFunctionParams,
+          functionParamTypes)((param, tp) =>
+          methSym.newSyntheticValueParam(boxedType(tp), param.name.toTermName))
 
         val bridgeResultType: Type = {
           if (target.info.resultType == UnitTpe &&
@@ -411,11 +409,11 @@ abstract class Delambdafy
 
         bridgeMethod foreach
           (bm =>
-             // TODO SI-6260 maybe just create the apply method with the signature (Object => Object) in all cases
-             //      rather than the method+bridge pair.
-             if (bm.symbol.tpe =:= applyMethodDef.symbol.tpe)
-               erasure.resolveAnonymousBridgeClash(applyMethodDef.symbol,
-                                                   bm.symbol))
+            // TODO SI-6260 maybe just create the apply method with the signature (Object => Object) in all cases
+            //      rather than the method+bridge pair.
+            if (bm.symbol.tpe =:= applyMethodDef.symbol.tpe)
+              erasure.resolveAnonymousBridgeClash(applyMethodDef.symbol,
+                                                  bm.symbol))
 
         val body = members ++ List(constr, applyMethodDef) ++ bridgeMethod
 

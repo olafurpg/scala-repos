@@ -72,19 +72,20 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   implicit def timeExtractor[T <: (Long, Any)] =
     TestUtil.simpleTimeExtractor[T]
 
-  implicit val arbitraryInputWithTimeStampAndBatcher: Arbitrary[
-    (List[(Long, Int)], Batcher, TestStore[Int, Int])] = Arbitrary {
-    for {
-      arbInt <- Arbitrary.arbitrary[List[Int]]
-      in = arbInt.zipWithIndex.map {
-        case (item: Int, time: Int) => (time.toLong, item)
-      }
-      arbMap <- Arbitrary.arbitrary[Map[Int, Int]]
-      batcher = TestUtil.randomBatcher(in)
-      lastTimeStamp = in.size
-      testStore = TestStore[Int, Int]("test", batcher, arbMap, lastTimeStamp)
-    } yield (in, batcher, testStore)
-  }
+  implicit val arbitraryInputWithTimeStampAndBatcher
+    : Arbitrary[(List[(Long, Int)], Batcher, TestStore[Int, Int])] =
+    Arbitrary {
+      for {
+        arbInt <- Arbitrary.arbitrary[List[Int]]
+        in = arbInt.zipWithIndex.map {
+          case (item: Int, time: Int) => (time.toLong, item)
+        }
+        arbMap <- Arbitrary.arbitrary[Map[Int, Int]]
+        batcher = TestUtil.randomBatcher(in)
+        lastTimeStamp = in.size
+        testStore = TestStore[Int, Int]("test", batcher, arbMap, lastTimeStamp)
+      } yield (in, batcher, testStore)
+    }
 
   implicit def arbitraryLocalMode: Arbitrary[Mode] = Arbitrary {
     Gen.const(Local(true))
@@ -161,7 +162,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
        inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
                                               Batcher,
                                               TestStore[Int, Int]),
-       commutativity: Commutativity, mode: Mode) =>
+       commutativity: Commutativity,
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val mergeResult = testStore.merge(diskPipeFactory,
@@ -197,7 +199,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
        inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
                                               Batcher,
                                               TestStore[Int, Int]),
-       commutativity: Commutativity, mode: Mode) =>
+       commutativity: Commutativity,
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         (atLeast2MsBatcher(batcher)) ==> {

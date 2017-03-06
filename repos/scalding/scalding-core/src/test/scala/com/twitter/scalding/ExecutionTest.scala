@@ -458,9 +458,9 @@ class ExecutionTest extends WordSpec with Matchers {
     "handle an error running in parallel" in {
       val executions =
         Execution.failed(new Exception("failed")) :: 0
-          .to(10)
-          .map(i => Execution.from[Int](i))
-          .toList
+        .to(10)
+        .map(i => Execution.from[Int](i))
+        .toList
 
       val result = Execution.withParallelism(executions, 3)
 

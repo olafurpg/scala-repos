@@ -176,7 +176,7 @@ class ScalaDelegateMethodTest
         |<caret>
         |}"""
     val result = //no action
-    """class Base {
+      """class Base {
         |  private val d = new D()
         |}
         |
@@ -250,7 +250,7 @@ class ScalaDelegateMethodTest
         |  }
         |}"""
     val result = //no effect
-    """class D {
+      """class D {
         |  def foo(x: Int): Int = x
         |}
         |

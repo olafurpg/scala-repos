@@ -53,7 +53,7 @@ object Script {
     val arguments = state.remainingCommands.drop(1)
     val newState =
       arguments.mkString("run ", " ", "") :: state.copy(
-        remainingCommands = Nil)
+      remainingCommands = Nil)
     Project.setProject(session, newStructure, newState)
   }
 

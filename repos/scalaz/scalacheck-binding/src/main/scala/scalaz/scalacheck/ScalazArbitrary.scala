@@ -58,12 +58,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit val arbBigInteger: Arbitrary[BigInteger] =
     Functor[Arbitrary].map(arb[BigInt])(_.bigInteger)
 
-  implicit val BigIntegerMultiplicationArbitrary: Arbitrary[
-    BigInteger @@ Multiplication] =
+  implicit val BigIntegerMultiplicationArbitrary
+    : Arbitrary[BigInteger @@ Multiplication] =
     Tag.subst[BigInteger, Arbitrary, Multiplication](arb[BigInteger])
 
-  implicit val BigIntMultiplicationArbitrary: Arbitrary[
-    BigInt @@ Multiplication] = Tag.subst(arb[BigInt])
+  implicit val BigIntMultiplicationArbitrary
+    : Arbitrary[BigInt @@ Multiplication] = Tag.subst(arb[BigInt])
 
   implicit val ByteMultiplicationArbitrary: Arbitrary[Byte @@ Multiplication] =
     Tag.subst(arb[Byte])
@@ -71,7 +71,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit val CharMultiplicationArbitrary: Arbitrary[Char @@ Multiplication] =
     Tag.subst(arb[Char])
 
-  implicit val ShortMultiplicationArbitrary: Arbitrary[Short @@ Multiplication] =
+  implicit val ShortMultiplicationArbitrary
+    : Arbitrary[Short @@ Multiplication] =
     Tag.subst(arb[Short])
 
   implicit val IntMultiplicationArbitrary: Arbitrary[Int @@ Multiplication] =
@@ -80,11 +81,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit val LongMultiplicationArbitrary: Arbitrary[Long @@ Multiplication] =
     Tag.subst(arb[Long])
 
-  implicit val FloatMultiplicationArbitrary: Arbitrary[Float @@ Multiplication] =
+  implicit val FloatMultiplicationArbitrary
+    : Arbitrary[Float @@ Multiplication] =
     Tag.subst(arb[Float])
 
-  implicit val DoubleMultiplicationArbitrary: Arbitrary[
-    Double @@ Multiplication] = Tag.subst(arb[Double])
+  implicit val DoubleMultiplicationArbitrary
+    : Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
   implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(
     oneOf(Digit.digits))

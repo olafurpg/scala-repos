@@ -11,7 +11,7 @@ object Resolve {
             mask: ScopeMask): Scope => Scope = {
     val rs =
       resolveProject(current, mask) _ :: resolveExtra(mask) _ :: resolveTask(
-        mask) _ :: resolveConfig(index, key, mask) _ :: Nil
+      mask) _ :: resolveConfig(index, key, mask) _ :: Nil
     scope =>
       (scope /: rs) { (s, f) =>
         f(s)

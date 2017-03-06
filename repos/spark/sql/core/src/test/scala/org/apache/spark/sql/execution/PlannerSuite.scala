@@ -123,8 +123,8 @@ class PlannerSuite extends SharedSQLContext {
 
     val simpleTypes =
       NullType :: BooleanType :: ByteType :: ShortType :: IntegerType :: LongType :: FloatType :: DoubleType :: DecimalType(
-        10,
-        5) :: DecimalType.SYSTEM_DEFAULT :: DateType :: TimestampType :: StringType :: BinaryType :: Nil
+      10,
+      5) :: DecimalType.SYSTEM_DEFAULT :: DateType :: TimestampType :: StringType :: BinaryType :: Nil
 
     withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "16434") {
       checkPlan(simpleTypes)
@@ -132,12 +132,12 @@ class PlannerSuite extends SharedSQLContext {
 
     val complexTypes =
       ArrayType(DoubleType, true) :: ArrayType(StringType, false) :: MapType(
-        IntegerType,
-        StringType,
-        true) :: MapType(IntegerType, ArrayType(DoubleType), false) :: StructType(
-        Seq(StructField("a", IntegerType, nullable = true),
-            StructField("b", ArrayType(DoubleType), nullable = false),
-            StructField("c", DoubleType, nullable = false))) :: Nil
+      IntegerType,
+      StringType,
+      true) :: MapType(IntegerType, ArrayType(DoubleType), false) :: StructType(
+      Seq(StructField("a", IntegerType, nullable = true),
+          StructField("b", ArrayType(DoubleType), nullable = false),
+          StructField("c", DoubleType, nullable = false))) :: Nil
 
     withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "901617") {
       checkPlan(complexTypes)
@@ -487,7 +487,7 @@ class PlannerSuite extends SharedSQLContext {
     val inputPlan = ShuffleExchange(
       finalPartitioning,
       DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
+                       outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
       None
@@ -511,7 +511,7 @@ class PlannerSuite extends SharedSQLContext {
     val inputPlan = ShuffleExchange(
       finalPartitioning,
       DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
+                       outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
       None
@@ -535,7 +535,7 @@ class PlannerSuite extends SharedSQLContext {
     val shuffle = ShuffleExchange(
       finalPartitioning,
       DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
+                       outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
       None

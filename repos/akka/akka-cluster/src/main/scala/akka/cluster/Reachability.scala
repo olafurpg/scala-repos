@@ -89,8 +89,8 @@ private[cluster] class Reachability private (
           else if (r.status == Terminated) terminatedBuilder += r.subject
         }
 
-        val observerRowsMap: Map[UniqueAddress,
-                                 Map[UniqueAddress, Reachability.Record]] =
+        val observerRowsMap
+          : Map[UniqueAddress, Map[UniqueAddress, Reachability.Record]] =
           mapBuilder.toMap
         val allTerminated: Set[UniqueAddress] = terminatedBuilder.result()
         val allUnreachable: Set[UniqueAddress] =

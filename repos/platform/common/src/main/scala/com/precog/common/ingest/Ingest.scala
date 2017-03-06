@@ -167,10 +167,10 @@ object Archive {
 
   val schemaV1 =
     "apiKey" :: "path" :: "jobId" ::
-      ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
+    ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
   val schemaV0 =
     "tokenId" :: "path" :: Omit ::
-      ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
+    ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
 
   val decomposerV1: Decomposer[Archive] =
     decomposerV[Archive](schemaV1, Some("1.0".v))

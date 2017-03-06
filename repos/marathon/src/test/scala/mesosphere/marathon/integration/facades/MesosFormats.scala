@@ -8,7 +8,8 @@ object MesosFormats {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  implicit lazy val ITResourceScalarValueFormat: Format[ITResourceScalarValue] =
+  implicit lazy val ITResourceScalarValueFormat
+    : Format[ITResourceScalarValue] =
     Format(
       Reads.of[Double].map(ITResourceScalarValue(_)),
       Writes(scalarValue => JsNumber(scalarValue.value))

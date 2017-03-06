@@ -119,7 +119,8 @@ trait MutableInnerProductModule[V, S]
 // Vector Spaces
 trait VectorSpace[V, S] extends Module[V, S] {
   implicit def scalars: Field[S]
-  implicit def divVS: OpDiv.Impl2[V, S, V] // Inverse module operator since Fields have multiplicative inverse
+  implicit def divVS
+    : OpDiv.Impl2[V, S, V] // Inverse module operator since Fields have multiplicative inverse
 }
 
 trait MutableVectorSpace[V, S]
@@ -236,7 +237,8 @@ trait FiniteCoordinateField[V, I, S]
   implicit def canDim: dim.Impl[V, I]
   implicit def tabulateTensor: CanTabulate[I, V, S]
 
-  implicit def addVS: OpAdd.Impl2[V, S, V] // Implicitly Broadcast scalars to vector-space
+  implicit def addVS
+    : OpAdd.Impl2[V, S, V] // Implicitly Broadcast scalars to vector-space
   implicit def subVS: OpSub.Impl2[V, S, V]
 }
 
@@ -686,7 +688,8 @@ object MutableFiniteCoordinateField {
         _mapActiveVals
       override implicit def zipMapValues: CanZipMapValues[V, S, S, V] =
         _zipMapVals
-      override implicit def zipMapKeyValues: CanZipMapKeyValues[V, I, S, S, V] =
+      override implicit def zipMapKeyValues
+        : CanZipMapKeyValues[V, I, S, S, V] =
         _zipMapKeyVals
       override implicit def iterateValues: CanTraverseValues[V, S] =
         _traverseVals
@@ -760,7 +763,8 @@ object MutableEnumeratedCoordinateField {
       override implicit def scalarOf: ScalarOf[V, S] = _scalarOf
       override implicit def zipMapValues: CanZipMapValues[V, S, S, V] =
         _zipMapVals
-      override implicit def zipMapKeyValues: CanZipMapKeyValues[V, I, S, S, V] =
+      override implicit def zipMapKeyValues
+        : CanZipMapKeyValues[V, I, S, S, V] =
         _zipMapKeyVals
       override implicit def iterateValues: CanTraverseValues[V, S] =
         _traverseVals
@@ -789,10 +793,10 @@ object MutableOptimizationSpace {
   }
 
   object DenseDoubleOptimizationSpace {
-    implicit def denseDoubleOptSpace: MutableOptimizationSpace[
-      DenseMatrix[Double],
-      DenseVector[Double],
-      Double] = {
+    implicit def denseDoubleOptSpace
+      : MutableOptimizationSpace[DenseMatrix[Double],
+                                 DenseVector[Double],
+                                 Double] = {
       val norms = EntrywiseMatrixNorms.make[DenseMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
       import DenseMatrix.canMapValues
@@ -802,10 +806,10 @@ object MutableOptimizationSpace {
   }
 
   object SparseDoubleOptimizationSpace {
-    implicit def sparseDoubleOptSpace: MutableOptimizationSpace[
-      CSCMatrix[Double],
-      SparseVector[Double],
-      Double] = {
+    implicit def sparseDoubleOptSpace
+      : MutableOptimizationSpace[CSCMatrix[Double],
+                                 SparseVector[Double],
+                                 Double] = {
       val norms = EntrywiseMatrixNorms.make[CSCMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
       make[CSCMatrix[Double], SparseVector[Double], Double](_.asCscRow,
@@ -940,11 +944,8 @@ object MutableOptimizationSpace {
       implicit def mulIntoVV: OpMulScalar.InPlaceImpl2[V, V] = _mulIntoVV
       implicit def setIntoVS: OpSet.InPlaceImpl2[V, S] = _setIntoVS
       implicit def zipMapValues: CanZipMapValues[V, S, S, V] = _zipMapVals
-      override implicit def zipMapKeyValues: CanZipMapKeyValues[V,
-                                                                Int,
-                                                                S,
-                                                                S,
-                                                                V] =
+      override implicit def zipMapKeyValues
+        : CanZipMapKeyValues[V, Int, S, S, V] =
         _zipMapKeyVals
       implicit def iterateValues: CanTraverseValues[V, S] = _traverseVals
       implicit def mapValues: CanMapValues[V, S, S, V] = _mapVals

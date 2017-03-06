@@ -18,7 +18,8 @@ class StaticOnlyWithManualPicklerTest extends FunSuite {
     // StaticOnly should be happy with us, because
     // we define this pickler. If we remove this, then
     // this file should not compile.
-    implicit val picklerUnpickler: Pickler[NotClosed] with Unpickler[NotClosed] =
+    implicit val picklerUnpickler
+      : Pickler[NotClosed] with Unpickler[NotClosed] =
       new Pickler[NotClosed] with Unpickler[NotClosed] {
         def pickle(picklee: NotClosed, builder: PBuilder): Unit =
           throw FakeImplementation()

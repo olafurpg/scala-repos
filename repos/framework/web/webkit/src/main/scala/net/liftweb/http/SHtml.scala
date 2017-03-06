@@ -1922,32 +1922,32 @@ trait SHtml extends Loggable {
   def makeFormsAjax: NodeSeq => NodeSeq =
     "form" #>
       ((ns: NodeSeq) =>
-         (ns match {
-           case e: Elem => {
-             val id: String =
-               e.attribute("id").map(_.text) getOrElse Helpers.nextFuncName
+        (ns match {
+          case e: Elem => {
+            val id: String =
+              e.attribute("id").map(_.text) getOrElse Helpers.nextFuncName
 
-             val newMeta = e.attributes.filter {
-               case up: UnprefixedAttribute =>
-                 up.key match {
-                   case "id" => false
-                   case "action" => false
-                   case "onsubmit" => false
-                   case "method" => false
-                   case _ => true
-                 }
-               case _ => true
-             }
+            val newMeta = e.attributes.filter {
+              case up: UnprefixedAttribute =>
+                up.key match {
+                  case "id" => false
+                  case "action" => false
+                  case "onsubmit" => false
+                  case "method" => false
+                  case _ => true
+                }
+              case _ => true
+            }
 
-             e.copy(attributes = newMeta) % ("id" -> id) %
-               ("action" -> "javascript://") %
-               ("onsubmit" ->
-                 (SHtml
-                   .makeAjaxCall(LiftRules.jsArtifacts.serialize(id))
-                   .toJsCmd + "; return false;"))
-           }
-           case x => x
-         }): NodeSeq)
+            e.copy(attributes = newMeta) % ("id" -> id) %
+              ("action" -> "javascript://") %
+              ("onsubmit" ->
+                (SHtml
+                  .makeAjaxCall(LiftRules.jsArtifacts.serialize(id))
+                  .toJsCmd + "; return false;"))
+          }
+          case x => x
+        }): NodeSeq)
 
   /**
     * Submits a form denominated by a formId and execute the func function

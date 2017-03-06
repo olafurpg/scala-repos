@@ -114,148 +114,146 @@ private final class AggregationPipeline {
       ),
       /* sortDate :: */ sampleGames ::
         ((metric match {
-          case M.MeanCpl =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(),
-              sampleMoves,
-              group(dimension, Avg(F.moves("c"))),
-              sliceIds
-            )
-          case M.Material =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(),
-              sampleMoves,
-              group(dimension, Avg(F.moves("i"))),
-              sliceIds
-            )
-          case M.Opportunism =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(
-                BSONDocument(F.moves("o") -> BSONDocument("$exists" -> true))),
-              sampleMoves,
-              group(dimension,
-                    GroupFunction("$push",
-                                  BSONDocument(
-                                    "$cond" -> BSONArray("$" +
-                                                           F.moves("o"),
-                                                         1,
-                                                         0)
-                                  ))),
-              sliceIds,
-              Project(
-                BSONDocument(
-                  "_id" -> true,
-                  "v" -> BSONDocument(
-                    "$multiply" -> BSONArray(100,
-                                             BSONDocument("$avg" -> "$v"))),
-                  "nb" -> true,
-                  "ids" -> true
-                )).some
-            )
-          case M.Luck =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(
-                BSONDocument(F.moves("l") -> BSONDocument("$exists" -> true))),
-              sampleMoves,
-              group(dimension,
-                    GroupFunction("$push",
-                                  BSONDocument(
-                                    "$cond" -> BSONArray("$" +
-                                                           F.moves("l"),
-                                                         1,
-                                                         0)
-                                  ))),
-              sliceIds,
-              Project(
-                BSONDocument(
-                  "_id" -> true,
-                  "v" -> BSONDocument(
-                    "$multiply" -> BSONArray(100,
-                                             BSONDocument("$avg" -> "$v"))),
-                  "nb" -> true,
-                  "ids" -> true
-                )).some
-            )
-          case M.NbMoves =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(),
-              sampleMoves,
-              group(dimension, SumValue(1)),
-              Project(
-                BSONDocument(
-                  "v" -> true,
-                  "ids" -> true,
-                  "nb" -> BSONDocument("$size" -> "$ids")
-                )).some,
-              Project(
-                BSONDocument(
-                  "v" -> BSONDocument(
-                    "$divide" -> BSONArray("$v", "$nb")
-                  ),
-                  "nb" -> true,
-                  "ids" -> BSONDocument("$slice" -> BSONArray("$ids", 4))
-                )).some
-            )
-          case M.Movetime =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(),
-              sampleMoves,
-              group(dimension,
-                    GroupFunction(
-                      "$avg",
-                      BSONDocument(
-                        "$divide" -> BSONArray("$" + F.moves("t"), 10)))),
-              sliceIds
-            )
-          case M.RatingDiff =>
-            List(
-              group(dimension, Avg(F.ratingDiff)),
-              sliceIds
-            )
-          case M.OpponentRating =>
-            List(
-              group(dimension, Avg(F.opponentRating)),
-              sliceIds
-            )
-          case M.Result =>
-            List(
-              groupMulti(dimension, F.result),
-              regroupStacked,
-              sliceStackedIds
-            )
-          case M.Termination =>
-            List(
-              groupMulti(dimension, F.termination),
-              regroupStacked,
-              sliceStackedIds
-            )
-          case M.PieceRole =>
-            List(
-              projectForMove,
-              unwindMoves,
-              matchMoves(),
-              sampleMoves,
-              groupMulti(dimension, F.moves("r")),
-              regroupStacked,
-              sliceStackedIds
-            )
-        }) :::
-          (dimension match {
-            case D.Opening => List(sortNb, limit(12))
-            case _ => Nil
-          })).flatten
+        case M.MeanCpl =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(),
+            sampleMoves,
+            group(dimension, Avg(F.moves("c"))),
+            sliceIds
+          )
+        case M.Material =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(),
+            sampleMoves,
+            group(dimension, Avg(F.moves("i"))),
+            sliceIds
+          )
+        case M.Opportunism =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(
+              BSONDocument(F.moves("o") -> BSONDocument("$exists" -> true))),
+            sampleMoves,
+            group(dimension,
+                  GroupFunction("$push",
+                                BSONDocument(
+                                  "$cond" -> BSONArray("$" +
+                                                         F.moves("o"),
+                                                       1,
+                                                       0)
+                                ))),
+            sliceIds,
+            Project(
+              BSONDocument(
+                "_id" -> true,
+                "v" -> BSONDocument(
+                  "$multiply" -> BSONArray(100, BSONDocument("$avg" -> "$v"))),
+                "nb" -> true,
+                "ids" -> true
+              )).some
+          )
+        case M.Luck =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(
+              BSONDocument(F.moves("l") -> BSONDocument("$exists" -> true))),
+            sampleMoves,
+            group(dimension,
+                  GroupFunction("$push",
+                                BSONDocument(
+                                  "$cond" -> BSONArray("$" +
+                                                         F.moves("l"),
+                                                       1,
+                                                       0)
+                                ))),
+            sliceIds,
+            Project(
+              BSONDocument(
+                "_id" -> true,
+                "v" -> BSONDocument(
+                  "$multiply" -> BSONArray(100, BSONDocument("$avg" -> "$v"))),
+                "nb" -> true,
+                "ids" -> true
+              )).some
+          )
+        case M.NbMoves =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(),
+            sampleMoves,
+            group(dimension, SumValue(1)),
+            Project(
+              BSONDocument(
+                "v" -> true,
+                "ids" -> true,
+                "nb" -> BSONDocument("$size" -> "$ids")
+              )).some,
+            Project(
+              BSONDocument(
+                "v" -> BSONDocument(
+                  "$divide" -> BSONArray("$v", "$nb")
+                ),
+                "nb" -> true,
+                "ids" -> BSONDocument("$slice" -> BSONArray("$ids", 4))
+              )).some
+          )
+        case M.Movetime =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(),
+            sampleMoves,
+            group(
+              dimension,
+              GroupFunction(
+                "$avg",
+                BSONDocument("$divide" -> BSONArray("$" + F.moves("t"), 10)))),
+            sliceIds
+          )
+        case M.RatingDiff =>
+          List(
+            group(dimension, Avg(F.ratingDiff)),
+            sliceIds
+          )
+        case M.OpponentRating =>
+          List(
+            group(dimension, Avg(F.opponentRating)),
+            sliceIds
+          )
+        case M.Result =>
+          List(
+            groupMulti(dimension, F.result),
+            regroupStacked,
+            sliceStackedIds
+          )
+        case M.Termination =>
+          List(
+            groupMulti(dimension, F.termination),
+            regroupStacked,
+            sliceStackedIds
+          )
+        case M.PieceRole =>
+          List(
+            projectForMove,
+            unwindMoves,
+            matchMoves(),
+            sampleMoves,
+            groupMulti(dimension, F.moves("r")),
+            regroupStacked,
+            sliceStackedIds
+          )
+      }) :::
+        (dimension match {
+        case D.Opening => List(sortNb, limit(12))
+        case _ => Nil
+      })).flatten
     )
   }
 }

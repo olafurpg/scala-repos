@@ -87,7 +87,7 @@ trait BaseScaldingShell extends MainGenericRunner {
     scaldingREPL = Some(repl)
     replState.mode = mode
     replState.customConfig = replState.customConfig ++
-        (mode match {
+      (mode match {
         case _: HadoopMode => cfg
         case _ => Config.empty
       })

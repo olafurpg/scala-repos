@@ -36,10 +36,10 @@ abstract class ParserSettings private[akka] ()
   def getHeaderValueCacheLimits: ju.Map[String, Int]
   def getIncludeTlsSessionInfoHeader: Boolean
   def headerValueCacheLimits: Map[String, Int]
-  def getCustomMethods: java.util.function.Function[String,
-                                                    Optional[HttpMethod]]
-  def getCustomStatusCodes: java.util.function.Function[Int,
-                                                        Optional[StatusCode]]
+  def getCustomMethods
+    : java.util.function.Function[String, Optional[HttpMethod]]
+  def getCustomStatusCodes
+    : java.util.function.Function[Int, Optional[StatusCode]]
 
   // ---
 

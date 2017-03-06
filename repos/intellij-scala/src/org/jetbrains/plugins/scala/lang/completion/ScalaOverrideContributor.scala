@@ -112,9 +112,9 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       parameters: CompletionParameters): Unit = {
     val position = positionFromParameters(parameters)
 
-    val clazz = PsiTreeUtil.getParentOfType(
-      position,
-      classOf[ScTemplateDefinition], /*strict = */ false)
+    val clazz = PsiTreeUtil.getParentOfType(position,
+                                            classOf[ScTemplateDefinition],
+                                            /*strict = */ false)
     if (clazz == null) return
 
     val mlo = Option(

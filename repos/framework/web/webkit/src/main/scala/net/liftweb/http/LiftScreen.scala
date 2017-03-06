@@ -820,9 +820,9 @@ trait AbstractScreen extends Factory with Loggable {
   protected def makeField[T, OV](theName: => String,
                                  defaultValue: => T,
                                  theToForm: (Field {
-                                               type OtherValueType = OV
-                                               type ValueType = T
-                                             } => Box[NodeSeq]),
+                                   type OtherValueType = OV
+                                   type ValueType = T
+                                 } => Box[NodeSeq]),
                                  otherValue: OtherValueInitializer[OV],
                                  stuff: FilterOrValidate[T]*)
     : Field { type ValueType = T; type OtherValueType = OV } = {
@@ -1011,7 +1011,7 @@ trait AbstractScreen extends Factory with Loggable {
 
     val eAttr: List[SHtml.ElemAttr] =
       (("rows" -> rows.toString): SHtml.ElemAttr) :: (("cols" -> cols.toString): SHtml.ElemAttr) :: grabParams(
-        stuff)
+      stuff)
 
     makeField[String, Nothing](
       name,
@@ -1221,8 +1221,8 @@ trait ScreenWizardRendered extends Loggable {
           .format(style, includeMissing),
         fields filter
           (field =>
-             field.binding map (_.bindingStyle == style) openOr
-               (includeMissing))
+            field.binding map (_.bindingStyle == style) openOr
+              (includeMissing))
       )
 
     def bindingInfoWithFields(style: BindingStyle) =
@@ -1907,8 +1907,8 @@ trait LiftScreen
       Empty,
       cancelId ->
         (() => {
-           redirectBack()
-         }), //cancelId: (String, () => Unit),
+          redirectBack()
+        }), //cancelId: (String, () => Unit),
       theScreen,
       ajaxForms_?
     )

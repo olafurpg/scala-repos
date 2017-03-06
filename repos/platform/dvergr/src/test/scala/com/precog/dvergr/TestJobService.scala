@@ -99,8 +99,8 @@ class JobServiceSpec extends TestJobService {
   def startJob(ts: Option[DateTime] = None): JValue = JObject(
     JField("state", JString("started")) ::
       (ts map { dt =>
-        JField("timestamp", dt.serialize) :: Nil
-      } getOrElse Nil)
+      JField("timestamp", dt.serialize) :: Nil
+    } getOrElse Nil)
   )
 
   def postJob(job: JValue, apiKey: String = validAPIKey) =

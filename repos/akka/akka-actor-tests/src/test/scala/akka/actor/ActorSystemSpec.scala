@@ -60,7 +60,7 @@ object ActorSystemSpec {
       case n: Int ⇒
         master = sender()
         terminaters = Set() ++
-            (for (i ← 1 to n) yield {
+          (for (i ← 1 to n) yield {
             val man =
               context.watch(context.system.actorOf(Props[Terminater]))
             man ! "run"
@@ -343,10 +343,10 @@ class ActorSystemSpec
 
       created filter
         (ref ⇒
-           !ref.isTerminated && !ref
-             .asInstanceOf[ActorRefWithCell]
-             .underlying
-             .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
+          !ref.isTerminated && !ref
+            .asInstanceOf[ActorRefWithCell]
+            .underlying
+            .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
     }
 
     "shut down when /user fails" in {

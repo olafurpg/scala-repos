@@ -70,8 +70,7 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
         (bytes ⇒ ClusterHeartbeatSender.Heartbeat(addressFromBinary(bytes))),
       classOf[ClusterHeartbeatSender.HeartbeatRsp] ->
         (bytes ⇒
-           ClusterHeartbeatSender.HeartbeatRsp(
-             uniqueAddressFromBinary(bytes))),
+          ClusterHeartbeatSender.HeartbeatRsp(uniqueAddressFromBinary(bytes))),
       classOf[GossipStatus] -> gossipStatusFromBinary,
       classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
       classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary
@@ -462,10 +461,11 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     val allNodeMetrics = envelope.gossip.nodes
     val allAddresses: Vector[Address] = allNodeMetrics.map(_.address)(breakOut)
     val addressMapping = allAddresses.zipWithIndex.toMap
-    val allMetricNames: Vector[String] = allNodeMetrics
-      .foldLeft(Set.empty[String])((s, n) ⇒
-        s ++ n.metrics.iterator.map(_.name))
-      .toVector
+    val allMetricNames: Vector[String] =
+      allNodeMetrics
+        .foldLeft(Set.empty[String])((s, n) ⇒
+          s ++ n.metrics.iterator.map(_.name))
+        .toVector
     val metricNamesMapping = allMetricNames.zipWithIndex.toMap
     def mapAddress(address: Address) =
       mapWithErrorMessage(addressMapping, address, "address")

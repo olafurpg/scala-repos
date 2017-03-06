@@ -76,7 +76,8 @@ sealed trait IngestStore {
 }
 
 sealed trait ParseDirective {
-  def toMap: Map[String, String] // escape hatch for interacting with other systems
+  def toMap
+    : Map[String, String] // escape hatch for interacting with other systems
 }
 
 class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],

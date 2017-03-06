@@ -58,7 +58,8 @@ abstract class ParserSettings private[akka] ()
   override def getMaxResponseReasonLength = maxResponseReasonLength
   override def getMaxUriLength = maxUriLength
   override def getMaxMethodLength = maxMethodLength
-  override def getErrorLoggingVerbosity: js.ParserSettings.ErrorLoggingVerbosity =
+  override def getErrorLoggingVerbosity
+    : js.ParserSettings.ErrorLoggingVerbosity =
     errorLoggingVerbosity
 
   override def getCustomMethods =

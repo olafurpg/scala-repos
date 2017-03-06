@@ -16,9 +16,11 @@ import akka.stream.stage.{SyncDirective, Context, StatefulStage}
   * INTERNAL API
   */
 private[http] object Masking {
-  def apply(serverSide: Boolean, maskRandom: () ⇒ Random): BidiFlow[
-    /* net in */ FrameEvent, /* app out */ FrameEventOrError, /* app in */ FrameEvent, /* net out */ FrameEvent,
-    NotUsed] =
+  def apply(serverSide: Boolean, maskRandom: () ⇒ Random)
+    : BidiFlow[
+               /* net in */ FrameEvent, /* app out */ FrameEventOrError,
+               /* app in */ FrameEvent, /* net out */ FrameEvent,
+               NotUsed] =
     BidiFlow.fromFlowsMat(unmaskIf(serverSide),
                           maskIf(!serverSide, maskRandom))(Keep.none)
 

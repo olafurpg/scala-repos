@@ -86,11 +86,10 @@ object BSONHandlers {
         turns = nbTurns,
         startedAtTurn = r intD startedAtTurn,
         clock = r
-            .getO[Color => Clock](clock)(
-              clockBSONReader(createdAtValue,
-                              wPlayer.berserk,
-                              bPlayer.berserk)) map
-            (_(Color(0 == nbTurns % 2))),
+          .getO[Color => Clock](clock)(clockBSONReader(createdAtValue,
+                                                       wPlayer.berserk,
+                                                       bPlayer.berserk)) map
+          (_(Color(0 == nbTurns % 2))),
         positionHashes = r.bytesD(positionHashes).value,
         checkCount = {
           val counts = r.intsD(checkCount)
@@ -103,7 +102,7 @@ object BSONHandlers {
         mode = Mode(r boolD rated),
         variant = realVariant,
         crazyData = (realVariant == Crazyhouse) option r
-            .get[Crazyhouse.Data](crazyData),
+          .get[Crazyhouse.Data](crazyData),
         next = r strO next,
         bookmarks = r intD bookmarks,
         createdAt = createdAtValue,
@@ -128,13 +127,13 @@ object BSONHandlers {
       whitePlayer -> w.docO(
         playerBSONHandler write
           ((_: Color) =>
-             (_: Player.Id) =>
-               (_: Player.UserId) => (_: Player.Win) => o.whitePlayer)),
+            (_: Player.Id) =>
+              (_: Player.UserId) => (_: Player.Win) => o.whitePlayer)),
       blackPlayer -> w.docO(
         playerBSONHandler write
           ((_: Color) =>
-             (_: Player.Id) =>
-               (_: Player.UserId) => (_: Player.Win) => o.blackPlayer)),
+            (_: Player.Id) =>
+              (_: Player.UserId) => (_: Player.Win) => o.blackPlayer)),
       binaryPieces -> o.binaryPieces,
       binaryPgn -> w.byteArrayO(o.binaryPgn),
       status -> o.status,

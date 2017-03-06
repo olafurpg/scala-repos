@@ -490,8 +490,8 @@ object CSCMatrix
     }
   }
 
-  implicit def canTransposeComplex: CanTranspose[CSCMatrix[Complex],
-                                                 CSCMatrix[Complex]] = {
+  implicit def canTransposeComplex
+    : CanTranspose[CSCMatrix[Complex], CSCMatrix[Complex]] = {
     new CanTranspose[CSCMatrix[Complex], CSCMatrix[Complex]] {
       def apply(from: CSCMatrix[Complex]) = {
         val transposedMtx = CSCMatrix.zeros[Complex](from.cols, from.rows)

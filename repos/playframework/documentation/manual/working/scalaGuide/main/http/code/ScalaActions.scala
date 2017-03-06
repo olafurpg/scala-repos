@@ -57,9 +57,9 @@ package scalaguide.http.scalaactions {
       "allow specifying a parser" in {
         testAction(
           action = //#json-parser-action
-          Action(parse.json) { implicit request =>
-            Ok("Got request [" + request + "]")
-          }
+            Action(parse.json) { implicit request =>
+              Ok("Got request [" + request + "]")
+            }
           //#json-parser-action
           ,
           request = FakeRequest()

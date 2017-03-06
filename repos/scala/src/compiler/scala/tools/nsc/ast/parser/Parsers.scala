@@ -2799,9 +2799,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       }
       val trees =
         (lhs.toList.init flatMap (mkDefs(_, tp.duplicate, rhs.duplicate))) ::: mkDefs(
-          lhs.last,
-          tp,
-          rhs)
+        lhs.last,
+        tp,
+        rhs)
       val hd = trees.head
       hd setPos hd.pos.withStart(pos)
       ensureNonOverlapping(hd, trees.tail)
@@ -2951,8 +2951,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       atPos(in.skipToken()) {
         val stats =
           selfInvocation(vparamss) :: {
-            if (isStatSep) { in.nextToken(); blockStatSeq() } else Nil
-          }
+          if (isStatSep) { in.nextToken(); blockStatSeq() } else Nil
+        }
         accept(RBRACE)
         Block(stats, literalUnit)
       }

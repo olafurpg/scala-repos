@@ -31,12 +31,12 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("AnalysisNodes", Once, EliminateSubqueryAliases) :: Batch(
-        "Constant Folding",
-        FixedPoint(50),
-        NullPropagation,
-        ConstantFolding,
-        BooleanSimplification,
-        PruneFilters) :: Nil
+      "Constant Folding",
+      FixedPoint(50),
+      NullPropagation,
+      ConstantFolding,
+      BooleanSimplification,
+      PruneFilters) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int, 'd.string)

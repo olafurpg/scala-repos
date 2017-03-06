@@ -67,7 +67,8 @@ object ScroogeOrderedBuf {
         }
         .toList
 
-    val elementData: List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
+    val elementData
+      : List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
       outerType.declarations
         .collect { case m: MethodSymbol => m }
         .filter(m =>

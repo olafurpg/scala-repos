@@ -56,7 +56,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
   private val stateChangeLogger = KafkaController.stateChangeLogger
 
   this.logIdent = "[Replica state machine on controller " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
 
   /**
     * Invoked on successful controller election. First registers a broker change listener since that triggers all
@@ -498,7 +498,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     */
   class BrokerChangeListener() extends IZkChildListener with Logging {
     this.logIdent = "[BrokerChangeListener on Controller " +
-        controller.config.brokerId + "]: "
+      controller.config.brokerId + "]: "
     def handleChildChange(parentPath: String,
                           currentBrokerList: java.util.List[String]) {
       info(

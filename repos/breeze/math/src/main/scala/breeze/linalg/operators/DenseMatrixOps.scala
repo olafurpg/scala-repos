@@ -147,10 +147,10 @@ trait DenseMatrixMultiplyStuff
     }
   }
 
-  implicit val implOpMulMatrix_DVD_DMD_eq_DMD: OpMulMatrix.Impl2[
-    DenseVector[Double],
-    DenseMatrix[Double],
-    DenseMatrix[Double]] = {
+  implicit val implOpMulMatrix_DVD_DMD_eq_DMD
+    : OpMulMatrix.Impl2[DenseVector[Double],
+                        DenseMatrix[Double],
+                        DenseMatrix[Double]] = {
     new OpMulMatrix.Impl2[DenseVector[Double],
                           DenseMatrix[Double],
                           DenseMatrix[Double]] {
@@ -428,10 +428,10 @@ trait DenseMatrixFloatMultiplyStuff
     }
   }
 
-  implicit val implOpMulMatrix_DVF_DMF_eq_DMF: OpMulMatrix.Impl2[
-    DenseVector[Float],
-    DenseMatrix[Float],
-    DenseMatrix[Float]] = {
+  implicit val implOpMulMatrix_DVF_DMF_eq_DMF
+    : OpMulMatrix.Impl2[DenseVector[Float],
+                        DenseMatrix[Float],
+                        DenseMatrix[Float]] = {
     new OpMulMatrix.Impl2[DenseVector[Float],
                           DenseMatrix[Float],
                           DenseMatrix[Float]] {

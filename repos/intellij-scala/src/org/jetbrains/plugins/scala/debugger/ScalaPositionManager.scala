@@ -824,8 +824,8 @@ object ScalaPositionManager {
       def findParent(element: PsiElement): Option[PsiElement] = {
         val parentsOnTheLine =
           element +: element.parentsInFile
-            .takeWhile(e => e.getTextOffset > startLine)
-            .toIndexedSeq
+          .takeWhile(e => e.getTextOffset > startLine)
+          .toIndexedSeq
         val anon = parentsOnTheLine.collectFirst {
           case e if isLambda(e) => e
           case newTd: ScNewTemplateDefinition

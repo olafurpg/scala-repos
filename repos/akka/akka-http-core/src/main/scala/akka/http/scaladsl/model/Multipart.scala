@@ -121,8 +121,8 @@ object Multipart {
         .asInstanceOf[JSource[_ <: jm.Multipart.BodyPart.Strict, AnyRef]]
 
     /** Java API */
-    override def getStrictParts: java.lang.Iterable[
-      _ <: jm.Multipart.BodyPart.Strict] =
+    override def getStrictParts
+      : java.lang.Iterable[_ <: jm.Multipart.BodyPart.Strict] =
       (strictParts: immutable.Seq[jm.Multipart.BodyPart.Strict]).asJava
 
     /** Java API */
@@ -236,7 +236,8 @@ object Multipart {
     }
 
     /** Java API */
-    override def getParts: JSource[_ <: jm.Multipart.General.BodyPart, AnyRef] =
+    override def getParts
+      : JSource[_ <: jm.Multipart.General.BodyPart, AnyRef] =
       super.getParts
         .asInstanceOf[JSource[_ <: jm.Multipart.General.BodyPart, AnyRef]]
 
@@ -282,15 +283,15 @@ object Multipart {
       override def productPrefix = "General.Strict"
 
       /** Java API */
-      override def getParts: JSource[jm.Multipart.General.BodyPart.Strict,
-                                     AnyRef] =
+      override def getParts
+        : JSource[jm.Multipart.General.BodyPart.Strict, AnyRef] =
         super.getParts
           .asInstanceOf[JSource[_ <: jm.Multipart.General.BodyPart.Strict,
                                 AnyRef]]
 
       /** Java API */
-      override def getStrictParts: java.lang.Iterable[
-        jm.Multipart.General.BodyPart.Strict] =
+      override def getStrictParts
+        : java.lang.Iterable[jm.Multipart.General.BodyPart.Strict] =
         super.getStrictParts.asInstanceOf[java.lang.Iterable[
           jm.Multipart.General.BodyPart.Strict]]
     }
@@ -373,11 +374,11 @@ object Multipart {
             implicit fm: Materializer)
           : Future[Multipart.General.BodyPart.Strict] =
           FastFuture.successful(this)
-        override def toFormDataBodyPart: Try[
-          Multipart.FormData.BodyPart.Strict] =
+        override def toFormDataBodyPart
+          : Try[Multipart.FormData.BodyPart.Strict] =
           tryCreateFormDataBodyPart(FormData.BodyPart.Strict(_, entity, _, _))
-        override def toByteRangesBodyPart: Try[
-          Multipart.ByteRanges.BodyPart.Strict] =
+        override def toByteRangesBodyPart
+          : Try[Multipart.ByteRanges.BodyPart.Strict] =
           tryCreateByteRangesBodyPart(
             ByteRanges.BodyPart.Strict(_, entity, _, _))
         override def productPrefix = "General.BodyPart.Strict"
@@ -402,7 +403,8 @@ object Multipart {
     }
 
     /** Java API */
-    override def getParts: JSource[_ <: jm.Multipart.FormData.BodyPart, AnyRef] =
+    override def getParts
+      : JSource[_ <: jm.Multipart.FormData.BodyPart, AnyRef] =
       super.getParts
         .asInstanceOf[JSource[_ <: jm.Multipart.FormData.BodyPart, AnyRef]]
 
@@ -465,14 +467,14 @@ object Multipart {
       override def productPrefix = "FormData.Strict"
 
       /** Java API */
-      override def getParts: JSource[jm.Multipart.FormData.BodyPart.Strict,
-                                     AnyRef] =
+      override def getParts
+        : JSource[jm.Multipart.FormData.BodyPart.Strict, AnyRef] =
         super.getParts
           .asInstanceOf[JSource[jm.Multipart.FormData.BodyPart.Strict, AnyRef]]
 
       /** Java API */
-      override def getStrictParts: java.lang.Iterable[
-        jm.Multipart.FormData.BodyPart.Strict] =
+      override def getStrictParts
+        : java.lang.Iterable[jm.Multipart.FormData.BodyPart.Strict] =
         super.getStrictParts.asInstanceOf[java.lang.Iterable[
           jm.Multipart.FormData.BodyPart.Strict]]
     }
@@ -616,8 +618,8 @@ object Multipart {
     }
 
     /** Java API */
-    override def getParts: JSource[_ <: jm.Multipart.ByteRanges.BodyPart,
-                                   AnyRef] =
+    override def getParts
+      : JSource[_ <: jm.Multipart.ByteRanges.BodyPart, AnyRef] =
       super.getParts
         .asInstanceOf[JSource[_ <: jm.Multipart.ByteRanges.BodyPart, AnyRef]]
 
@@ -655,15 +657,15 @@ object Multipart {
       override def productPrefix = "ByteRanges.Strict"
 
       /** Java API */
-      override def getParts: JSource[jm.Multipart.ByteRanges.BodyPart.Strict,
-                                     AnyRef] =
+      override def getParts
+        : JSource[jm.Multipart.ByteRanges.BodyPart.Strict, AnyRef] =
         super.getParts
           .asInstanceOf[JSource[jm.Multipart.ByteRanges.BodyPart.Strict,
                                 AnyRef]]
 
       /** Java API */
-      override def getStrictParts: java.lang.Iterable[
-        jm.Multipart.ByteRanges.BodyPart.Strict] =
+      override def getStrictParts
+        : java.lang.Iterable[jm.Multipart.ByteRanges.BodyPart.Strict] =
         super.getStrictParts.asInstanceOf[java.lang.Iterable[
           jm.Multipart.ByteRanges.BodyPart.Strict]]
     }

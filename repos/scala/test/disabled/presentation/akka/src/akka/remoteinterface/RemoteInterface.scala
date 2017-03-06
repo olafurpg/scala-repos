@@ -28,8 +28,8 @@ trait RemoteModule {
   private[akka] def actorsFactories: ConcurrentHashMap[String, () => ActorRef]
   private[akka] def typedActors: ConcurrentHashMap[String, AnyRef]
   private[akka] def typedActorsByUuid: ConcurrentHashMap[String, AnyRef]
-  private[akka] def typedActorsFactories: ConcurrentHashMap[String,
-                                                            () => AnyRef]
+  private[akka] def typedActorsFactories
+    : ConcurrentHashMap[String, () => AnyRef]
 
   /** Lookup methods **/
   private[akka] def findActorById(id: String): ActorRef = actors.get(id)

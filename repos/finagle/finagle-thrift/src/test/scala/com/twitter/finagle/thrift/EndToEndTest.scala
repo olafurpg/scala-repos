@@ -493,42 +493,48 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
     server.close()
   }
 
-  private[this] val servers: Seq[
-    (String, (StatsReceiver, Echo.FutureIface) => ListeningServer)] = Seq(
-    "Thrift.server" ->
-      ((sr, fi) =>
-         Thrift.server
-           .withLabel("server")
-           .withStatsReceiver(sr)
-           .serve("localhost:*",
-                  new Echo.FinagledService(fi, Protocols.binaryFactory()))),
-    "ServerBuilder(stack)" ->
-      ((sr, fi) =>
-         ServerBuilder()
-           .stack(Thrift.server)
-           .name("server")
-           .reportTo(sr)
-           .bindTo(new InetSocketAddress(0))
-           .build(new Echo.FinagledService(fi, Protocols.binaryFactory()))),
-    "ServerBuilder(codec)" ->
-      ((sr, fi) =>
-         ServerBuilder()
-           .codec(ThriftServerFramedCodec())
-           .name("server")
-           .reportTo(sr)
-           .bindTo(new InetSocketAddress(0))
-           .build(new Echo.FinagledService(fi, Protocols.binaryFactory())))
-  )
+  private[this] val servers
+    : Seq[(String, (StatsReceiver, Echo.FutureIface) => ListeningServer)] =
+    Seq(
+      "Thrift.server" ->
+        ((sr,
+          fi) =>
+           Thrift.server
+             .withLabel("server")
+             .withStatsReceiver(sr)
+             .serve("localhost:*",
+                    new Echo.FinagledService(fi, Protocols.binaryFactory()))),
+      "ServerBuilder(stack)" ->
+        ((sr,
+          fi) =>
+           ServerBuilder()
+             .stack(Thrift.server)
+             .name("server")
+             .reportTo(sr)
+             .bindTo(new InetSocketAddress(0))
+             .build(new Echo.FinagledService(fi, Protocols.binaryFactory()))),
+      "ServerBuilder(codec)" ->
+        ((sr,
+          fi) =>
+           ServerBuilder()
+             .codec(ThriftServerFramedCodec())
+             .name("server")
+             .reportTo(sr)
+             .bindTo(new InetSocketAddress(0))
+             .build(new Echo.FinagledService(fi, Protocols.binaryFactory())))
+    )
 
-  private[this] val clients: Seq[
-    (String, (StatsReceiver, Address) => Echo.FutureIface)] = Seq(
+  private[this] val clients
+    : Seq[(String, (StatsReceiver, Address) => Echo.FutureIface)] = Seq(
     "Thrift.client" ->
-      ((sr, addr) =>
+      ((sr,
+        addr) =>
          Thrift.client
            .withStatsReceiver(sr)
            .newIface[Echo.FutureIface](Name.bound(addr), "client")),
     "ClientBuilder(stack)" ->
-      ((sr, addr) =>
+      ((sr,
+        addr) =>
          new Echo.FinagledClient(
            ClientBuilder()
              .stack(Thrift.client)
@@ -538,7 +544,8 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
              .dest(Name.bound(addr))
              .build())),
     "ClientBuilder(codec)" ->
-      ((sr, addr) =>
+      ((sr,
+        addr) =>
          new Echo.FinagledClient(
            ClientBuilder()
              .codec(ThriftClientFramedCodec())

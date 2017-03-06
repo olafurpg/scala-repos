@@ -81,8 +81,8 @@ class MarshallingSpec
               entity =
                 HttpEntity(ContentTypes.`text/plain(UTF-8)`, "test@there.com"),
               headers = `Content-Disposition`(
-                  ContentDispositionTypes.`form-data`,
-                  Map("name" -> "email")) :: Nil
+                ContentDispositionTypes.`form-data`,
+                Map("name" -> "email")) :: Nil
             )
           )) shouldEqual HttpEntity(
           contentType = `multipart/alternative` withBoundary randomBoundary withCharset `UTF-8`,

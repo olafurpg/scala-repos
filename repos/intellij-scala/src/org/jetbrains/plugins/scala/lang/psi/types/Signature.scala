@@ -255,8 +255,8 @@ object Signature {
       val (tp1, tp2) = (iterator1.next(), iterator2.next())
 
       res = res bindT
-          ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
-          ScTypeParameterType.toTypeParameterType(tp1))
+        ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
+        ScTypeParameterType.toTypeParameterType(tp1))
     }
     res
   }

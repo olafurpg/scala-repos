@@ -121,7 +121,8 @@ private[spark] class CoarseMesosSchedulerBackend(
     getRejectOfferDurationForUnmetConstraints(sc)
 
   // A client for talking to the external shuffle service
-  private val mesosExternalShuffleClient: Option[MesosExternalShuffleClient] = {
+  private val mesosExternalShuffleClient
+    : Option[MesosExternalShuffleClient] = {
     if (shuffleServiceEnabled) {
       Some(getShuffleClient())
     } else {

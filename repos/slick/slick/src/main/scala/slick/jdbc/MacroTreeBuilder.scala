@@ -226,11 +226,12 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                 ),
                 Block(
                   remaining.toList map
-                    (sp =>
-                       Apply(
-                         Select(sp.tree, TermName("apply")),
-                         List(Ident(TermName("u")), Ident(TermName("pp")))
-                       )),
+                    (
+                        sp =>
+                          Apply(
+                            Select(sp.tree, TermName("apply")),
+                            List(Ident(TermName("u")), Ident(TermName("pp")))
+                          )),
                   Literal(Constant(()))
                 )
               )

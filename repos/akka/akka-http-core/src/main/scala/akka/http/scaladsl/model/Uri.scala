@@ -540,7 +540,8 @@ object Uri {
     def head: Head
     def tail: Path
     def length: Int
-    def charCount: Int // count of decoded (!) chars, i.e. the ones contained directly in this high-level model
+    def charCount
+      : Int // count of decoded (!) chars, i.e. the ones contained directly in this high-level model
     def ::(c: Char): Path = { require(c == '/'); Path.Slash(this) }
     def ::(segment: String): Path
     def +(pathString: String): Path = this ++ Path(pathString)

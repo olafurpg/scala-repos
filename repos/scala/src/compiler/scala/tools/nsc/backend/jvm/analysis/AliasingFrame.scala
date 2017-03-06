@@ -653,7 +653,7 @@ object AliasSet {
                  if (xs(index) == 0l) {
                    // boom. for nullness, this saves 35% of the overall analysis time.
                    i = ((index + 1) << 6) -
-                       1 // -1 required because i is incremented in the loop body
+                     1 // -1 required because i is incremented in the loop body
                    true
                  } else {
                    val mask = 1l << i

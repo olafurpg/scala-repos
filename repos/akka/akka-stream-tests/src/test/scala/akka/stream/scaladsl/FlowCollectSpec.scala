@@ -24,9 +24,9 @@ class FlowCollectSpec extends AkkaSpec with ScriptedTest {
         }: _*)
       TestConfig.RandomTestRange foreach
         (_ ⇒
-           runScript(script, settings)(_.collect {
-             case x if x % 2 == 0 ⇒ (x * x).toString
-           }))
+          runScript(script, settings)(_.collect {
+            case x if x % 2 == 0 ⇒ (x * x).toString
+          }))
     }
   }
 }

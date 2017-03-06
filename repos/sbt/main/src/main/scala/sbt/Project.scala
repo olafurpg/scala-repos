@@ -106,7 +106,7 @@ sealed trait ProjectDefinition[PR <: ProjectReference] {
     val autos = ifNonEmpty("autoPlugins", autoPlugins.map(_.label))
     val fields =
       s"id $id" :: s"base: $base" :: agg ::: dep ::: conf :::
-        (s"plugins: List($plugins)" :: autos)
+      (s"plugins: List($plugins)" :: autos)
     s"Project(${fields.mkString(", ")})"
   }
   private[this] def ifNonEmpty[T](label: String,

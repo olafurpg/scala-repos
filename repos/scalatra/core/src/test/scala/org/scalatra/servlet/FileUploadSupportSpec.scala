@@ -145,8 +145,8 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
       ("files[]",
        new File(
          "core/src/test/resources/org/scalatra/servlet/lorem_ipsum.txt")) :: ("files[]",
-                                                                              new File(
-                                                                                "core/src/test/resources/org/scalatra/servlet/smiley.png")) :: Nil
+                                                                            new File(
+                                                                              "core/src/test/resources/org/scalatra/servlet/smiley.png")) :: Nil
 
     post("/uploadFileMultiParams", Map(), files) {
       f

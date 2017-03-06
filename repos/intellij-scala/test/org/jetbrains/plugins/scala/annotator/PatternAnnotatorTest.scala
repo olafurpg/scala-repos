@@ -355,10 +355,10 @@ class PatternAnnotatorTest
       """.stripMargin
     val errors =
       Error("ONE", ScalaBundle.message("stable.identifier.required", "ONE")) :: Error(
-        "`two`",
-        ScalaBundle.message("stable.identifier.required", "`two`")) :: Error(
-        "this.two",
-        ScalaBundle.message("stable.identifier.required", "this.two")) :: Nil
+      "`two`",
+      ScalaBundle.message("stable.identifier.required", "`two`")) :: Error(
+      "this.two",
+      ScalaBundle.message("stable.identifier.required", "this.two")) :: Nil
     checkErrors(code, errors)
     assertNoWarnings(code)
   }

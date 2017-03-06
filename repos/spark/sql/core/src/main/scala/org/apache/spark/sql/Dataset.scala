@@ -255,25 +255,25 @@ class Dataset[T] private[sql] (
     // For cells that are beyond 20 characters, replace it with the first 17 and "..."
     val rows: Seq[Seq[String]] =
       schema.fieldNames.toSeq +: data
-        .map {
-          case r: Row => r
-          case tuple: Product => Row.fromTuple(tuple)
-          case o => Row(o)
-        }
-        .map { row =>
-          row.toSeq.map { cell =>
-            val str = cell match {
-              case null => "null"
-              case binary: Array[Byte] =>
-                binary.map("%02X".format(_)).mkString("[", " ", "]")
-              case array: Array[_] => array.mkString("[", ", ", "]")
-              case seq: Seq[_] => seq.mkString("[", ", ", "]")
-              case _ => cell.toString
-            }
-            if (truncate && str.length > 20) str.substring(0, 17) + "..."
-            else str
-          }: Seq[String]
-        }
+      .map {
+        case r: Row => r
+        case tuple: Product => Row.fromTuple(tuple)
+        case o => Row(o)
+      }
+      .map { row =>
+        row.toSeq.map { cell =>
+          val str = cell match {
+            case null => "null"
+            case binary: Array[Byte] =>
+              binary.map("%02X".format(_)).mkString("[", " ", "]")
+            case array: Array[_] => array.mkString("[", ", ", "]")
+            case seq: Seq[_] => seq.mkString("[", ", ", "]")
+            case _ => cell.toString
+          }
+          if (truncate && str.length > 20) str.substring(0, 17) + "..."
+          else str
+        }: Seq[String]
+      }
 
     formatString(rows, numRows, hasMoreData, truncate)
   }

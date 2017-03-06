@@ -449,8 +449,8 @@ class SparseVectorOps_IntTest
   val space = SparseVector.space[Int]
 
   val N = 100
-  implicit def genTriple: Arbitrary[
-    (SparseVector[Int], SparseVector[Int], SparseVector[Int])] = {
+  implicit def genTriple
+    : Arbitrary[(SparseVector[Int], SparseVector[Int], SparseVector[Int])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Int].map { _ % 100 }

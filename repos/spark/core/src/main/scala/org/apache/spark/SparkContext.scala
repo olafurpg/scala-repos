@@ -371,8 +371,8 @@ class SparkContext(config: SparkConf)
 
   private[spark] def eventLogger: Option[EventLoggingListener] = _eventLogger
 
-  private[spark] def executorAllocationManager: Option[
-    ExecutorAllocationManager] =
+  private[spark] def executorAllocationManager
+    : Option[ExecutorAllocationManager] =
     _executorAllocationManager
 
   private[spark] def cleaner: Option[ContextCleaner] = _cleaner

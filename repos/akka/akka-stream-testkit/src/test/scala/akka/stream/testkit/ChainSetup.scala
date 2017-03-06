@@ -21,11 +21,11 @@ class ChainSetup[In, Out, M](
     this(stream, settings, ActorMaterializer(settings)(system), toPublisher)(
       system)
 
-  def this(
-      stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
-      settings: ActorMaterializerSettings,
-      materializerCreator: (ActorMaterializerSettings, ActorRefFactory) ⇒ ActorMaterializer,
-      toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
+  def this(stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
+           settings: ActorMaterializerSettings,
+           materializerCreator: (ActorMaterializerSettings,
+                                 ActorRefFactory) ⇒ ActorMaterializer,
+           toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
       implicit system: ActorSystem) =
     this(stream, settings, materializerCreator(settings, system), toPublisher)(
       system)

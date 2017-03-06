@@ -171,11 +171,11 @@ class InlinerTest extends ClearAfterClass {
 
     val gBeforeLocalOpt =
       VarOp(ALOAD, 0) :: VarOp(ASTORE, 1) :: invokeQQQ ::: List(
-        VarOp(ASTORE, 2),
-        Jump(GOTO, Label(11)),
-        Label(11),
-        VarOp(ALOAD, 2),
-        Op(ATHROW))
+      VarOp(ASTORE, 2),
+      Jump(GOTO, Label(11)),
+      Label(11),
+      VarOp(ALOAD, 2),
+      Op(ATHROW))
 
     assertSameCode(convertMethod(g), gBeforeLocalOpt)
 
@@ -980,7 +980,7 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(
       newCompiler(extraArgs = InlinerTest.args +
-          " -Yopt-inline-heuristics:everything"))(code)
+        " -Yopt-inline-heuristics:everything"))(code)
     assertInvoke(getSingleMethod(c, "t"), "java/lang/System", "arraycopy")
   }
 

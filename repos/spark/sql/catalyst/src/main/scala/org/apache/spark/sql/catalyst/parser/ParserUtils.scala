@@ -87,7 +87,7 @@ object ParserUtils {
       val (matches, nonMatches) =
         remainingNodes.partition(_.text.toUpperCase == clauseName)
       remainingNodes = nonMatches ++
-          (if (matches.nonEmpty) matches.tail else Nil)
+        (if (matches.nonEmpty) matches.tail else Nil)
       matches.headOption
     }
 

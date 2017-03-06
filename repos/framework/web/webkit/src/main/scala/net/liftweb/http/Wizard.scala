@@ -262,19 +262,19 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       wizardBottom, //wizardBottom: Box[Elem],
       nextId ->
         (() => {
-           this.nextScreen()
-           // if (currentScreen.isEmpty) S.seeOther(Referer.is)
-         }), // nextId: (String, () => Unit),
+          this.nextScreen()
+          // if (currentScreen.isEmpty) S.seeOther(Referer.is)
+        }), // nextId: (String, () => Unit),
       Full(
         prevId ->
           (() => {
-             this.prevScreen
-           })), // prevId: Box[(String, () => Unit)],
+            this.prevScreen
+          })), // prevId: Box[(String, () => Unit)],
       cancelId ->
         (() => {
-           WizardRules.deregisterWizardSession(CurrentSession.is);
-           redirectBack()
-         }), //cancelId: (String, () => Unit),
+          WizardRules.deregisterWizardSession(CurrentSession.is);
+          redirectBack()
+        }), //cancelId: (String, () => Unit),
       theScreen,
       ajaxForms_?
     )

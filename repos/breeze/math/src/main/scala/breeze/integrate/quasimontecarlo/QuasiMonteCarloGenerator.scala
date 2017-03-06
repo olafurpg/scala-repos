@@ -33,7 +33,8 @@ trait QuasiMonteCarloGenerator {
    * Using this is purely a performance optimization and should
    * be done extremely carefully.
    */
-  def getNextUnsafe: Array[Double] // This must return an array of length this.dimension
+  def getNextUnsafe
+    : Array[Double] // This must return an array of length this.dimension
 
   def getNext: Array[Double] = getNextUnsafe.clone()
 

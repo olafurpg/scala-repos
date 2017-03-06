@@ -180,8 +180,8 @@ object DecimalPrecision extends Rule[LogicalPlan] {
     * There are a lot more possible rules we can implement, but we don't do them
     * because we are not sure how common they are.
     */
-  private val integralAndDecimalLiteral: PartialFunction[Expression,
-                                                         Expression] = {
+  private val integralAndDecimalLiteral
+    : PartialFunction[Expression, Expression] = {
 
     case GreaterThan(i @ IntegralType(), DecimalLiteral(value)) =>
       if (DecimalLiteral.smallerThanSmallestLong(value)) {

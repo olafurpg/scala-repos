@@ -32,33 +32,33 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
 
   val tuples: Seq[(String, String)] =
     ("1", """{"f1": "value1", "f2": "value2", "f3": 3, "f5": 5.23}""") :: ("2",
-                                                                           """{"f1": "value12", "f3": "value3", "f2": 2, "f4": 4.01}""") :: ("3",
-                                                                                                                                             """{"f1": "value13", "f4": "value44", "f3": "value33", "f2": 2, "f5": 5.01}""") :: ("4",
-                                                                                                                                                                                                                                 null) :: ("5",
-                                                                                                                                                                                                                                           """{"f1": "", "f5": null}""") :: ("6",
-                                                                                                                                                                                                                                                                             "[invalid JSON string]") :: Nil
+                                                                         """{"f1": "value12", "f3": "value3", "f2": 2, "f4": 4.01}""") :: ("3",
+                                                                                                                                           """{"f1": "value13", "f4": "value44", "f3": "value33", "f2": 2, "f5": 5.01}""") :: ("4",
+                                                                                                                                                                                                                               null) :: ("5",
+                                                                                                                                                                                                                                         """{"f1": "", "f5": null}""") :: ("6",
+                                                                                                                                                                                                                                                                           "[invalid JSON string]") :: Nil
 
   test("function get_json_object - null") {
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expected =
       Row("1", "value1", "value2", "3", null, "5.23") :: Row(
-        "2",
-        "value12",
-        "2",
-        "value3",
-        "4.01",
-        null) :: Row("3", "value13", "2", "value33", "value44", "5.01") :: Row(
-        "4",
-        null,
-        null,
-        null,
-        null,
-        null) :: Row("5", "", null, null, null, null) :: Row("6",
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null) :: Nil
+      "2",
+      "value12",
+      "2",
+      "value3",
+      "4.01",
+      null) :: Row("3", "value13", "2", "value33", "value44", "5.01") :: Row(
+      "4",
+      null,
+      null,
+      null,
+      null,
+      null) :: Row("5", "", null, null, null, null) :: Row("6",
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null) :: Nil
 
     checkAnswer(
       df.select(
@@ -77,23 +77,23 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expected =
       Row("1", "value1", "value2", "3", null, "5.23") :: Row(
-        "2",
-        "value12",
-        "2",
-        "value3",
-        "4.01",
-        null) :: Row("3", "value13", "2", "value33", "value44", "5.01") :: Row(
-        "4",
-        null,
-        null,
-        null,
-        null,
-        null) :: Row("5", "", null, null, null, null) :: Row("6",
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null) :: Nil
+      "2",
+      "value12",
+      "2",
+      "value3",
+      "4.01",
+      null) :: Row("3", "value13", "2", "value33", "value44", "5.01") :: Row(
+      "4",
+      null,
+      null,
+      null,
+      null,
+      null) :: Row("5", "", null, null, null, null) :: Row("6",
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null) :: Nil
 
     checkAnswer(
       df.select(

@@ -328,7 +328,7 @@ trait EvaluatorModule[M[+ _]]
                 _ <- monadState.modify { state =>
                   state.copy(
                     assume = state.assume +
-                        (graph -> (pending.table, pending.sort)))
+                      (graph -> (pending.table, pending.sort)))
                 }
               } yield pending
             }
@@ -768,9 +768,8 @@ trait EvaluatorModule[M[+ _]]
                                          trans.WrapArray(srcRight))
               }
 
-              val joined: StateT[N,
-                                 EvaluatorState,
-                                 (Morph1Apply, PendingTable)] =
+              val joined
+                : StateT[N, EvaluatorState, (Morph1Apply, PendingTable)] =
                 mor.alignment match {
                   case MorphismAlignment.Cross(morph1) =>
                     ((transState liftM mn(morph1)) |@| cross(
@@ -918,7 +917,7 @@ trait EvaluatorModule[M[+ _]]
                 _ <- monadState.modify { state =>
                   state.copy(
                     assume = state.assume +
-                        (m -> (wrapped, IdentityOrder.empty)),
+                      (m -> (wrapped, IdentityOrder.empty)),
                     reductions = state.reductions + (m -> rvalue)
                   )
                 }

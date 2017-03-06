@@ -153,12 +153,13 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       })
   }
 
-  override def getAllMethodsAndTheirSubstitutors: JList[
-    IPair[PsiMethod, PsiSubstitutor]] = {
+  override def getAllMethodsAndTheirSubstitutors
+    : JList[IPair[PsiMethod, PsiSubstitutor]] = {
     PsiClassImplUtil.getAllWithSubstitutorsByMap(this, MemberType.METHOD)
   }
 
-  override def getVisibleSignatures: JCollection[HierarchicalMethodSignature] = {
+  override def getVisibleSignatures
+    : JCollection[HierarchicalMethodSignature] = {
     PsiSuperMethodImplUtil.getVisibleSignatures(this)
   }
 

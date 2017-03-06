@@ -390,13 +390,13 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
       val v = stopReplicaRequestMap(brokerId)
       if (callback != null)
         stopReplicaRequestMap(brokerId) = v :+ StopReplicaRequestInfo(
-            PartitionAndReplica(topic, partition, brokerId),
-            deletePartition,
-            (r: AbstractRequestResponse) => callback(r, brokerId))
+          PartitionAndReplica(topic, partition, brokerId),
+          deletePartition,
+          (r: AbstractRequestResponse) => callback(r, brokerId))
       else
         stopReplicaRequestMap(brokerId) = v :+ StopReplicaRequestInfo(
-            PartitionAndReplica(topic, partition, brokerId),
-            deletePartition)
+          PartitionAndReplica(topic, partition, brokerId),
+          deletePartition)
     }
   }
 

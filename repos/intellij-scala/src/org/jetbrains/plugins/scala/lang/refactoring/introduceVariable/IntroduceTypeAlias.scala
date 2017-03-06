@@ -189,15 +189,15 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
             isReplaceOccurrenceInInheritors = false,
             scopeItem)
 
-          val introduceRunnable: Computable[
-            (SmartPsiElementPointer[PsiElement],
-             SmartPsiElementPointer[PsiElement])] = introduceTypeAlias(
-            file,
-            editor,
-            typeElement,
-            allOccurrences,
-            suggestedNames(0),
-            scopeItem)
+          val introduceRunnable
+            : Computable[(SmartPsiElementPointer[PsiElement],
+                          SmartPsiElementPointer[PsiElement])] =
+            introduceTypeAlias(file,
+                               editor,
+                               typeElement,
+                               allOccurrences,
+                               suggestedNames(0),
+                               scopeItem)
 
           CommandProcessor.getInstance.executeCommand(
             project,

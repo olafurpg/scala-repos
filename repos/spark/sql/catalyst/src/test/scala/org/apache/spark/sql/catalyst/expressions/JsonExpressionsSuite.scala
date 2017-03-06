@@ -197,7 +197,7 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   val jsonTupleQuery =
     Literal("f1") :: Literal("f2") :: Literal("f3") :: Literal("f4") :: Literal(
-      "f5") :: Nil
+    "f5") :: Nil
 
   private def checkJsonTuple(jt: JsonTuple, expected: InternalRow): Unit = {
     assert(jt.eval(null).toSeq.head === expected)

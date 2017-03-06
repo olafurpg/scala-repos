@@ -28,8 +28,8 @@ object CanDesignFilterDecimation {
   /** Use via implicit delegate syntax firwin(xxxx)
     *
     */
-  implicit def decimationFilterDouble: CanDesignFilterDecimation[
-    FIRKernel1D[Double]] = {
+  implicit def decimationFilterDouble
+    : CanDesignFilterDecimation[FIRKernel1D[Double]] = {
     new CanDesignFilterDecimation[FIRKernel1D[Double]] {
       def apply(factor: Int,
                 multiplier: Double,
@@ -64,8 +64,8 @@ object CanDesignFilterDecimation {
   /** Use via implicit delegate syntax firwin(xxxx)
     *
     */
-  implicit def decimationFilterLong: CanDesignFilterDecimation[
-    FIRKernel1D[Long]] = {
+  implicit def decimationFilterLong
+    : CanDesignFilterDecimation[FIRKernel1D[Long]] = {
     new CanDesignFilterDecimation[FIRKernel1D[Long]] {
       def apply(factor: Int,
                 multiplier: Double,

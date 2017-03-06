@@ -113,7 +113,7 @@ case class FilesystemIngestFailureLog(
                 message: EventMessage,
                 lastKnownGood: YggCheckpoint): IngestFailureLog = {
     copy(failureLog = failureLog +
-             (message -> LogRecord(offset, message, lastKnownGood)),
+           (message -> LogRecord(offset, message, lastKnownGood)),
          restoreFrom = lastKnownGood min restoreFrom)
   }
 
@@ -503,9 +503,9 @@ abstract class KafkaShardIngestActor(
           }.toList
         }
 
-      val batched: Validation[Error,
-                              Future[(Vector[(Long, EventMessage)],
-                                      YggCheckpoint)]] =
+      val batched
+        : Validation[Error,
+                     Future[(Vector[(Long, EventMessage)], YggCheckpoint)]] =
         eventMessages
           .sequence[({ type λ[α] = Validation[Error, α] })#λ,
                     (Long, EventMessage.EventMessageExtraction)] map {

@@ -37,11 +37,8 @@ private[http] object WebSocket {
       log) atop messageAPI(serverSide, closeTimeout)
 
   /** The lowest layer that implements the binary protocol */
-  def framing: BidiFlow[ByteString,
-                        FrameEvent,
-                        FrameEvent,
-                        ByteString,
-                        NotUsed] =
+  def framing
+    : BidiFlow[ByteString, FrameEvent, FrameEvent, ByteString, NotUsed] =
     BidiFlow
       .fromFlows(Flow[ByteString].via(FrameEventParser),
                  Flow[FrameEvent].transform(() ⇒ new FrameEventRenderer))

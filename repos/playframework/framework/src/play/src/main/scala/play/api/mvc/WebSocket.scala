@@ -105,9 +105,8 @@ object WebSocket {
 
   object MessageFlowTransformer {
 
-    implicit val identityMessageFlowTransformer: MessageFlowTransformer[
-      Message,
-      Message] = {
+    implicit val identityMessageFlowTransformer
+      : MessageFlowTransformer[Message, Message] = {
       new MessageFlowTransformer[Message, Message] {
         def transform(flow: Flow[Message, Message, _]) = flow
       }
@@ -116,9 +115,8 @@ object WebSocket {
     /**
       * Converts text messages to/from Strings.
       */
-    implicit val stringMessageFlowTransformer: MessageFlowTransformer[
-      String,
-      String] = {
+    implicit val stringMessageFlowTransformer
+      : MessageFlowTransformer[String, String] = {
       new MessageFlowTransformer[String, String] {
         def transform(flow: Flow[String, String, _]) = {
           AkkaStreams.bypassWith[Message, String, Message](
@@ -136,9 +134,8 @@ object WebSocket {
     /**
       * Converts binary messages to/from ByteStrings.
       */
-    implicit val byteStringMessageFlowTransformer: MessageFlowTransformer[
-      ByteString,
-      ByteString] = {
+    implicit val byteStringMessageFlowTransformer
+      : MessageFlowTransformer[ByteString, ByteString] = {
       new MessageFlowTransformer[ByteString, ByteString] {
         def transform(flow: Flow[ByteString, ByteString, _]) = {
           AkkaStreams.bypassWith[Message, ByteString, Message](
@@ -156,18 +153,16 @@ object WebSocket {
     /**
       * Converts binary messages to/from byte arrays.
       */
-    implicit val byteArrayMessageFlowTransformer: MessageFlowTransformer[
-      Array[Byte],
-      Array[Byte]] = {
+    implicit val byteArrayMessageFlowTransformer
+      : MessageFlowTransformer[Array[Byte], Array[Byte]] = {
       byteStringMessageFlowTransformer.map(_.toArray, ByteString.apply)
     }
 
     /**
       * Converts messages to/from JsValue
       */
-    implicit val jsonMessageFlowTransformer: MessageFlowTransformer[
-      JsValue,
-      JsValue] = {
+    implicit val jsonMessageFlowTransformer
+      : MessageFlowTransformer[JsValue, JsValue] = {
       def closeOnException[T](block: => T) =
         try {
           Left(block)

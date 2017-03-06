@@ -162,8 +162,8 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
             case typed: ScTypedDefinition
                 if typed.getType().getOrAny.conforms(expectedType) =>
               variant.isLocalVariable = (typed.isVar || typed.isVal) &&
-                  (typed.containingFile exists
-                    (_.getName == parameters.getOriginalFile.getName))
+                (typed.containingFile exists
+                  (_.getName == parameters.getOriginalFile.getName))
               apply(variant)
             case _ => // do nothing
           }

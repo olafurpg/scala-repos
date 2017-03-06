@@ -69,7 +69,7 @@ object RawCompileLike {
         File] :+: File :+: Seq[String] :+: Int :+: HNil
       val inputs: Inputs =
         hash(sources.toSet ++ optionFiles(options, fileInputOpts)) :+: lastModified(
-          classpath.toSet) :+: classpath :+: outputDirectory :+: options :+: maxErrors :+: HNil
+        classpath.toSet) :+: classpath :+: outputDirectory :+: options :+: maxErrors :+: HNil
       implicit val stringEquiv: Equiv[String] = defaultEquiv
       implicit val fileEquiv: Equiv[File] = defaultEquiv
       implicit val intEquiv: Equiv[Int] = defaultEquiv

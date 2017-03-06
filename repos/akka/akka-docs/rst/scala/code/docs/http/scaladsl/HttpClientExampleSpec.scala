@@ -24,9 +24,8 @@ class HttpClientExampleSpec extends WordSpec with Matchers {
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
 
-    val connectionFlow: Flow[HttpRequest,
-                             HttpResponse,
-                             Future[Http.OutgoingConnection]] =
+    val connectionFlow
+      : Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] =
       Http().outgoingConnection("akka.io")
     val responseFuture: Future[HttpResponse] = Source
       .single(HttpRequest(uri = "/"))

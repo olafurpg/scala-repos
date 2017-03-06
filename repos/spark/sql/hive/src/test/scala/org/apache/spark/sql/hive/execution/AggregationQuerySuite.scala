@@ -962,8 +962,8 @@ abstract class AggregationQuerySuite
 
       val data =
         Row(1, Seq(Row(1), Row(2), Row(3))) :: Row(
-          1,
-          Seq(Row(4), Row(5), Row(6))) :: Row(2, Seq(Row(-10))) :: Nil
+        1,
+        Seq(Row(4), Row(5), Row(6))) :: Row(2, Seq(Row(-10))) :: Nil
       val schema = StructType(
         StructField("key", IntegerType) :: StructField(
           "myArray",

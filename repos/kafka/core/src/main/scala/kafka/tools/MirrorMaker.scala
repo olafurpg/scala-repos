@@ -333,7 +333,7 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
       // Create mirror maker threads.
       mirrorMakerThreads = (0 until numStreams) map
-          (i => new MirrorMakerThread(mirrorMakerConsumers(i), i))
+        (i => new MirrorMakerThread(mirrorMakerConsumers(i), i))
 
       // Create and initialize message handler
       val customMessageHandlerClass = options.valueOf(messageHandlerOpt)
@@ -631,8 +631,8 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     val regex = whitelistOpt.getOrElse(
       throw new IllegalArgumentException(
         "New consumer only supports whitelist."))
-    var recordIter: java.util.Iterator[ConsumerRecord[Array[Byte],
-                                                      Array[Byte]]] = null
+    var recordIter
+      : java.util.Iterator[ConsumerRecord[Array[Byte], Array[Byte]]] = null
 
     // TODO: we need to manually maintain the consumed offsets for new consumer
     // since its internal consumed position is updated in batch rather than one

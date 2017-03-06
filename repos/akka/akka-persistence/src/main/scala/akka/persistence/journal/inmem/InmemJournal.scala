@@ -63,7 +63,7 @@ private[persistence] trait InmemMessages {
 
   def add(p: PersistentRepr): Unit =
     messages = messages +
-        (messages.get(p.persistenceId) match {
+      (messages.get(p.persistenceId) match {
         case Some(ms) ⇒ p.persistenceId -> (ms :+ p)
         case None ⇒ p.persistenceId -> Vector(p)
       })

@@ -821,11 +821,10 @@ object ScalaPsiUtil {
     index.getModuleForFile(element.getContainingFile.getVirtualFile)
   }
 
-  val collectImplicitObjectsCache: ConcurrentMap[(ScType,
-                                                  Project,
-                                                  GlobalSearchScope),
-                                                 Seq[ScType]] = ContainerUtil
-    .newConcurrentMap[(ScType, Project, GlobalSearchScope), Seq[ScType]]()
+  val collectImplicitObjectsCache
+    : ConcurrentMap[(ScType, Project, GlobalSearchScope), Seq[ScType]] =
+    ContainerUtil
+      .newConcurrentMap[(ScType, Project, GlobalSearchScope), Seq[ScType]]()
 
   def collectImplicitObjects(_tp: ScType,
                              project: Project,
@@ -1070,10 +1069,10 @@ object ScalaPsiUtil {
         //implicit conversions
         def addConversions(fromUnderscore: Boolean) {
           res = res ++ expr
-              .getTypeAfterImplicitConversion(
-                expectedOption = expr.smartExpectedType(fromUnderscore),
-                fromUnderscore = fromUnderscore)
-              .importsUsed
+            .getTypeAfterImplicitConversion(
+              expectedOption = expr.smartExpectedType(fromUnderscore),
+              fromUnderscore = fromUnderscore)
+            .importsUsed
         }
         if (ScUnderScoreSectionUtil.isUnderscoreFunction(expr))
           addConversions(fromUnderscore = true)

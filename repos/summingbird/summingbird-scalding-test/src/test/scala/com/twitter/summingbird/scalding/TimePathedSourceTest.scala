@@ -50,8 +50,8 @@ object TimePathSourceLaws extends Properties("Time path source") {
 
   def genEmbiggen(embiggen: Long): (DateRange => DateRange) = {
     ((dr: DateRange) =>
-       DateRange(RichDate(dr.start.timestamp - embiggen),
-                 RichDate(dr.end.timestamp + embiggen)))
+      DateRange(RichDate(dr.start.timestamp - embiggen),
+                RichDate(dr.end.timestamp + embiggen)))
   }
 
   def genVertractor(

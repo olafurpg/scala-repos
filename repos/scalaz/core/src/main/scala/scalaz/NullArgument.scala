@@ -136,19 +136,21 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullArgumentCategory: Split[NullArgument] with Profunctor[
-    NullArgument] = new Split[NullArgument] with Profunctor[NullArgument] {
-    override def compose[A, B, C](f: NullArgument[B, C],
-                                  g: NullArgument[A, B]): NullArgument[A, C] =
-      f compose g
-    override def split[A, B, C, D](f: NullArgument[A, B],
-                                   g: NullArgument[C, D]) =
-      f *** g
-    override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
-      r contramap f
-    override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
-      r map f
-  }
+  implicit val nullArgumentCategory
+    : Split[NullArgument] with Profunctor[NullArgument] =
+    new Split[NullArgument] with Profunctor[NullArgument] {
+      override def compose[A, B, C](
+          f: NullArgument[B, C],
+          g: NullArgument[A, B]): NullArgument[A, C] =
+        f compose g
+      override def split[A, B, C, D](f: NullArgument[A, B],
+                                     g: NullArgument[C, D]) =
+        f *** g
+      override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
+        r contramap f
+      override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
+        r map f
+    }
 
   implicit def nullArgumentMonad[X]
     : Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] =

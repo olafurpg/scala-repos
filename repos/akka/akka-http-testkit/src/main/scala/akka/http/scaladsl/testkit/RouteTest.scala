@@ -191,7 +191,7 @@ trait RouteTest
             routingSettings)
           val sealedExceptionHandler = ExceptionHandler.seal(exceptionHandler)
           val semiSealedRoute = // sealed for exceptions but not for rejections
-          Directives.handleExceptions(sealedExceptionHandler)(route)
+            Directives.handleExceptions(sealedExceptionHandler)(route)
           val deferrableRouteResult = semiSealedRoute(ctx)
           deferrableRouteResult.fast.foreach(routeTestResult.handleResult)(
             executionContext)

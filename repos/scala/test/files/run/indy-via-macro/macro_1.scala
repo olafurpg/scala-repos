@@ -21,7 +21,7 @@ object Macro {
         .setInfo(NullaryMethodType(typeOf[Pattern]))
       val args: List[Tree] =
         Literal(Constant(bootstrapMethod)).setType(NoType) :: bootstrapArgs
-          .asInstanceOf[List[Tree]]
+        .asInstanceOf[List[Tree]]
       val result =
         ApplyDynamic(Ident(dummySymbol).setType(dummySymbol.info), args)
       result.setType(dummySymbol.info.resultType)

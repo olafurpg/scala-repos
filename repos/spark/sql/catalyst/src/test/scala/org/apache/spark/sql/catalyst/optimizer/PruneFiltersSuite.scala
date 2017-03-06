@@ -30,12 +30,12 @@ class PruneFiltersSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
-        "Filter Pushdown and Pruning",
-        Once,
-        CombineFilters,
-        PruneFilters,
-        PushPredicateThroughProject,
-        PushPredicateThroughJoin) :: Nil
+      "Filter Pushdown and Pruning",
+      Once,
+      CombineFilters,
+      PruneFilters,
+      PushPredicateThroughProject,
+      PushPredicateThroughJoin) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

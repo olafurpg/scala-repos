@@ -403,8 +403,8 @@ abstract class FormatInterpolator {
         case 'o' | 'x' | 'X' if hasAnyFlag(maybeOK) && !isBigInt =>
           maybeOK filter hasFlag foreach
             (badf =>
-               badFlag(badf,
-                       s"only use '$badf' for BigInt conversions to o, x, X"))
+              badFlag(badf,
+                      s"only use '$badf' for BigInt conversions to o, x, X"))
           true
       }
       if (bad_+) None

@@ -309,13 +309,13 @@ trait DocTemplateEntity extends MemberTemplateEntity {
   def implicitsShadowing: Map[MemberEntity, ImplicitMemberShadowing]
 
   /** Classes that can be implicitly converted to this class */
-  def incomingImplicitlyConvertedClasses: List[(DocTemplateEntity,
-                                                ImplicitConversion)]
+  def incomingImplicitlyConvertedClasses
+    : List[(DocTemplateEntity, ImplicitConversion)]
 
   /** Classes to which this class can be implicitly converted to
       NOTE: Some classes might not be included in the scaladoc run so they will be NoDocTemplateEntities */
-  def outgoingImplicitlyConvertedClasses: List[
-    (TemplateEntity, TypeEntity, ImplicitConversion)]
+  def outgoingImplicitlyConvertedClasses
+    : List[(TemplateEntity, TypeEntity, ImplicitConversion)]
 
   /** If this template takes place in inheritance and implicit conversion relations, it will be shown in this diagram */
   def inheritanceDiagram: Option[Diagram]

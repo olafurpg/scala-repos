@@ -85,9 +85,9 @@ private[forum] final class TopicApi(
                 troll: Boolean): Fu[Paginator[TopicView]] =
     Paginator(
       adapter = new Adapter[Topic](
-          selector = TopicRepo(troll) byCategQuery categ,
-          sort = Seq($sort.updatedDesc)
-        ) mapFuture { topic =>
+        selector = TopicRepo(troll) byCategQuery categ,
+        sort = Seq($sort.updatedDesc)
+      ) mapFuture { topic =>
         $find.byId[Post](topic lastPostId troll) map { post =>
           TopicView(categ, topic, post, env.postApi lastPageOf topic, troll)
         }

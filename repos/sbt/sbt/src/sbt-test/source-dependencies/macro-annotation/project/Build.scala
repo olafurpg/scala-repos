@@ -25,21 +25,21 @@ object MyBuild extends Build {
       "root",
       file("."),
       settings = buildSettings ++ Seq(
-          run <<= run in Compile in core
-        )
+        run <<= run in Compile in core
+      )
     ) aggregate (macros, core)
 
   lazy val macros: Project = Project(
     "macros",
     file("macros"),
     settings = buildSettings ++ Seq(
-        libraryDependencies <+=
-          (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
-        libraryDependencies ++=
-          (if (scalaVersion.value.startsWith("2.10"))
-             List("org.scalamacros" %% "quasiquotes" % paradiseVersion)
-           else Nil)
-      )
+      libraryDependencies <+=
+        (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
+      libraryDependencies ++=
+        (if (scalaVersion.value.startsWith("2.10"))
+           List("org.scalamacros" %% "quasiquotes" % paradiseVersion)
+         else Nil)
+    )
   )
 
   lazy val core: Project =

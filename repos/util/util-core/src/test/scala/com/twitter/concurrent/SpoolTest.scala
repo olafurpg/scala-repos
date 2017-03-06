@@ -566,7 +566,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
   "Spool.distinctBy should distinct by in order" in {
     val spool: Spool[String] =
       "ac" *:: Future.value(
-        "bbe" *:: Future.value("ab" *:: Future.value(Spool.empty[String])))
+      "bbe" *:: Future.value("ab" *:: Future.value(Spool.empty[String])))
     assert(
       Await.result(spool.distinctBy(_.length).toSeq, 5.seconds) == Seq("ac",
                                                                        "bbe"))

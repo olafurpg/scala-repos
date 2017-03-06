@@ -53,8 +53,8 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       implicit request: HttpServletRequest): S = {
     val originalParams = multiParams
     request(MultiParamsKey) = originalParams ++ matchedRoute
-        .map(_.multiParams)
-        .getOrElse(Map.empty)
+      .map(_.multiParams)
+      .getOrElse(Map.empty)
     fillMdc()
     try { thunk } finally { request(MultiParamsKey) = originalParams }
   }

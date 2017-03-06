@@ -30,8 +30,8 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   // `function1Covariant[=> Any]`. In 2.11.0-M6 and above, they would infer this value.
   // Those places have been change to explicitly use this instance so that we don't see different
   // behaviour based on Scala version.
-  implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[
-    (=> T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[
+  implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[(
+      => T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[
     (=> T) => ?] =
     new Monad[(=> T) => ?] with BindRec[(=> T) => ?] with Zip[(=> T) => ?]
     with Unzip[(=> T) => ?] with Distributive[(=> T) => ?] {
@@ -112,30 +112,31 @@ trait FunctionInstances extends FunctionInstances0 {
       def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
     }
 
-  implicit val function1Instance: Arrow[Function1] with Choice[Function1] with ProChoice[
-    Function1] = new Arrow[Function1] with Choice[Function1]
-  with ProChoice[Function1] {
-    def left[A, B, C](fa: A => B) = _.leftMap(fa)
+  implicit val function1Instance
+    : Arrow[Function1] with Choice[Function1] with ProChoice[Function1] =
+    new Arrow[Function1] with Choice[Function1] with ProChoice[Function1] {
+      def left[A, B, C](fa: A => B) = _.leftMap(fa)
 
-    def right[A, B, C](fa: A => B) = _.map(fa)
+      def right[A, B, C](fa: A => B) = _.map(fa)
 
-    def arr[A, B](f: A => B) = f
+      def arr[A, B](f: A => B) = f
 
-    def first[A, B, C](a: A => B) = (ac: (A, C)) => (a(ac._1), ac._2)
+      def first[A, B, C](a: A => B) = (ac: (A, C)) => (a(ac._1), ac._2)
 
-    def compose[A, B, C](f: B => C, g: A => B) = f compose g
+      def compose[A, B, C](f: B => C, g: A => B) = f compose g
 
-    def id[A]: A => A = a => a
+      def id[A]: A => A = a => a
 
-    def choice[A, B, C](f: => A => C, g: => B => C): (A \/ B) => C = {
-      case -\/(a) => f(a)
-      case \/-(b) => g(b)
+      def choice[A, B, C](f: => A => C, g: => B => C): (A \/ B) => C = {
+        case -\/(a) => f(a)
+        case \/-(b) => g(b)
+      }
+
+      override def split[A, B, C, D](f: A => B,
+                                     g: C => D): ((A, C)) => (B, D) = {
+        case (a, c) => (f(a), g(c))
+      }
     }
-
-    override def split[A, B, C, D](f: A => B, g: C => D): ((A, C)) => (B, D) = {
-      case (a, c) => (f(a), g(c))
-    }
-  }
 
   implicit def function1Covariant[T]: Monad[T => ?] with BindRec[T => ?] with Zip[
     T => ?] with Unzip[T => ?] with Distributive[T => ?] =
@@ -265,8 +266,8 @@ trait FunctionInstances extends FunctionInstances0 {
     }
 
   implicit def function6Instance[T1, T2, T3, T4, T5, T6]
-    : Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5,
-                                                         T6) => ?] =
+    : Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[
+      (T1, T2, T3, T4, T5, T6) => ?] =
     new Monad[(T1, T2, T3, T4, T5, T6) => ?]
     with BindRec[(T1, T2, T3, T4, T5, T6) => ?] {
       def point[A](a: => A) =

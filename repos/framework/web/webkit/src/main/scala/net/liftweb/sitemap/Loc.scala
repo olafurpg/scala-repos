@@ -237,8 +237,8 @@ trait Loc[T] {
   /**
     * Find the stateless calculation Loc params
     */
-  protected def findStatelessCalc: (Box[Loc.CalcStateless],
-                                    Box[Loc.CalcParamStateless[T]]) =
+  protected def findStatelessCalc
+    : (Box[Loc.CalcStateless], Box[Loc.CalcParamStateless[T]]) =
     (allParams.collect {
       case v @ Loc.CalcStateless(_) => v
     }.headOption, allParams.collect {
@@ -248,12 +248,12 @@ trait Loc[T] {
   /**
     * The cached Loc params
     */
-  protected lazy val _foundStatelessCalc: (Box[Loc.CalcStateless],
-                                           Box[Loc.CalcParamStateless[T]]) =
+  protected lazy val _foundStatelessCalc
+    : (Box[Loc.CalcStateless], Box[Loc.CalcParamStateless[T]]) =
     findStatelessCalc
 
-  protected def foundStatelessCalc: (Box[Loc.CalcStateless],
-                                     Box[Loc.CalcParamStateless[T]]) =
+  protected def foundStatelessCalc
+    : (Box[Loc.CalcStateless], Box[Loc.CalcParamStateless[T]]) =
     if (Props.devMode) findStatelessCalc else _foundStatelessCalc
 
   /**

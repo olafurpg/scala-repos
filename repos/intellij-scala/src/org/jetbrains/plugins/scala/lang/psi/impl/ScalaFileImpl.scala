@@ -287,7 +287,7 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
             val path = {
               val splits =
                 ScalaFileImpl.toVector(base) :: ScalaFileImpl.splitsIn(
-                  ScalaFileImpl.pathIn(this))
+                ScalaFileImpl.pathIn(this))
               splits.foldLeft(List(vector))(ScalaFileImpl.splitAt)
             }
             path

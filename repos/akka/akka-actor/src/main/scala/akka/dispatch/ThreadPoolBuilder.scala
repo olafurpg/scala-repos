@@ -131,7 +131,8 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
       queue: BlockingQueue[Runnable]): ThreadPoolConfigBuilder =
     withNewThreadPoolWithCustomBlockingQueue(reusableQueue(queue))
 
-  def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity: ThreadPoolConfigBuilder =
+  def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity
+    : ThreadPoolConfigBuilder =
     this.copy(config = config.copy(queueFactory = linkedBlockingQueue()))
 
   def withNewThreadPoolWithLinkedBlockingQueueWithCapacity(

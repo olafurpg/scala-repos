@@ -33,10 +33,10 @@ trait Notifier
     (// individual repository's owner
     issue.userName :: // collaborators
       getCollaborators(issue.userName, issue.repositoryName) ::: // participants
-        issue.openedUserName :: getComments(
-          issue.userName,
-          issue.repositoryName,
-          issue.issueId).map(_.commentedUserName)).distinct
+      issue.openedUserName :: getComments(
+      issue.userName,
+      issue.repositoryName,
+      issue.issueId).map(_.commentedUserName)).distinct
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
       .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
         (LDAPUtil.isDummyMailAddress(_)) foreach (x => notify(x.mailAddress)))

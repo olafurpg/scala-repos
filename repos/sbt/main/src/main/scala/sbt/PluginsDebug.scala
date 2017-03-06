@@ -384,10 +384,10 @@ private[sbt] object PluginsDebug {
         def note(str: String) = if (str.isEmpty) "" else s"Note: $str"
         val parts =
           indent(excludedError(false /* TODO */, blockingExcludes.toList)) :: indent(
-            required(enablingPlugins.toList)) :: indent(
-            needToDeactivate(deactivate)) :: note(
-            willAdd(plugin, extraEnabledPlugins.toList)) :: note(
-            willRemove(plugin, toBeRemoved.toList)) :: Nil
+          required(enablingPlugins.toList)) :: indent(
+          needToDeactivate(deactivate)) :: note(
+          willAdd(plugin, extraEnabledPlugins.toList)) :: note(
+          willRemove(plugin, toBeRemoved.toList)) :: Nil
         parts.filterNot(_.isEmpty).mkString("\n")
       case PluginImpossible(plugin, context, contradictions) =>
         pluginImpossible(plugin, contradictions)

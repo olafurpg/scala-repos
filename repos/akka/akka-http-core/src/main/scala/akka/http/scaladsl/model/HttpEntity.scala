@@ -355,7 +355,7 @@ object HttpEntity {
     override def withSizeLimit(maxBytes: Long): HttpEntity.Default =
       copy(
         data = data withAttributes Attributes(
-            SizeLimit(maxBytes, Some(contentLength))))
+          SizeLimit(maxBytes, Some(contentLength))))
 
     override def withoutSizeLimit: HttpEntity.Default =
       withSizeLimit(SizeLimit.Disabled)
@@ -484,7 +484,8 @@ object HttpEntity {
     override def productPrefix = "HttpEntity.Chunked"
 
     /** Java API */
-    def getChunks: stream.javadsl.Source[jm.HttpEntity.ChunkStreamPart, AnyRef] =
+    def getChunks
+      : stream.javadsl.Source[jm.HttpEntity.ChunkStreamPart, AnyRef] =
       stream.javadsl.Source.fromGraph(
         chunks.asInstanceOf[Source[jm.HttpEntity.ChunkStreamPart, AnyRef]])
   }

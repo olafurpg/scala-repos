@@ -99,7 +99,8 @@ trait DispatcherBuilder {
 
 object ThreadPoolConfigDispatcherBuilder {
   def conf_?[T](opt: Option[T])(
-      fun: (T) => ThreadPoolConfigDispatcherBuilder => ThreadPoolConfigDispatcherBuilder)
+      fun: (
+          T) => ThreadPoolConfigDispatcherBuilder => ThreadPoolConfigDispatcherBuilder)
     : Option[
       (ThreadPoolConfigDispatcherBuilder) => ThreadPoolConfigDispatcherBuilder] =
     opt map fun
@@ -132,7 +133,8 @@ case class ThreadPoolConfigDispatcherBuilder(
       queue: BlockingQueue[Runnable]): ThreadPoolConfigDispatcherBuilder =
     withNewThreadPoolWithCustomBlockingQueue(reusableQueue(queue))
 
-  def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity: ThreadPoolConfigDispatcherBuilder =
+  def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity
+    : ThreadPoolConfigDispatcherBuilder =
     this.copy(
       config = config.copy(queueFactory = linkedBlockingQueue(),
                            flowHandler = defaultFlowHandler))

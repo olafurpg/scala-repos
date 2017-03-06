@@ -148,8 +148,8 @@ object RuntimeStats extends java.io.Serializable {
   @transient private lazy val logger: Logger =
     LoggerFactory.getLogger(this.getClass)
 
-  private val flowMappingStore: mutable.Map[String,
-                                            WeakReference[FlowProcess[_]]] = {
+  private val flowMappingStore
+    : mutable.Map[String, WeakReference[FlowProcess[_]]] = {
     (new ConcurrentHashMap[String, WeakReference[FlowProcess[_]]]).asScala
   }
 

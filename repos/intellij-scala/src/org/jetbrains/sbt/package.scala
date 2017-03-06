@@ -39,7 +39,7 @@ package object sbt {
   implicit class RichFile(val file: File) extends AnyVal {
     def /(path: String): File = new File(file, path)
 
-    def `<<`: File = <<(1)
+    def `<<` : File = <<(1)
 
     def `<<`(level: Int): File = RichFile.parent(file, level)
 

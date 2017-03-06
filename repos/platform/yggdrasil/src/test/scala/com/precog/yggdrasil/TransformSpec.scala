@@ -2462,10 +2462,9 @@ trait TransformSpec[M[+ _]]
       JObject(
         JField("value", JNum(BigDecimal("2705009941739170689"))) :: JField(
           "key",
-          JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(JField("value",
-                                                             JString("")) :: JField(
-        "key",
-        JArray(JNum(2) :: Nil)) :: Nil) #:: Stream.empty
+          JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(JField(
+      "value",
+      JString("")) :: JField("key", JArray(JNum(2) :: Nil)) :: Nil) #:: Stream.empty
 
     val sample = SampleData(data)
     val table = fromSample(sample)
@@ -2492,11 +2491,11 @@ trait TransformSpec[M[+ _]]
       JObject(JField("value", JNum(12)) :: JField(
         "key",
         JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(JField("value", JNum(10)) :: JField(
+      "key",
+      JArray(JNum(2) :: Nil)) :: Nil) #:: JObject(
+      JField("value", JArray(JNum(13) :: Nil)) :: JField(
         "key",
-        JArray(JNum(2) :: Nil)) :: Nil) #:: JObject(
-        JField("value", JArray(JNum(13) :: Nil)) :: JField(
-          "key",
-          JArray(JNum(3) :: Nil)) :: Nil) #:: Stream.empty
+        JArray(JNum(3) :: Nil)) :: Nil) #:: Stream.empty
 
     val sample = SampleData(data)
     val table = fromSample(sample)
@@ -2544,11 +2543,11 @@ trait TransformSpec[M[+ _]]
   def testDerefObjectDynamic = {
     val data =
       JObject(JField("foo", JNum(1)) :: JField("ref", JString("foo")) :: Nil) #:: JObject(JField(
-        "bar",
-        JNum(2)) :: JField("ref", JString("bar")) :: Nil) #:: JObject(JField(
-        "baz",
-        JNum(3)) :: JField("ref", JString("baz")) :: Nil) #:: Stream
-        .empty[JValue]
+      "bar",
+      JNum(2)) :: JField("ref", JString("bar")) :: Nil) #:: JObject(JField(
+      "baz",
+      JNum(3)) :: JField("ref", JString("baz")) :: Nil) #:: Stream
+      .empty[JValue]
 
     val table = fromSample(SampleData(data))
     val results = toJson(table.transform {

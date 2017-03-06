@@ -20,23 +20,23 @@ object MarathonBuild extends Build {
     id = "plugin-interface",
     base = file("plugin-interface"),
     settings = baseSettings ++ asmSettings ++ formatSettings ++ scalaStyleSettings ++ publishSettings ++ Seq(
-        libraryDependencies ++= Dependencies.pluginInterface
-      )
+      libraryDependencies ++= Dependencies.pluginInterface
+    )
   )
 
   lazy val root: Project = Project(
     id = "marathon",
     base = file("."),
     settings = baseSettings ++ buildInfoSettings ++ asmSettings ++ customReleaseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ graphSettings ++ testSettings ++ integrationTestSettings ++ teamCitySetEnvSettings ++ Seq(
-        unmanagedResourceDirectories in Compile +=
-          file("docs/docs/rest-api"),
-        libraryDependencies ++= Dependencies.root,
-        parallelExecution in Test := false,
-        sourceGenerators in Compile <+= buildInfo,
-        buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion),
-        buildInfoPackage := "mesosphere.marathon",
-        fork in Test := true
-      )
+      unmanagedResourceDirectories in Compile +=
+        file("docs/docs/rest-api"),
+      libraryDependencies ++= Dependencies.root,
+      parallelExecution in Test := false,
+      sourceGenerators in Compile <+= buildInfo,
+      buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion),
+      buildInfoPackage := "mesosphere.marathon",
+      fork in Test := true
+    )
   ).configs(IntegrationTest)
     .dependsOn(pluginInterface)
     // run mesos-simulation/test:test when running test

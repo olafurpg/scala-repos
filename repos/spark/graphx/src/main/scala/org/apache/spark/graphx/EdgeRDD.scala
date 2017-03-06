@@ -40,9 +40,10 @@ abstract class EdgeRDD[ED](sc: SparkContext, deps: Seq[Dependency[_]])
     extends RDD[Edge[ED]](sc, deps) {
 
   // scalastyle:off structural.type
-  private[graphx] def partitionsRDD: RDD[(PartitionID, EdgePartition[ED, VD])] forSome {
-    type VD
-  }
+  private[graphx] def partitionsRDD
+    : RDD[(PartitionID, EdgePartition[ED, VD])] forSome {
+      type VD
+    }
   // scalastyle:on structural.type
 
   override protected def getPartitions: Array[Partition] =

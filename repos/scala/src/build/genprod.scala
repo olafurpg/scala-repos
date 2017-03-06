@@ -325,9 +325,7 @@ class Tuple(val i: Int) extends Group("Tuple") with Arity {
   private def params =
     (
       1 to i map (x =>
-                    " *  @param  _%d   Element %d of this Tuple%d".format(x,
-                                                                          x,
-                                                                          i))
+        " *  @param  _%d   Element %d of this Tuple%d".format(x, x, i))
     ) mkString "\n"
 
   // prettifies it a little if it's overlong

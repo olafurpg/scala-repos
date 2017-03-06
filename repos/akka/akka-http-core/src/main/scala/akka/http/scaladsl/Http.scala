@@ -55,7 +55,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
 
   // configured default HttpsContext for the client-side
   // SYNCHRONIZED ACCESS ONLY!
-  private[this] var _defaultClientHttpsConnectionContext: HttpsConnectionContext =
+  private[this] var _defaultClientHttpsConnectionContext
+    : HttpsConnectionContext =
     _
   private[this] var _defaultServerConnectionContext: ConnectionContext = _
 
@@ -92,7 +93,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     : Source[IncomingConnection, Future[ServerBinding]] = {
     val effectivePort = if (port >= 0) port else connectionContext.defaultPort
     val tlsStage = sslTlsStage(connectionContext, Server)
-    val connections: Source[Tcp.IncomingConnection, Future[Tcp.ServerBinding]] =
+    val connections
+      : Source[Tcp.IncomingConnection, Future[Tcp.ServerBinding]] =
       Tcp().bind(interface,
                  effectivePort,
                  settings.backlog,

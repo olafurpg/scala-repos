@@ -149,8 +149,8 @@ final class CookedReader(baseDir: File,
     }
   }
 
-  private def segmentsByRef: Validation[IOException,
-                                        Map[ColumnRef, List[File]]] =
+  private def segmentsByRef
+    : Validation[IOException, Map[ColumnRef, List[File]]] =
     metadata map { md =>
       md.segments
         .groupBy(s => (s._1.cpath, s._1.ctype))

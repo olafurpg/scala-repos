@@ -810,10 +810,8 @@ object MutablizingAdaptor {
             }
           }
 
-        implicit def mapActiveValues: CanMapActiveValues[Wrapper,
-                                                         S,
-                                                         S,
-                                                         Wrapper] =
+        implicit def mapActiveValues
+          : CanMapActiveValues[Wrapper, S, S, Wrapper] =
           new CanMapActiveValues[Wrapper, S, S, Wrapper] {
             override def apply(from: Wrapper, fn: (S) => S): Wrapper = {
               from.map(canMapActive(_, fn))

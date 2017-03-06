@@ -877,8 +877,8 @@ object Enumeratee {
     * $paramEcSingle
     */
   def recover[E](f: (Throwable, Input[E]) => Unit =
-                   (_: Throwable, _: Input[E]) =>
-                     ())(implicit ec: ExecutionContext): Enumeratee[E, E] = {
+                   (_: Throwable, _: Input[E]) => ())(
+      implicit ec: ExecutionContext): Enumeratee[E, E] = {
     val pec = ec.prepare()
     new Enumeratee[E, E] {
 

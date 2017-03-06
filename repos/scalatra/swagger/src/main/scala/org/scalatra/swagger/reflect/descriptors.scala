@@ -104,10 +104,10 @@ object ManifestScalaType {
     override def typeVars = {
       if (_typeVars == null)
         _typeVars = Map
-            .empty[TypeVariable[_], ScalaType] ++ erasure.getTypeParameters
-            .map(_.asInstanceOf[TypeVariable[_]])
-            .toList
-            .zip(manifest.typeArguments map (ManifestScalaType(_)))
+          .empty[TypeVariable[_], ScalaType] ++ erasure.getTypeParameters
+          .map(_.asInstanceOf[TypeVariable[_]])
+          .toList
+          .zip(manifest.typeArguments map (ManifestScalaType(_)))
       _typeVars
     }
   }
@@ -161,9 +161,9 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
   def typeVars = {
     if (_typeVars == null)
       _typeVars = Map.empty ++ erasure.getTypeParameters
-          .map(_.asInstanceOf[TypeVariable[_]])
-          .toList
-          .zip(manifest.typeArguments map (ManifestScalaType(_)))
+        .map(_.asInstanceOf[TypeVariable[_]])
+        .toList
+        .zip(manifest.typeArguments map (ManifestScalaType(_)))
     _typeVars
   }
 

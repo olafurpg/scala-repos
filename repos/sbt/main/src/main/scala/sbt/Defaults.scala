@@ -534,8 +534,8 @@ object Defaults extends BuildCommon {
   }
   // Returns the ScalaInstance only if it was not constructed via `update`
   //  This is necessary to prevent cycles between `update` and `scalaInstance`
-  private[sbt] def unmanagedScalaInstanceOnly: Initialize[
-    Task[Option[ScalaInstance]]] = Def.taskDyn {
+  private[sbt] def unmanagedScalaInstanceOnly
+    : Initialize[Task[Option[ScalaInstance]]] = Def.taskDyn {
     if (scalaHome.value.isDefined) Def.task(Some(scalaInstance.value))
     else Def.task(None)
   }
@@ -724,7 +724,8 @@ object Defaults extends BuildCommon {
         new Tests.Execution(opts, par, ts)
     }
 
-  def testQuickFilter: Initialize[Task[Seq[String] => Seq[String => Boolean]]] =
+  def testQuickFilter
+    : Initialize[Task[Seq[String] => Seq[String => Boolean]]] =
     (fullClasspath in test, streams in test) map { (cp, s) =>
       val ans: Seq[Analysis] =
         cp.flatMap(_.metadata get Keys.analysis) map {
@@ -1402,7 +1403,8 @@ object Defaults extends BuildCommon {
       .writeDescriptor(plugins.toSeq, dir, PluginDiscovery.Paths.Plugins)
       .toList
 
-  def discoverSbtPluginNames: Initialize[Task[PluginDiscovery.DiscoveredNames]] =
+  def discoverSbtPluginNames
+    : Initialize[Task[PluginDiscovery.DiscoveredNames]] =
     Def.task {
       if (sbtPlugin.value) PluginDiscovery.discoverSourceAll(compile.value)
       else PluginDiscovery.emptyDiscoveredNames
@@ -1437,13 +1439,14 @@ object Defaults extends BuildCommon {
         "<arg>")
   }
 
-  def testOnlyParser: (State, Seq[String]) => Parser[
-    (Seq[String], Seq[String])] = { (state, tests) =>
-    import DefaultParsers._
-    val selectTests = distinctParser(tests.toSet, true)
-    val options =
-      (token(Space) ~> token("--") ~> spaceDelimited("<option>")) ?? Nil
-    selectTests ~ options
+  def testOnlyParser
+    : (State, Seq[String]) => Parser[(Seq[String], Seq[String])] = {
+    (state, tests) =>
+      import DefaultParsers._
+      val selectTests = distinctParser(tests.toSet, true)
+      val options =
+        (token(Space) ~> token("--") ~> spaceDelimited("<option>")) ?? Nil
+      selectTests ~ options
   }
 
   private def distinctParser(exs: Set[String],
@@ -2375,8 +2378,8 @@ object Classpaths {
   private[this] def fileUptodate(file: File,
                                  stamps: Map[File, Long]): Boolean =
     stamps.get(file).forall(_ == file.lastModified)
-  private[sbt] def dependencyPositionsTask: Initialize[
-    Task[Map[ModuleID, SourcePosition]]] = Def.task {
+  private[sbt] def dependencyPositionsTask
+    : Initialize[Task[Map[ModuleID, SourcePosition]]] = Def.task {
     val projRef = thisProjectRef.value
     val st = state.value
     val s = streams.value
@@ -2773,8 +2776,8 @@ object Classpaths {
     plugins.map("-Xplugin:" + _.getAbsolutePath).toSeq
   }
 
-  private[this] lazy val internalCompilerPluginClasspath: Initialize[
-    Task[Classpath]] =
+  private[this] lazy val internalCompilerPluginClasspath
+    : Initialize[Task[Classpath]] =
     (thisProjectRef, settingsData, buildDependencies) flatMap {
       (ref, data, deps) =>
         internalDependencies0(ref, CompilerPlugin, CompilerPlugin, data, deps)

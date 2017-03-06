@@ -193,16 +193,16 @@ private[spire] trait Fuser[C <: Context, A] {
     val (apx, mes, ind, exact) = freshApproxNames
     val indValDef = fused.ind.fold(n => q"val $ind = $n + 1" :: Nil, _ => Nil)
     val stats = List(
-        q"val $apx = ${sqrt(fused.apx)}",
-        q"""val $mes =
+      q"val $apx = ${sqrt(fused.apx)}",
+      q"""val $mes =
         if (${fused.apx} < 0) {
           ${sqrt(fused.mes)} * (1 << 26)
         } else {
           (${fused.mes} / ${fused.apx}) * $apx
         }
       """,
-        q"def $exact = $ev.sqrt(${fused.exact})"
-      ) ++ indValDef
+      q"def $exact = $ev.sqrt(${fused.exact})"
+    ) ++ indValDef
     val ind0 = fused.ind.fold(_ => Left(ind), n => Right(n + 1))
     val result = Fused(fused.stats ++ stats, apx, mes, ind0, exact)
     result

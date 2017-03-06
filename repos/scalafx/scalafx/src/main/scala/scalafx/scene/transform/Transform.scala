@@ -115,8 +115,8 @@ abstract class Transform(override val delegate: jfxst.Transform)
   def identity: ReadOnlyBooleanProperty = delegate.identityProperty
 
   /** The onTransformChanged event handler is called whenever the transform changes any of its parameters. */
-  def onTransformChanged: ObjectProperty[
-    jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]] =
+  def onTransformChanged
+    : ObjectProperty[jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]] =
     delegate.onTransformChangedProperty
   def onTransformChanged_=(
       v: jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]) {

@@ -74,23 +74,23 @@ object ThriftMux
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux clients.
     */
-  private[twitter] val BaseClientStack: Stack[
-    ServiceFactory[mux.Request, mux.Response]] =
+  private[twitter] val BaseClientStack
+    : Stack[ServiceFactory[mux.Request, mux.Response]] =
     (ThriftMuxUtil.protocolRecorder +: Mux.client.stack)
       .replace(StackClient.Role.protoTracing, ClientRpcTracing)
 
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux servers.
     */
-  private[twitter] val BaseServerStack: Stack[
-    ServiceFactory[mux.Request, mux.Response]] =
+  private[twitter] val BaseServerStack
+    : Stack[ServiceFactory[mux.Request, mux.Response]] =
     // NOTE: ideally this would not use the `prepConn` role, but it's conveniently
     // located in the right location of the stack and is defaulted to a no-op.
     // We would like this located anywhere before the StatsFilter so that success
     // and failure can be measured properly before converting the exceptions into
     // byte arrays. see CSL-1351
     ThriftMuxUtil.protocolRecorder +: Mux.server.stack
-      .replace(StackServer.Role.preparer, Server.ExnHandler)
+    .replace(StackServer.Role.preparer, Server.ExnHandler)
 
   private[this] def recordRpc(buffer: Array[Byte]): Unit =
     try {
@@ -194,8 +194,8 @@ object ThriftMux
       }
     }
 
-    private[this] def deserializingClassifier: StackClient[mux.Request,
-                                                           mux.Response] = {
+    private[this] def deserializingClassifier
+      : StackClient[mux.Request, mux.Response] = {
       // Note: what type of deserializer used is important if none is specified
       // so that we keep the prior behavior of Thrift exceptions
       // being counted as a success. Otherwise, even using the default

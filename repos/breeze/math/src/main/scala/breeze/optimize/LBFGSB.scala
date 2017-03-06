@@ -206,7 +206,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
 
     for (sortIdx <- i until n) {
       xCauchy(sortedIndeces(sortIdx)) = x(sortedIndeces(sortIdx)) + oldT * d(
-          sortedIndeces(sortIdx))
+        sortedIndeces(sortIdx))
     }
 
     c += p :* dtMin

@@ -236,7 +236,7 @@ class ScLiteralImpl(node: ASTNode)
     if (getFirstChild.getNode.getElementType != ScalaTokenTypes.kNULL)
       assert(assertion = false,
              message = "Only null literals accepted, type: " +
-                 getFirstChild.getNode.getElementType)
+               getFirstChild.getNode.getElementType)
     typeWithoutImplicits = tp
   }
 
@@ -262,8 +262,8 @@ class ScLiteralImpl(node: ASTNode)
    * }
    */
 
-  private[this] var myAnnotationOwner: Option[
-    PsiAnnotationOwner with PsiElement] = None
+  private[this] var myAnnotationOwner
+    : Option[PsiAnnotationOwner with PsiElement] = None
   private[this] var expirationTime = 0L
 
   private val expTimeLengthGenerator: Random = new Random(
@@ -278,7 +278,7 @@ class ScLiteralImpl(node: ASTNode)
         myAnnotationOwner.exists(!_.isValid)) {
       myAnnotationOwner = annotationOwnerLookUp(this)
       expirationTime = System.currentTimeMillis() +
-          (2 + expTimeLengthGenerator.nextInt(8)) * 1000
+        (2 + expTimeLengthGenerator.nextInt(8)) * 1000
     }
 
     myAnnotationOwner

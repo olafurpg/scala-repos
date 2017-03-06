@@ -456,8 +456,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val inputQuantiles =
             <td>Input Size / Records</td> +: getFormattedSizeQuantilesWithRecords(
-              inputSizes,
-              inputRecords)
+            inputSizes,
+            inputRecords)
 
           val outputSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -477,8 +477,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val outputQuantiles =
             <td>Output Size / Records</td> +: getFormattedSizeQuantilesWithRecords(
-              outputSizes,
-              outputRecords)
+            outputSizes,
+            outputRecords)
 
           val shuffleReadBlockedTimes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -515,8 +515,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                 Shuffle Read Size / Records
               </span>
             </td> +: getFormattedSizeQuantilesWithRecords(
-              shuffleReadTotalSizes,
-              shuffleReadTotalRecords)
+            shuffleReadTotalSizes,
+            shuffleReadTotalRecords)
 
           val shuffleReadRemoteSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -550,8 +550,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val shuffleWriteQuantiles =
             <td>Shuffle Write Size / Records</td> +: getFormattedSizeQuantilesWithRecords(
-              shuffleWriteSizes,
-              shuffleWriteRecords)
+            shuffleWriteSizes,
+            shuffleWriteRecords)
 
           val memoryBytesSpilledSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -559,7 +559,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           }
           val memoryBytesSpilledQuantiles =
             <td>Shuffle spill (memory)</td> +: getFormattedSizeQuantiles(
-              memoryBytesSpilledSizes)
+            memoryBytesSpilledSizes)
 
           val diskBytesSpilledSizes = validTasks.map {
             case TaskUIData(_, metrics, _) =>
@@ -567,7 +567,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           }
           val diskBytesSpilledQuantiles =
             <td>Shuffle spill (disk)</td> +: getFormattedSizeQuantiles(
-              diskBytesSpilledSizes)
+            diskBytesSpilledSizes)
 
           val listings: Seq[Seq[Node]] = Seq(
             <tr>{serviceQuantiles}</tr>,

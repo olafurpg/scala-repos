@@ -406,8 +406,8 @@ sealed abstract class TreeLocInstances {
       private[this] val ForestT: Traverse[TreeForest] =
         Traverse[Stream].compose[Tree]
 
-      private[this] val ForestT1: Traverse1[
-        Lambda[a => OneAnd[Stream, Tree[a]]]] =
+      private[this] val ForestT1
+        : Traverse1[Lambda[a => OneAnd[Stream, Tree[a]]]] =
         Traverse1[Lambda[a => OneAnd[Stream, a]]].compose[Tree]
 
       private[this] implicit val ParentT: Traverse1[Parent] =
@@ -465,8 +465,8 @@ sealed abstract class TreeLocInstances {
       private[this] val ParentsT: Traverse[Parents] =
         Traverse[Stream].compose[Parent]
 
-      private[this] val ParentsT1: Traverse1[
-        Lambda[a => OneAnd[Stream, Parent[a]]]] =
+      private[this] val ParentsT1
+        : Traverse1[Lambda[a => OneAnd[Stream, Parent[a]]]] =
         Traverse1[Lambda[a => OneAnd[Stream, a]]].compose[Parent]
     }
 

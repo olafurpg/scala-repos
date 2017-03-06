@@ -307,7 +307,8 @@ final case class OneVersionVector private[akka] (node: UniqueAddress,
     n == node
 
   /** INTERNAL API */
-  private[akka] override def versionsIterator: Iterator[(UniqueAddress, Long)] =
+  private[akka] override def versionsIterator
+    : Iterator[(UniqueAddress, Long)] =
     Iterator.single((node, version))
 
   override def merge(that: VersionVector): VersionVector = {
@@ -365,7 +366,8 @@ final case class ManyVersionVector(versions: TreeMap[UniqueAddress, Long])
     versions.contains(node)
 
   /** INTERNAL API */
-  private[akka] override def versionsIterator: Iterator[(UniqueAddress, Long)] =
+  private[akka] override def versionsIterator
+    : Iterator[(UniqueAddress, Long)] =
     versions.iterator
 
   override def merge(that: VersionVector): VersionVector = {

@@ -73,7 +73,7 @@ private[spark] class ShuffleMapTask(
       ByteBuffer.wrap(taskBinary.value),
       Thread.currentThread.getContextClassLoader)
     _executorDeserializeTime = System.currentTimeMillis() -
-        deserializeStartTime
+      deserializeStartTime
 
     metrics = Some(context.taskMetrics)
     var writer: ShuffleWriter[Any, Any] = null

@@ -109,7 +109,8 @@ object Digit extends DigitInstances {
 }
 
 sealed abstract class DigitInstances {
-  implicit val digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] =
+  implicit val digitInstances
+    : Enum[Digit] with Show[Digit] with Monoid[Digit] =
     new Enum[Digit] with Show[Digit] with Monoid[Digit] {
 
       import std.anyVal._

@@ -259,7 +259,8 @@ object HashEqualsArrayWrapper {
         intArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsShortOrdering: Ordering[HashEqualsArrayWrapper[Short]] =
+  implicit val hashEqualsShortOrdering
+    : Ordering[HashEqualsArrayWrapper[Short]] =
     new Ordering[HashEqualsArrayWrapper[Short]] {
       override def compare(x: HashEqualsArrayWrapper[Short],
                            y: HashEqualsArrayWrapper[Short]): Int =
@@ -280,23 +281,24 @@ object HashEqualsArrayWrapper {
         byteArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsBooleanOrdering: Ordering[
-    HashEqualsArrayWrapper[Boolean]] =
+  implicit val hashEqualsBooleanOrdering
+    : Ordering[HashEqualsArrayWrapper[Boolean]] =
     new Ordering[HashEqualsArrayWrapper[Boolean]] {
       override def compare(x: HashEqualsArrayWrapper[Boolean],
                            y: HashEqualsArrayWrapper[Boolean]): Int =
         booleanArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsFloatOrdering: Ordering[HashEqualsArrayWrapper[Float]] =
+  implicit val hashEqualsFloatOrdering
+    : Ordering[HashEqualsArrayWrapper[Float]] =
     new Ordering[HashEqualsArrayWrapper[Float]] {
       override def compare(x: HashEqualsArrayWrapper[Float],
                            y: HashEqualsArrayWrapper[Float]): Int =
         floatArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsDoubleOrdering: Ordering[
-    HashEqualsArrayWrapper[Double]] =
+  implicit val hashEqualsDoubleOrdering
+    : Ordering[HashEqualsArrayWrapper[Double]] =
     new Ordering[HashEqualsArrayWrapper[Double]] {
       override def compare(x: HashEqualsArrayWrapper[Double],
                            y: HashEqualsArrayWrapper[Double]): Int =

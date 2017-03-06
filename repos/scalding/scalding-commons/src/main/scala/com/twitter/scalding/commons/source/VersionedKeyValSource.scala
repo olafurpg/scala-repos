@@ -195,9 +195,8 @@ class VersionedKeyValSource[K, V](val path: String,
   }
 
   // Override this for more control on failure on decode
-  protected lazy val checkedInversion: CheckedInversion[(K, V),
-                                                        (Array[Byte],
-                                                         Array[Byte])] =
+  protected lazy val checkedInversion
+    : CheckedInversion[(K, V), (Array[Byte], Array[Byte])] =
     new MaxFailuresCheck(maxFailures)(codecBox.get)
 
   override def sinkFields: Fields = fields

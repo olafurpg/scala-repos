@@ -73,8 +73,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
   // reset cache if plugin has been updated
   // cache: jarFilePath -> jarManifest
   private var jarCache: InjectorPersistentCache = null
-  private val loadedInjectors: mutable.HashMap[Class[_],
-                                               mutable.HashSet[String]] =
+  private val loadedInjectors
+    : mutable.HashMap[Class[_], mutable.HashSet[String]] =
     mutable.HashMap()
 
   private val myLibraryTableListener = new LibraryTable.Listener {

@@ -585,8 +585,8 @@ object DenseVector
     }
   }
 
-  implicit def canTransposeComplex: CanTranspose[DenseVector[Complex],
-                                                 DenseMatrix[Complex]] = {
+  implicit def canTransposeComplex
+    : CanTranspose[DenseVector[Complex], DenseMatrix[Complex]] = {
     new CanTranspose[DenseVector[Complex], DenseMatrix[Complex]] {
       def apply(from: DenseVector[Complex]): DenseMatrix[Complex] = {
         new DenseMatrix(data = from.data map { _.conjugate },
@@ -656,8 +656,8 @@ object DenseVector
   implicit def zipMapKV[V, R: ClassTag]: CanZipMapKeyValuesDenseVector[V, R] =
     new CanZipMapKeyValuesDenseVector[V, R]
 
-  implicit val canAddIntoD: OpAdd.InPlaceImpl2[DenseVector[Double],
-                                               DenseVector[Double]] = {
+  implicit val canAddIntoD
+    : OpAdd.InPlaceImpl2[DenseVector[Double], DenseVector[Double]] = {
     new OpAdd.InPlaceImpl2[DenseVector[Double], DenseVector[Double]] {
       def apply(a: DenseVector[Double], b: DenseVector[Double]) = {
         canDaxpy(a, 1.0, b)
@@ -703,8 +703,8 @@ object DenseVector
     BinaryRegistry[Vector[Double], Vector[Double], OpAdd.type, Vector[Double]]]
     .register(canAddD)
 
-  implicit val canSubIntoD: OpSub.InPlaceImpl2[DenseVector[Double],
-                                               DenseVector[Double]] = {
+  implicit val canSubIntoD
+    : OpSub.InPlaceImpl2[DenseVector[Double], DenseVector[Double]] = {
     new OpSub.InPlaceImpl2[DenseVector[Double], DenseVector[Double]] {
       def apply(a: DenseVector[Double], b: DenseVector[Double]) = {
         canDaxpy(a, -1.0, b)
@@ -797,7 +797,8 @@ object DenseVector
   /**
     *  Returns the p-norm of this Vector (specialized for Double).
     */
-  implicit def canNorm_Double: norm.Impl2[DenseVector[Double], Double, Double] = {
+  implicit def canNorm_Double
+    : norm.Impl2[DenseVector[Double], Double, Double] = {
     new norm.Impl2[DenseVector[Double], Double, Double] {
       def apply(v: DenseVector[Double], p: Double): Double = {
         if (p == 2) {
@@ -838,27 +839,23 @@ object DenseVector
     MutableFiniteCoordinateField.make[DenseVector[E], Int, E]
   }
 
-  implicit val space_Double: MutableFiniteCoordinateField[DenseVector[Double],
-                                                          Int,
-                                                          Double] = {
+  implicit val space_Double
+    : MutableFiniteCoordinateField[DenseVector[Double], Int, Double] = {
     MutableFiniteCoordinateField.make[DenseVector[Double], Int, Double]
   }
 
-  implicit val space_Float: MutableFiniteCoordinateField[DenseVector[Float],
-                                                         Int,
-                                                         Float] = {
+  implicit val space_Float
+    : MutableFiniteCoordinateField[DenseVector[Float], Int, Float] = {
     MutableFiniteCoordinateField.make[DenseVector[Float], Int, Float]
   }
 
-  implicit val space_Int: MutableFiniteCoordinateField[DenseVector[Int],
-                                                       Int,
-                                                       Int] = {
+  implicit val space_Int
+    : MutableFiniteCoordinateField[DenseVector[Int], Int, Int] = {
     MutableFiniteCoordinateField.make[DenseVector[Int], Int, Int]
   }
 
-  implicit val space_Long: MutableFiniteCoordinateField[DenseVector[Long],
-                                                        Int,
-                                                        Long] = {
+  implicit val space_Long
+    : MutableFiniteCoordinateField[DenseVector[Long], Int, Long] = {
     MutableFiniteCoordinateField.make[DenseVector[Long], Int, Long]
   }
 

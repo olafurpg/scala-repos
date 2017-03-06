@@ -1235,8 +1235,8 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       val committer = format.getOutputCommitter(hadoopContext)
       committer.setupTask(hadoopContext)
 
-      val outputMetricsAndBytesWrittenCallback: Option[(OutputMetrics,
-                                                        () => Long)] =
+      val outputMetricsAndBytesWrittenCallback
+        : Option[(OutputMetrics, () => Long)] =
         initHadoopOutputMetrics(context)
 
       val writer = format
@@ -1331,8 +1331,8 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       // around by taking a mod. We expect that no task will be attempted 2 billion times.
       val taskAttemptId = (context.taskAttemptId % Int.MaxValue).toInt
 
-      val outputMetricsAndBytesWrittenCallback: Option[(OutputMetrics,
-                                                        () => Long)] =
+      val outputMetricsAndBytesWrittenCallback
+        : Option[(OutputMetrics, () => Long)] =
         initHadoopOutputMetrics(context)
 
       writer.setup(context.stageId, context.partitionId, taskAttemptId)

@@ -41,8 +41,8 @@ trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
           Unmarshaller.bestUnmarshallingCharsetFor(entity).nioCharset.name)
     }
 
-  implicit def defaultUrlEncodedFormDataUnmarshaller: FromEntityUnmarshaller[
-    FormData] =
+  implicit def defaultUrlEncodedFormDataUnmarshaller
+    : FromEntityUnmarshaller[FormData] =
     urlEncodedFormDataUnmarshaller(
       MediaTypes.`application/x-www-form-urlencoded`)
   def urlEncodedFormDataUnmarshaller(

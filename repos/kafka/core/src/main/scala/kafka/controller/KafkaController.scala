@@ -66,14 +66,14 @@ class ControllerContext(val zkUtils: ZkUtils, val zkSessionTimeout: Int) {
   var allTopics: Set[String] = Set.empty
   var partitionReplicaAssignment: mutable.Map[TopicAndPartition, Seq[Int]] =
     mutable.Map.empty
-  var partitionLeadershipInfo: mutable.Map[TopicAndPartition,
-                                           LeaderIsrAndControllerEpoch] =
+  var partitionLeadershipInfo
+    : mutable.Map[TopicAndPartition, LeaderIsrAndControllerEpoch] =
     mutable.Map.empty
-  val partitionsBeingReassigned: mutable.Map[TopicAndPartition,
-                                             ReassignedPartitionsContext] =
+  val partitionsBeingReassigned
+    : mutable.Map[TopicAndPartition, ReassignedPartitionsContext] =
     new mutable.HashMap
-  val partitionsUndergoingPreferredReplicaElection: mutable.Set[
-    TopicAndPartition] = new mutable.HashSet
+  val partitionsUndergoingPreferredReplicaElection
+    : mutable.Set[TopicAndPartition] = new mutable.HashSet
 
   private var liveBrokersUnderlying: Set[Broker] = Set.empty
   private var liveBrokerIdsUnderlying: Set[Int] = Set.empty
@@ -333,8 +333,8 @@ class KafkaController(val config: KafkaConfig,
         debug("Live brokers: " + controllerContext.liveBrokerIds.mkString(","))
       }
 
-      val allPartitionsAndReplicationFactorOnBroker: Set[(TopicAndPartition,
-                                                          Int)] =
+      val allPartitionsAndReplicationFactorOnBroker
+        : Set[(TopicAndPartition, Int)] =
         inLock(controllerContext.controllerLock) {
           controllerContext
             .partitionsOnBroker(id)
@@ -1052,8 +1052,8 @@ class KafkaController(val config: KafkaConfig,
       .map(_._1)
     reassignedPartitions.foreach(p =>
       removePartitionFromReassignedPartitions(p))
-    var partitionsToReassign: mutable.Map[TopicAndPartition,
-                                          ReassignedPartitionsContext] =
+    var partitionsToReassign
+      : mutable.Map[TopicAndPartition, ReassignedPartitionsContext] =
       new mutable.HashMap
     partitionsToReassign ++= partitionsBeingReassigned
     partitionsToReassign --= reassignedPartitions
@@ -1661,9 +1661,8 @@ class KafkaController(val config: KafkaConfig,
     if (isActive()) {
       trace("checking need to trigger partition rebalance")
       // get all the active brokers
-      var preferredReplicasForTopicsByBrokers: Map[
-        Int,
-        Map[TopicAndPartition, Seq[Int]]] = null
+      var preferredReplicasForTopicsByBrokers
+        : Map[Int, Map[TopicAndPartition, Seq[Int]]] = null
       inLock(controllerContext.controllerLock) {
         preferredReplicasForTopicsByBrokers =
           controllerContext.partitionReplicaAssignment
@@ -1745,7 +1744,7 @@ class PartitionsReassignedListener(controller: KafkaController)
     extends IZkDataListener
     with Logging {
   this.logIdent = "[PartitionsReassignedListener on " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
   val zkUtils = controller.controllerContext.zkUtils
   val controllerContext = controller.controllerContext
 
@@ -1801,7 +1800,7 @@ class ReassignedPartitionsIsrChangeListener(controller: KafkaController,
     extends IZkDataListener
     with Logging {
   this.logIdent = "[ReassignedPartitionsIsrChangeListener on controller " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
   val zkUtils = controller.controllerContext.zkUtils
   val controllerContext = controller.controllerContext
 
@@ -1960,7 +1959,7 @@ class PreferredReplicaElectionListener(controller: KafkaController)
     extends IZkDataListener
     with Logging {
   this.logIdent = "[PreferredReplicaElectionListener on " +
-      controller.config.brokerId + "]: "
+    controller.config.brokerId + "]: "
   val zkUtils = controller.controllerContext.zkUtils
   val controllerContext = controller.controllerContext
 

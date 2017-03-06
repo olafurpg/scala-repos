@@ -133,7 +133,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                   getIssueLabels(owner, name, issueId),
                   (getCollaborators(owner, name) :::
                     (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-                     else List(owner))).sorted,
+                   else List(owner))).sorted,
                   getMilestonesWithIssueCount(owner, name),
                   getLabels(owner, name),
                   commits,
@@ -168,25 +168,25 @@ trait PullRequestsControllerBase extends ControllerBase {
                   getCommitStatues(owner, name, pullreq.commitIdTo),
                 branchProtection = branchProtection,
                 branchIsOutOfDate = JGitUtil.getShaByRef(
-                    owner,
-                    name,
-                    pullreq.branch) != Some(pullreq.commitIdFrom),
+                  owner,
+                  name,
+                  pullreq.branch) != Some(pullreq.commitIdFrom),
                 needStatusCheck = context.loginAccount
                   .map { u =>
                     branchProtection.needStatusCheck(u.userName)
                   }
                   .getOrElse(true),
                 hasUpdatePermission = hasWritePermission(
-                    pullreq.requestUserName,
-                    pullreq.requestRepositoryName,
-                    context.loginAccount) && context.loginAccount
-                    .map { u =>
+                  pullreq.requestUserName,
+                  pullreq.requestRepositoryName,
+                  context.loginAccount) && context.loginAccount
+                  .map { u =>
                     !getProtectedBranchInfo(
                       pullreq.requestUserName,
                       pullreq.requestRepositoryName,
                       pullreq.requestBranch).needStatusCheck(u.userName)
                   }
-                    .getOrElse(false),
+                  .getOrElse(false),
                 hasMergePermission = hasMergePermission,
                 commitIdTo = pullreq.commitIdTo
               )
@@ -593,8 +593,8 @@ trait PullRequestsControllerBase extends ControllerBase {
                   (getCollaborators(originRepository.owner,
                                     originRepository.name) :::
                     (if (getAccountByUserName(originRepository.owner).get.isGroupAccount)
-                       Nil
-                     else List(originRepository.owner))).sorted,
+                     Nil
+                   else List(originRepository.owner))).sorted,
                   getMilestones(originRepository.owner, originRepository.name),
                   getLabels(originRepository.owner, originRepository.name)
                 )

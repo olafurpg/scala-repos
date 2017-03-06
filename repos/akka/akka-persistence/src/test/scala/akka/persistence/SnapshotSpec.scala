@@ -243,7 +243,7 @@ class SnapshotSpec
 
       expectMsgPF(
         hint = "" +
-            SnapshotOffer(SnapshotMetadata(`persistenceId`, 2, 0), null)) {
+          SnapshotOffer(SnapshotMetadata(`persistenceId`, 2, 0), null)) {
         case SnapshotOffer(md @ SnapshotMetadata(`persistenceId`, 2, _),
                            state) ⇒
           state should ===(List("a-1", "b-2").reverse)

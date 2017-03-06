@@ -60,14 +60,14 @@ object LabelledGenericTestsAux {
   val taplRecord =
     ('author ->> "Benjamin Pierce") ::
       ('title ->> "Types and Programming Languages") :: ('id ->> 262162091) ::
-        ('price ->> 44.11) :: HNil
+    ('price ->> 44.11) :: HNil
 
   val dpRecord =
     ('title ->> "Design Patterns") :: ('id ->> 201633612) ::
-      ('authors ->> Seq("Erich Gamma",
-                        "Richard Helm",
-                        "Ralph Johnson",
-                        "John Vlissides")) :: HNil
+    ('authors ->> Seq("Erich Gamma",
+                      "Richard Helm",
+                      "Ralph Johnson",
+                      "John Vlissides")) :: HNil
 
   type BookRec =
     Record.`'author -> String, 'title -> String, 'id -> Int, 'price -> Double`.T

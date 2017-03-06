@@ -443,7 +443,7 @@ private[spark] class MapOutputTrackerMaster(conf: SparkConf)
               val blockSize = status.getSizeForBlock(reducerId)
               if (blockSize > 0) {
                 locs(status.location) = locs.getOrElse(status.location, 0L) +
-                    blockSize
+                  blockSize
                 totalOutputSize += blockSize
               }
             }

@@ -727,7 +727,7 @@ class ScalaTestConfigurationProducer extends {
                   case SuccessResult(invoc, tName, middleName) =>
                     call = invoc
                     testName = tName + " " + middleName +
-                        (if (testName.isEmpty) "" else " ") + testName
+                      (if (testName.isEmpty) "" else " ") + testName
                   case WrongResult => return None
                   case _ => call = null
                 }

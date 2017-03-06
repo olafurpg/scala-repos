@@ -336,8 +336,8 @@ object Execution {
     def cleanCache: EvalCache = {
       val self = this
       new EvalCache {
-        override protected[EvalCache] val messageQueue: LinkedBlockingQueue[
-          EvalCache.FlowDefAction] = self.messageQueue
+        override protected[EvalCache] val messageQueue
+          : LinkedBlockingQueue[EvalCache.FlowDefAction] = self.messageQueue
         override def start(): Unit =
           sys.error("Invalid to start child EvalCache")
         override def finished(): Unit =

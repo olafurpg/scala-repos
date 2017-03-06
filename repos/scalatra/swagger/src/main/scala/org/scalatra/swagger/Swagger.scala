@@ -563,7 +563,7 @@ case class Model(id: String,
     val prop = properties.find(_._1 == property).get
     copy(
       properties = (property -> prop._2
-          .copy(required = required)) :: properties)
+        .copy(required = required)) :: properties)
   }
 }
 

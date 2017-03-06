@@ -342,7 +342,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     val canObserveTree =
       (interruptsEnabled && analyzer.lockedCount == 0 &&
         !context.bufferErrors // SI-7558 look away during exploratory typing in "silent mode"
-      )
+    )
     if (canObserveTree) {
       if (context.unit.exists && result.pos.isOpaqueRange &&
           (result.pos includes context.unit.targetPos)) {

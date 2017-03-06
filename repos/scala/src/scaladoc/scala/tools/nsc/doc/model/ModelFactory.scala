@@ -137,8 +137,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       else
         makeTemplate(sym.owner) ::
           (sym.allOverriddenSymbols map { inhSym =>
-            makeTemplate(inhSym.owner)
-          })
+          makeTemplate(inhSym.owner)
+        })
     def visibility = {
       if (sym.isPrivateLocal) PrivateInInstance()
       else if (sym.isProtectedLocal) ProtectedInInstance()
@@ -390,8 +390,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       if (subClassesCache == null) Nil else subClassesCache.toList
 
     /* Implicitly convertible class cache */
-    private var implicitlyConvertibleClassesCache: mutable.ListBuffer[
-      (DocTemplateImpl, ImplicitConversionImpl)] = null
+    private var implicitlyConvertibleClassesCache
+      : mutable.ListBuffer[(DocTemplateImpl, ImplicitConversionImpl)] = null
     def registerImplicitlyConvertibleClass(
         dtpl: DocTemplateImpl,
         conv: ImplicitConversionImpl): Unit = {
@@ -401,8 +401,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       implicitlyConvertibleClassesCache += ((dtpl, conv))
     }
 
-    def incomingImplicitlyConvertedClasses: List[(DocTemplateImpl,
-                                                  ImplicitConversionImpl)] =
+    def incomingImplicitlyConvertedClasses
+      : List[(DocTemplateImpl, ImplicitConversionImpl)] =
       if (implicitlyConvertibleClassesCache == null) List()
       else implicitlyConvertibleClassesCache.toList
 
@@ -465,20 +465,20 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
 
     var implicitsShadowing = Map[MemberEntity, ImplicitMemberShadowing]()
 
-    lazy val outgoingImplicitlyConvertedClasses: List[
-      (TemplateEntity, TypeEntity, ImplicitConversionImpl)] =
+    lazy val outgoingImplicitlyConvertedClasses
+      : List[(TemplateEntity, TypeEntity, ImplicitConversionImpl)] =
       conversions flatMap
         (conv =>
-           if (!implicitExcluded(conv.conversionQualifiedName))
-             conv.targetTypeComponents map {
-               case (template, tpe) =>
-                 template match {
-                   case d: DocTemplateImpl if (d != this) =>
-                     d.registerImplicitlyConvertibleClass(this, conv)
-                   case _ => // nothing
-                 }
-                 (template, tpe, conv)
-             } else List())
+          if (!implicitExcluded(conv.conversionQualifiedName))
+            conv.targetTypeComponents map {
+              case (template, tpe) =>
+                template match {
+                  case d: DocTemplateImpl if (d != this) =>
+                    d.registerImplicitlyConvertibleClass(this, conv)
+                  case _ => // nothing
+                }
+                (template, tpe, conv)
+            } else List())
 
     override def isDocTemplate = true
     private[this] lazy val companionSymbol =
@@ -529,8 +529,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     def groupSearch[T](extractor: Comment => Option[T]): Option[T] = {
       val comments =
         comment +: linearizationTemplates.collect {
-          case dtpl: DocTemplateImpl => dtpl.comment
-        }
+        case dtpl: DocTemplateImpl => dtpl.comment
+      }
       comments.flatten.map(extractor).flatten.headOption orElse {
         Option(inTpl) flatMap (_.groupSearch(extractor))
       }

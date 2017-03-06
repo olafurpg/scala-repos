@@ -36,16 +36,16 @@ class Decoder extends AbstractDecoder with StateMachine {
     state = AwaitingResponse
   }
 
-  private[this] val awaitingResponseContinue: Seq[ChannelBuffer] => Decoding = {
-    tokens =>
-      if (isEnd(tokens)) {
-        EmptyValueLines
-      } else if (isStats(tokens)) {
-        awaitStatsOrEnd(Seq(Tokens(tokens.map(ChannelBufferBuf.Owned(_)))))
-        NeedMoreData
-      } else {
-        Tokens(tokens.map(ChannelBufferBuf.Owned(_)))
-      }
+  private[this] val awaitingResponseContinue
+    : Seq[ChannelBuffer] => Decoding = { tokens =>
+    if (isEnd(tokens)) {
+      EmptyValueLines
+    } else if (isStats(tokens)) {
+      awaitStatsOrEnd(Seq(Tokens(tokens.map(ChannelBufferBuf.Owned(_)))))
+      NeedMoreData
+    } else {
+      Tokens(tokens.map(ChannelBufferBuf.Owned(_)))
+    }
   }
 
   def decode(ctx: ChannelHandlerContext,

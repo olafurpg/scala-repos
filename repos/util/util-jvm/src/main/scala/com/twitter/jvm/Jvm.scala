@@ -52,7 +52,7 @@ case class PoolState(numCollections: Long,
     numCollections = this.numCollections - other.numCollections,
     capacity = other.capacity,
     used = this.used + other.capacity - other.used + other.capacity *
-        (this.numCollections - other.numCollections - 1)
+      (this.numCollections - other.numCollections - 1)
   )
 
   override def toString =

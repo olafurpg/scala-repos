@@ -46,7 +46,7 @@ class EnsembleToggleButton extends EnsembleExample {
     selectedToggle.onChange(
       (_, oldValue, newValue) => {
         toggleLabel.text = "You selected : " +
-            newValue.asInstanceOf[JfxToggleBtn].getText
+          newValue.asInstanceOf[JfxToggleBtn].getText
       }
     )
   }

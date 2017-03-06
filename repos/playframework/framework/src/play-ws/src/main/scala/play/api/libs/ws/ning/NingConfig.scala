@@ -65,7 +65,8 @@ object NingWSClientConfigFactory {
 class NingAsyncHttpClientConfigBuilder(
     ningConfig: NingWSClientConfig = NingWSClientConfig()) {
 
-  protected val addCustomSettings: DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
+  protected val addCustomSettings
+    : DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
     identity
 
   /**

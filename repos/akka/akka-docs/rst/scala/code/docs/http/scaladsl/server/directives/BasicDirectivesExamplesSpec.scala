@@ -533,9 +533,9 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
   "0mapRouteResult" in {
     //#0mapRouteResult
     val rejectAll = // not particularly useful directive
-    mapRouteResult {
-      case _ => Rejected(List(AuthorizationFailedRejection))
-    }
+      mapRouteResult {
+        case _ => Rejected(List(AuthorizationFailedRejection))
+      }
     val route = rejectAll {
       complete("abc")
     }
@@ -550,9 +550,9 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     //#mapRouteResultPF
     case object MyCustomRejection extends Rejection
     val rejectRejections = // not particularly useful directive
-    mapRouteResultPF {
-      case Rejected(_) => Rejected(List(AuthorizationFailedRejection))
-    }
+      mapRouteResultPF {
+        case Rejected(_) => Rejected(List(AuthorizationFailedRejection))
+      }
     val route = rejectRejections {
       reject(MyCustomRejection)
     }
@@ -567,9 +567,10 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     //#mapRouteResultWithPF-0
     case object MyCustomRejection extends Rejection
     val rejectRejections = // not particularly useful directive
-    mapRouteResultWithPF {
-      case Rejected(_) => Future(Rejected(List(AuthorizationFailedRejection)))
-    }
+      mapRouteResultWithPF {
+        case Rejected(_) =>
+          Future(Rejected(List(AuthorizationFailedRejection)))
+      }
     val route = rejectRejections {
       reject(MyCustomRejection)
     }
@@ -584,13 +585,13 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     //#mapRouteResultWith-0
     case object MyCustomRejection extends Rejection
     val rejectRejections = // not particularly useful directive
-    mapRouteResultWith { res =>
-      res match {
-        case Rejected(_) =>
-          Future(Rejected(List(AuthorizationFailedRejection)))
-        case _ => Future(res)
+      mapRouteResultWith { res =>
+        res match {
+          case Rejected(_) =>
+            Future(Rejected(List(AuthorizationFailedRejection)))
+          case _ => Future(res)
+        }
       }
-    }
     val route = rejectRejections {
       reject(MyCustomRejection)
     }

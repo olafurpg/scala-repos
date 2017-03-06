@@ -29,8 +29,8 @@ object GzipEncoding extends PlaySpecification {
         implicit val mat = ActorMaterializer()(app.actorSystem)
 
         val filter = //#should-gzip
-        new GzipFilter(shouldGzip = (request, response) =>
-          response.body.contentType.exists(_.startsWith("text/html")))
+          new GzipFilter(shouldGzip = (request, response) =>
+            response.body.contentType.exists(_.startsWith("text/html")))
         //#should-gzip
 
         header(

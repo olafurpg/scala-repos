@@ -94,8 +94,8 @@ trait PersistentFSM[S <: FSMState, D, E]
     //Prevent StateChangeEvent persistence when staying in the same state, except when state defines a timeout
     if (nextState.notifies || nextState.timeout.nonEmpty) {
       eventsToPersist = eventsToPersist :+ StateChangeEvent(
-          nextState.stateName.identifier,
-          nextState.timeout)
+        nextState.stateName.identifier,
+        nextState.timeout)
     }
 
     if (eventsToPersist.isEmpty) {

@@ -316,7 +316,7 @@ private[ui] class StreamingPage(parent: StreamingTab)
     val numReceivers =
       listener.numInactiveReceivers + listener.numActiveReceivers
     val table = // scalastyle:off
-    <table id="stat-table" class="table table-bordered" style="width: auto">
+      <table id="stat-table" class="table table-bordered" style="width: auto">
       <thead>
         <tr>
           <th style="width: 160px;"></th>

@@ -137,8 +137,8 @@ private[hive] class HiveMetastoreCatalog(val client: HiveClient,
   }
 
   /** A cache of Spark SQL data source tables that have been accessed. */
-  protected[hive] val cachedDataSourceTables: LoadingCache[QualifiedTableName,
-                                                           LogicalPlan] = {
+  protected[hive] val cachedDataSourceTables
+    : LoadingCache[QualifiedTableName, LogicalPlan] = {
     val cacheLoader = new CacheLoader[QualifiedTableName, LogicalPlan]() {
       override def load(in: QualifiedTableName): LogicalPlan = {
         logDebug(s"Creating new cached data source for $in")

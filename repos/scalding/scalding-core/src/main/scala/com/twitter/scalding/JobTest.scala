@@ -151,7 +151,7 @@ class JobTest(cons: (Args) => Job) {
       op: Long => Unit) = {
     statsCallbacks +=
       ((stats: CascadingStats) =>
-         op(Stats.getCounterValue(counter, group)(stats)))
+        op(Stats.getCounterValue(counter, group)(stats)))
     this
   }
 

@@ -32,7 +32,7 @@ import scala.collection.JavaConversions._
   */
 @deprecated(
   message = "Deprecated in favor of Servlet 3.0 API's multipart features. " +
-      "Please use org.scalatra.servlet.FileUploadSupport instead.",
+    "Please use org.scalatra.servlet.FileUploadSupport instead.",
   since = "2.1.0")
 trait FileUploadSupport extends ServletBase {
   import org.scalatra.fileupload.FileUploadSupport._

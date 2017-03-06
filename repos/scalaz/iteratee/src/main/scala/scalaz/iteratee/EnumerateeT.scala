@@ -25,16 +25,13 @@ trait EnumerateeTFunctions {
     new EnumerateeT[O, I, F] {
       def apply[A] = {
         def loop = step andThen cont[O, F, StepT[I, F, A]]
-        def step: (Input[I] => IterateeT[I, F, A]) => (Input[O] => IterateeT[
-                                                         O,
-                                                         F,
-                                                         StepT[I, F, A]]) = {
-          k => in =>
-            in(
-              el = e => k(elInput(f(e))) >>== doneOr(loop),
-              empty = cont(step(k)),
-              eof = done(scont(k), in)
-            )
+        def step: (Input[I] => IterateeT[I, F, A]) => (
+            Input[O] => IterateeT[O, F, StepT[I, F, A]]) = { k => in =>
+          in(
+            el = e => k(elInput(f(e))) >>== doneOr(loop),
+            empty = cont(step(k)),
+            eof = done(scont(k), in)
+          )
         }
 
         doneOr(loop)
@@ -70,19 +67,16 @@ trait EnumerateeTFunctions {
     new EnumerateeT[O, I, F] {
       def apply[A] = {
         def loop = step andThen cont[O, F, StepT[I, F, A]]
-        def step: (Input[I] => IterateeT[I, F, A]) => (Input[O] => IterateeT[
-                                                         O,
-                                                         F,
-                                                         StepT[I, F, A]]) = {
-          k => in =>
-            in(
-              el = e =>
-                if (pf.isDefinedAt(e))
-                  k(elInput(pf(e))) >>== doneOr(loop)
-                else cont(step(k)),
-              empty = cont(step(k)),
-              eof = done(scont(k), in)
-            )
+        def step: (Input[I] => IterateeT[I, F, A]) => (
+            Input[O] => IterateeT[O, F, StepT[I, F, A]]) = { k => in =>
+          in(
+            el = e =>
+              if (pf.isDefinedAt(e))
+                k(elInput(pf(e))) >>== doneOr(loop)
+              else cont(step(k)),
+            empty = cont(step(k)),
+            eof = done(scont(k), in)
+          )
         }
 
         doneOr(loop)
@@ -93,18 +87,15 @@ trait EnumerateeTFunctions {
     new EnumerateeT[E, E, F] {
       def apply[A] = {
         def loop = step andThen cont[E, F, StepT[E, F, A]]
-        def step: (Input[E] => IterateeT[E, F, A]) => (Input[E] => IterateeT[
-                                                         E,
-                                                         F,
-                                                         StepT[E, F, A]]) = {
-          k => in =>
-            in(
-              el = e =>
-                if (p(e)) k(in) >>== doneOr(loop)
-                else cont(step(k)),
-              empty = cont(step(k)),
-              eof = done(scont(k), in)
-            )
+        def step: (Input[E] => IterateeT[E, F, A]) => (
+            Input[E] => IterateeT[E, F, StepT[E, F, A]]) = { k => in =>
+          in(
+            el = e =>
+              if (p(e)) k(in) >>== doneOr(loop)
+              else cont(step(k)),
+            empty = cont(step(k)),
+            eof = done(scont(k), in)
+          )
         }
 
         doneOr(loop)

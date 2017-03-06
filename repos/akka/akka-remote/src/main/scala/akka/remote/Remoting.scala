@@ -139,9 +139,8 @@ private[remote] class Remoting(_system: ExtendedActorSystem,
     extends RemoteTransport(_system, _provider) {
 
   @volatile private var endpointManager: Option[ActorRef] = None
-  @volatile private var transportMapping: Map[String,
-                                              Set[(AkkaProtocolTransport,
-                                                   Address)]] = _
+  @volatile private var transportMapping
+    : Map[String, Set[(AkkaProtocolTransport, Address)]] = _
   // This is effectively a write-once variable similar to a lazy val. The reason for not using a lazy val is exception
   // handling.
   @volatile var addresses: Set[Address] = _
@@ -211,7 +210,8 @@ private[remote] class Remoting(_system: ExtendedActorSystem,
         endpointManager = Some(manager)
 
         try {
-          val addressesPromise: Promise[Seq[(AkkaProtocolTransport, Address)]] =
+          val addressesPromise
+            : Promise[Seq[(AkkaProtocolTransport, Address)]] =
             Promise()
           manager ! Listen(addressesPromise)
 
@@ -901,9 +901,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
     }
   }
 
-  private def listens: Future[Seq[(AkkaProtocolTransport,
-                                   Address,
-                                   Promise[AssociationEventListener])]] = {
+  private def listens: Future[Seq[
+    (AkkaProtocolTransport, Address, Promise[AssociationEventListener])]] = {
     /*
      * Constructs chains of adapters on top of each driver as given in configuration. The resulting structure looks
      * like the following:

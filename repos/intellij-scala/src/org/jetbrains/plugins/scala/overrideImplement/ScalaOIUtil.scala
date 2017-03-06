@@ -82,9 +82,9 @@ object ScalaOIUtil {
                               isImplement: Boolean,
                               methodName: String = null) {
     val elem = file.findElementAt(editor.getCaretModel.getOffset - 1)
-    val clazz = PsiTreeUtil.getParentOfType(
-      elem,
-      classOf[ScTemplateDefinition], /*strict = */ false)
+    val clazz = PsiTreeUtil.getParentOfType(elem,
+                                            classOf[ScTemplateDefinition],
+                                            /*strict = */ false)
     if (clazz == null) return
 
     val classMembers =

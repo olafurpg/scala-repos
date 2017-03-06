@@ -172,9 +172,9 @@ object Finagle extends Build {
       id = "finagle",
       base = file("."),
       settings = Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings ++ Seq(
-          unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-            inAnyProject -- inProjects(finagleExample)
-        )
+        unidocProjectFilter in (ScalaUnidoc, unidoc) :=
+          inAnyProject -- inProjects(finagleExample)
+      )
     ) aggregate
       (// Core, support.
       finagleCore, finagleStats, finagleNetty4, finagleZipkin,
@@ -186,11 +186,11 @@ object Finagle extends Build {
       finagleThriftMux, finagleMySQL, finagleSpdy, finagleRedis,
       finagleHttpNetty4
 
-    // finagleBenchmark
+  // finagleBenchmark
 
-    // Removing projects with specs tests and their dependencies
-    // finagleExample
-    )
+  // Removing projects with specs tests and their dependencies
+  // finagleExample
+  )
 
   lazy val finagleIntegration = Project(
     id = "finagle-integration",
@@ -611,17 +611,17 @@ object Finagle extends Build {
     id = "finagle-doc",
     base = file("doc"),
     settings = Defaults.coreDefaultSettings ++ site.settings ++ site
-        .sphinxSupport() ++ sharedSettings ++ Seq(
-        scalacOptions in doc <++= version.map(v =>
-          Seq("-doc-title", "Finagle", "-doc-version", v)),
-        includeFilter in Sphinx :=
-          ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
-        // Workaround for sbt bug: Without a testGrouping for all test configs,
-        // the wrong tests are run
-        testGrouping <<= definedTests in Test map partitionTests,
-        testGrouping in DocTest <<=
-          definedTests in DocTest map partitionTests
-      )
+      .sphinxSupport() ++ sharedSettings ++ Seq(
+      scalacOptions in doc <++= version.map(v =>
+        Seq("-doc-title", "Finagle", "-doc-version", v)),
+      includeFilter in Sphinx :=
+        ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
+      // Workaround for sbt bug: Without a testGrouping for all test configs,
+      // the wrong tests are run
+      testGrouping <<= definedTests in Test map partitionTests,
+      testGrouping in DocTest <<=
+        definedTests in DocTest map partitionTests
+    )
   ).configs(DocTest)
     .settings(inConfig(DocTest)(Defaults.testSettings): _*)
     .settings(

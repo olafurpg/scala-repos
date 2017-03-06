@@ -89,7 +89,7 @@ object StepBuilder {
                 .copy(
                   nag = ad.nag.symbol.some,
                   comments = ad
-                      .makeComment(false, true) :: after.comments,
+                    .makeComment(false, true) :: after.comments,
                   variations =
                     if (ad.info.variation.isEmpty)
                       after.variations

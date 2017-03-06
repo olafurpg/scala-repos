@@ -110,12 +110,11 @@ class DslConsistencySpec extends WordSpec with Matchers {
 
     ("Source" -> List[Class[_]](sSourceClass, jSourceClass)) ::
       ("SubSource" -> List[Class[_]](sSubSourceClass, jSubSourceClass)) ::
-        ("Flow" -> List[Class[_]](sFlowClass, jFlowClass)) ::
-          ("SubFlow" -> List[Class[_]](sSubFlowClass, jSubFlowClass)) ::
-            ("Sink" -> List[Class[_]](sSinkClass, jSinkClass)) ::
-              ("RunanbleFlow" -> List[Class[_]](
-                sRunnableGraphClass,
-                jRunnableGraphClass)) :: Nil foreach {
+      ("Flow" -> List[Class[_]](sFlowClass, jFlowClass)) ::
+      ("SubFlow" -> List[Class[_]](sSubFlowClass, jSubFlowClass)) ::
+      ("Sink" -> List[Class[_]](sSinkClass, jSinkClass)) ::
+      ("RunanbleFlow" -> List[Class[_]](sRunnableGraphClass,
+                                        jRunnableGraphClass)) :: Nil foreach {
       case (element, classes) ⇒
         s"provide same $element transforming operators" in {
           val allOps = (for {

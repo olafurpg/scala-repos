@@ -113,8 +113,8 @@ trait JQueryArtifacts extends JSArtifacts {
                      path: String => JsExp): String =
     (("url : " + path(server).toJsCmd) :: "data : " + info.data.toJsCmd ::
       ("type : " + info.action.encJs) ::
-        ("dataType : " + info.dataType.encJs) :: "timeout : " +
-          info.timeout :: "cache : " + info.cache :: Nil) ++ info.successFunc
+      ("dataType : " + info.dataType.encJs) :: "timeout : " +
+      info.timeout :: "cache : " + info.cache :: Nil) ++ info.successFunc
       .map("success : " + _)
       .toList ++ info.failFunc.map("error : " + _).toList mkString
       ("{ ", ", ", " }")

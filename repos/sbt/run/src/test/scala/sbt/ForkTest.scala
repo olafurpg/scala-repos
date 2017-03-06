@@ -25,7 +25,7 @@ object ForkTest extends Properties("Fork") {
 
   lazy val requiredEntries =
     IO.classLocationFile[scala.Option[_]] :: IO
-      .classLocationFile[sbt.exit.type] :: Nil
+    .classLocationFile[sbt.exit.type] :: Nil
   lazy val mainAndArgs = "sbt.exit" :: "0" :: Nil
 
   property("Arbitrary length classpath successfully passed.") =
